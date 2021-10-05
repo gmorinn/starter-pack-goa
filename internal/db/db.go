@@ -34,6 +34,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getBooksStmt, err = db.PrepareContext(ctx, getBooks); err != nil {
 		return nil, fmt.Errorf("error preparing query GetBooks: %w", err)
 	}
+	if q.updateBookStmt, err = db.PrepareContext(ctx, updateBook); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateBook: %w", err)
+	}
 	return &q, nil
 }
 
@@ -57,6 +60,11 @@ func (q *Queries) Close() error {
 	if q.getBooksStmt != nil {
 		if cerr := q.getBooksStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getBooksStmt: %w", cerr)
+		}
+	}
+	if q.updateBookStmt != nil {
+		if cerr := q.updateBookStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateBookStmt: %w", cerr)
 		}
 	}
 	return err
@@ -102,6 +110,7 @@ type Queries struct {
 	deleteBookStmt *sql.Stmt
 	getBookStmt    *sql.Stmt
 	getBooksStmt   *sql.Stmt
+	updateBookStmt *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
@@ -112,5 +121,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteBookStmt: q.deleteBookStmt,
 		getBookStmt:    q.getBookStmt,
 		getBooksStmt:   q.getBooksStmt,
+		updateBookStmt: q.updateBookStmt,
 	}
 }

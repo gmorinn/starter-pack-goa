@@ -28,6 +28,8 @@ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea h1:CyhwejzVGvZ3Q2PSbQ4NRRYn+ZWv5eS1vlaEusT+bAI=
 github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea/go.mod h1:eNr558nEUjP8acGw8FFjTeWvSgU1stO7FAO6eknhHe4=
+goa.design/goa v2.2.5+incompatible h1:mjAtiy7ZdZIkj974hpFxCR6bL69qprfV00Veu3Vybts=
+goa.design/goa v2.2.5+incompatible/go.mod h1:NnzBwdNktihbNek+pPiFMQP9PPFsUt8MMPPyo9opDSo=
 goa.design/goa/v3 v3.5.2 h1:8kC5fVwUOl4RVV7pArW0zGTG4Zm4vC92sX7BIOZTYbA=
 goa.design/goa/v3 v3.5.2/go.mod h1:tCVpXqn31bQkKvpqeJCE1qnGx/t+vd9uDUNBP950Hc0=
 golang.org/x/mod v0.5.0 h1:UG21uOlmZabA4fW5i7ZX6bjw1xELEGg/ZLgZq9auk/Q=

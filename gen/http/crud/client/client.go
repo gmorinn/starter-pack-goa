@@ -21,6 +21,10 @@ type Client struct {
 	// endpoint.
 	GetBookDoer goahttp.Doer
 
+	// UpdateBook Doer is the HTTP client used to make requests to the updateBook
+	// endpoint.
+	UpdateBookDoer goahttp.Doer
+
 	// GetAllBooks Doer is the HTTP client used to make requests to the getAllBooks
 	// endpoint.
 	GetAllBooksDoer goahttp.Doer
@@ -54,6 +58,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		GetBookDoer:         doer,
+		UpdateBookDoer:      doer,
 		GetAllBooksDoer:     doer,
 		DeleteBookDoer:      doer,
 		CreateBookDoer:      doer,
@@ -79,6 +84,30 @@ func (c *Client) GetBook() goa.Endpoint {
 		resp, err := c.GetBookDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("crud", "getBook", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// UpdateBook returns an endpoint that makes HTTP requests to the crud service
+// updateBook server.
+func (c *Client) UpdateBook() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUpdateBookRequest(c.encoder)
+		decodeResponse = DecodeUpdateBookResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildUpdateBookRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UpdateBookDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("crud", "updateBook", err)
 		}
 		return decodeResponse(resp)
 	}

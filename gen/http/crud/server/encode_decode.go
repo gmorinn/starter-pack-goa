@@ -21,7 +21,7 @@ import (
 // getBook endpoint.
 func EncodeGetBookResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res, _ := v.(*crud.BookResponse)
+		res, _ := v.(*crud.GetBookResult)
 		enc := encoder(ctx, w)
 		body := NewGetBookResponseBody(res)
 		w.WriteHeader(http.StatusOK)
@@ -34,11 +34,17 @@ func EncodeGetBookResponse(encoder func(context.Context, http.ResponseWriter) go
 func DecodeGetBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id string
+			id  string
+			err error
 
 			params = mux.Vars(r)
 		)
 		id = params["id"]
+		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
+
+		if err != nil {
+			return nil, err
+		}
 		payload := NewGetBookPayload(id)
 
 		return payload, nil
@@ -55,18 +61,6 @@ func EncodeGetBookError(encoder func(context.Context, http.ResponseWriter) goaht
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "cannot_convert_string_to_uuid":
-			res := v.(*crud.CannotConvertStringToUUID)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewGetBookCannotConvertStringToUUIDResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
 		case "id_doesnt_exist":
 			res := v.(*crud.IDDoesntExist)
 			enc := encoder(ctx, w)
@@ -77,7 +71,108 @@ func EncodeGetBookError(encoder func(context.Context, http.ResponseWriter) goaht
 				body = NewGetBookIDDoesntExistResponseBody(res)
 			}
 			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "unknown_error":
+			res := v.(*crud.UnknownError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetBookUnknownErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeUpdateBookResponse returns an encoder for responses returned by the
+// crud updateBook endpoint.
+func EncodeUpdateBookResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*crud.UpdateBookResult)
+		enc := encoder(ctx, w)
+		body := NewUpdateBookResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeUpdateBookRequest returns a decoder for requests sent to the crud
+// updateBook endpoint.
+func DecodeUpdateBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body UpdateBookRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateUpdateBookRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+
+		var (
+			id string
+
+			params = mux.Vars(r)
+		)
+		id = params["id"]
+		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
+
+		if err != nil {
+			return nil, err
+		}
+		payload := NewUpdateBookPayload(&body, id)
+
+		return payload, nil
+	}
+}
+
+// EncodeUpdateBookError returns an encoder for errors returned by the
+// updateBook crud endpoint.
+func EncodeUpdateBookError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "id_doesnt_exist":
+			res := v.(*crud.IDDoesntExist)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUpdateBookIDDoesntExistResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "unknown_error":
+			res := v.(*crud.UnknownError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUpdateBookUnknownErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -89,7 +184,7 @@ func EncodeGetBookError(encoder func(context.Context, http.ResponseWriter) goaht
 // crud getAllBooks endpoint.
 func EncodeGetAllBooksResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res, _ := v.([]*crud.BookResponse)
+		res, _ := v.(*crud.GetAllBooksResult)
 		enc := encoder(ctx, w)
 		body := NewGetAllBooksResponseBody(res)
 		w.WriteHeader(http.StatusOK)
@@ -97,12 +192,43 @@ func EncodeGetAllBooksResponse(encoder func(context.Context, http.ResponseWriter
 	}
 }
 
+// EncodeGetAllBooksError returns an encoder for errors returned by the
+// getAllBooks crud endpoint.
+func EncodeGetAllBooksError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unknown_error":
+			res := v.(*crud.UnknownError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetAllBooksUnknownErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // EncodeDeleteBookResponse returns an encoder for responses returned by the
 // crud deleteBook endpoint.
 func EncodeDeleteBookResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*crud.DeleteBookResult)
+		enc := encoder(ctx, w)
+		body := NewDeleteBookResponseBody(res)
 		w.WriteHeader(http.StatusOK)
-		return nil
+		return enc.Encode(body)
 	}
 }
 
@@ -111,14 +237,60 @@ func EncodeDeleteBookResponse(encoder func(context.Context, http.ResponseWriter)
 func DecodeDeleteBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id string
+			id  string
+			err error
 
 			params = mux.Vars(r)
 		)
 		id = params["id"]
-		payload := id
+		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
+
+		if err != nil {
+			return nil, err
+		}
+		payload := NewDeleteBookPayload(id)
 
 		return payload, nil
+	}
+}
+
+// EncodeDeleteBookError returns an encoder for errors returned by the
+// deleteBook crud endpoint.
+func EncodeDeleteBookError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "id_doesnt_exist":
+			res := v.(*crud.IDDoesntExist)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDeleteBookIDDoesntExistResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "unknown_error":
+			res := v.(*crud.UnknownError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDeleteBookUnknownErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
 	}
 }
 
@@ -126,7 +298,7 @@ func DecodeDeleteBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 // crud createBook endpoint.
 func EncodeCreateBookResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res, _ := v.(*crud.BookResponse)
+		res, _ := v.(*crud.CreateBookResult)
 		enc := encoder(ctx, w)
 		body := NewCreateBookResponseBody(res)
 		w.WriteHeader(http.StatusCreated)
@@ -149,16 +321,48 @@ func DecodeCreateBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 			}
 			return nil, goa.DecodePayloadError(err.Error())
 		}
+		err = ValidateCreateBookRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
 		payload := NewCreateBookPayload(&body)
 
 		return payload, nil
 	}
 }
 
-// marshalCrudBookResponseToBookResponseResponse builds a value of type
-// *BookResponseResponse from a value of type *crud.BookResponse.
-func marshalCrudBookResponseToBookResponseResponse(v *crud.BookResponse) *BookResponseResponse {
-	res := &BookResponseResponse{
+// EncodeCreateBookError returns an encoder for errors returned by the
+// createBook crud endpoint.
+func EncodeCreateBookError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unknown_error":
+			res := v.(*crud.UnknownError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewCreateBookUnknownErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// marshalCrudBookResponseToBookResponseResponseBody builds a value of type
+// *BookResponseResponseBody from a value of type *crud.BookResponse.
+func marshalCrudBookResponseToBookResponseResponseBody(v *crud.BookResponse) *BookResponseResponseBody {
+	res := &BookResponseResponseBody{
 		ID:    v.ID,
 		Name:  v.Name,
 		Price: v.Price,

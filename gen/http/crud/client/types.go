@@ -13,41 +13,56 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// UpdateBookRequestBody is the type of the "crud" service "updateBook"
+// endpoint HTTP request body.
+type UpdateBookRequestBody struct {
+	Name  string  `form:"name" json:"name" xml:"name"`
+	Price float64 `form:"price" json:"price" xml:"price"`
+}
+
 // CreateBookRequestBody is the type of the "crud" service "createBook"
 // endpoint HTTP request body.
 type CreateBookRequestBody struct {
-	Name  *string  `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Price *float64 `form:"price,omitempty" json:"price,omitempty" xml:"price,omitempty"`
+	Name  string  `form:"name" json:"name" xml:"name"`
+	Price float64 `form:"price" json:"price" xml:"price"`
 }
 
 // GetBookResponseBody is the type of the "crud" service "getBook" endpoint
 // HTTP response body.
 type GetBookResponseBody struct {
-	ID    *string  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name  *string  `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Price *float64 `form:"price,omitempty" json:"price,omitempty" xml:"price,omitempty"`
+	ID      *string  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name    *string  `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Price   *float64 `form:"price,omitempty" json:"price,omitempty" xml:"price,omitempty"`
+	Success *bool    `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// UpdateBookResponseBody is the type of the "crud" service "updateBook"
+// endpoint HTTP response body.
+type UpdateBookResponseBody struct {
+	ID      *string  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name    *string  `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Price   *float64 `form:"price,omitempty" json:"price,omitempty" xml:"price,omitempty"`
+	Success *bool    `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // GetAllBooksResponseBody is the type of the "crud" service "getAllBooks"
 // endpoint HTTP response body.
-type GetAllBooksResponseBody []*BookResponseResponse
+type GetAllBooksResponseBody struct {
+	Books   []*BookResponseResponseBody `form:"books,omitempty" json:"books,omitempty" xml:"books,omitempty"`
+	Success *bool                       `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// DeleteBookResponseBody is the type of the "crud" service "deleteBook"
+// endpoint HTTP response body.
+type DeleteBookResponseBody struct {
+	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
 
 // CreateBookResponseBody is the type of the "crud" service "createBook"
 // endpoint HTTP response body.
 type CreateBookResponseBody struct {
-	ID    *string  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name  *string  `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Price *float64 `form:"price,omitempty" json:"price,omitempty" xml:"price,omitempty"`
-}
-
-// GetBookCannotConvertStringToUUIDResponseBody is the type of the "crud"
-// service "getBook" endpoint HTTP response body for the
-// "cannot_convert_string_to_uuid" error.
-type GetBookCannotConvertStringToUUIDResponseBody struct {
-	// Returning error
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	// Wrong Id
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Book    *BookResponseResponseBody `form:"book,omitempty" json:"book,omitempty" xml:"book,omitempty"`
+	Success *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // GetBookIDDoesntExistResponseBody is the type of the "crud" service "getBook"
@@ -56,14 +71,85 @@ type GetBookIDDoesntExistResponseBody struct {
 	// Returning error
 	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
 	// Wrong Id
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ID      *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
-// BookResponseResponse is used to define fields on response body types.
-type BookResponseResponse struct {
+// GetBookUnknownErrorResponseBody is the type of the "crud" service "getBook"
+// endpoint HTTP response body for the "unknown_error" error.
+type GetBookUnknownErrorResponseBody struct {
+	// Returning error
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// UpdateBookIDDoesntExistResponseBody is the type of the "crud" service
+// "updateBook" endpoint HTTP response body for the "id_doesnt_exist" error.
+type UpdateBookIDDoesntExistResponseBody struct {
+	// Returning error
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Wrong Id
+	ID      *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// UpdateBookUnknownErrorResponseBody is the type of the "crud" service
+// "updateBook" endpoint HTTP response body for the "unknown_error" error.
+type UpdateBookUnknownErrorResponseBody struct {
+	// Returning error
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// GetAllBooksUnknownErrorResponseBody is the type of the "crud" service
+// "getAllBooks" endpoint HTTP response body for the "unknown_error" error.
+type GetAllBooksUnknownErrorResponseBody struct {
+	// Returning error
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// DeleteBookIDDoesntExistResponseBody is the type of the "crud" service
+// "deleteBook" endpoint HTTP response body for the "id_doesnt_exist" error.
+type DeleteBookIDDoesntExistResponseBody struct {
+	// Returning error
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Wrong Id
+	ID      *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// DeleteBookUnknownErrorResponseBody is the type of the "crud" service
+// "deleteBook" endpoint HTTP response body for the "unknown_error" error.
+type DeleteBookUnknownErrorResponseBody struct {
+	// Returning error
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// CreateBookUnknownErrorResponseBody is the type of the "crud" service
+// "createBook" endpoint HTTP response body for the "unknown_error" error.
+type CreateBookUnknownErrorResponseBody struct {
+	// Returning error
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// BookResponseResponseBody is used to define fields on response body types.
+type BookResponseResponseBody struct {
 	ID    *string  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Name  *string  `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	Price *float64 `form:"price,omitempty" json:"price,omitempty" xml:"price,omitempty"`
+}
+
+// NewUpdateBookRequestBody builds the HTTP request body from the payload of
+// the "updateBook" endpoint of the "crud" service.
+func NewUpdateBookRequestBody(p *crud.UpdateBookPayload) *UpdateBookRequestBody {
+	body := &UpdateBookRequestBody{
+		Name:  p.Name,
+		Price: p.Price,
+	}
+	return body
 }
 
 // NewCreateBookRequestBody builds the HTTP request body from the payload of
@@ -76,24 +162,14 @@ func NewCreateBookRequestBody(p *crud.CreateBookPayload) *CreateBookRequestBody 
 	return body
 }
 
-// NewGetBookBookResponseOK builds a "crud" service "getBook" endpoint result
-// from a HTTP "OK" response.
-func NewGetBookBookResponseOK(body *GetBookResponseBody) *crud.BookResponse {
-	v := &crud.BookResponse{
-		ID:    body.ID,
-		Name:  body.Name,
-		Price: body.Price,
-	}
-
-	return v
-}
-
-// NewGetBookCannotConvertStringToUUID builds a crud service getBook endpoint
-// cannot_convert_string_to_uuid error.
-func NewGetBookCannotConvertStringToUUID(body *GetBookCannotConvertStringToUUIDResponseBody) *crud.CannotConvertStringToUUID {
-	v := &crud.CannotConvertStringToUUID{
-		Message: *body.Message,
+// NewGetBookResultOK builds a "crud" service "getBook" endpoint result from a
+// HTTP "OK" response.
+func NewGetBookResultOK(body *GetBookResponseBody) *crud.GetBookResult {
+	v := &crud.GetBookResult{
 		ID:      *body.ID,
+		Name:    *body.Name,
+		Price:   *body.Price,
+		Success: *body.Success,
 	}
 
 	return v
@@ -105,42 +181,216 @@ func NewGetBookIDDoesntExist(body *GetBookIDDoesntExistResponseBody) *crud.IDDoe
 	v := &crud.IDDoesntExist{
 		Message: *body.Message,
 		ID:      *body.ID,
+		Success: *body.Success,
 	}
 
 	return v
 }
 
-// NewGetAllBooksBookResponseOK builds a "crud" service "getAllBooks" endpoint
-// result from a HTTP "OK" response.
-func NewGetAllBooksBookResponseOK(body []*BookResponseResponse) []*crud.BookResponse {
-	v := make([]*crud.BookResponse, len(body))
-	for i, val := range body {
-		v[i] = unmarshalBookResponseResponseToCrudBookResponse(val)
+// NewGetBookUnknownError builds a crud service getBook endpoint unknown_error
+// error.
+func NewGetBookUnknownError(body *GetBookUnknownErrorResponseBody) *crud.UnknownError {
+	v := &crud.UnknownError{
+		Message: *body.Message,
+		Success: *body.Success,
 	}
 
 	return v
 }
 
-// NewCreateBookBookResponseCreated builds a "crud" service "createBook"
-// endpoint result from a HTTP "Created" response.
-func NewCreateBookBookResponseCreated(body *CreateBookResponseBody) *crud.BookResponse {
-	v := &crud.BookResponse{
-		ID:    body.ID,
-		Name:  body.Name,
-		Price: body.Price,
+// NewUpdateBookResultOK builds a "crud" service "updateBook" endpoint result
+// from a HTTP "OK" response.
+func NewUpdateBookResultOK(body *UpdateBookResponseBody) *crud.UpdateBookResult {
+	v := &crud.UpdateBookResult{
+		ID:      *body.ID,
+		Name:    *body.Name,
+		Price:   *body.Price,
+		Success: *body.Success,
 	}
 
 	return v
 }
 
-// ValidateGetBookCannotConvertStringToUUIDResponseBody runs the validations
-// defined on getBook_cannot_convert_string_to_uuid_response_body
-func ValidateGetBookCannotConvertStringToUUIDResponseBody(body *GetBookCannotConvertStringToUUIDResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+// NewUpdateBookIDDoesntExist builds a crud service updateBook endpoint
+// id_doesnt_exist error.
+func NewUpdateBookIDDoesntExist(body *UpdateBookIDDoesntExistResponseBody) *crud.IDDoesntExist {
+	v := &crud.IDDoesntExist{
+		Message: *body.Message,
+		ID:      *body.ID,
+		Success: *body.Success,
 	}
+
+	return v
+}
+
+// NewUpdateBookUnknownError builds a crud service updateBook endpoint
+// unknown_error error.
+func NewUpdateBookUnknownError(body *UpdateBookUnknownErrorResponseBody) *crud.UnknownError {
+	v := &crud.UnknownError{
+		Message: *body.Message,
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewGetAllBooksResultOK builds a "crud" service "getAllBooks" endpoint result
+// from a HTTP "OK" response.
+func NewGetAllBooksResultOK(body *GetAllBooksResponseBody) *crud.GetAllBooksResult {
+	v := &crud.GetAllBooksResult{
+		Success: *body.Success,
+	}
+	v.Books = make([]*crud.BookResponse, len(body.Books))
+	for i, val := range body.Books {
+		v.Books[i] = unmarshalBookResponseResponseBodyToCrudBookResponse(val)
+	}
+
+	return v
+}
+
+// NewGetAllBooksUnknownError builds a crud service getAllBooks endpoint
+// unknown_error error.
+func NewGetAllBooksUnknownError(body *GetAllBooksUnknownErrorResponseBody) *crud.UnknownError {
+	v := &crud.UnknownError{
+		Message: *body.Message,
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewDeleteBookResultOK builds a "crud" service "deleteBook" endpoint result
+// from a HTTP "OK" response.
+func NewDeleteBookResultOK(body *DeleteBookResponseBody) *crud.DeleteBookResult {
+	v := &crud.DeleteBookResult{
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewDeleteBookIDDoesntExist builds a crud service deleteBook endpoint
+// id_doesnt_exist error.
+func NewDeleteBookIDDoesntExist(body *DeleteBookIDDoesntExistResponseBody) *crud.IDDoesntExist {
+	v := &crud.IDDoesntExist{
+		Message: *body.Message,
+		ID:      *body.ID,
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewDeleteBookUnknownError builds a crud service deleteBook endpoint
+// unknown_error error.
+func NewDeleteBookUnknownError(body *DeleteBookUnknownErrorResponseBody) *crud.UnknownError {
+	v := &crud.UnknownError{
+		Message: *body.Message,
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewCreateBookResultCreated builds a "crud" service "createBook" endpoint
+// result from a HTTP "Created" response.
+func NewCreateBookResultCreated(body *CreateBookResponseBody) *crud.CreateBookResult {
+	v := &crud.CreateBookResult{
+		Success: *body.Success,
+	}
+	v.Book = unmarshalBookResponseResponseBodyToCrudBookResponse(body.Book)
+
+	return v
+}
+
+// NewCreateBookUnknownError builds a crud service createBook endpoint
+// unknown_error error.
+func NewCreateBookUnknownError(body *CreateBookUnknownErrorResponseBody) *crud.UnknownError {
+	v := &crud.UnknownError{
+		Message: *body.Message,
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// ValidateGetBookResponseBody runs the validations defined on
+// GetBookResponseBody
+func ValidateGetBookResponseBody(body *GetBookResponseBody) (err error) {
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Price == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("price", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateUpdateBookResponseBody runs the validations defined on
+// UpdateBookResponseBody
+func ValidateUpdateBookResponseBody(body *UpdateBookResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Price == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("price", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateGetAllBooksResponseBody runs the validations defined on
+// GetAllBooksResponseBody
+func ValidateGetAllBooksResponseBody(body *GetAllBooksResponseBody) (err error) {
+	if body.Books == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("books", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	for _, e := range body.Books {
+		if e != nil {
+			if err2 := ValidateBookResponseResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateDeleteBookResponseBody runs the validations defined on
+// DeleteBookResponseBody
+func ValidateDeleteBookResponseBody(body *DeleteBookResponseBody) (err error) {
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateCreateBookResponseBody runs the validations defined on
+// CreateBookResponseBody
+func ValidateCreateBookResponseBody(body *CreateBookResponseBody) (err error) {
+	if body.Book == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("book", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.Book != nil {
+		if err2 := ValidateBookResponseResponseBody(body.Book); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }
@@ -153,6 +403,117 @@ func ValidateGetBookIDDoesntExistResponseBody(body *GetBookIDDoesntExistResponse
 	}
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateGetBookUnknownErrorResponseBody runs the validations defined on
+// getBook_unknown_error_response_body
+func ValidateGetBookUnknownErrorResponseBody(body *GetBookUnknownErrorResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateUpdateBookIDDoesntExistResponseBody runs the validations defined on
+// updateBook_id_doesnt_exist_response_body
+func ValidateUpdateBookIDDoesntExistResponseBody(body *UpdateBookIDDoesntExistResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateUpdateBookUnknownErrorResponseBody runs the validations defined on
+// updateBook_unknown_error_response_body
+func ValidateUpdateBookUnknownErrorResponseBody(body *UpdateBookUnknownErrorResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateGetAllBooksUnknownErrorResponseBody runs the validations defined on
+// getAllBooks_unknown_error_response_body
+func ValidateGetAllBooksUnknownErrorResponseBody(body *GetAllBooksUnknownErrorResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateDeleteBookIDDoesntExistResponseBody runs the validations defined on
+// deleteBook_id_doesnt_exist_response_body
+func ValidateDeleteBookIDDoesntExistResponseBody(body *DeleteBookIDDoesntExistResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateDeleteBookUnknownErrorResponseBody runs the validations defined on
+// deleteBook_unknown_error_response_body
+func ValidateDeleteBookUnknownErrorResponseBody(body *DeleteBookUnknownErrorResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateCreateBookUnknownErrorResponseBody runs the validations defined on
+// createBook_unknown_error_response_body
+func ValidateCreateBookUnknownErrorResponseBody(body *CreateBookUnknownErrorResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateBookResponseResponseBody runs the validations defined on
+// BookResponseResponseBody
+func ValidateBookResponseResponseBody(body *BookResponseResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.Price == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("price", "body"))
+	}
+	if body.ID != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.id", *body.ID, goa.FormatUUID))
 	}
 	return
 }

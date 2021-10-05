@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/joho/godotenv"
-	"github.com/kataras/golog"
 )
 
 // API represent api
@@ -56,7 +55,7 @@ func getenvInt(key string) (int, error) {
 	s := os.Getenv(key)
 	v, err := strconv.Atoi(s)
 	if err != nil {
-		golog.Error("Env ", key, " : ", err.Error())
+		log.Println("Env ", key, " : ", err.Error())
 		return 0, err
 	}
 	return v, nil
@@ -66,7 +65,7 @@ func getenvBool(key string) (bool, error) {
 	s := os.Getenv(key)
 	v, err := strconv.ParseBool(s)
 	if err != nil {
-		golog.Error("Env ", key, " : ", err.Error())
+		log.Println("Env ", key, " : ", err.Error())
 		return false, err
 	}
 	return v, nil

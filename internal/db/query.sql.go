@@ -89,3 +89,20 @@ func (q *Queries) GetBooks(ctx context.Context) ([]Book, error) {
 	}
 	return items, nil
 }
+
+const updateBook = `-- name: UpdateBook :exec
+UPDATE books
+SET name = $1, price = $2
+WHERE id = $3
+`
+
+type UpdateBookParams struct {
+	Name  string    `json:"name"`
+	Price float64   `json:"price"`
+	ID    uuid.UUID `json:"id"`
+}
+
+func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) error {
+	_, err := q.exec(ctx, q.updateBookStmt, updateBook, arg.Name, arg.Price, arg.ID)
+	return err
+}

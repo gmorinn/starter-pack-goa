@@ -16,6 +16,11 @@ func GetBookCrudPath(id string) string {
 	return fmt.Sprintf("/book/%v", id)
 }
 
+// UpdateBookCrudPath returns the URL path to the crud service updateBook HTTP endpoint.
+func UpdateBookCrudPath(id string) string {
+	return fmt.Sprintf("/book/%v", id)
+}
+
 // GetAllBooksCrudPath returns the URL path to the crud service getAllBooks HTTP endpoint.
 func GetAllBooksCrudPath() string {
 	return "/books"

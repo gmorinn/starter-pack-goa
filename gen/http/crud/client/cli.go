@@ -11,16 +11,73 @@ import (
 	crud "api_crud/gen/crud"
 	"encoding/json"
 	"fmt"
+	"unicode/utf8"
+
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildGetBookPayload builds the payload for the crud getBook endpoint from
 // CLI flags.
 func BuildGetBookPayload(crudGetBookID string) (*crud.GetBookPayload, error) {
+	var err error
 	var id string
 	{
 		id = crudGetBookID
+		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
+
+		if err != nil {
+			return nil, err
+		}
 	}
 	v := &crud.GetBookPayload{}
+	v.ID = id
+
+	return v, nil
+}
+
+// BuildUpdateBookPayload builds the payload for the crud updateBook endpoint
+// from CLI flags.
+func BuildUpdateBookPayload(crudUpdateBookBody string, crudUpdateBookID string) (*crud.UpdateBookPayload, error) {
+	var err error
+	var body UpdateBookRequestBody
+	{
+		err = json.Unmarshal([]byte(crudUpdateBookBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Vitae nesciunt.\",\n      \"price\": 0.3857041479314441\n   }'")
+		}
+	}
+	var id string
+	{
+		id = crudUpdateBookID
+		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &crud.UpdateBookPayload{
+		Name:  body.Name,
+		Price: body.Price,
+	}
+	v.ID = id
+
+	return v, nil
+}
+
+// BuildDeleteBookPayload builds the payload for the crud deleteBook endpoint
+// from CLI flags.
+func BuildDeleteBookPayload(crudDeleteBookID string) (*crud.DeleteBookPayload, error) {
+	var err error
+	var id string
+	{
+		id = crudDeleteBookID
+		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &crud.DeleteBookPayload{}
 	v.ID = id
 
 	return v, nil
@@ -34,7 +91,16 @@ func BuildCreateBookPayload(crudCreateBookBody string) (*crud.CreateBookPayload,
 	{
 		err = json.Unmarshal([]byte(crudCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Est culpa eos nulla.\",\n      \"price\": 0.03987079186880613\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"6u7\",\n      \"price\": 0.4237253387372549\n   }'")
+		}
+		if utf8.RuneCountInString(body.Name) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))
+		}
+		if utf8.RuneCountInString(body.Name) > 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 10, false))
+		}
+		if err != nil {
+			return nil, err
 		}
 	}
 	v := &crud.CreateBookPayload{

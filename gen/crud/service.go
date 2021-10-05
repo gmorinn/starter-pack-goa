@@ -9,18 +9,22 @@ package crud
 
 import (
 	"context"
+
+	goa "goa.design/goa/v3/pkg"
 )
 
 // The principe of CRUD API with GET, PUT, POST, DELETE
 type Service interface {
 	// Read Book
-	GetBook(context.Context, *GetBookPayload) (res *BookResponse, err error)
+	GetBook(context.Context, *GetBookPayload) (res *GetBookResult, err error)
+	// Update One Book
+	UpdateBook(context.Context, *UpdateBookPayload) (res *UpdateBookResult, err error)
 	// Read All Books
-	GetAllBooks(context.Context) (res []*BookResponse, err error)
+	GetAllBooks(context.Context) (res *GetAllBooksResult, err error)
 	// Delete Book
-	DeleteBook(context.Context, string) (err error)
+	DeleteBook(context.Context, *DeleteBookPayload) (res *DeleteBookResult, err error)
 	// Create Book
-	CreateBook(context.Context, *CreateBookPayload) (res *BookResponse, err error)
+	CreateBook(context.Context, *CreateBookPayload) (res *CreateBookResult, err error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -31,33 +35,68 @@ const ServiceName = "crud"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"getBook", "getAllBooks", "deleteBook", "createBook"}
+var MethodNames = [5]string{"getBook", "updateBook", "getAllBooks", "deleteBook", "createBook"}
 
 // GetBookPayload is the payload type of the crud service getBook method.
 type GetBookPayload struct {
-	// Unique Id Book
 	ID string
 }
 
-// BookResponse is the result type of the crud service getBook method.
-type BookResponse struct {
-	ID    *string
-	Name  *string
-	Price *float64
+// GetBookResult is the result type of the crud service getBook method.
+type GetBookResult struct {
+	ID      string
+	Name    string
+	Price   float64
+	Success bool
+}
+
+// UpdateBookPayload is the payload type of the crud service updateBook method.
+type UpdateBookPayload struct {
+	ID    string
+	Name  string
+	Price float64
+}
+
+// UpdateBookResult is the result type of the crud service updateBook method.
+type UpdateBookResult struct {
+	ID      string
+	Name    string
+	Price   float64
+	Success bool
+}
+
+// GetAllBooksResult is the result type of the crud service getAllBooks method.
+type GetAllBooksResult struct {
+	Books   []*BookResponse
+	Success bool
+}
+
+// DeleteBookPayload is the payload type of the crud service deleteBook method.
+type DeleteBookPayload struct {
+	ID string
+}
+
+// DeleteBookResult is the result type of the crud service deleteBook method.
+type DeleteBookResult struct {
+	Success bool
 }
 
 // CreateBookPayload is the payload type of the crud service createBook method.
 type CreateBookPayload struct {
-	Name  *string
-	Price *float64
+	Name  string
+	Price float64
 }
 
-// CannotConvertStringToUuid is the error returned when id paramater is bad
-type CannotConvertStringToUUID struct {
-	// Returning error
-	Message string
-	// Wrong Id
-	ID string
+// CreateBookResult is the result type of the crud service createBook method.
+type CreateBookResult struct {
+	Book    *BookResponse
+	Success bool
+}
+
+type BookResponse struct {
+	ID    string
+	Name  string
+	Price float64
 }
 
 // IdDoesntExist is the error returned when 0 book have the id corresponding
@@ -65,17 +104,14 @@ type IDDoesntExist struct {
 	// Returning error
 	Message string
 	// Wrong Id
-	ID string
+	ID      string
+	Success bool
 }
 
-// Error returns an error description.
-func (e *CannotConvertStringToUUID) Error() string {
-	return "CannotConvertStringToUuid is the error returned when id paramater is bad"
-}
-
-// ErrorName returns "CannotConvertStringToUuid".
-func (e *CannotConvertStringToUUID) ErrorName() string {
-	return "cannot_convert_string_to_uuid"
+type UnknownError struct {
+	// Returning error
+	Message string
+	Success bool
 }
 
 // Error returns an error description.
@@ -86,4 +122,24 @@ func (e *IDDoesntExist) Error() string {
 // ErrorName returns "IdDoesntExist".
 func (e *IDDoesntExist) ErrorName() string {
 	return "id_doesnt_exist"
+}
+
+// Error returns an error description.
+func (e *UnknownError) Error() string {
+	return ""
+}
+
+// ErrorName returns "unknownError".
+func (e *UnknownError) ErrorName() string {
+	return "unknown_error"
+}
+
+// MakeTimeout builds a goa.ServiceError from an error.
+func MakeTimeout(err error) *goa.ServiceError {
+	return &goa.ServiceError{
+		Name:    "timeout",
+		ID:      goa.NewErrorID(),
+		Message: err.Error(),
+		Timeout: true,
+	}
 }

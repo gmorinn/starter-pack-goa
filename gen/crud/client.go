@@ -16,15 +16,17 @@ import (
 // Client is the "crud" service client.
 type Client struct {
 	GetBookEndpoint     goa.Endpoint
+	UpdateBookEndpoint  goa.Endpoint
 	GetAllBooksEndpoint goa.Endpoint
 	DeleteBookEndpoint  goa.Endpoint
 	CreateBookEndpoint  goa.Endpoint
 }
 
 // NewClient initializes a "crud" service client given the endpoints.
-func NewClient(getBook, getAllBooks, deleteBook, createBook goa.Endpoint) *Client {
+func NewClient(getBook, updateBook, getAllBooks, deleteBook, createBook goa.Endpoint) *Client {
 	return &Client{
 		GetBookEndpoint:     getBook,
+		UpdateBookEndpoint:  updateBook,
 		GetAllBooksEndpoint: getAllBooks,
 		DeleteBookEndpoint:  deleteBook,
 		CreateBookEndpoint:  createBook,
@@ -33,40 +35,68 @@ func NewClient(getBook, getAllBooks, deleteBook, createBook goa.Endpoint) *Clien
 
 // GetBook calls the "getBook" endpoint of the "crud" service.
 // GetBook may return the following errors:
-//	- "cannot_convert_string_to_uuid" (type *CannotConvertStringToUUID): cannot convert string to uuid
 //	- "id_doesnt_exist" (type *IDDoesntExist): Book with his id doesn't exist
+//	- "unknown_error" (type *UnknownError): Error not identified
 //	- error: internal error
-func (c *Client) GetBook(ctx context.Context, p *GetBookPayload) (res *BookResponse, err error) {
+func (c *Client) GetBook(ctx context.Context, p *GetBookPayload) (res *GetBookResult, err error) {
 	var ires interface{}
 	ires, err = c.GetBookEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*BookResponse), nil
+	return ires.(*GetBookResult), nil
+}
+
+// UpdateBook calls the "updateBook" endpoint of the "crud" service.
+// UpdateBook may return the following errors:
+//	- "id_doesnt_exist" (type *IDDoesntExist): Book with his id doesn't exist
+//	- "unknown_error" (type *UnknownError): Error not identified
+//	- error: internal error
+func (c *Client) UpdateBook(ctx context.Context, p *UpdateBookPayload) (res *UpdateBookResult, err error) {
+	var ires interface{}
+	ires, err = c.UpdateBookEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*UpdateBookResult), nil
 }
 
 // GetAllBooks calls the "getAllBooks" endpoint of the "crud" service.
-func (c *Client) GetAllBooks(ctx context.Context) (res []*BookResponse, err error) {
+// GetAllBooks may return the following errors:
+//	- "unknown_error" (type *UnknownError): Error not identified
+//	- error: internal error
+func (c *Client) GetAllBooks(ctx context.Context) (res *GetAllBooksResult, err error) {
 	var ires interface{}
 	ires, err = c.GetAllBooksEndpoint(ctx, nil)
 	if err != nil {
 		return
 	}
-	return ires.([]*BookResponse), nil
+	return ires.(*GetAllBooksResult), nil
 }
 
 // DeleteBook calls the "deleteBook" endpoint of the "crud" service.
-func (c *Client) DeleteBook(ctx context.Context, p string) (err error) {
-	_, err = c.DeleteBookEndpoint(ctx, p)
-	return
+// DeleteBook may return the following errors:
+//	- "id_doesnt_exist" (type *IDDoesntExist): Book with his id doesn't exist
+//	- "unknown_error" (type *UnknownError): Error not identified
+//	- error: internal error
+func (c *Client) DeleteBook(ctx context.Context, p *DeleteBookPayload) (res *DeleteBookResult, err error) {
+	var ires interface{}
+	ires, err = c.DeleteBookEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*DeleteBookResult), nil
 }
 
 // CreateBook calls the "createBook" endpoint of the "crud" service.
-func (c *Client) CreateBook(ctx context.Context, p *CreateBookPayload) (res *BookResponse, err error) {
+// CreateBook may return the following errors:
+//	- "unknown_error" (type *UnknownError): Error not identified
+//	- error: internal error
+func (c *Client) CreateBook(ctx context.Context, p *CreateBookPayload) (res *CreateBookResult, err error) {
 	var ires interface{}
 	ires, err = c.CreateBookEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*BookResponse), nil
+	return ires.(*CreateBookResult), nil
 }

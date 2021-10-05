@@ -47,8 +47,8 @@ func (c *Client) BuildGetBookRequest(ctx context.Context, v interface{}) (*http.
 // getBook endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeGetBookResponse may return the following errors:
-//	- "cannot_convert_string_to_uuid" (type *crud.CannotConvertStringToUUID): http.StatusBadRequest
-//	- "id_doesnt_exist" (type *crud.IDDoesntExist): http.StatusBadRequest
+//	- "id_doesnt_exist" (type *crud.IDDoesntExist): http.StatusInternalServerError
+//	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
 //	- error: internal error
 func DecodeGetBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -74,25 +74,15 @@ func DecodeGetBookResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("crud", "getBook", err)
 			}
-			res := NewGetBookBookResponseOK(&body)
+			err = ValidateGetBookResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("crud", "getBook", err)
+			}
+			res := NewGetBookResultOK(&body)
 			return res, nil
-		case http.StatusBadRequest:
+		case http.StatusInternalServerError:
 			en := resp.Header.Get("goa-error")
 			switch en {
-			case "cannot_convert_string_to_uuid":
-				var (
-					body GetBookCannotConvertStringToUUIDResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("crud", "getBook", err)
-				}
-				err = ValidateGetBookCannotConvertStringToUUIDResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("crud", "getBook", err)
-				}
-				return nil, NewGetBookCannotConvertStringToUUID(&body)
 			case "id_doesnt_exist":
 				var (
 					body GetBookIDDoesntExistResponseBody
@@ -107,6 +97,20 @@ func DecodeGetBookResponse(decoder func(*http.Response) goahttp.Decoder, restore
 					return nil, goahttp.ErrValidationError("crud", "getBook", err)
 				}
 				return nil, NewGetBookIDDoesntExist(&body)
+			case "unknown_error":
+				var (
+					body GetBookUnknownErrorResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("crud", "getBook", err)
+				}
+				err = ValidateGetBookUnknownErrorResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("crud", "getBook", err)
+				}
+				return nil, NewGetBookUnknownError(&body)
 			default:
 				body, _ := ioutil.ReadAll(resp.Body)
 				return nil, goahttp.ErrInvalidResponse("crud", "getBook", resp.StatusCode, string(body))
@@ -114,6 +118,126 @@ func DecodeGetBookResponse(decoder func(*http.Response) goahttp.Decoder, restore
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("crud", "getBook", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildUpdateBookRequest instantiates a HTTP request object with method and
+// path set to call the "crud" service "updateBook" endpoint
+func (c *Client) BuildUpdateBookRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id string
+	)
+	{
+		p, ok := v.(*crud.UpdateBookPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("crud", "updateBook", "*crud.UpdateBookPayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UpdateBookCrudPath(id)}
+	req, err := http.NewRequest("PUT", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("crud", "updateBook", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUpdateBookRequest returns an encoder for requests sent to the crud
+// updateBook server.
+func EncodeUpdateBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*crud.UpdateBookPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("crud", "updateBook", "*crud.UpdateBookPayload", v)
+		}
+		body := NewUpdateBookRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("crud", "updateBook", err)
+		}
+		return nil
+	}
+}
+
+// DecodeUpdateBookResponse returns a decoder for responses returned by the
+// crud updateBook endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeUpdateBookResponse may return the following errors:
+//	- "id_doesnt_exist" (type *crud.IDDoesntExist): http.StatusInternalServerError
+//	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
+//	- error: internal error
+func DecodeUpdateBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body UpdateBookResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("crud", "updateBook", err)
+			}
+			err = ValidateUpdateBookResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("crud", "updateBook", err)
+			}
+			res := NewUpdateBookResultOK(&body)
+			return res, nil
+		case http.StatusInternalServerError:
+			en := resp.Header.Get("goa-error")
+			switch en {
+			case "id_doesnt_exist":
+				var (
+					body UpdateBookIDDoesntExistResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("crud", "updateBook", err)
+				}
+				err = ValidateUpdateBookIDDoesntExistResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("crud", "updateBook", err)
+				}
+				return nil, NewUpdateBookIDDoesntExist(&body)
+			case "unknown_error":
+				var (
+					body UpdateBookUnknownErrorResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("crud", "updateBook", err)
+				}
+				err = ValidateUpdateBookUnknownErrorResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("crud", "updateBook", err)
+				}
+				return nil, NewUpdateBookUnknownError(&body)
+			default:
+				body, _ := ioutil.ReadAll(resp.Body)
+				return nil, goahttp.ErrInvalidResponse("crud", "updateBook", resp.StatusCode, string(body))
+			}
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("crud", "updateBook", resp.StatusCode, string(body))
 		}
 	}
 }
@@ -136,6 +260,9 @@ func (c *Client) BuildGetAllBooksRequest(ctx context.Context, v interface{}) (*h
 // DecodeGetAllBooksResponse returns a decoder for responses returned by the
 // crud getAllBooks endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
+// DecodeGetAllBooksResponse may return the following errors:
+//	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
+//	- error: internal error
 func DecodeGetAllBooksResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -160,8 +287,26 @@ func DecodeGetAllBooksResponse(decoder func(*http.Response) goahttp.Decoder, res
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("crud", "getAllBooks", err)
 			}
-			res := NewGetAllBooksBookResponseOK(body)
+			err = ValidateGetAllBooksResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("crud", "getAllBooks", err)
+			}
+			res := NewGetAllBooksResultOK(&body)
 			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body GetAllBooksUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("crud", "getAllBooks", err)
+			}
+			err = ValidateGetAllBooksUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("crud", "getAllBooks", err)
+			}
+			return nil, NewGetAllBooksUnknownError(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("crud", "getAllBooks", resp.StatusCode, string(body))
@@ -176,11 +321,11 @@ func (c *Client) BuildDeleteBookRequest(ctx context.Context, v interface{}) (*ht
 		id string
 	)
 	{
-		p, ok := v.(string)
+		p, ok := v.(*crud.DeleteBookPayload)
 		if !ok {
-			return nil, goahttp.ErrInvalidType("crud", "deleteBook", "string", v)
+			return nil, goahttp.ErrInvalidType("crud", "deleteBook", "*crud.DeleteBookPayload", v)
 		}
-		id = p
+		id = p.ID
 	}
 	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteBookCrudPath(id)}
 	req, err := http.NewRequest("DELETE", u.String(), nil)
@@ -197,6 +342,10 @@ func (c *Client) BuildDeleteBookRequest(ctx context.Context, v interface{}) (*ht
 // DecodeDeleteBookResponse returns a decoder for responses returned by the
 // crud deleteBook endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
+// DecodeDeleteBookResponse may return the following errors:
+//	- "id_doesnt_exist" (type *crud.IDDoesntExist): http.StatusInternalServerError
+//	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
+//	- error: internal error
 func DecodeDeleteBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -213,7 +362,55 @@ func DecodeDeleteBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 		}
 		switch resp.StatusCode {
 		case http.StatusOK:
-			return nil, nil
+			var (
+				body DeleteBookResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("crud", "deleteBook", err)
+			}
+			err = ValidateDeleteBookResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("crud", "deleteBook", err)
+			}
+			res := NewDeleteBookResultOK(&body)
+			return res, nil
+		case http.StatusInternalServerError:
+			en := resp.Header.Get("goa-error")
+			switch en {
+			case "id_doesnt_exist":
+				var (
+					body DeleteBookIDDoesntExistResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("crud", "deleteBook", err)
+				}
+				err = ValidateDeleteBookIDDoesntExistResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("crud", "deleteBook", err)
+				}
+				return nil, NewDeleteBookIDDoesntExist(&body)
+			case "unknown_error":
+				var (
+					body DeleteBookUnknownErrorResponseBody
+					err  error
+				)
+				err = decoder(resp).Decode(&body)
+				if err != nil {
+					return nil, goahttp.ErrDecodingError("crud", "deleteBook", err)
+				}
+				err = ValidateDeleteBookUnknownErrorResponseBody(&body)
+				if err != nil {
+					return nil, goahttp.ErrValidationError("crud", "deleteBook", err)
+				}
+				return nil, NewDeleteBookUnknownError(&body)
+			default:
+				body, _ := ioutil.ReadAll(resp.Body)
+				return nil, goahttp.ErrInvalidResponse("crud", "deleteBook", resp.StatusCode, string(body))
+			}
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("crud", "deleteBook", resp.StatusCode, string(body))
@@ -255,6 +452,9 @@ func EncodeCreateBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // DecodeCreateBookResponse returns a decoder for responses returned by the
 // crud createBook endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
+// DecodeCreateBookResponse may return the following errors:
+//	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
+//	- error: internal error
 func DecodeCreateBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -279,8 +479,26 @@ func DecodeCreateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("crud", "createBook", err)
 			}
-			res := NewCreateBookBookResponseCreated(&body)
+			err = ValidateCreateBookResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("crud", "createBook", err)
+			}
+			res := NewCreateBookResultCreated(&body)
 			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body CreateBookUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("crud", "createBook", err)
+			}
+			err = ValidateCreateBookUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("crud", "createBook", err)
+			}
+			return nil, NewCreateBookUnknownError(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("crud", "createBook", resp.StatusCode, string(body))
@@ -288,13 +506,13 @@ func DecodeCreateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 	}
 }
 
-// unmarshalBookResponseResponseToCrudBookResponse builds a value of type
-// *crud.BookResponse from a value of type *BookResponseResponse.
-func unmarshalBookResponseResponseToCrudBookResponse(v *BookResponseResponse) *crud.BookResponse {
+// unmarshalBookResponseResponseBodyToCrudBookResponse builds a value of type
+// *crud.BookResponse from a value of type *BookResponseResponseBody.
+func unmarshalBookResponseResponseBodyToCrudBookResponse(v *BookResponseResponseBody) *crud.BookResponse {
 	res := &crud.BookResponse{
-		ID:    v.ID,
-		Name:  v.Name,
-		Price: v.Price,
+		ID:    *v.ID,
+		Name:  *v.Name,
+		Price: *v.Price,
 	}
 
 	return res

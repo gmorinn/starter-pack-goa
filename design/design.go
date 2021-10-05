@@ -13,65 +13,149 @@ var _ = API("basic", func() {
 })
 
 var BookResponse = Type("BookResponse", func() {
-	Attribute("id", String)
+	Attribute("id", String, func() {
+		Format(FormatUUID)
+	})
 	Attribute("name", String)
 	Attribute("price", Float64)
+	Required("id", "name", "price")
 })
 
 // Service describes a service
 var _ = Service("crud", func() {
 	Description("The principe of CRUD API with GET, PUT, POST, DELETE")
 
+	Error("timeout", func() { // Use default error type
+		Timeout()
+	})
+
 	Method("getBook", func() {
 		Description("Read Book")
 		Payload(func() {
-			Attribute("id", String, "Unique Id Book")
+			Attribute("id", String, func() {
+				Format(FormatUUID)
+			})
 			Required("id")
 		})
-		Error("cannot_convert_string_to_uuid", CannotConvertStringToUuid, "cannot convert string to uuid")
+
 		Error("id_doesnt_exist", IdDoesntExist, "Book with his id doesn't exist")
+		Error("unknown_error", unknownError, "Error not identified")
 		HTTP(func() {
 			GET("/book/{id}")
-			Response("cannot_convert_string_to_uuid", StatusBadRequest, func() {
-				Description("Id parameter is bad")
-			})
-			Response("id_doesnt_exist", StatusBadRequest, func() {
+			Response("id_doesnt_exist", StatusInternalServerError, func() {
 				Description("Book with his id doesn't exist")
+			})
+			Response("unknown_error", StatusInternalServerError, func() {
+				Description("Error in general")
 			})
 			Response(StatusOK)
 		})
-		Result(BookResponse)
+		Result(func() {
+			Attribute("id", String)
+			Attribute("name", String)
+			Attribute("price", Float64)
+			Attribute("success", Boolean)
+			Required("id", "name", "price", "success")
+		})
+	})
+
+	Method("updateBook", func() {
+		Description("Update One Book")
+		Payload(func() {
+			Attribute("id", String, func() {
+				Format(FormatUUID)
+			})
+			Attribute("name", String)
+			Attribute("price", Float64)
+			Required("id", "name", "price")
+		})
+		Error("id_doesnt_exist", IdDoesntExist, "Book with his id doesn't exist")
+		Error("unknown_error", unknownError, "Error not identified")
+		HTTP(func() {
+			PUT("/book/{id}")
+			Response("id_doesnt_exist", StatusInternalServerError, func() {
+				Description("Book with his id doesn't exist")
+			})
+			Response("unknown_error", StatusInternalServerError, func() {
+				Description("Error in general")
+			})
+			Response(StatusOK)
+		})
+		Result(func() {
+			Attribute("id", String)
+			Attribute("name", String)
+			Attribute("price", Float64)
+			Attribute("success", Boolean)
+			Required("id", "name", "price", "success")
+		})
 	})
 
 	Method("getAllBooks", func() {
 		Description("Read All Books")
+		Error("unknown_error", unknownError, "Error not identified")
 		HTTP(func() {
 			GET("/books")
+			Response("unknown_error", StatusInternalServerError, func() {
+				Description("Error in general")
+			})
 			Response(StatusOK)
 		})
-		Result(ArrayOf(BookResponse))
+		Result(func() {
+			Attribute("books", ArrayOf(BookResponse))
+			Attribute("success", Boolean)
+			Required("books", "success")
+		})
 	})
 
 	Method("deleteBook", func() {
 		Description("Delete Book")
-		Payload(String, "UUID of an existing book")
+		Error("id_doesnt_exist", IdDoesntExist, "Book with his id doesn't exist")
+		Error("unknown_error", unknownError, "Error not identified")
+		Payload(func() {
+			Attribute("id", String, func() {
+				Format(FormatUUID)
+			})
+			Required("id")
+		})
 		HTTP(func() {
 			DELETE("/book/remove/{id}")
+			Response("id_doesnt_exist", StatusInternalServerError, func() {
+				Description("Book with his id doesn't exist")
+			})
+			Response("unknown_error", StatusInternalServerError, func() {
+				Description("Error in general")
+			})
 			Response(StatusOK)
+		})
+		Result(func() {
+			Attribute("success", Boolean)
+			Required("success")
 		})
 	})
 
 	Method("createBook", func() {
 		Description("Create Book")
+		Error("unknown_error", unknownError, "Error not identified")
 		Payload(func() {
-			Attribute("name", String)
+			Attribute("name", String, func() {
+				MinLength(3)
+				MaxLength(10)
+			})
 			Attribute("price", Float64)
+			Required("name", "price")
 		})
 		HTTP(func() {
 			POST("/book/add")
+			Response("unknown_error", StatusInternalServerError, func() {
+				Description("Error in general")
+			})
 			Response(StatusCreated)
 		})
-		Result(BookResponse)
+		Result(func() {
+			Attribute("book", BookResponse)
+			Attribute("success", Boolean)
+			Required("book", "success")
+		})
 	})
 
 })
@@ -80,16 +164,16 @@ var _ = Service("openapi", func() {
 	Files("/openapi.json", "openapi3.json")
 })
 
-var CannotConvertStringToUuid = Type("CannotConvertStringToUuid", func() {
-	Description("CannotConvertStringToUuid is the error returned when id paramater is bad")
-	Field(1, "message", String, "Returning error")
-	Field(1, "id", String, "Wrong Id")
-	Required("message", "id")
-})
-
 var IdDoesntExist = Type("IdDoesntExist", func() {
 	Description("IdDoesntExist is the error returned when 0 book have the id corresponding")
 	Field(1, "message", String, "Returning error")
 	Field(1, "id", String, "Wrong Id")
-	Required("message", "id")
+	Field(1, "success", Boolean)
+	Required("message", "id", "success")
+})
+
+var unknownError = Type("unknownError", func() {
+	Field(1, "message", String, "Returning error")
+	Field(1, "success", Boolean)
+	Required("message", "success")
 })

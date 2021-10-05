@@ -34,77 +34,135 @@ func NewCrud(logger *log.Logger) crud.Service {
 }
 
 // Read Book
-func (s *crudsrvc) GetBook(ctx context.Context, p *crud.GetBookPayload) (res *crud.BookResponse, err error) {
-	if _, err := uuid.Parse(p.ID); err != nil {
-		return nil, &crud.CannotConvertStringToUUID{
-			Message: err.Error(),
-			ID:      p.ID,
-		}
-	}
+func (s *crudsrvc) GetBook(ctx context.Context, p *crud.GetBookPayload) (res *crud.GetBookResult, err error) {
 	book, err := s.store.GetBook(ctx, uuid.MustParse(p.ID))
 	if err != nil {
 		return nil, &crud.IDDoesntExist{
-			Message: err.Error(),
+			Message: "ERROR_GET_BOOK: " + err.Error(),
 			ID:      p.ID,
+			Success: false,
 		}
 	}
-	id := book.ID.String()
-	response := crud.BookResponse{
-		Name:  &book.Name,
-		Price: &book.Price,
-		ID:    &id,
+
+	response := crud.GetBookResult{
+		ID:      book.ID.String(),
+		Name:    book.Name,
+		Price:   book.Price,
+		Success: true,
 	}
 	return &response, nil
 }
 
 // Delete Book
-func (s *crudsrvc) DeleteBook(ctx context.Context, p string) (err error) {
-	if err := s.store.DeleteBook(ctx, uuid.MustParse(p)); err != nil {
-		if err != nil {
-			s.logger.Print("ERROR_DELETE_ONE_BOOK")
-			return err
+func (s *crudsrvc) DeleteBook(ctx context.Context, p *crud.DeleteBookPayload) (res *crud.DeleteBookResult, err error) {
+	if _, err := s.store.GetBook(ctx, uuid.MustParse(p.ID)); err != nil {
+		return nil, &crud.IDDoesntExist{
+			Message: "ERROR_GET_BOOK: " + err.Error(),
+			ID:      p.ID,
+			Success: false,
 		}
 	}
-	s.logger.Print("Success")
-	return nil
+
+	if err := s.store.DeleteBook(ctx, uuid.MustParse(p.ID)); err != nil {
+		return nil, &crud.UnknownError{
+			Message: "ERROR_DELETE_BOOK: " + err.Error(),
+			Success: false,
+		}
+	}
+
+	return &crud.DeleteBookResult{Success: true}, nil
 }
 
 // Create Book
-func (s *crudsrvc) CreateBook(ctx context.Context, p *crud.CreateBookPayload) (res *crud.BookResponse, err error) {
+func (s *crudsrvc) CreateBook(ctx context.Context, p *crud.CreateBookPayload) (res *crud.CreateBookResult, err error) {
 	arg := db.CreateBookParams{
-		Price: *p.Price,
-		Name:  *p.Name,
+		Price: p.Price,
+		Name:  p.Name,
 	}
 	book, err := s.store.CreateBook(ctx, arg)
 	if err != nil {
-		s.logger.Print("ERROR_CREATE_BOOK")
-		return nil, err
+		return nil, &crud.UnknownError{
+			Message: "ERROR_CREATE_BOOK: " + err.Error(),
+			Success: false,
+		}
 	}
 
 	newBook, err := s.GetBook(ctx, &crud.GetBookPayload{ID: book.ID.String()})
 	if err != nil {
-		s.logger.Print("ERROR_GET_ONE_BOOK")
-		return nil, err
+		return nil, &crud.UnknownError{
+			Message: "ERROR_GET_BOOK: " + err.Error(),
+			Success: false,
+		}
 	}
 
-	return newBook, nil
+	response := crud.CreateBookResult{
+		Book: &crud.BookResponse{
+			ID:    newBook.ID,
+			Name:  newBook.Name,
+			Price: newBook.Price,
+		},
+		Success: true,
+	}
+
+	return &response, nil
 }
 
 // Read Books
-func (s *crudsrvc) GetAllBooks(ctx context.Context) (res []*crud.BookResponse, err error) {
+func (s *crudsrvc) GetAllBooks(ctx context.Context) (res *crud.GetAllBooksResult, err error) {
 	books, err := s.store.GetBooks(ctx)
 	if err != nil {
-		s.logger.Print("ERROR_GET_ALL_BOOK")
-		return nil, err
+		return nil, &crud.UnknownError{
+			Success: false,
+			Message: "ERROR_GET_ALL_BOOK: " + err.Error(),
+		}
 	}
-	var response []*crud.BookResponse
+
+	var BookResponse []*crud.BookResponse
+
 	for _, v := range books {
 		id := v.ID.String()
-		response = append(response, &crud.BookResponse{
-			ID:    &id,
-			Name:  &v.Name,
-			Price: &v.Price,
+		BookResponse = append(BookResponse, &crud.BookResponse{
+			ID:    id,
+			Name:  v.Name,
+			Price: v.Price,
 		})
 	}
-	return response, nil
+
+	response := crud.GetAllBooksResult{
+		Books:   BookResponse,
+		Success: true,
+	}
+	return &response, nil
+}
+
+func (s *crudsrvc) UpdateBook(ctx context.Context, p *crud.UpdateBookPayload) (res *crud.UpdateBookResult, err error) {
+	arg := db.UpdateBookParams{
+		ID:    uuid.MustParse(p.ID),
+		Name:  p.Name,
+		Price: p.Price,
+	}
+
+	if err := s.store.UpdateBook(ctx, arg); err != nil {
+		return nil, &crud.UnknownError{
+			Success: false,
+			Message: "ERROR_UPDATE_BOOK: " + err.Error(),
+		}
+	}
+
+	newBook, err := s.store.GetBook(ctx, uuid.MustParse(p.ID))
+	if err != nil {
+		return nil, &crud.IDDoesntExist{
+			Message: "ERROR_GET_BOOK: " + err.Error(),
+			ID:      p.ID,
+			Success: false,
+		}
+	}
+
+	response := crud.UpdateBookResult{
+		ID:      newBook.ID.String(),
+		Name:    newBook.Name,
+		Price:   newBook.Price,
+		Success: true,
+	}
+	return &response, nil
 }

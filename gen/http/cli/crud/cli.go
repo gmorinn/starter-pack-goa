@@ -23,13 +23,13 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `crud (get-book|get-all-books|delete-book|create-book)
+	return `crud (get-book|update-book|get-all-books|delete-book|create-book)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` crud get-book --id "Sed enim sit."` + "\n" +
+	return os.Args[0] + ` crud get-book --id "77EB7E77-465C-FCC6-CEC6-11F6C8938D24"` + "\n" +
 		""
 }
 
@@ -46,18 +46,23 @@ func ParseEndpoint(
 		crudFlags = flag.NewFlagSet("crud", flag.ContinueOnError)
 
 		crudGetBookFlags  = flag.NewFlagSet("get-book", flag.ExitOnError)
-		crudGetBookIDFlag = crudGetBookFlags.String("id", "REQUIRED", "Unique Id Book")
+		crudGetBookIDFlag = crudGetBookFlags.String("id", "REQUIRED", "")
+
+		crudUpdateBookFlags    = flag.NewFlagSet("update-book", flag.ExitOnError)
+		crudUpdateBookBodyFlag = crudUpdateBookFlags.String("body", "REQUIRED", "")
+		crudUpdateBookIDFlag   = crudUpdateBookFlags.String("id", "REQUIRED", "")
 
 		crudGetAllBooksFlags = flag.NewFlagSet("get-all-books", flag.ExitOnError)
 
-		crudDeleteBookFlags = flag.NewFlagSet("delete-book", flag.ExitOnError)
-		crudDeleteBookPFlag = crudDeleteBookFlags.String("p", "REQUIRED", "UUID of an existing book")
+		crudDeleteBookFlags  = flag.NewFlagSet("delete-book", flag.ExitOnError)
+		crudDeleteBookIDFlag = crudDeleteBookFlags.String("id", "REQUIRED", "")
 
 		crudCreateBookFlags    = flag.NewFlagSet("create-book", flag.ExitOnError)
 		crudCreateBookBodyFlag = crudCreateBookFlags.String("body", "REQUIRED", "")
 	)
 	crudFlags.Usage = crudUsage
 	crudGetBookFlags.Usage = crudGetBookUsage
+	crudUpdateBookFlags.Usage = crudUpdateBookUsage
 	crudGetAllBooksFlags.Usage = crudGetAllBooksUsage
 	crudDeleteBookFlags.Usage = crudDeleteBookUsage
 	crudCreateBookFlags.Usage = crudCreateBookUsage
@@ -99,6 +104,9 @@ func ParseEndpoint(
 			case "get-book":
 				epf = crudGetBookFlags
 
+			case "update-book":
+				epf = crudUpdateBookFlags
+
 			case "get-all-books":
 				epf = crudGetAllBooksFlags
 
@@ -136,12 +144,15 @@ func ParseEndpoint(
 			case "get-book":
 				endpoint = c.GetBook()
 				data, err = crudc.BuildGetBookPayload(*crudGetBookIDFlag)
+			case "update-book":
+				endpoint = c.UpdateBook()
+				data, err = crudc.BuildUpdateBookPayload(*crudUpdateBookBodyFlag, *crudUpdateBookIDFlag)
 			case "get-all-books":
 				endpoint = c.GetAllBooks()
 				data = nil
 			case "delete-book":
 				endpoint = c.DeleteBook()
-				data = *crudDeleteBookPFlag
+				data, err = crudc.BuildDeleteBookPayload(*crudDeleteBookIDFlag)
 			case "create-book":
 				endpoint = c.CreateBook()
 				data, err = crudc.BuildCreateBookPayload(*crudCreateBookBodyFlag)
@@ -163,6 +174,7 @@ Usage:
 
 COMMAND:
     get-book: Read Book
+    update-book: Update One Book
     get-all-books: Read All Books
     delete-book: Delete Book
     create-book: Create Book
@@ -175,10 +187,25 @@ func crudGetBookUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud get-book -id STRING
 
 Read Book
-    -id STRING: Unique Id Book
+    -id STRING: 
 
 Example:
-    %[1]s crud get-book --id "Sed enim sit."
+    %[1]s crud get-book --id "77EB7E77-465C-FCC6-CEC6-11F6C8938D24"
+`, os.Args[0])
+}
+
+func crudUpdateBookUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud update-book -body JSON -id STRING
+
+Update One Book
+    -body JSON: 
+    -id STRING: 
+
+Example:
+    %[1]s crud update-book --body '{
+      "name": "Vitae nesciunt.",
+      "price": 0.3857041479314441
+   }' --id "FB1E8AC6-4FA4-C883-ED5A-54960E88F5FE"
 `, os.Args[0])
 }
 
@@ -193,13 +220,13 @@ Example:
 }
 
 func crudDeleteBookUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud delete-book -p STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud delete-book -id STRING
 
 Delete Book
-    -p STRING: UUID of an existing book
+    -id STRING: 
 
 Example:
-    %[1]s crud delete-book --p "Aliquid et quisquam ducimus omnis sit ut."
+    %[1]s crud delete-book --id "5E3B665E-1239-9C12-9643-FFC1E6C04697"
 `, os.Args[0])
 }
 
@@ -211,8 +238,8 @@ Create Book
 
 Example:
     %[1]s crud create-book --body '{
-      "name": "Est culpa eos nulla.",
-      "price": 0.03987079186880613
+      "name": "6u7",
+      "price": 0.4237253387372549
    }'
 `, os.Args[0])
 }

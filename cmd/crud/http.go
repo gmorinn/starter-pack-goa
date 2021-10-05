@@ -50,24 +50,24 @@ func handleHTTPServer(ctx context.Context, u *url.URL, crudEndpoints *crud.Endpo
 	// the service input and output data structures to HTTP requests and
 	// responses.
 	var (
-		crudServer    *crudsvr.Server
 		openapiServer *openapisvr.Server
+		crudServer    *crudsvr.Server
 	)
 	{
 		eh := errorHandler(logger)
-		crudServer = crudsvr.New(crudEndpoints, mux, dec, enc, eh, nil)
 		openapiServer = openapisvr.New(nil, mux, dec, enc, eh, nil, nil)
+		crudServer = crudsvr.New(crudEndpoints, mux, dec, enc, eh, nil)
 		if debug {
 			servers := goahttp.Servers{
-				crudServer,
 				openapiServer,
+				crudServer,
 			}
 			servers.Use(httpmdlwr.Debug(mux, os.Stdout))
 		}
 	}
 	// Configure the mux.
-	crudsvr.Mount(mux, crudServer)
 	openapisvr.Mount(mux, openapiServer)
+	crudsvr.Mount(mux, crudServer)
 
 	// Wrap the multiplexer with additional middlewares. Middlewares mounted
 	// here apply to all the service endpoints.
@@ -80,10 +80,10 @@ func handleHTTPServer(ctx context.Context, u *url.URL, crudEndpoints *crud.Endpo
 	// Start HTTP server using default configuration, change the code to
 	// configure the server as required by your service.
 	srv := &http.Server{Addr: u.Host, Handler: handler}
-	for _, m := range crudServer.Mounts {
+	for _, m := range openapiServer.Mounts {
 		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
-	for _, m := range openapiServer.Mounts {
+	for _, m := range crudServer.Mounts {
 		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 

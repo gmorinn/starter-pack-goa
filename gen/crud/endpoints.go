@@ -16,6 +16,7 @@ import (
 // Endpoints wraps the "crud" service endpoints.
 type Endpoints struct {
 	GetBook     goa.Endpoint
+	UpdateBook  goa.Endpoint
 	GetAllBooks goa.Endpoint
 	DeleteBook  goa.Endpoint
 	CreateBook  goa.Endpoint
@@ -25,6 +26,7 @@ type Endpoints struct {
 func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		GetBook:     NewGetBookEndpoint(s),
+		UpdateBook:  NewUpdateBookEndpoint(s),
 		GetAllBooks: NewGetAllBooksEndpoint(s),
 		DeleteBook:  NewDeleteBookEndpoint(s),
 		CreateBook:  NewCreateBookEndpoint(s),
@@ -34,6 +36,7 @@ func NewEndpoints(s Service) *Endpoints {
 // Use applies the given middleware to all the "crud" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.GetBook = m(e.GetBook)
+	e.UpdateBook = m(e.UpdateBook)
 	e.GetAllBooks = m(e.GetAllBooks)
 	e.DeleteBook = m(e.DeleteBook)
 	e.CreateBook = m(e.CreateBook)
@@ -45,6 +48,15 @@ func NewGetBookEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*GetBookPayload)
 		return s.GetBook(ctx, p)
+	}
+}
+
+// NewUpdateBookEndpoint returns an endpoint function that calls the method
+// "updateBook" of service "crud".
+func NewUpdateBookEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*UpdateBookPayload)
+		return s.UpdateBook(ctx, p)
 	}
 }
 
@@ -60,8 +72,8 @@ func NewGetAllBooksEndpoint(s Service) goa.Endpoint {
 // "deleteBook" of service "crud".
 func NewDeleteBookEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(string)
-		return nil, s.DeleteBook(ctx, p)
+		p := req.(*DeleteBookPayload)
+		return s.DeleteBook(ctx, p)
 	}
 }
 
