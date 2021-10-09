@@ -21,10 +21,11 @@ type Client struct {
 	DeleteBookEndpoint  goa.Endpoint
 	CreateBookEndpoint  goa.Endpoint
 	SignupEndpoint      goa.Endpoint
+	SigninEndpoint      goa.Endpoint
 }
 
 // NewClient initializes a "crud" service client given the endpoints.
-func NewClient(getBook, updateBook, getAllBooks, deleteBook, createBook, signup goa.Endpoint) *Client {
+func NewClient(getBook, updateBook, getAllBooks, deleteBook, createBook, signup, signin goa.Endpoint) *Client {
 	return &Client{
 		GetBookEndpoint:     getBook,
 		UpdateBookEndpoint:  updateBook,
@@ -32,6 +33,7 @@ func NewClient(getBook, updateBook, getAllBooks, deleteBook, createBook, signup 
 		DeleteBookEndpoint:  deleteBook,
 		CreateBookEndpoint:  createBook,
 		SignupEndpoint:      signup,
+		SigninEndpoint:      signin,
 	}
 }
 
@@ -86,11 +88,21 @@ func (c *Client) CreateBook(ctx context.Context, p *CreateBookPayload) (res *Cre
 }
 
 // Signup calls the "signup" endpoint of the "crud" service.
-func (c *Client) Signup(ctx context.Context, p *SignupPayload) (res *Register, err error) {
+func (c *Client) Signup(ctx context.Context, p *SignupPayload) (res *Sign, err error) {
 	var ires interface{}
 	ires, err = c.SignupEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*Register), nil
+	return ires.(*Sign), nil
+}
+
+// Signin calls the "signin" endpoint of the "crud" service.
+func (c *Client) Signin(ctx context.Context, p *SigninPayload) (res *Sign, err error) {
+	var ires interface{}
+	ires, err = c.SigninEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Sign), nil
 }

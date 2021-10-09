@@ -37,6 +37,13 @@ type SignupRequestBody struct {
 	Email     *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 }
 
+// SigninRequestBody is the type of the "crud" service "signin" endpoint HTTP
+// request body.
+type SigninRequestBody struct {
+	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
+}
+
 // GetBookResponseBody is the type of the "crud" service "getBook" endpoint
 // HTTP response body.
 type GetBookResponseBody struct {
@@ -83,10 +90,17 @@ type SignupResponseBody struct {
 	Success      bool   `form:"success" json:"success" xml:"success"`
 }
 
+// SigninResponseBody is the type of the "crud" service "signin" endpoint HTTP
+// response body.
+type SigninResponseBody struct {
+	AccessToken  string `form:"access_token" json:"access_token" xml:"access_token"`
+	RefreshToken string `form:"refresh_token" json:"refresh_token" xml:"refresh_token"`
+	Success      bool   `form:"success" json:"success" xml:"success"`
+}
+
 // GetBookEmailAlreadyExistResponseBody is the type of the "crud" service
 // "getBook" endpoint HTTP response body for the "email_already_exist" error.
 type GetBookEmailAlreadyExistResponseBody struct {
-	// Returning error
 	Message string `form:"message" json:"message" xml:"message"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -95,7 +109,7 @@ type GetBookEmailAlreadyExistResponseBody struct {
 // endpoint HTTP response body for the "id_doesnt_exist" error.
 type GetBookIDDoesntExistResponseBody struct {
 	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	ID      string `form:"id" json:"id" xml:"id"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -103,9 +117,9 @@ type GetBookIDDoesntExistResponseBody struct {
 // GetBookUnknownErrorResponseBody is the type of the "crud" service "getBook"
 // endpoint HTTP response body for the "unknown_error" error.
 type GetBookUnknownErrorResponseBody struct {
-	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
-	Success bool   `form:"success" json:"success" xml:"success"`
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
 // GetBookUnauthorizedResponseBody is the type of the "crud" service "getBook"
@@ -115,7 +129,6 @@ type GetBookUnauthorizedResponseBody string
 // UpdateBookEmailAlreadyExistResponseBody is the type of the "crud" service
 // "updateBook" endpoint HTTP response body for the "email_already_exist" error.
 type UpdateBookEmailAlreadyExistResponseBody struct {
-	// Returning error
 	Message string `form:"message" json:"message" xml:"message"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -124,7 +137,7 @@ type UpdateBookEmailAlreadyExistResponseBody struct {
 // "updateBook" endpoint HTTP response body for the "id_doesnt_exist" error.
 type UpdateBookIDDoesntExistResponseBody struct {
 	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	ID      string `form:"id" json:"id" xml:"id"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -132,9 +145,9 @@ type UpdateBookIDDoesntExistResponseBody struct {
 // UpdateBookUnknownErrorResponseBody is the type of the "crud" service
 // "updateBook" endpoint HTTP response body for the "unknown_error" error.
 type UpdateBookUnknownErrorResponseBody struct {
-	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
-	Success bool   `form:"success" json:"success" xml:"success"`
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
 // UpdateBookUnauthorizedResponseBody is the type of the "crud" service
@@ -145,7 +158,6 @@ type UpdateBookUnauthorizedResponseBody string
 // "getAllBooks" endpoint HTTP response body for the "email_already_exist"
 // error.
 type GetAllBooksEmailAlreadyExistResponseBody struct {
-	// Returning error
 	Message string `form:"message" json:"message" xml:"message"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -154,7 +166,7 @@ type GetAllBooksEmailAlreadyExistResponseBody struct {
 // "getAllBooks" endpoint HTTP response body for the "id_doesnt_exist" error.
 type GetAllBooksIDDoesntExistResponseBody struct {
 	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	ID      string `form:"id" json:"id" xml:"id"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -162,9 +174,9 @@ type GetAllBooksIDDoesntExistResponseBody struct {
 // GetAllBooksUnknownErrorResponseBody is the type of the "crud" service
 // "getAllBooks" endpoint HTTP response body for the "unknown_error" error.
 type GetAllBooksUnknownErrorResponseBody struct {
-	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
-	Success bool   `form:"success" json:"success" xml:"success"`
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
 // GetAllBooksUnauthorizedResponseBody is the type of the "crud" service
@@ -174,7 +186,6 @@ type GetAllBooksUnauthorizedResponseBody string
 // DeleteBookEmailAlreadyExistResponseBody is the type of the "crud" service
 // "deleteBook" endpoint HTTP response body for the "email_already_exist" error.
 type DeleteBookEmailAlreadyExistResponseBody struct {
-	// Returning error
 	Message string `form:"message" json:"message" xml:"message"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -183,7 +194,7 @@ type DeleteBookEmailAlreadyExistResponseBody struct {
 // "deleteBook" endpoint HTTP response body for the "id_doesnt_exist" error.
 type DeleteBookIDDoesntExistResponseBody struct {
 	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	ID      string `form:"id" json:"id" xml:"id"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -191,9 +202,9 @@ type DeleteBookIDDoesntExistResponseBody struct {
 // DeleteBookUnknownErrorResponseBody is the type of the "crud" service
 // "deleteBook" endpoint HTTP response body for the "unknown_error" error.
 type DeleteBookUnknownErrorResponseBody struct {
-	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
-	Success bool   `form:"success" json:"success" xml:"success"`
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
 // DeleteBookUnauthorizedResponseBody is the type of the "crud" service
@@ -203,7 +214,6 @@ type DeleteBookUnauthorizedResponseBody string
 // CreateBookEmailAlreadyExistResponseBody is the type of the "crud" service
 // "createBook" endpoint HTTP response body for the "email_already_exist" error.
 type CreateBookEmailAlreadyExistResponseBody struct {
-	// Returning error
 	Message string `form:"message" json:"message" xml:"message"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -212,7 +222,7 @@ type CreateBookEmailAlreadyExistResponseBody struct {
 // "createBook" endpoint HTTP response body for the "id_doesnt_exist" error.
 type CreateBookIDDoesntExistResponseBody struct {
 	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	ID      string `form:"id" json:"id" xml:"id"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -220,9 +230,9 @@ type CreateBookIDDoesntExistResponseBody struct {
 // CreateBookUnknownErrorResponseBody is the type of the "crud" service
 // "createBook" endpoint HTTP response body for the "unknown_error" error.
 type CreateBookUnknownErrorResponseBody struct {
-	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
-	Success bool   `form:"success" json:"success" xml:"success"`
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
 // CreateBookUnauthorizedResponseBody is the type of the "crud" service
@@ -232,7 +242,6 @@ type CreateBookUnauthorizedResponseBody string
 // SignupEmailAlreadyExistResponseBody is the type of the "crud" service
 // "signup" endpoint HTTP response body for the "email_already_exist" error.
 type SignupEmailAlreadyExistResponseBody struct {
-	// Returning error
 	Message string `form:"message" json:"message" xml:"message"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -241,7 +250,7 @@ type SignupEmailAlreadyExistResponseBody struct {
 // endpoint HTTP response body for the "id_doesnt_exist" error.
 type SignupIDDoesntExistResponseBody struct {
 	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	ID      string `form:"id" json:"id" xml:"id"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
@@ -249,14 +258,42 @@ type SignupIDDoesntExistResponseBody struct {
 // SignupUnknownErrorResponseBody is the type of the "crud" service "signup"
 // endpoint HTTP response body for the "unknown_error" error.
 type SignupUnknownErrorResponseBody struct {
-	// Returning error
-	Message string `form:"message" json:"message" xml:"message"`
-	Success bool   `form:"success" json:"success" xml:"success"`
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
 // SignupUnauthorizedResponseBody is the type of the "crud" service "signup"
 // endpoint HTTP response body for the "unauthorized" error.
 type SignupUnauthorizedResponseBody string
+
+// SigninEmailAlreadyExistResponseBody is the type of the "crud" service
+// "signin" endpoint HTTP response body for the "email_already_exist" error.
+type SigninEmailAlreadyExistResponseBody struct {
+	Message string `form:"message" json:"message" xml:"message"`
+	Success bool   `form:"success" json:"success" xml:"success"`
+}
+
+// SigninIDDoesntExistResponseBody is the type of the "crud" service "signin"
+// endpoint HTTP response body for the "id_doesnt_exist" error.
+type SigninIDDoesntExistResponseBody struct {
+	// Returning error
+	Err     string `form:"err" json:"err" xml:"err"`
+	ID      string `form:"id" json:"id" xml:"id"`
+	Success bool   `form:"success" json:"success" xml:"success"`
+}
+
+// SigninUnknownErrorResponseBody is the type of the "crud" service "signin"
+// endpoint HTTP response body for the "unknown_error" error.
+type SigninUnknownErrorResponseBody struct {
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
+}
+
+// SigninUnauthorizedResponseBody is the type of the "crud" service "signin"
+// endpoint HTTP response body for the "unauthorized" error.
+type SigninUnauthorizedResponseBody string
 
 // BookResponseResponseBody is used to define fields on response body types.
 type BookResponseResponseBody struct {
@@ -327,8 +364,19 @@ func NewCreateBookResponseBody(res *crud.CreateBookResult) *CreateBookResponseBo
 
 // NewSignupResponseBody builds the HTTP response body from the result of the
 // "signup" endpoint of the "crud" service.
-func NewSignupResponseBody(res *crud.Register) *SignupResponseBody {
+func NewSignupResponseBody(res *crud.Sign) *SignupResponseBody {
 	body := &SignupResponseBody{
+		AccessToken:  res.AccessToken,
+		RefreshToken: res.RefreshToken,
+		Success:      res.Success,
+	}
+	return body
+}
+
+// NewSigninResponseBody builds the HTTP response body from the result of the
+// "signin" endpoint of the "crud" service.
+func NewSigninResponseBody(res *crud.Sign) *SigninResponseBody {
+	body := &SigninResponseBody{
 		AccessToken:  res.AccessToken,
 		RefreshToken: res.RefreshToken,
 		Success:      res.Success,
@@ -350,7 +398,7 @@ func NewGetBookEmailAlreadyExistResponseBody(res *crud.EmailAlreadyExist) *GetBo
 // result of the "getBook" endpoint of the "crud" service.
 func NewGetBookIDDoesntExistResponseBody(res *crud.IDDoesntExist) *GetBookIDDoesntExistResponseBody {
 	body := &GetBookIDDoesntExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		ID:      res.ID,
 		Success: res.Success,
 	}
@@ -361,8 +409,9 @@ func NewGetBookIDDoesntExistResponseBody(res *crud.IDDoesntExist) *GetBookIDDoes
 // result of the "getBook" endpoint of the "crud" service.
 func NewGetBookUnknownErrorResponseBody(res *crud.UnknownError) *GetBookUnknownErrorResponseBody {
 	body := &GetBookUnknownErrorResponseBody{
-		Message: res.Message,
-		Success: res.Success,
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
 	}
 	return body
 }
@@ -388,7 +437,7 @@ func NewUpdateBookEmailAlreadyExistResponseBody(res *crud.EmailAlreadyExist) *Up
 // the result of the "updateBook" endpoint of the "crud" service.
 func NewUpdateBookIDDoesntExistResponseBody(res *crud.IDDoesntExist) *UpdateBookIDDoesntExistResponseBody {
 	body := &UpdateBookIDDoesntExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		ID:      res.ID,
 		Success: res.Success,
 	}
@@ -399,8 +448,9 @@ func NewUpdateBookIDDoesntExistResponseBody(res *crud.IDDoesntExist) *UpdateBook
 // result of the "updateBook" endpoint of the "crud" service.
 func NewUpdateBookUnknownErrorResponseBody(res *crud.UnknownError) *UpdateBookUnknownErrorResponseBody {
 	body := &UpdateBookUnknownErrorResponseBody{
-		Message: res.Message,
-		Success: res.Success,
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
 	}
 	return body
 }
@@ -426,7 +476,7 @@ func NewGetAllBooksEmailAlreadyExistResponseBody(res *crud.EmailAlreadyExist) *G
 // the result of the "getAllBooks" endpoint of the "crud" service.
 func NewGetAllBooksIDDoesntExistResponseBody(res *crud.IDDoesntExist) *GetAllBooksIDDoesntExistResponseBody {
 	body := &GetAllBooksIDDoesntExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		ID:      res.ID,
 		Success: res.Success,
 	}
@@ -437,8 +487,9 @@ func NewGetAllBooksIDDoesntExistResponseBody(res *crud.IDDoesntExist) *GetAllBoo
 // the result of the "getAllBooks" endpoint of the "crud" service.
 func NewGetAllBooksUnknownErrorResponseBody(res *crud.UnknownError) *GetAllBooksUnknownErrorResponseBody {
 	body := &GetAllBooksUnknownErrorResponseBody{
-		Message: res.Message,
-		Success: res.Success,
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
 	}
 	return body
 }
@@ -464,7 +515,7 @@ func NewDeleteBookEmailAlreadyExistResponseBody(res *crud.EmailAlreadyExist) *De
 // the result of the "deleteBook" endpoint of the "crud" service.
 func NewDeleteBookIDDoesntExistResponseBody(res *crud.IDDoesntExist) *DeleteBookIDDoesntExistResponseBody {
 	body := &DeleteBookIDDoesntExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		ID:      res.ID,
 		Success: res.Success,
 	}
@@ -475,8 +526,9 @@ func NewDeleteBookIDDoesntExistResponseBody(res *crud.IDDoesntExist) *DeleteBook
 // result of the "deleteBook" endpoint of the "crud" service.
 func NewDeleteBookUnknownErrorResponseBody(res *crud.UnknownError) *DeleteBookUnknownErrorResponseBody {
 	body := &DeleteBookUnknownErrorResponseBody{
-		Message: res.Message,
-		Success: res.Success,
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
 	}
 	return body
 }
@@ -502,7 +554,7 @@ func NewCreateBookEmailAlreadyExistResponseBody(res *crud.EmailAlreadyExist) *Cr
 // the result of the "createBook" endpoint of the "crud" service.
 func NewCreateBookIDDoesntExistResponseBody(res *crud.IDDoesntExist) *CreateBookIDDoesntExistResponseBody {
 	body := &CreateBookIDDoesntExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		ID:      res.ID,
 		Success: res.Success,
 	}
@@ -513,8 +565,9 @@ func NewCreateBookIDDoesntExistResponseBody(res *crud.IDDoesntExist) *CreateBook
 // result of the "createBook" endpoint of the "crud" service.
 func NewCreateBookUnknownErrorResponseBody(res *crud.UnknownError) *CreateBookUnknownErrorResponseBody {
 	body := &CreateBookUnknownErrorResponseBody{
-		Message: res.Message,
-		Success: res.Success,
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
 	}
 	return body
 }
@@ -540,7 +593,7 @@ func NewSignupEmailAlreadyExistResponseBody(res *crud.EmailAlreadyExist) *Signup
 // result of the "signup" endpoint of the "crud" service.
 func NewSignupIDDoesntExistResponseBody(res *crud.IDDoesntExist) *SignupIDDoesntExistResponseBody {
 	body := &SignupIDDoesntExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		ID:      res.ID,
 		Success: res.Success,
 	}
@@ -551,8 +604,9 @@ func NewSignupIDDoesntExistResponseBody(res *crud.IDDoesntExist) *SignupIDDoesnt
 // result of the "signup" endpoint of the "crud" service.
 func NewSignupUnknownErrorResponseBody(res *crud.UnknownError) *SignupUnknownErrorResponseBody {
 	body := &SignupUnknownErrorResponseBody{
-		Message: res.Message,
-		Success: res.Success,
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
 	}
 	return body
 }
@@ -561,6 +615,45 @@ func NewSignupUnknownErrorResponseBody(res *crud.UnknownError) *SignupUnknownErr
 // result of the "signup" endpoint of the "crud" service.
 func NewSignupUnauthorizedResponseBody(res crud.Unauthorized) SignupUnauthorizedResponseBody {
 	body := SignupUnauthorizedResponseBody(res)
+	return body
+}
+
+// NewSigninEmailAlreadyExistResponseBody builds the HTTP response body from
+// the result of the "signin" endpoint of the "crud" service.
+func NewSigninEmailAlreadyExistResponseBody(res *crud.EmailAlreadyExist) *SigninEmailAlreadyExistResponseBody {
+	body := &SigninEmailAlreadyExistResponseBody{
+		Message: res.Message,
+		Success: res.Success,
+	}
+	return body
+}
+
+// NewSigninIDDoesntExistResponseBody builds the HTTP response body from the
+// result of the "signin" endpoint of the "crud" service.
+func NewSigninIDDoesntExistResponseBody(res *crud.IDDoesntExist) *SigninIDDoesntExistResponseBody {
+	body := &SigninIDDoesntExistResponseBody{
+		Err:     res.Err,
+		ID:      res.ID,
+		Success: res.Success,
+	}
+	return body
+}
+
+// NewSigninUnknownErrorResponseBody builds the HTTP response body from the
+// result of the "signin" endpoint of the "crud" service.
+func NewSigninUnknownErrorResponseBody(res *crud.UnknownError) *SigninUnknownErrorResponseBody {
+	body := &SigninUnknownErrorResponseBody{
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
+	}
+	return body
+}
+
+// NewSigninUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "signin" endpoint of the "crud" service.
+func NewSigninUnauthorizedResponseBody(res crud.Unauthorized) SigninUnauthorizedResponseBody {
+	body := SigninUnauthorizedResponseBody(res)
 	return body
 }
 
@@ -608,6 +701,16 @@ func NewSignupPayload(body *SignupRequestBody) *crud.SignupPayload {
 		Lastname:  *body.Lastname,
 		Password:  *body.Password,
 		Email:     *body.Email,
+	}
+
+	return v
+}
+
+// NewSigninPayload builds a crud service signin endpoint payload.
+func NewSigninPayload(body *SigninRequestBody) *crud.SigninPayload {
+	v := &crud.SigninPayload{
+		Email:    *body.Email,
+		Password: *body.Password,
 	}
 
 	return v
@@ -666,18 +769,42 @@ func ValidateSignupRequestBody(body *SignupRequestBody) (err error) {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", *body.Firstname, utf8.RuneCountInString(*body.Firstname), 3, true))
 		}
 	}
+	if body.Firstname != nil {
+		if utf8.RuneCountInString(*body.Firstname) > 15 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", *body.Firstname, utf8.RuneCountInString(*body.Firstname), 15, false))
+		}
+	}
 	if body.Lastname != nil {
 		if utf8.RuneCountInString(*body.Lastname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.lastname", *body.Lastname, utf8.RuneCountInString(*body.Lastname), 3, true))
 		}
 	}
 	if body.Password != nil {
-		if utf8.RuneCountInString(*body.Password) < 7 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 7, true))
+		if utf8.RuneCountInString(*body.Password) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 8, true))
 		}
 	}
 	if body.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
+	}
+	return
+}
+
+// ValidateSigninRequestBody runs the validations defined on SigninRequestBody
+func ValidateSigninRequestBody(body *SigninRequestBody) (err error) {
+	if body.Password == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("password", "body"))
+	}
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Email != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
+	}
+	if body.Password != nil {
+		if utf8.RuneCountInString(*body.Password) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 8, true))
+		}
 	}
 	return
 }

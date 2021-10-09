@@ -38,19 +38,20 @@ func NewCrud(logger *log.Logger) crud.Service {
 
 func Error_ID(msg, id string, err error) *crud.IDDoesntExist {
 	return &crud.IDDoesntExist{
-		Message: msg + " " + err.Error(),
-		ID:      id,
+		Err: err.Error(),
+		ID:  id,
 	}
 }
 
 func ErrorResponse(msg string, err error) *crud.UnknownError {
 	return &crud.UnknownError{
-		Message: msg + " " + err.Error(),
+		Err:       err.Error(),
+		ErrorCode: msg,
 	}
 }
 
-func ErrorEmail() *crud.UnknownError {
-	return &crud.UnknownError{
+func ErrorEmail() *crud.EmailAlreadyExist {
+	return &crud.EmailAlreadyExist{
 		Message: "EMAIL_ALREADY_EXIST",
 	}
 }
@@ -61,7 +62,6 @@ func (s *crudsrvc) GetBook(ctx context.Context, p *crud.GetBookPayload) (res *cr
 	if err != nil {
 		return nil, Error_ID("ERROR_GET_BOOK", p.ID, err)
 	}
-
 	response := crud.GetBookResult{
 		ID:      book.ID.String(),
 		Name:    book.Name,
@@ -155,7 +155,7 @@ func (s *crudsrvc) UpdateBook(ctx context.Context, p *crud.UpdateBookPayload) (r
 	return &response, nil
 }
 
-func (s *crudsrvc) Signup(ctx context.Context, p *crud.SignupPayload) (res *crud.Register, err error) {
+func (s *crudsrvc) Signup(ctx context.Context, p *crud.SignupPayload) (res *crud.Sign, err error) {
 
 	isExist, err := s.store.ExistUserByEmail(ctx, p.Email)
 	if err != nil {
@@ -192,7 +192,41 @@ func (s *crudsrvc) Signup(ctx context.Context, p *crud.SignupPayload) (res *crud
 		return nil, ErrorResponse("ERROR_GENERATE_REFRESH_JWT", err)
 	}
 
-	response := crud.Register{
+	response := crud.Sign{
+		AccessToken:  t,
+		RefreshToken: r,
+		Success:      true,
+	}
+	return &response, nil
+}
+
+func (s *crudsrvc) Signin(ctx context.Context, p *crud.SigninPayload) (res *crud.Sign, err error) {
+	arg := db.LoginUserParams{
+		Email: p.Email,
+		Crypt: p.Password,
+	}
+	user, err := s.store.LoginUser(ctx, arg)
+	if err != nil {
+		return nil, ErrorResponse("ERROR_LOGIN_USER", err)
+	}
+
+	claims := make(jwt.MapClaims)
+	claims["id"] = user.ID.String()
+	claims["exp"] = time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.AccessTokenDuration))).Unix()
+	t, err := generateJWT(claims, s.config.Security.Secret)
+	if err != nil {
+		return nil, ErrorResponse("ERROR_GENERATE_ACCESS_JWT", err)
+	}
+
+	expt := time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.RefreshTokenDuration)))
+	exp := expt.Unix()
+	claims["exp"] = exp
+	r, err := generateJWT(claims, s.config.Security.Secret)
+	if err != nil {
+		return nil, ErrorResponse("ERROR_GENERATE_REFRESH_JWT", err)
+	}
+
+	response := crud.Sign{
 		AccessToken:  t,
 		RefreshToken: r,
 		Success:      true,

@@ -15,3 +15,17 @@ CREATE TABLE "users" (
   "lastname" text NOT NULL,
   "firstname" text NOT NULL
 );
+
+CREATE TABLE "refresh_token" (
+  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
+  "created_at" timestamp NOT NULL DEFAULT (now()),
+  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "deleted_at" timestamp,
+  "ip" text NOT NULL,
+  "user_agent" text,
+  "token" text NOT NULL,
+  "expir_on" timestamp NOT NULL,
+  "user_id" uuid NOT NULL
+);
+
+ALTER TABLE "refresh_token" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");

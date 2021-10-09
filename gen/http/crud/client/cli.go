@@ -43,7 +43,7 @@ func BuildUpdateBookPayload(crudUpdateBookBody string, crudUpdateBookID string) 
 	{
 		err = json.Unmarshal([]byte(crudUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Sint voluptas in.\",\n      \"price\": 0.6399601382054029\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.08062031473621718\n   }'")
 		}
 	}
 	var id string
@@ -91,7 +91,7 @@ func BuildCreateBookPayload(crudCreateBookBody string) (*crud.CreateBookPayload,
 	{
 		err = json.Unmarshal([]byte(crudCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"j71\",\n      \"price\": 0.023143062949744986\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.13037940184325017\n   }'")
 		}
 		if utf8.RuneCountInString(body.Name) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))
@@ -119,16 +119,19 @@ func BuildSignupPayload(crudSignupBody string) (*crud.SignupPayload, error) {
 	{
 		err = json.Unmarshal([]byte(crudSignupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"cordia.muller@ferry.name\",\n      \"firstname\": \"o2q\",\n      \"lastname\": \"ei1\",\n      \"password\": \"wi5\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"idq\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
 		}
+		if utf8.RuneCountInString(body.Firstname) > 15 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 15, false))
+		}
 		if utf8.RuneCountInString(body.Lastname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.lastname", body.Lastname, utf8.RuneCountInString(body.Lastname), 3, true))
 		}
-		if utf8.RuneCountInString(body.Password) < 7 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 7, true))
+		if utf8.RuneCountInString(body.Password) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 8, true))
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
@@ -141,6 +144,33 @@ func BuildSignupPayload(crudSignupBody string) (*crud.SignupPayload, error) {
 		Lastname:  body.Lastname,
 		Password:  body.Password,
 		Email:     body.Email,
+	}
+
+	return v, nil
+}
+
+// BuildSigninPayload builds the payload for the crud signin endpoint from CLI
+// flags.
+func BuildSigninPayload(crudSigninBody string) (*crud.SigninPayload, error) {
+	var err error
+	var body SigninRequestBody
+	{
+		err = json.Unmarshal([]byte(crudSigninBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"password\": \"jmq\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
+
+		if utf8.RuneCountInString(body.Password) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 8, true))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &crud.SigninPayload{
+		Email:    body.Email,
+		Password: body.Password,
 	}
 
 	return v, nil

@@ -23,9 +23,9 @@ var _ = Service("crud", func() {
 	})
 
 	Error("unauthorized", String, "Identifiers are invalid")
-	Error("id_doesnt_exist", idDoesntExist)
-	Error("unknown_error", unknownError, "Error not identified")
-	Error("email_already_exist", emailAlreadyExist)
+	Error("id_doesnt_exist", idDoesntExist, "When ID doesn't exist")
+	Error("unknown_error", unknownError, "Error not identified (500)")
+	Error("email_already_exist", emailAlreadyExist, "When email already exist")
 
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)
@@ -35,10 +35,11 @@ var _ = Service("crud", func() {
 	})
 
 	Method("getBook", func() {
-		Description("Read Book")
+		Description("Get one item")
 		Payload(func() {
 			Attribute("id", String, func() {
 				Format(FormatUUID)
+				Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
 			})
 			Required("id")
 		})
@@ -57,12 +58,15 @@ var _ = Service("crud", func() {
 	})
 
 	Method("updateBook", func() {
-		Description("Update One Book")
+		Description("Update one item")
 		Payload(func() {
 			Attribute("id", String, func() {
 				Format(FormatUUID)
+				Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
 			})
-			Attribute("name", String)
+			Attribute("name", String, func() {
+				Example("Guillaume")
+			})
 			Attribute("price", Float64)
 			Required("id", "name", "price")
 		})
@@ -80,7 +84,7 @@ var _ = Service("crud", func() {
 	})
 
 	Method("getAllBooks", func() {
-		Description("Read All Books")
+		Description("Read All items")
 		HTTP(func() {
 			GET("/books")
 			Response(StatusOK)
@@ -93,10 +97,11 @@ var _ = Service("crud", func() {
 	})
 
 	Method("deleteBook", func() {
-		Description("Delete Book")
+		Description("Delete one item by ID")
 		Payload(func() {
 			Attribute("id", String, func() {
 				Format(FormatUUID)
+				Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
 			})
 			Required("id")
 		})
@@ -111,11 +116,12 @@ var _ = Service("crud", func() {
 	})
 
 	Method("createBook", func() {
-		Description("Create Book")
+		Description("Create one item")
 		Payload(func() {
 			Attribute("name", String, func() {
 				MinLength(3)
 				MaxLength(10)
+				Example("Guillaume")
 			})
 			Attribute("price", Float64)
 			Required("name", "price")
@@ -138,24 +144,50 @@ var _ = Service("crud", func() {
 			Description("Use client ID and client secret to oAuth")
 			Attribute("firstname", String, func() {
 				MinLength(3)
+				MaxLength(15)
+				Example("Guillaume")
 			})
 			Attribute("lastname", String, func() {
 				MinLength(3)
+				Example("Morin")
 			})
 			Attribute("password", String, func() {
-				MinLength(7)
+				MinLength(8)
 
 			})
 			Attribute("email", String, func() {
 				Format(FormatEmail)
+				Example("guillaume@epitech.eu")
 			})
 			Required("firstname", "lastname", "password", "email")
 		})
 
-		Result(Register)
+		Result(Sign)
 
 		HTTP(func() {
 			POST("/signup")
+			Response(StatusOK)
+		})
+	})
+
+	Method("signin", func() {
+		Description("signin")
+
+		Payload(func() {
+			Attribute("email", String, func() {
+				Format(FormatEmail)
+				Example("guillaume@epitech.eu")
+			})
+			Attribute("password", String, func() {
+				MinLength(8)
+			})
+			Required("password", "email")
+		})
+
+		Result(Sign)
+
+		HTTP(func() {
+			POST("/signin")
 			Response(StatusOK)
 		})
 	})
@@ -169,20 +201,23 @@ var _ = Service("openapi", func() {
 var BookResponse = Type("BookResponse", func() {
 	Attribute("id", String, func() {
 		Format(FormatUUID)
+		Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
 	})
-	Attribute("name", String)
+	Attribute("name", String, func() {
+		Example("Guillaume")
+	})
 	Attribute("price", Float64)
 	Required("id", "name", "price")
 })
 
 var idDoesntExist = Type("IdDoesntExist", func() {
 	Description("IdDoesntExist is the error returned when 0 book have the id corresponding")
-	Field(1, "message", String, "Returning error")
+	Field(1, "err", String, "Returning error")
 	Field(2, "id", String)
 	Field(3, "success", Boolean, func() {
 		Default(false)
 	})
-	Required("message", "success", "id")
+	Required("err", "success", "id")
 })
 
 var emailAlreadyExist = Type("emailAlreadyExist", func() {
@@ -194,14 +229,15 @@ var emailAlreadyExist = Type("emailAlreadyExist", func() {
 })
 
 var unknownError = Type("unknownError", func() {
-	Field(1, "message", String, "Returning error")
-	Field(2, "success", Boolean, func() {
+	Field(1, "err", String)
+	Field(2, "error_code", String)
+	Field(3, "success", Boolean, func() {
 		Default(false)
 	})
-	Required("message", "success")
+	Required("err", "success", "error_code")
 })
 
-var Register = Type("Register", func() {
+var Sign = Type("Sign", func() {
 	Field(1, "access_token", String, func() {
 		Example("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
 	})

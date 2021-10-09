@@ -15,18 +15,20 @@ import (
 
 // The principe of CRUD API with GET, PUT, POST, DELETE
 type Service interface {
-	// Read Book
+	// Get one item
 	GetBook(context.Context, *GetBookPayload) (res *GetBookResult, err error)
-	// Update One Book
+	// Update one item
 	UpdateBook(context.Context, *UpdateBookPayload) (res *UpdateBookResult, err error)
-	// Read All Books
+	// Read All items
 	GetAllBooks(context.Context) (res *GetAllBooksResult, err error)
-	// Delete Book
+	// Delete one item by ID
 	DeleteBook(context.Context, *DeleteBookPayload) (res *DeleteBookResult, err error)
-	// Create Book
+	// Create one item
 	CreateBook(context.Context, *CreateBookPayload) (res *CreateBookResult, err error)
 	// signup
-	Signup(context.Context, *SignupPayload) (res *Register, err error)
+	Signup(context.Context, *SignupPayload) (res *Sign, err error)
+	// signin
+	Signin(context.Context, *SigninPayload) (res *Sign, err error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -37,7 +39,7 @@ const ServiceName = "crud"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"getBook", "updateBook", "getAllBooks", "deleteBook", "createBook", "signup"}
+var MethodNames = [7]string{"getBook", "updateBook", "getAllBooks", "deleteBook", "createBook", "signup", "signin"}
 
 // GetBookPayload is the payload type of the crud service getBook method.
 type GetBookPayload struct {
@@ -103,11 +105,17 @@ type SignupPayload struct {
 	Email     string
 }
 
-// Register is the result type of the crud service signup method.
-type Register struct {
+// Sign is the result type of the crud service signup method.
+type Sign struct {
 	AccessToken  string
 	RefreshToken string
 	Success      bool
+}
+
+// SigninPayload is the payload type of the crud service signin method.
+type SigninPayload struct {
+	Email    string
+	Password string
 }
 
 type BookResponse struct {
@@ -122,19 +130,18 @@ type Unauthorized string
 // IdDoesntExist is the error returned when 0 book have the id corresponding
 type IDDoesntExist struct {
 	// Returning error
-	Message string
+	Err     string
 	ID      string
 	Success bool
 }
 
 type UnknownError struct {
-	// Returning error
-	Message string
-	Success bool
+	Err       string
+	ErrorCode string
+	Success   bool
 }
 
 type EmailAlreadyExist struct {
-	// Returning error
 	Message string
 	Success bool
 }

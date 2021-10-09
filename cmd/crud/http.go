@@ -66,7 +66,8 @@ func handleHTTPServer(ctx context.Context, u *url.URL, crudEndpoints *crud.Endpo
 		}
 	}
 	// Configure the mux.
-	openapisvr.Mount(mux, openapiServer)
+	svr := openapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("../../gen/http"))
+	openapisvr.Mount(mux, svr)
 	crudsvr.Mount(mux, crudServer)
 
 	// Wrap the multiplexer with additional middlewares. Middlewares mounted

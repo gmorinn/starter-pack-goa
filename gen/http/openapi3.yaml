@@ -11,7 +11,7 @@ paths:
       tags:
       - crud
       summary: getBook crud
-      description: Read Book
+      description: Get one item
       operationId: crud#getBook
       parameters:
       - name: id
@@ -19,9 +19,9 @@ paths:
         required: true
         schema:
           type: string
-          example: 0E0CB887-B526-812D-F285-DE018C555BB8
+          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           format: uuid
-        example: 77DFBD55-EC3C-CF64-7021-5A80D932517B
+        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
       responses:
         "200":
           description: OK response.
@@ -30,18 +30,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetBookResponseBody'
               example:
-                id: Eveniet non velit.
-                name: Eum ut corrupti.
-                price: 0.6309571725745455
+                id: Consectetur excepturi.
+                name: Et excepturi.
+                price: 0.47192910673773814
                 success: false
         "400":
           description: Bad Request response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnknownError'
+                $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Nihil dolorum ea voluptas.
+                message: Id dolor delectus.
                 success: false
         "401":
           description: Unauthorized response.
@@ -49,7 +49,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Mollitia voluptatibus quas.
+              example: At sint molestiae quam est eos perspiciatis.
         "500":
           description: Internal Server Error response.
           content:
@@ -57,13 +57,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/IDDoesntExist'
               example:
-                message: Aut impedit sequi.
-                success: false
+                err: Incidunt magnam totam.
+                error_code: Totam beatae et adipisci quis et ut.
+                success: true
     put:
       tags:
       - crud
       summary: updateBook crud
-      description: Update One Book
+      description: Update one item
       operationId: crud#updateBook
       parameters:
       - name: id
@@ -71,9 +72,9 @@ paths:
         required: true
         schema:
           type: string
-          example: 2AE5027E-EF4C-E00D-314E-1CB4449A11C0
+          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           format: uuid
-        example: 233374F1-297F-8711-5FC3-4F6B3731AD63
+        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
       requestBody:
         required: true
         content:
@@ -81,8 +82,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateBookRequestBody'
             example:
-              name: Sint voluptas in.
-              price: 0.6399601382054029
+              name: Guillaume
+              price: 0.08062031473621718
       responses:
         "200":
           description: OK response.
@@ -91,26 +92,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetBookResponseBody'
               example:
-                id: Non est harum ad sequi.
-                name: Id sed consequatur occaecati sed.
-                price: 0.4478314905371223
+                id: Numquam est culpa.
+                name: Nulla rerum laudantium recusandae blanditiis ea.
+                price: 0.5862269414454934
                 success: true
         "400":
           description: Bad Request response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnknownError'
+                $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Pariatur autem.
-                success: true
+                message: Et perferendis.
+                success: false
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Dignissimos aliquid.
+              example: Minus aut autem id.
         "500":
           description: Internal Server Error response.
           content:
@@ -118,14 +119,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/IDDoesntExist'
               example:
-                message: Ad excepturi alias.
-                success: true
+                err: Delectus et est atque ipsam.
+                error_code: Unde repellendus quaerat nemo neque.
+                success: false
   /book/add:
     post:
       tags:
       - crud
       summary: createBook crud
-      description: Create Book
+      description: Create one item
       operationId: crud#createBook
       requestBody:
         required: true
@@ -134,8 +136,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateBookRequestBody'
             example:
-              name: j71
-              price: 0.023143062949744986
+              name: Guillaume
+              price: 0.13037940184325017
       responses:
         "201":
           description: Created response.
@@ -145,18 +147,18 @@ paths:
                 $ref: '#/components/schemas/CreateBookResponseBody'
               example:
                 book:
-                  id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                  name: Debitis voluptatem.
-                  price: 0.5991312265161935
+                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 0.2993168197570513
                 success: true
         "400":
           description: Bad Request response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnknownError'
+                $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Quia quam natus dolorem nesciunt.
+                message: Dolore enim error voluptatem consectetur inventore.
                 success: false
         "401":
           description: Unauthorized response.
@@ -164,7 +166,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Unde occaecati ipsum quo est.
+              example: Dolor expedita quidem.
         "500":
           description: Internal Server Error response.
           content:
@@ -172,14 +174,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/IDDoesntExist'
               example:
-                message: Nobis ut quos assumenda.
+                err: Dolor aut odit aliquam aut perspiciatis.
+                error_code: Commodi et iusto.
                 success: true
   /book/remove/{id}:
     delete:
       tags:
       - crud
       summary: deleteBook crud
-      description: Delete Book
+      description: Delete one item by ID
       operationId: crud#deleteBook
       parameters:
       - name: id
@@ -187,9 +190,9 @@ paths:
         required: true
         schema:
           type: string
-          example: A8E7C55C-B3EA-B228-EF84-9DB3D55D57A4
+          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           format: uuid
-        example: 1576BB1F-D21C-05AD-6677-73725A387FA6
+        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
       responses:
         "200":
           description: OK response.
@@ -204,9 +207,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnknownError'
+                $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Nobis corporis.
+                message: Esse vero autem a omnis aut voluptatibus.
                 success: true
         "401":
           description: Unauthorized response.
@@ -214,7 +217,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Quisquam optio qui cupiditate.
+              example: Distinctio enim vel distinctio.
         "500":
           description: Internal Server Error response.
           content:
@@ -222,14 +225,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/IDDoesntExist'
               example:
-                message: Ipsa aut et nam nisi.
-                success: false
+                err: Laboriosam eligendi animi delectus.
+                error_code: Consequatur voluptas neque possimus odit veniam.
+                success: true
   /books:
     get:
       tags:
       - crud
       summary: getAllBooks crud
-      description: Read All Books
+      description: Read All items
       operationId: crud#getAllBooks
       responses:
         "200":
@@ -240,24 +244,24 @@ paths:
                 $ref: '#/components/schemas/GetAllBooksResponseBody'
               example:
                 books:
-                - id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                  name: Debitis voluptatem.
-                  price: 0.5991312265161935
-                - id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                  name: Debitis voluptatem.
-                  price: 0.5991312265161935
-                - id: 773F4E7F-A748-DF6D-4355-233071D2534A
-                  name: Debitis voluptatem.
-                  price: 0.5991312265161935
+                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 0.2993168197570513
+                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 0.2993168197570513
+                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 0.2993168197570513
                 success: false
         "400":
           description: Bad Request response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnknownError'
+                $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Autem recusandae voluptatem laudantium corporis ut.
+                message: Cumque voluptatem adipisci.
                 success: true
         "401":
           description: Unauthorized response.
@@ -265,7 +269,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Laborum non consequatur.
+              example: Consequatur voluptas.
         "500":
           description: Internal Server Error response.
           content:
@@ -273,8 +277,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/IDDoesntExist'
               example:
-                message: Aut dolores.
-                success: true
+                err: Omnis esse modi.
+                error_code: Tenetur blanditiis quo earum.
+                success: false
   /openapi.json:
     get:
       tags:
@@ -284,6 +289,59 @@ paths:
       responses:
         "200":
           description: File downloaded
+  /signin:
+    post:
+      tags:
+      - crud
+      summary: signin crud
+      description: signin
+      operationId: crud#signin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SigninRequestBody'
+            example:
+              email: guillaume@epitech.eu
+              password: jmq
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sign'
+              example:
+                access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+                refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+                success: true
+        "400":
+          description: Bad Request response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailAlreadyExist'
+              example:
+                message: Quis sapiente.
+                success: true
+        "401":
+          description: Unauthorized response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example: Quis assumenda et.
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDDoesntExist'
+              example:
+                err: Beatae accusantium qui accusantium voluptates et et.
+                error_code: Molestiae quasi et voluptas rerum tempore.
+                success: true
   /signup:
     post:
       tags:
@@ -298,17 +356,17 @@ paths:
             schema:
               $ref: '#/components/schemas/SignupRequestBody'
             example:
-              email: cordia.muller@ferry.name
-              firstname: o2q
-              lastname: ei1
-              password: wi5
+              email: guillaume@epitech.eu
+              firstname: Guillaume
+              lastname: Morin
+              password: idq
       responses:
         "200":
           description: OK response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Register'
+                $ref: '#/components/schemas/Sign'
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
@@ -318,9 +376,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnknownError'
+                $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Et nam voluptas maxime facilis labore voluptatem.
+                message: Nihil sint consequatur.
                 success: true
         "401":
           description: Unauthorized response.
@@ -328,7 +386,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Ut et cumque.
+              example: Atque id.
         "500":
           description: Internal Server Error response.
           content:
@@ -336,7 +394,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/IDDoesntExist'
               example:
-                message: Sunt odit aliquam quia.
+                err: Labore voluptate recusandae.
+                error_code: Id quis consequatur.
                 success: true
 components:
   schemas:
@@ -345,19 +404,19 @@ components:
       properties:
         id:
           type: string
-          example: A129B534-C1FC-F09D-BF29-3DA5781E0ECB
+          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           format: uuid
         name:
           type: string
-          example: Autem dolor est accusantium non est.
+          example: Guillaume
         price:
           type: number
-          example: 0.4254228782084665
+          example: 0.7507439233560477
           format: double
       example:
-        id: 4CCDE767-7648-444F-D09F-4B4FFE4EB36B
-        name: Sit sunt sequi.
-        price: 0.6766201316195586
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 0.040083175808508356
       required:
       - id
       - name
@@ -369,13 +428,13 @@ components:
           $ref: '#/components/schemas/BookResponse'
         success:
           type: boolean
-          example: false
+          example: true
       example:
         book:
-          id: 773F4E7F-A748-DF6D-4355-233071D2534A
-          name: Debitis voluptatem.
-          price: 0.5991312265161935
-        success: false
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 0.2993168197570513
+        success: true
       required:
       - book
       - success
@@ -384,10 +443,27 @@ components:
       properties:
         success:
           type: boolean
-          example: true
+          example: false
       example:
+        success: true
+      required:
+      - success
+    EmailAlreadyExist:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Nam consequatur et maxime.
+        success:
+          type: boolean
+          default: false
+          example: false
+      description: When email already exist
+      example:
+        message: Quia dolor rem unde sint.
         success: false
       required:
+      - message
       - success
     GetAllBooksResponseBody:
       type: object
@@ -397,27 +473,30 @@ components:
           items:
             $ref: '#/components/schemas/BookResponse'
           example:
-          - id: 773F4E7F-A748-DF6D-4355-233071D2534A
-            name: Debitis voluptatem.
-            price: 0.5991312265161935
-          - id: 773F4E7F-A748-DF6D-4355-233071D2534A
-            name: Debitis voluptatem.
-            price: 0.5991312265161935
-          - id: 773F4E7F-A748-DF6D-4355-233071D2534A
-            name: Debitis voluptatem.
-            price: 0.5991312265161935
+          - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 0.2993168197570513
+          - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 0.2993168197570513
+          - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 0.2993168197570513
         success:
           type: boolean
-          example: false
+          example: true
       example:
         books:
-        - id: 773F4E7F-A748-DF6D-4355-233071D2534A
-          name: Debitis voluptatem.
-          price: 0.5991312265161935
-        - id: 773F4E7F-A748-DF6D-4355-233071D2534A
-          name: Debitis voluptatem.
-          price: 0.5991312265161935
-        success: false
+        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 0.2993168197570513
+        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 0.2993168197570513
+        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 0.2993168197570513
+        success: true
       required:
       - books
       - success
@@ -426,21 +505,21 @@ components:
       properties:
         id:
           type: string
-          example: Animi dicta et placeat qui deleniti.
+          example: Aut adipisci.
         name:
           type: string
-          example: Quis rerum distinctio assumenda est laudantium.
+          example: Velit corrupti architecto accusamus eos dolor.
         price:
           type: number
-          example: 0.8543005591024386
+          example: 0.13925049655949595
           format: double
         success:
           type: boolean
           example: false
       example:
-        id: Quia dolorem ratione.
-        name: Cupiditate rerum nam sed qui.
-        price: 0.13556151216250195
+        id: Modi autem nesciunt.
+        name: Est tempore vel ipsa recusandae tenetur et.
+        price: 0.014420100680339642
         success: true
       required:
       - id
@@ -450,26 +529,27 @@ components:
     IDDoesntExist:
       type: object
       properties:
-        id:
-          type: string
-          example: Error sed.
-        message:
+        err:
           type: string
           description: Returning error
-          example: Mollitia ullam voluptatem.
+          example: Quam reprehenderit aliquam laborum tenetur.
+        id:
+          type: string
+          example: Odio sed illum rerum id quia.
         success:
           type: boolean
           default: false
-          example: false
+          example: true
+      description: When ID doesn't exist
       example:
-        id: Quam sed.
-        message: Voluptas iusto culpa id qui fugit odit.
-        success: false
+        err: Modi voluptas quae laborum qui unde.
+        id: Maxime maxime voluptatum beatae.
+        success: true
       required:
-      - message
+      - err
       - success
       - id
-    Register:
+    Sign:
       type: object
       properties:
         access_token:
@@ -484,36 +564,54 @@ components:
       example:
         access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-        success: true
+        success: false
       required:
       - access_token
       - refresh_token
       - success
+    SigninRequestBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: guillaume@epitech.eu
+          format: email
+        password:
+          type: string
+          example: fia
+          minLength: 8
+      example:
+        email: guillaume@epitech.eu
+        password: v7h
+      required:
+      - password
+      - email
     SignupRequestBody:
       type: object
       properties:
         email:
           type: string
-          example: joseph_weber@stiedemannbernier.com
+          example: guillaume@epitech.eu
           format: email
         firstname:
           type: string
-          example: 4nu
+          example: Guillaume
           minLength: 3
+          maxLength: 15
         lastname:
           type: string
-          example: sm8
+          example: Morin
           minLength: 3
         password:
           type: string
-          example: yjz
-          minLength: 7
+          example: mne
+          minLength: 8
       description: Use client ID and client secret to oAuth
       example:
-        email: kayli@stehr.com
-        firstname: shu
-        lastname: hdg
-        password: h9u
+        email: guillaume@epitech.eu
+        firstname: Guillaume
+        lastname: Morin
+        password: 5dw
       required:
       - firstname
       - lastname
@@ -522,38 +620,42 @@ components:
     Unauthorized:
       type: string
       description: Identifiers are invalid
-      example: Distinctio voluptates laborum.
+      example: Expedita inventore voluptate beatae dignissimos odio.
     UnknownError:
       type: object
       properties:
-        message:
+        err:
           type: string
-          description: Returning error
-          example: Et officia.
+          example: Reiciendis consequatur sed voluptatem eos sequi.
+        error_code:
+          type: string
+          example: Vitae ullam in dolorem nisi laborum sit.
         success:
           type: boolean
           default: false
           example: false
-      description: Error not identified
+      description: Error not identified (500)
       example:
-        message: Et voluptas voluptas hic et ut et.
+        err: Eos a porro.
+        error_code: Id sit.
         success: false
       required:
-      - message
+      - err
       - success
+      - error_code
     UpdateBookRequestBody:
       type: object
       properties:
         name:
           type: string
-          example: Voluptate dolorum.
+          example: Guillaume
         price:
           type: number
-          example: 0.6201686975094265
+          example: 0.05923306476516975
           format: double
       example:
-        name: Non nihil optio vel.
-        price: 0.41937332908089614
+        name: Guillaume
+        price: 0.6367119068829208
       required:
       - name
       - price

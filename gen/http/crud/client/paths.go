@@ -40,3 +40,8 @@ func CreateBookCrudPath() string {
 func SignupCrudPath() string {
 	return "/signup"
 }
+
+// SigninCrudPath returns the URL path to the crud service signin HTTP endpoint.
+func SigninCrudPath() string {
+	return "/signin"
+}

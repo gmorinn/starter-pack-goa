@@ -507,7 +507,7 @@ func EncodeCreateBookError(encoder func(context.Context, http.ResponseWriter) go
 // signup endpoint.
 func EncodeSignupResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res, _ := v.(*crud.Register)
+		res, _ := v.(*crud.Sign)
 		enc := encoder(ctx, w)
 		body := NewSignupResponseBody(res)
 		w.WriteHeader(http.StatusOK)
@@ -594,6 +594,107 @@ func EncodeSignupError(encoder func(context.Context, http.ResponseWriter) goahtt
 				body = formatter(res)
 			} else {
 				body = NewSignupUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeSigninResponse returns an encoder for responses returned by the crud
+// signin endpoint.
+func EncodeSigninResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*crud.Sign)
+		enc := encoder(ctx, w)
+		body := NewSigninResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeSigninRequest returns a decoder for requests sent to the crud signin
+// endpoint.
+func DecodeSigninRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body SigninRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateSigninRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewSigninPayload(&body)
+
+		return payload, nil
+	}
+}
+
+// EncodeSigninError returns an encoder for errors returned by the signin crud
+// endpoint.
+func EncodeSigninError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "email_already_exist":
+			res := v.(*crud.EmailAlreadyExist)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewSigninEmailAlreadyExistResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		case "id_doesnt_exist":
+			res := v.(*crud.IDDoesntExist)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewSigninIDDoesntExistResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "unknown_error":
+			res := v.(*crud.UnknownError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewSigninUnknownErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(crud.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewSigninUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusUnauthorized)

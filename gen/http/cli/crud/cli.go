@@ -23,13 +23,13 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `crud (get-book|update-book|get-all-books|delete-book|create-book|signup)
+	return `crud (get-book|update-book|get-all-books|delete-book|create-book|signup|signin)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` crud get-book --id "74C53540-E974-ABFF-2565-6BF99F9017B2"` + "\n" +
+	return os.Args[0] + ` crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"` + "\n" +
 		""
 }
 
@@ -62,6 +62,9 @@ func ParseEndpoint(
 
 		crudSignupFlags    = flag.NewFlagSet("signup", flag.ExitOnError)
 		crudSignupBodyFlag = crudSignupFlags.String("body", "REQUIRED", "")
+
+		crudSigninFlags    = flag.NewFlagSet("signin", flag.ExitOnError)
+		crudSigninBodyFlag = crudSigninFlags.String("body", "REQUIRED", "")
 	)
 	crudFlags.Usage = crudUsage
 	crudGetBookFlags.Usage = crudGetBookUsage
@@ -70,6 +73,7 @@ func ParseEndpoint(
 	crudDeleteBookFlags.Usage = crudDeleteBookUsage
 	crudCreateBookFlags.Usage = crudCreateBookUsage
 	crudSignupFlags.Usage = crudSignupUsage
+	crudSigninFlags.Usage = crudSigninUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -123,6 +127,9 @@ func ParseEndpoint(
 			case "signup":
 				epf = crudSignupFlags
 
+			case "signin":
+				epf = crudSigninFlags
+
 			}
 
 		}
@@ -166,6 +173,9 @@ func ParseEndpoint(
 			case "signup":
 				endpoint = c.Signup()
 				data, err = crudc.BuildSignupPayload(*crudSignupBodyFlag)
+			case "signin":
+				endpoint = c.Signin()
+				data, err = crudc.BuildSigninPayload(*crudSigninBodyFlag)
 			}
 		}
 	}
@@ -183,12 +193,13 @@ Usage:
     %[1]s [globalflags] crud COMMAND [flags]
 
 COMMAND:
-    get-book: Read Book
-    update-book: Update One Book
-    get-all-books: Read All Books
-    delete-book: Delete Book
-    create-book: Create Book
+    get-book: Get one item
+    update-book: Update one item
+    get-all-books: Read All items
+    delete-book: Delete one item by ID
+    create-book: Create one item
     signup: signup
+    signin: signin
 
 Additional help:
     %[1]s crud COMMAND --help
@@ -197,33 +208,33 @@ Additional help:
 func crudGetBookUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud get-book -id STRING
 
-Read Book
+Get one item
     -id STRING: 
 
 Example:
-    %[1]s crud get-book --id "74C53540-E974-ABFF-2565-6BF99F9017B2"
+    %[1]s crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
 `, os.Args[0])
 }
 
 func crudUpdateBookUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud update-book -body JSON -id STRING
 
-Update One Book
+Update one item
     -body JSON: 
     -id STRING: 
 
 Example:
     %[1]s crud update-book --body '{
-      "name": "Sint voluptas in.",
-      "price": 0.6399601382054029
-   }' --id "2C91774A-6D4A-67B6-DC43-6AED849DACC1"
+      "name": "Guillaume",
+      "price": 0.08062031473621718
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
 `, os.Args[0])
 }
 
 func crudGetAllBooksUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud get-all-books
 
-Read All Books
+Read All items
 
 Example:
     %[1]s crud get-all-books
@@ -233,24 +244,24 @@ Example:
 func crudDeleteBookUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud delete-book -id STRING
 
-Delete Book
+Delete one item by ID
     -id STRING: 
 
 Example:
-    %[1]s crud delete-book --id "1265498D-5A84-134A-1C7A-ED5B4B92788E"
+    %[1]s crud delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
 `, os.Args[0])
 }
 
 func crudCreateBookUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud create-book -body JSON
 
-Create Book
+Create one item
     -body JSON: 
 
 Example:
     %[1]s crud create-book --body '{
-      "name": "j71",
-      "price": 0.023143062949744986
+      "name": "Guillaume",
+      "price": 0.13037940184325017
    }'
 `, os.Args[0])
 }
@@ -263,10 +274,24 @@ signup
 
 Example:
     %[1]s crud signup --body '{
-      "email": "cordia.muller@ferry.name",
-      "firstname": "o2q",
-      "lastname": "ei1",
-      "password": "wi5"
+      "email": "guillaume@epitech.eu",
+      "firstname": "Guillaume",
+      "lastname": "Morin",
+      "password": "idq"
+   }'
+`, os.Args[0])
+}
+
+func crudSigninUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud signin -body JSON
+
+signin
+    -body JSON: 
+
+Example:
+    %[1]s crud signin --body '{
+      "email": "guillaume@epitech.eu",
+      "password": "jmq"
    }'
 `, os.Args[0])
 }

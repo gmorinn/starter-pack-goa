@@ -40,6 +40,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserByIDStmt, err = db.PrepareContext(ctx, getUserByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByID: %w", err)
 	}
+	if q.loginUserStmt, err = db.PrepareContext(ctx, loginUser); err != nil {
+		return nil, fmt.Errorf("error preparing query LoginUser: %w", err)
+	}
 	if q.signupStmt, err = db.PrepareContext(ctx, signup); err != nil {
 		return nil, fmt.Errorf("error preparing query Signup: %w", err)
 	}
@@ -79,6 +82,11 @@ func (q *Queries) Close() error {
 	if q.getUserByIDStmt != nil {
 		if cerr := q.getUserByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserByIDStmt: %w", cerr)
+		}
+	}
+	if q.loginUserStmt != nil {
+		if cerr := q.loginUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing loginUserStmt: %w", cerr)
 		}
 	}
 	if q.signupStmt != nil {
@@ -136,6 +144,7 @@ type Queries struct {
 	getBookStmt          *sql.Stmt
 	getBooksStmt         *sql.Stmt
 	getUserByIDStmt      *sql.Stmt
+	loginUserStmt        *sql.Stmt
 	signupStmt           *sql.Stmt
 	updateBookStmt       *sql.Stmt
 }
@@ -150,6 +159,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getBookStmt:          q.getBookStmt,
 		getBooksStmt:         q.getBooksStmt,
 		getUserByIDStmt:      q.getUserByIDStmt,
+		loginUserStmt:        q.loginUserStmt,
 		signupStmt:           q.signupStmt,
 		updateBookStmt:       q.updateBookStmt,
 	}

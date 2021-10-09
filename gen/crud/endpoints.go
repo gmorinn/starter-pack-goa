@@ -21,6 +21,7 @@ type Endpoints struct {
 	DeleteBook  goa.Endpoint
 	CreateBook  goa.Endpoint
 	Signup      goa.Endpoint
+	Signin      goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "crud" service with endpoints.
@@ -32,6 +33,7 @@ func NewEndpoints(s Service) *Endpoints {
 		DeleteBook:  NewDeleteBookEndpoint(s),
 		CreateBook:  NewCreateBookEndpoint(s),
 		Signup:      NewSignupEndpoint(s),
+		Signin:      NewSigninEndpoint(s),
 	}
 }
 
@@ -43,6 +45,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.DeleteBook = m(e.DeleteBook)
 	e.CreateBook = m(e.CreateBook)
 	e.Signup = m(e.Signup)
+	e.Signin = m(e.Signin)
 }
 
 // NewGetBookEndpoint returns an endpoint function that calls the method
@@ -95,5 +98,14 @@ func NewSignupEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*SignupPayload)
 		return s.Signup(ctx, p)
+	}
+}
+
+// NewSigninEndpoint returns an endpoint function that calls the method
+// "signin" of service "crud".
+func NewSigninEndpoint(s Service) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*SigninPayload)
+		return s.Signin(ctx, p)
 	}
 }
