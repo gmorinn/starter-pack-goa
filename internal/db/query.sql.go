@@ -41,6 +41,21 @@ func (q *Queries) DeleteBook(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const existUserByEmail = `-- name: ExistUserByEmail :one
+SELECT EXISTS(
+    SELECT id, created_at, updated_at, deleted_at, email, password, lastname, firstname FROM users
+    WHERE email = $1
+    AND deleted_at IS NULL
+)
+`
+
+func (q *Queries) ExistUserByEmail(ctx context.Context, email string) (bool, error) {
+	row := q.queryRow(ctx, q.existUserByEmailStmt, existUserByEmail, email)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const getBook = `-- name: GetBook :one
 SELECT id, created_at, price, name FROM books
 WHERE id = $1
@@ -88,6 +103,63 @@ func (q *Queries) GetBooks(ctx context.Context) ([]Book, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const getUserByID = `-- name: GetUserByID :one
+SELECT id, created_at, updated_at, deleted_at, email, password, lastname, firstname FROM users
+WHERE id = $1
+AND deleted_at IS NULL
+LIMIT 1
+`
+
+func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.queryRow(ctx, q.getUserByIDStmt, getUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.Email,
+		&i.Password,
+		&i.Lastname,
+		&i.Firstname,
+	)
+	return i, err
+}
+
+const signup = `-- name: Signup :one
+INSERT INTO users (firstname, lastname, email, password) 
+VALUES ($1, $2, $3, crypt($4, gen_salt('bf')))
+RETURNING id, created_at, updated_at, deleted_at, email, password, lastname, firstname
+`
+
+type SignupParams struct {
+	Firstname string      `json:"firstname"`
+	Lastname  string      `json:"lastname"`
+	Email     string      `json:"email"`
+	Crypt     interface{} `json:"crypt"`
+}
+
+func (q *Queries) Signup(ctx context.Context, arg SignupParams) (User, error) {
+	row := q.queryRow(ctx, q.signupStmt, signup,
+		arg.Firstname,
+		arg.Lastname,
+		arg.Email,
+		arg.Crypt,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.Email,
+		&i.Password,
+		&i.Lastname,
+		&i.Firstname,
+	)
+	return i, err
 }
 
 const updateBook = `-- name: UpdateBook :exec

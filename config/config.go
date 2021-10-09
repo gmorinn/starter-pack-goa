@@ -16,6 +16,7 @@ type API struct {
 	Port     int
 	Cert     string
 	Key      string
+	Security Security
 	Database Database
 }
 
@@ -26,6 +27,13 @@ type Database struct {
 	User     string
 	Password string
 	Port     int
+}
+
+// Security represent security
+type Security struct {
+	Secret               string
+	AccessTokenDuration  int
+	RefreshTokenDuration int
 }
 
 // Get return config
@@ -47,6 +55,10 @@ func Get() *API {
 	config.Database.User = os.Getenv("POSTGRES_USER")
 	config.Database.Password = os.Getenv("POSTGRES_PASSWORD")
 	config.Database.Port, _ = getenvInt("POSTGRES_PORT")
+
+	config.Security.Secret = os.Getenv("API_SECRET")
+	config.Security.AccessTokenDuration, _ = getenvInt("API_ACCESS_TOKEN")
+	config.Security.RefreshTokenDuration, _ = getenvInt("API_REFRESH_TOKEN")
 
 	return &config
 }

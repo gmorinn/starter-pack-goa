@@ -1,6 +1,8 @@
 package design
 
-import . "goa.design/goa/v3/dsl"
+import (
+	. "goa.design/goa/v3/dsl"
+)
 
 // API describes the global properties of the API server.
 var _ = API("basic", func() {
@@ -12,21 +14,24 @@ var _ = API("basic", func() {
 	})
 })
 
-var BookResponse = Type("BookResponse", func() {
-	Attribute("id", String, func() {
-		Format(FormatUUID)
-	})
-	Attribute("name", String)
-	Attribute("price", Float64)
-	Required("id", "name", "price")
-})
-
 // Service describes a service
 var _ = Service("crud", func() {
 	Description("The principe of CRUD API with GET, PUT, POST, DELETE")
 
 	Error("timeout", func() { // Use default error type
 		Timeout()
+	})
+
+	Error("unauthorized", String, "Identifiers are invalid")
+	Error("id_doesnt_exist", idDoesntExist)
+	Error("unknown_error", unknownError, "Error not identified")
+	Error("email_already_exist", emailAlreadyExist)
+
+	HTTP(func() {
+		Response("unauthorized", StatusUnauthorized)
+		Response("id_doesnt_exist", StatusInternalServerError)
+		Response("email_already_exist", StatusBadRequest)
+		Response("unknown_error", StatusInternalServerError)
 	})
 
 	Method("getBook", func() {
@@ -38,16 +43,8 @@ var _ = Service("crud", func() {
 			Required("id")
 		})
 
-		Error("id_doesnt_exist", IdDoesntExist, "Book with his id doesn't exist")
-		Error("unknown_error", unknownError, "Error not identified")
 		HTTP(func() {
 			GET("/book/{id}")
-			Response("id_doesnt_exist", StatusInternalServerError, func() {
-				Description("Book with his id doesn't exist")
-			})
-			Response("unknown_error", StatusInternalServerError, func() {
-				Description("Error in general")
-			})
 			Response(StatusOK)
 		})
 		Result(func() {
@@ -69,16 +66,8 @@ var _ = Service("crud", func() {
 			Attribute("price", Float64)
 			Required("id", "name", "price")
 		})
-		Error("id_doesnt_exist", IdDoesntExist, "Book with his id doesn't exist")
-		Error("unknown_error", unknownError, "Error not identified")
 		HTTP(func() {
 			PUT("/book/{id}")
-			Response("id_doesnt_exist", StatusInternalServerError, func() {
-				Description("Book with his id doesn't exist")
-			})
-			Response("unknown_error", StatusInternalServerError, func() {
-				Description("Error in general")
-			})
 			Response(StatusOK)
 		})
 		Result(func() {
@@ -92,12 +81,8 @@ var _ = Service("crud", func() {
 
 	Method("getAllBooks", func() {
 		Description("Read All Books")
-		Error("unknown_error", unknownError, "Error not identified")
 		HTTP(func() {
 			GET("/books")
-			Response("unknown_error", StatusInternalServerError, func() {
-				Description("Error in general")
-			})
 			Response(StatusOK)
 		})
 		Result(func() {
@@ -109,8 +94,6 @@ var _ = Service("crud", func() {
 
 	Method("deleteBook", func() {
 		Description("Delete Book")
-		Error("id_doesnt_exist", IdDoesntExist, "Book with his id doesn't exist")
-		Error("unknown_error", unknownError, "Error not identified")
 		Payload(func() {
 			Attribute("id", String, func() {
 				Format(FormatUUID)
@@ -119,12 +102,6 @@ var _ = Service("crud", func() {
 		})
 		HTTP(func() {
 			DELETE("/book/remove/{id}")
-			Response("id_doesnt_exist", StatusInternalServerError, func() {
-				Description("Book with his id doesn't exist")
-			})
-			Response("unknown_error", StatusInternalServerError, func() {
-				Description("Error in general")
-			})
 			Response(StatusOK)
 		})
 		Result(func() {
@@ -135,7 +112,6 @@ var _ = Service("crud", func() {
 
 	Method("createBook", func() {
 		Description("Create Book")
-		Error("unknown_error", unknownError, "Error not identified")
 		Payload(func() {
 			Attribute("name", String, func() {
 				MinLength(3)
@@ -146,9 +122,6 @@ var _ = Service("crud", func() {
 		})
 		HTTP(func() {
 			POST("/book/add")
-			Response("unknown_error", StatusInternalServerError, func() {
-				Description("Error in general")
-			})
 			Response(StatusCreated)
 		})
 		Result(func() {
@@ -158,22 +131,83 @@ var _ = Service("crud", func() {
 		})
 	})
 
+	Method("signup", func() {
+		Description("signup")
+
+		Payload(func() {
+			Description("Use client ID and client secret to oAuth")
+			Attribute("firstname", String, func() {
+				MinLength(3)
+			})
+			Attribute("lastname", String, func() {
+				MinLength(3)
+			})
+			Attribute("password", String, func() {
+				MinLength(7)
+
+			})
+			Attribute("email", String, func() {
+				Format(FormatEmail)
+			})
+			Required("firstname", "lastname", "password", "email")
+		})
+
+		Result(Register)
+
+		HTTP(func() {
+			POST("/signup")
+			Response(StatusOK)
+		})
+	})
+
 })
 
 var _ = Service("openapi", func() {
 	Files("/openapi.json", "openapi3.json")
 })
 
-var IdDoesntExist = Type("IdDoesntExist", func() {
+var BookResponse = Type("BookResponse", func() {
+	Attribute("id", String, func() {
+		Format(FormatUUID)
+	})
+	Attribute("name", String)
+	Attribute("price", Float64)
+	Required("id", "name", "price")
+})
+
+var idDoesntExist = Type("IdDoesntExist", func() {
 	Description("IdDoesntExist is the error returned when 0 book have the id corresponding")
 	Field(1, "message", String, "Returning error")
-	Field(1, "id", String, "Wrong Id")
-	Field(1, "success", Boolean)
-	Required("message", "id", "success")
+	Field(2, "id", String)
+	Field(3, "success", Boolean, func() {
+		Default(false)
+	})
+	Required("message", "success", "id")
+})
+
+var emailAlreadyExist = Type("emailAlreadyExist", func() {
+	Field(1, "message", String)
+	Field(2, "success", Boolean, func() {
+		Default(false)
+	})
+	Required("message", "success")
 })
 
 var unknownError = Type("unknownError", func() {
 	Field(1, "message", String, "Returning error")
-	Field(1, "success", Boolean)
+	Field(2, "success", Boolean, func() {
+		Default(false)
+	})
 	Required("message", "success")
+})
+
+var Register = Type("Register", func() {
+	Field(1, "access_token", String, func() {
+		Example("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+	})
+	Field(2, "refresh_token", String, func() {
+		Example("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+	})
+	Field(3, "success", Boolean)
+	Required("access_token", "refresh_token", "success")
 })

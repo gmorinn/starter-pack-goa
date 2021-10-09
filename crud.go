@@ -9,7 +9,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 )
@@ -19,6 +21,7 @@ import (
 type crudsrvc struct {
 	logger *log.Logger
 	store  *api.Store
+	config *config.API
 }
 
 // NewCrud returns the crud service implementation.
@@ -30,18 +33,33 @@ func NewCrud(logger *log.Logger) crud.Service {
 		log.Fatal(err)
 	}
 	store := api.NewStore(pg)
-	return &crudsrvc{logger, store}
+	return &crudsrvc{logger, store, cnf}
+}
+
+func Error_ID(msg, id string, err error) *crud.IDDoesntExist {
+	return &crud.IDDoesntExist{
+		Message: msg + " " + err.Error(),
+		ID:      id,
+	}
+}
+
+func ErrorResponse(msg string, err error) *crud.UnknownError {
+	return &crud.UnknownError{
+		Message: msg + " " + err.Error(),
+	}
+}
+
+func ErrorEmail() *crud.UnknownError {
+	return &crud.UnknownError{
+		Message: "EMAIL_ALREADY_EXIST",
+	}
 }
 
 // Read Book
 func (s *crudsrvc) GetBook(ctx context.Context, p *crud.GetBookPayload) (res *crud.GetBookResult, err error) {
 	book, err := s.store.GetBook(ctx, uuid.MustParse(p.ID))
 	if err != nil {
-		return nil, &crud.IDDoesntExist{
-			Message: "ERROR_GET_BOOK: " + err.Error(),
-			ID:      p.ID,
-			Success: false,
-		}
+		return nil, Error_ID("ERROR_GET_BOOK", p.ID, err)
 	}
 
 	response := crud.GetBookResult{
@@ -55,21 +73,9 @@ func (s *crudsrvc) GetBook(ctx context.Context, p *crud.GetBookPayload) (res *cr
 
 // Delete Book
 func (s *crudsrvc) DeleteBook(ctx context.Context, p *crud.DeleteBookPayload) (res *crud.DeleteBookResult, err error) {
-	if _, err := s.store.GetBook(ctx, uuid.MustParse(p.ID)); err != nil {
-		return nil, &crud.IDDoesntExist{
-			Message: "ERROR_GET_BOOK: " + err.Error(),
-			ID:      p.ID,
-			Success: false,
-		}
-	}
-
 	if err := s.store.DeleteBook(ctx, uuid.MustParse(p.ID)); err != nil {
-		return nil, &crud.UnknownError{
-			Message: "ERROR_DELETE_BOOK: " + err.Error(),
-			Success: false,
-		}
+		return nil, ErrorResponse("ERROR_DELETE_BOOK", err)
 	}
-
 	return &crud.DeleteBookResult{Success: true}, nil
 }
 
@@ -81,20 +87,13 @@ func (s *crudsrvc) CreateBook(ctx context.Context, p *crud.CreateBookPayload) (r
 	}
 	book, err := s.store.CreateBook(ctx, arg)
 	if err != nil {
-		return nil, &crud.UnknownError{
-			Message: "ERROR_CREATE_BOOK: " + err.Error(),
-			Success: false,
-		}
+		return nil, ErrorResponse("ERROR_CREATE_BOOK", err)
 	}
 
 	newBook, err := s.GetBook(ctx, &crud.GetBookPayload{ID: book.ID.String()})
 	if err != nil {
-		return nil, &crud.UnknownError{
-			Message: "ERROR_GET_BOOK: " + err.Error(),
-			Success: false,
-		}
+		return nil, Error_ID("ERROR_GET_BOOK", book.ID.String(), err)
 	}
-
 	response := crud.CreateBookResult{
 		Book: &crud.BookResponse{
 			ID:    newBook.ID,
@@ -111,14 +110,11 @@ func (s *crudsrvc) CreateBook(ctx context.Context, p *crud.CreateBookPayload) (r
 func (s *crudsrvc) GetAllBooks(ctx context.Context) (res *crud.GetAllBooksResult, err error) {
 	books, err := s.store.GetBooks(ctx)
 	if err != nil {
-		return nil, &crud.UnknownError{
-			Success: false,
-			Message: "ERROR_GET_ALL_BOOK: " + err.Error(),
-		}
+		return nil, ErrorResponse("ERROR_GET_ALL_BOOKS", err)
+
 	}
 
 	var BookResponse []*crud.BookResponse
-
 	for _, v := range books {
 		id := v.ID.String()
 		BookResponse = append(BookResponse, &crud.BookResponse{
@@ -141,28 +137,65 @@ func (s *crudsrvc) UpdateBook(ctx context.Context, p *crud.UpdateBookPayload) (r
 		Name:  p.Name,
 		Price: p.Price,
 	}
-
 	if err := s.store.UpdateBook(ctx, arg); err != nil {
-		return nil, &crud.UnknownError{
-			Success: false,
-			Message: "ERROR_UPDATE_BOOK: " + err.Error(),
-		}
-	}
+		return nil, ErrorResponse("ERROR_UPDATE_BOOK", err)
 
+	}
 	newBook, err := s.store.GetBook(ctx, uuid.MustParse(p.ID))
 	if err != nil {
-		return nil, &crud.IDDoesntExist{
-			Message: "ERROR_GET_BOOK: " + err.Error(),
-			ID:      p.ID,
-			Success: false,
-		}
-	}
+		return nil, Error_ID("ERROR_GET_BOOK", p.ID, err)
 
+	}
 	response := crud.UpdateBookResult{
 		ID:      newBook.ID.String(),
 		Name:    newBook.Name,
 		Price:   newBook.Price,
 		Success: true,
+	}
+	return &response, nil
+}
+
+func (s *crudsrvc) Signup(ctx context.Context, p *crud.SignupPayload) (res *crud.Register, err error) {
+
+	isExist, err := s.store.ExistUserByEmail(ctx, p.Email)
+	if err != nil {
+		return nil, ErrorResponse("ERROR_GET_MAIL", err)
+	}
+	if isExist {
+		return nil, ErrorEmail()
+	}
+
+	arg := db.SignupParams{
+		Firstname: p.Firstname,
+		Lastname:  p.Lastname,
+		Email:     p.Email,
+		Crypt:     p.Password,
+	}
+	user, err := s.store.Signup(ctx, arg)
+	if err != nil {
+		return nil, ErrorResponse("ERROR_CREATE_USER", err)
+	}
+
+	claims := make(jwt.MapClaims)
+	claims["id"] = user.ID.String()
+	claims["exp"] = time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.AccessTokenDuration))).Unix()
+	t, err := generateJWT(claims, s.config.Security.Secret)
+	if err != nil {
+		return nil, ErrorResponse("ERROR_GENERATE_ACCESS_JWT", err)
+	}
+
+	expt := time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.RefreshTokenDuration)))
+	exp := expt.Unix()
+	claims["exp"] = exp
+	r, err := generateJWT(claims, s.config.Security.Secret)
+	if err != nil {
+		return nil, ErrorResponse("ERROR_GENERATE_REFRESH_JWT", err)
+	}
+
+	response := crud.Register{
+		AccessToken:  t,
+		RefreshToken: r,
+		Success:      true,
 	}
 	return &response, nil
 }

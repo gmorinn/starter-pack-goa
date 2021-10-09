@@ -19,9 +19,9 @@ paths:
         required: true
         schema:
           type: string
-          example: 95545D09-3153-0F17-09F7-7FEB1545D780
+          example: 0E0CB887-B526-812D-F285-DE018C555BB8
           format: uuid
-        example: AC77D914-0A36-9917-2BA7-F519556A50B8
+        example: 77DFBD55-EC3C-CF64-7021-5A80D932517B
       responses:
         "200":
           description: OK response.
@@ -30,18 +30,34 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetBookResponseBody'
               example:
-                id: Voluptate recusandae voluptas id quis consequatur quasi.
-                name: Nihil sint consequatur.
-                price: 0.544306198131186
-                success: true
+                id: Eveniet non velit.
+                name: Eum ut corrupti.
+                price: 0.6309571725745455
+                success: false
+        "400":
+          description: Bad Request response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+              example:
+                message: Nihil dolorum ea voluptas.
+                success: false
+        "401":
+          description: Unauthorized response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example: Mollitia voluptatibus quas.
         "500":
-          description: Error in general
+          description: Internal Server Error response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/IDDoesntExist'
               example:
-                message: Quasi et voluptas.
+                message: Aut impedit sequi.
                 success: false
     put:
       tags:
@@ -55,9 +71,9 @@ paths:
         required: true
         schema:
           type: string
-          example: A129B534-C1FC-F09D-BF29-3DA5781E0ECB
+          example: 2AE5027E-EF4C-E00D-314E-1CB4449A11C0
           format: uuid
-        example: 4CCDE767-7648-444F-D09F-4B4FFE4EB36B
+        example: 233374F1-297F-8711-5FC3-4F6B3731AD63
       requestBody:
         required: true
         content:
@@ -65,8 +81,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateBookRequestBody'
             example:
-              name: Vitae nesciunt.
-              price: 0.3857041479314441
+              name: Sint voluptas in.
+              price: 0.6399601382054029
       responses:
         "200":
           description: OK response.
@@ -75,19 +91,35 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetBookResponseBody'
               example:
-                id: Animi ea ut mollitia tenetur et.
-                name: Qui sed.
-                price: 0.0033257296738615255
-                success: false
+                id: Non est harum ad sequi.
+                name: Id sed consequatur occaecati sed.
+                price: 0.4478314905371223
+                success: true
+        "400":
+          description: Bad Request response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+              example:
+                message: Pariatur autem.
+                success: true
+        "401":
+          description: Unauthorized response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example: Dignissimos aliquid.
         "500":
-          description: Error in general
+          description: Internal Server Error response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/IDDoesntExist'
               example:
-                message: Aperiam quidem cupiditate excepturi.
-                success: false
+                message: Ad excepturi alias.
+                success: true
   /book/add:
     post:
       tags:
@@ -102,8 +134,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateBookRequestBody'
             example:
-              name: 6u7
-              price: 0.4237253387372549
+              name: j71
+              price: 0.023143062949744986
       responses:
         "201":
           description: Created response.
@@ -113,19 +145,35 @@ paths:
                 $ref: '#/components/schemas/CreateBookResponseBody'
               example:
                 book:
-                  id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-                  name: Porro minus minus iure non est harum.
-                  price: 0.07143035631844412
+                  id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                  name: Debitis voluptatem.
+                  price: 0.5991312265161935
                 success: true
-        "500":
-          description: Error in general
+        "400":
+          description: Bad Request response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                message: Aperiam quis repellendus ut delectus distinctio.
+                message: Quia quam natus dolorem nesciunt.
                 success: false
+        "401":
+          description: Unauthorized response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example: Unde occaecati ipsum quo est.
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDDoesntExist'
+              example:
+                message: Nobis ut quos assumenda.
+                success: true
   /book/remove/{id}:
     delete:
       tags:
@@ -139,9 +187,9 @@ paths:
         required: true
         schema:
           type: string
-          example: 0C589E55-99C1-3ED8-809A-1463C91242B6
+          example: A8E7C55C-B3EA-B228-EF84-9DB3D55D57A4
           format: uuid
-        example: AB12B85B-1864-53B4-4A92-3519B45D0D5E
+        example: 1576BB1F-D21C-05AD-6677-73725A387FA6
       responses:
         "200":
           description: OK response.
@@ -150,16 +198,32 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeleteBookResponseBody'
               example:
+                success: false
+        "400":
+          description: Bad Request response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+              example:
+                message: Nobis corporis.
                 success: true
+        "401":
+          description: Unauthorized response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example: Quisquam optio qui cupiditate.
         "500":
-          description: Error in general
+          description: Internal Server Error response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/IDDoesntExist'
               example:
-                message: Laudantium corporis ut.
-                success: true
+                message: Ipsa aut et nam nisi.
+                success: false
   /books:
     get:
       tags:
@@ -176,27 +240,40 @@ paths:
                 $ref: '#/components/schemas/GetAllBooksResponseBody'
               example:
                 books:
-                - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-                  name: Porro minus minus iure non est harum.
-                  price: 0.07143035631844412
-                - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-                  name: Porro minus minus iure non est harum.
-                  price: 0.07143035631844412
-                - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-                  name: Porro minus minus iure non est harum.
-                  price: 0.07143035631844412
-                - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-                  name: Porro minus minus iure non est harum.
-                  price: 0.07143035631844412
-                success: true
-        "500":
-          description: Error in general
+                - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                  name: Debitis voluptatem.
+                  price: 0.5991312265161935
+                - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                  name: Debitis voluptatem.
+                  price: 0.5991312265161935
+                - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+                  name: Debitis voluptatem.
+                  price: 0.5991312265161935
+                success: false
+        "400":
+          description: Bad Request response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                message: Sed consequatur occaecati sed vel.
+                message: Autem recusandae voluptatem laudantium corporis ut.
+                success: true
+        "401":
+          description: Unauthorized response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example: Laborum non consequatur.
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDDoesntExist'
+              example:
+                message: Aut dolores.
                 success: true
   /openapi.json:
     get:
@@ -207,6 +284,60 @@ paths:
       responses:
         "200":
           description: File downloaded
+  /signup:
+    post:
+      tags:
+      - crud
+      summary: signup crud
+      description: signup
+      operationId: crud#signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequestBody'
+            example:
+              email: cordia.muller@ferry.name
+              firstname: o2q
+              lastname: ei1
+              password: wi5
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Register'
+              example:
+                access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+                refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+                success: true
+        "400":
+          description: Bad Request response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+              example:
+                message: Et nam voluptas maxime facilis labore voluptatem.
+                success: true
+        "401":
+          description: Unauthorized response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+              example: Ut et cumque.
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDDoesntExist'
+              example:
+                message: Sunt odit aliquam quia.
+                success: true
 components:
   schemas:
     BookResponse:
@@ -214,19 +345,19 @@ components:
       properties:
         id:
           type: string
-          example: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
+          example: A129B534-C1FC-F09D-BF29-3DA5781E0ECB
           format: uuid
         name:
           type: string
-          example: Omnis nobis eos pariatur qui.
+          example: Autem dolor est accusantium non est.
         price:
           type: number
-          example: 0.9288355556652551
+          example: 0.4254228782084665
           format: double
       example:
-        id: A45D83CF-F038-77BB-220E-D79EFC31D198
-        name: Et voluptatum doloremque sed in tempora dolores.
-        price: 0.33723830015506456
+        id: 4CCDE767-7648-444F-D09F-4B4FFE4EB36B
+        name: Sit sunt sequi.
+        price: 0.6766201316195586
       required:
       - id
       - name
@@ -238,13 +369,13 @@ components:
           $ref: '#/components/schemas/BookResponse'
         success:
           type: boolean
-          example: true
+          example: false
       example:
         book:
-          id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-          name: Porro minus minus iure non est harum.
-          price: 0.07143035631844412
-        success: true
+          id: 773F4E7F-A748-DF6D-4355-233071D2534A
+          name: Debitis voluptatem.
+          price: 0.5991312265161935
+        success: false
       required:
       - book
       - success
@@ -255,7 +386,7 @@ components:
           type: boolean
           example: true
       example:
-        success: true
+        success: false
       required:
       - success
     GetAllBooksResponseBody:
@@ -266,29 +397,26 @@ components:
           items:
             $ref: '#/components/schemas/BookResponse'
           example:
-          - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-            name: Porro minus minus iure non est harum.
-            price: 0.07143035631844412
-          - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-            name: Porro minus minus iure non est harum.
-            price: 0.07143035631844412
-          - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-            name: Porro minus minus iure non est harum.
-            price: 0.07143035631844412
+          - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+            name: Debitis voluptatem.
+            price: 0.5991312265161935
+          - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+            name: Debitis voluptatem.
+            price: 0.5991312265161935
+          - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+            name: Debitis voluptatem.
+            price: 0.5991312265161935
         success:
           type: boolean
-          example: true
+          example: false
       example:
         books:
-        - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-          name: Porro minus minus iure non est harum.
-          price: 0.07143035631844412
-        - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-          name: Porro minus minus iure non est harum.
-          price: 0.07143035631844412
-        - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-          name: Porro minus minus iure non est harum.
-          price: 0.07143035631844412
+        - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+          name: Debitis voluptatem.
+          price: 0.5991312265161935
+        - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+          name: Debitis voluptatem.
+          price: 0.5991312265161935
         success: false
       required:
       - books
@@ -298,21 +426,21 @@ components:
       properties:
         id:
           type: string
-          example: Consequatur et.
+          example: Animi dicta et placeat qui deleniti.
         name:
           type: string
-          example: Dolorum incidunt quia dolor.
+          example: Quis rerum distinctio assumenda est laudantium.
         price:
           type: number
-          example: 0.6678428513119036
+          example: 0.8543005591024386
           format: double
         success:
           type: boolean
-          example: true
+          example: false
       example:
-        id: Qui natus.
-        name: Nesciunt quidem.
-        price: 0.6587211247709938
+        id: Quia dolorem ratione.
+        name: Cupiditate rerum nam sed qui.
+        price: 0.13556151216250195
         success: true
       required:
       - id
@@ -324,37 +452,91 @@ components:
       properties:
         id:
           type: string
-          description: Wrong Id
-          example: Amet expedita dolorem.
+          example: Error sed.
         message:
           type: string
           description: Returning error
-          example: Ipsa qui aut harum repellat dignissimos soluta.
+          example: Mollitia ullam voluptatem.
+        success:
+          type: boolean
+          default: false
+          example: false
+      example:
+        id: Quam sed.
+        message: Voluptas iusto culpa id qui fugit odit.
+        success: false
+      required:
+      - message
+      - success
+      - id
+    Register:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         success:
           type: boolean
           example: false
-      description: Book with his id doesn't exist
       example:
-        id: Alias natus dolores modi libero ut ullam.
-        message: Nesciunt blanditiis deserunt dolores mollitia quia qui.
+        access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+        refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         success: true
       required:
-      - message
-      - id
+      - access_token
+      - refresh_token
       - success
+    SignupRequestBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: joseph_weber@stiedemannbernier.com
+          format: email
+        firstname:
+          type: string
+          example: 4nu
+          minLength: 3
+        lastname:
+          type: string
+          example: sm8
+          minLength: 3
+        password:
+          type: string
+          example: yjz
+          minLength: 7
+      description: Use client ID and client secret to oAuth
+      example:
+        email: kayli@stehr.com
+        firstname: shu
+        lastname: hdg
+        password: h9u
+      required:
+      - firstname
+      - lastname
+      - password
+      - email
+    Unauthorized:
+      type: string
+      description: Identifiers are invalid
+      example: Distinctio voluptates laborum.
     UnknownError:
       type: object
       properties:
         message:
           type: string
           description: Returning error
-          example: Illum aliquam veniam.
+          example: Et officia.
         success:
           type: boolean
-          example: true
+          default: false
+          example: false
       description: Error not identified
       example:
-        message: Tempore sapiente quam.
+        message: Et voluptas voluptas hic et ut et.
         success: false
       required:
       - message
@@ -364,14 +546,14 @@ components:
       properties:
         name:
           type: string
-          example: Doloremque dicta eaque dolores ducimus.
+          example: Voluptate dolorum.
         price:
           type: number
-          example: 0.34443400215013714
+          example: 0.6201686975094265
           format: double
       example:
-        name: Est dolore eveniet quibusdam.
-        price: 0.159571355015219
+        name: Non nihil optio vel.
+        price: 0.41937332908089614
       required:
       - name
       - price

@@ -28,11 +28,20 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteBookStmt, err = db.PrepareContext(ctx, deleteBook); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteBook: %w", err)
 	}
+	if q.existUserByEmailStmt, err = db.PrepareContext(ctx, existUserByEmail); err != nil {
+		return nil, fmt.Errorf("error preparing query ExistUserByEmail: %w", err)
+	}
 	if q.getBookStmt, err = db.PrepareContext(ctx, getBook); err != nil {
 		return nil, fmt.Errorf("error preparing query GetBook: %w", err)
 	}
 	if q.getBooksStmt, err = db.PrepareContext(ctx, getBooks); err != nil {
 		return nil, fmt.Errorf("error preparing query GetBooks: %w", err)
+	}
+	if q.getUserByIDStmt, err = db.PrepareContext(ctx, getUserByID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserByID: %w", err)
+	}
+	if q.signupStmt, err = db.PrepareContext(ctx, signup); err != nil {
+		return nil, fmt.Errorf("error preparing query Signup: %w", err)
 	}
 	if q.updateBookStmt, err = db.PrepareContext(ctx, updateBook); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateBook: %w", err)
@@ -52,6 +61,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteBookStmt: %w", cerr)
 		}
 	}
+	if q.existUserByEmailStmt != nil {
+		if cerr := q.existUserByEmailStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing existUserByEmailStmt: %w", cerr)
+		}
+	}
 	if q.getBookStmt != nil {
 		if cerr := q.getBookStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getBookStmt: %w", cerr)
@@ -60,6 +74,16 @@ func (q *Queries) Close() error {
 	if q.getBooksStmt != nil {
 		if cerr := q.getBooksStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getBooksStmt: %w", cerr)
+		}
+	}
+	if q.getUserByIDStmt != nil {
+		if cerr := q.getUserByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserByIDStmt: %w", cerr)
+		}
+	}
+	if q.signupStmt != nil {
+		if cerr := q.signupStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing signupStmt: %w", cerr)
 		}
 	}
 	if q.updateBookStmt != nil {
@@ -104,23 +128,29 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db             DBTX
-	tx             *sql.Tx
-	createBookStmt *sql.Stmt
-	deleteBookStmt *sql.Stmt
-	getBookStmt    *sql.Stmt
-	getBooksStmt   *sql.Stmt
-	updateBookStmt *sql.Stmt
+	db                   DBTX
+	tx                   *sql.Tx
+	createBookStmt       *sql.Stmt
+	deleteBookStmt       *sql.Stmt
+	existUserByEmailStmt *sql.Stmt
+	getBookStmt          *sql.Stmt
+	getBooksStmt         *sql.Stmt
+	getUserByIDStmt      *sql.Stmt
+	signupStmt           *sql.Stmt
+	updateBookStmt       *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:             tx,
-		tx:             tx,
-		createBookStmt: q.createBookStmt,
-		deleteBookStmt: q.deleteBookStmt,
-		getBookStmt:    q.getBookStmt,
-		getBooksStmt:   q.getBooksStmt,
-		updateBookStmt: q.updateBookStmt,
+		db:                   tx,
+		tx:                   tx,
+		createBookStmt:       q.createBookStmt,
+		deleteBookStmt:       q.deleteBookStmt,
+		existUserByEmailStmt: q.existUserByEmailStmt,
+		getBookStmt:          q.getBookStmt,
+		getBooksStmt:         q.getBooksStmt,
+		getUserByIDStmt:      q.getUserByIDStmt,
+		signupStmt:           q.signupStmt,
+		updateBookStmt:       q.updateBookStmt,
 	}
 }

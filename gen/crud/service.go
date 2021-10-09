@@ -25,6 +25,8 @@ type Service interface {
 	DeleteBook(context.Context, *DeleteBookPayload) (res *DeleteBookResult, err error)
 	// Create Book
 	CreateBook(context.Context, *CreateBookPayload) (res *CreateBookResult, err error)
+	// signup
+	Signup(context.Context, *SignupPayload) (res *Register, err error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -35,7 +37,7 @@ const ServiceName = "crud"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [5]string{"getBook", "updateBook", "getAllBooks", "deleteBook", "createBook"}
+var MethodNames = [6]string{"getBook", "updateBook", "getAllBooks", "deleteBook", "createBook", "signup"}
 
 // GetBookPayload is the payload type of the crud service getBook method.
 type GetBookPayload struct {
@@ -93,17 +95,34 @@ type CreateBookResult struct {
 	Success bool
 }
 
+// Use client ID and client secret to oAuth
+type SignupPayload struct {
+	Firstname string
+	Lastname  string
+	Password  string
+	Email     string
+}
+
+// Register is the result type of the crud service signup method.
+type Register struct {
+	AccessToken  string
+	RefreshToken string
+	Success      bool
+}
+
 type BookResponse struct {
 	ID    string
 	Name  string
 	Price float64
 }
 
+// Identifiers are invalid
+type Unauthorized string
+
 // IdDoesntExist is the error returned when 0 book have the id corresponding
 type IDDoesntExist struct {
 	// Returning error
 	Message string
-	// Wrong Id
 	ID      string
 	Success bool
 }
@@ -112,6 +131,22 @@ type UnknownError struct {
 	// Returning error
 	Message string
 	Success bool
+}
+
+type EmailAlreadyExist struct {
+	// Returning error
+	Message string
+	Success bool
+}
+
+// Error returns an error description.
+func (e Unauthorized) Error() string {
+	return "Identifiers are invalid"
+}
+
+// ErrorName returns "unauthorized".
+func (e Unauthorized) ErrorName() string {
+	return "unauthorized"
 }
 
 // Error returns an error description.
@@ -132,6 +167,16 @@ func (e *UnknownError) Error() string {
 // ErrorName returns "unknownError".
 func (e *UnknownError) ErrorName() string {
 	return "unknown_error"
+}
+
+// Error returns an error description.
+func (e *EmailAlreadyExist) Error() string {
+	return ""
+}
+
+// ErrorName returns "emailAlreadyExist".
+func (e *EmailAlreadyExist) ErrorName() string {
+	return "email_already_exist"
 }
 
 // MakeTimeout builds a goa.ServiceError from an error.

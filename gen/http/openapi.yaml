@@ -36,8 +36,19 @@ paths:
             - name
             - price
             - success
+        "400":
+          description: Bad Request response.
+          schema:
+            $ref: '#/definitions/CrudGetBookEmailAlreadyExistResponseBody'
+            required:
+            - message
+            - success
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/CrudGetBookUnauthorizedResponseBody'
         "500":
-          description: Error in general
+          description: Internal Server Error response.
           schema:
             $ref: '#/definitions/CrudGetBookUnknownErrorResponseBody'
             required:
@@ -75,8 +86,19 @@ paths:
             - name
             - price
             - success
+        "400":
+          description: Bad Request response.
+          schema:
+            $ref: '#/definitions/CrudUpdateBookEmailAlreadyExistResponseBody'
+            required:
+            - message
+            - success
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/CrudUpdateBookUnauthorizedResponseBody'
         "500":
-          description: Error in general
+          description: Internal Server Error response.
           schema:
             $ref: '#/definitions/CrudUpdateBookUnknownErrorResponseBody'
             required:
@@ -108,8 +130,19 @@ paths:
             required:
             - book
             - success
+        "400":
+          description: Bad Request response.
+          schema:
+            $ref: '#/definitions/CrudCreateBookEmailAlreadyExistResponseBody'
+            required:
+            - message
+            - success
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/CrudCreateBookUnauthorizedResponseBody'
         "500":
-          description: Error in general
+          description: Internal Server Error response.
           schema:
             $ref: '#/definitions/CrudCreateBookUnknownErrorResponseBody'
             required:
@@ -137,8 +170,19 @@ paths:
             $ref: '#/definitions/CrudDeleteBookResponseBody'
             required:
             - success
+        "400":
+          description: Bad Request response.
+          schema:
+            $ref: '#/definitions/CrudDeleteBookEmailAlreadyExistResponseBody'
+            required:
+            - message
+            - success
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/CrudDeleteBookUnauthorizedResponseBody'
         "500":
-          description: Error in general
+          description: Internal Server Error response.
           schema:
             $ref: '#/definitions/CrudDeleteBookUnknownErrorResponseBody'
             required:
@@ -161,8 +205,19 @@ paths:
             required:
             - books
             - success
+        "400":
+          description: Bad Request response.
+          schema:
+            $ref: '#/definitions/CrudGetAllBooksEmailAlreadyExistResponseBody'
+            required:
+            - message
+            - success
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/CrudGetAllBooksUnauthorizedResponseBody'
         "500":
-          description: Error in general
+          description: Internal Server Error response.
           schema:
             $ref: '#/definitions/CrudGetAllBooksUnknownErrorResponseBody'
             required:
@@ -183,6 +238,53 @@ paths:
             type: file
       schemes:
       - http
+  /signup:
+    post:
+      tags:
+      - crud
+      summary: signup crud
+      description: signup
+      operationId: crud#signup
+      parameters:
+      - name: SignupRequestBody
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/CrudSignupRequestBody'
+          required:
+          - firstname
+          - lastname
+          - password
+          - email
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/CrudSignupResponseBody'
+            required:
+            - access_token
+            - refresh_token
+            - success
+        "400":
+          description: Bad Request response.
+          schema:
+            $ref: '#/definitions/CrudSignupEmailAlreadyExistResponseBody'
+            required:
+            - message
+            - success
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/CrudSignupUnauthorizedResponseBody'
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/CrudSignupUnknownErrorResponseBody'
+            required:
+            - message
+            - success
+      schemes:
+      - http
 definitions:
   BookResponseResponseBody:
     title: BookResponseResponseBody
@@ -190,39 +292,81 @@ definitions:
     properties:
       id:
         type: string
-        example: 1265498D-5A84-134A-1C7A-ED5B4B92788E
+        example: 76FB876C-96AC-91E7-BD21-B0C2988DDF65
         format: uuid
       name:
         type: string
-        example: Est consequatur quia optio.
+        example: Iure illum.
       price:
         type: number
-        example: 0.7291693177339085
+        example: 0.819434771833692
         format: double
     example:
-      id: 7D80331A-7620-D09D-7CCB-2EF87B797732
-      name: Ipsam rerum.
-      price: 0.2660289833301354
+      id: A45D83CF-F038-77BB-220E-D79EFC31D198
+      name: Et voluptatum doloremque sed in tempora dolores.
+      price: 0.33723830015506456
     required:
     - id
     - name
     - price
+  CrudCreateBookEmailAlreadyExistResponseBody:
+    title: CrudCreateBookEmailAlreadyExistResponseBody
+    type: object
+    properties:
+      message:
+        type: string
+        description: Returning error
+        default: Email_Already_Exist
+        example: Ratione natus sit.
+      success:
+        type: boolean
+        default: false
+        example: false
+    example:
+      message: Minima accusantium est quos quam.
+      success: false
+    required:
+    - message
+    - success
+  CrudCreateBookIDDoesntExistResponseBody:
+    title: CrudCreateBookIDDoesntExistResponseBody
+    type: object
+    properties:
+      id:
+        type: string
+        example: Quibusdam minima sapiente accusantium sint.
+      message:
+        type: string
+        description: Returning error
+        example: Voluptas delectus eos reprehenderit.
+      success:
+        type: boolean
+        default: false
+        example: false
+    example:
+      id: Porro sunt consequatur est nemo.
+      message: Et beatae et necessitatibus.
+      success: true
+    required:
+    - message
+    - success
+    - id
   CrudCreateBookRequestBody:
     title: CrudCreateBookRequestBody
     type: object
     properties:
       name:
         type: string
-        example: 1bj
+        example: g0j
         minLength: 3
         maxLength: 10
       price:
         type: number
-        example: 0.06634497172281495
+        example: 0.06873857912299935
         format: double
     example:
-      name: w8b
-      price: 0.9350966163659117
+      name: "337"
+      price: 0.7746400509912199
     required:
     - name
     - price
@@ -237,13 +381,18 @@ definitions:
         example: false
     example:
       book:
-        id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-        name: Porro minus minus iure non est harum.
-        price: 0.07143035631844412
+        id: 773F4E7F-A748-DF6D-4355-233071D2534A
+        name: Debitis voluptatem.
+        price: 0.5991312265161935
       success: true
     required:
     - book
     - success
+  CrudCreateBookUnauthorizedResponseBody:
+    title: CrudCreateBookUnauthorizedResponseBody
+    type: string
+    description: Identifiers are invalid
+    example: Quia qui maiores sunt.
   CrudCreateBookUnknownErrorResponseBody:
     title: CrudCreateBookUnknownErrorResponseBody
     type: object
@@ -251,14 +400,34 @@ definitions:
       message:
         type: string
         description: Returning error
-        example: Cumque nihil reiciendis consequatur sed voluptatem.
+        example: Aliquid aut ipsa eaque.
       success:
         type: boolean
-        example: true
+        default: false
+        example: false
     description: Error not identified
     example:
-      message: Vitae vitae ullam in dolorem nisi laborum.
-      success: false
+      message: Enim et dolorum repudiandae distinctio nisi.
+      success: true
+    required:
+    - message
+    - success
+  CrudDeleteBookEmailAlreadyExistResponseBody:
+    title: CrudDeleteBookEmailAlreadyExistResponseBody
+    type: object
+    properties:
+      message:
+        type: string
+        description: Returning error
+        default: Email_Already_Exist
+        example: Accusamus consequatur modi rerum et voluptatem.
+      success:
+        type: boolean
+        default: false
+        example: false
+    example:
+      message: Qui commodi velit illum.
+      success: true
     required:
     - message
     - success
@@ -268,35 +437,39 @@ definitions:
     properties:
       id:
         type: string
-        description: Wrong Id
-        example: Beatae voluptas.
+        example: Perspiciatis et est earum ut sint.
       message:
         type: string
         description: Returning error
-        example: Est tempore vel ipsa recusandae tenetur et.
+        example: Aut iure voluptas ipsam autem.
       success:
         type: boolean
-        example: false
-    description: Book with his id doesn't exist
+        default: false
+        example: true
     example:
-      id: Laborum tenetur.
-      message: Voluptate beatae dignissimos odio veritatis quam reprehenderit.
-      success: true
+      id: Maiores dolores atque similique.
+      message: Quia voluptate culpa asperiores consequatur aut.
+      success: false
     required:
     - message
-    - id
     - success
+    - id
   CrudDeleteBookResponseBody:
     title: CrudDeleteBookResponseBody
     type: object
     properties:
       success:
         type: boolean
-        example: false
+        example: true
     example:
       success: true
     required:
     - success
+  CrudDeleteBookUnauthorizedResponseBody:
+    title: CrudDeleteBookUnauthorizedResponseBody
+    type: string
+    description: Identifiers are invalid
+    example: Commodi qui.
   CrudDeleteBookUnknownErrorResponseBody:
     title: CrudDeleteBookUnknownErrorResponseBody
     type: object
@@ -304,17 +477,60 @@ definitions:
       message:
         type: string
         description: Returning error
-        example: Sed illum rerum id quia ut.
+        example: Et enim.
       success:
         type: boolean
-        example: true
+        default: false
+        example: false
     description: Error not identified
     example:
-      message: Voluptas quae laborum qui unde ullam.
+      message: Voluptas id est aliquam facere.
       success: false
     required:
     - message
     - success
+  CrudGetAllBooksEmailAlreadyExistResponseBody:
+    title: CrudGetAllBooksEmailAlreadyExistResponseBody
+    type: object
+    properties:
+      message:
+        type: string
+        description: Returning error
+        default: Email_Already_Exist
+        example: Aperiam praesentium eveniet non enim.
+      success:
+        type: boolean
+        default: false
+        example: true
+    example:
+      message: Nulla vero at perspiciatis molestiae.
+      success: true
+    required:
+    - message
+    - success
+  CrudGetAllBooksIDDoesntExistResponseBody:
+    title: CrudGetAllBooksIDDoesntExistResponseBody
+    type: object
+    properties:
+      id:
+        type: string
+        example: Reiciendis ratione quisquam in deserunt impedit.
+      message:
+        type: string
+        description: Returning error
+        example: Tenetur explicabo quisquam ratione est quas.
+      success:
+        type: boolean
+        default: false
+        example: false
+    example:
+      id: Et alias et sunt.
+      message: Et in corporis cumque.
+      success: false
+    required:
+    - message
+    - success
+    - id
   CrudGetAllBooksResponseBody:
     title: CrudGetAllBooksResponseBody
     type: object
@@ -324,39 +540,38 @@ definitions:
         items:
           $ref: '#/definitions/BookResponseResponseBody'
         example:
-        - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-          name: Porro minus minus iure non est harum.
-          price: 0.07143035631844412
-        - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-          name: Porro minus minus iure non est harum.
-          price: 0.07143035631844412
-        - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-          name: Porro minus minus iure non est harum.
-          price: 0.07143035631844412
-        - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-          name: Porro minus minus iure non est harum.
-          price: 0.07143035631844412
+        - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+          name: Debitis voluptatem.
+          price: 0.5991312265161935
+        - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+          name: Debitis voluptatem.
+          price: 0.5991312265161935
+        - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+          name: Debitis voluptatem.
+          price: 0.5991312265161935
       success:
         type: boolean
-        example: false
+        example: true
     example:
       books:
-      - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-        name: Porro minus minus iure non est harum.
-        price: 0.07143035631844412
-      - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-        name: Porro minus minus iure non est harum.
-        price: 0.07143035631844412
-      - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-        name: Porro minus minus iure non est harum.
-        price: 0.07143035631844412
-      - id: 2C91774A-6D4A-67B6-DC43-6AED849DACC1
-        name: Porro minus minus iure non est harum.
-        price: 0.07143035631844412
+      - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+        name: Debitis voluptatem.
+        price: 0.5991312265161935
+      - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+        name: Debitis voluptatem.
+        price: 0.5991312265161935
+      - id: 773F4E7F-A748-DF6D-4355-233071D2534A
+        name: Debitis voluptatem.
+        price: 0.5991312265161935
       success: false
     required:
     - books
     - success
+  CrudGetAllBooksUnauthorizedResponseBody:
+    title: CrudGetAllBooksUnauthorizedResponseBody
+    type: string
+    description: Identifiers are invalid
+    example: Ut doloribus aut tenetur ad omnis.
   CrudGetAllBooksUnknownErrorResponseBody:
     title: CrudGetAllBooksUnknownErrorResponseBody
     type: object
@@ -364,14 +579,34 @@ definitions:
       message:
         type: string
         description: Returning error
-        example: Iure ut aut adipisci consequatur velit corrupti.
+        example: Voluptas voluptatem id voluptatem iste.
       success:
         type: boolean
+        default: false
         example: false
     description: Error not identified
     example:
-      message: Eos dolor atque odit est.
+      message: Ratione non est voluptas est eum praesentium.
       success: false
+    required:
+    - message
+    - success
+  CrudGetBookEmailAlreadyExistResponseBody:
+    title: CrudGetBookEmailAlreadyExistResponseBody
+    type: object
+    properties:
+      message:
+        type: string
+        description: Returning error
+        default: Email_Already_Exist
+        example: Eos odio.
+      success:
+        type: boolean
+        default: false
+        example: false
+    example:
+      message: Rerum id quia ut reprehenderit modi voluptas.
+      success: true
     required:
     - message
     - success
@@ -381,51 +616,55 @@ definitions:
     properties:
       id:
         type: string
-        description: Wrong Id
-        example: Eos repellat et fugit porro repellendus.
+        example: Dolor atque odit.
       message:
         type: string
         description: Returning error
-        example: Dolorem tenetur consectetur accusantium.
+        example: Consequatur velit corrupti architecto accusamus.
       success:
         type: boolean
+        default: false
         example: true
-    description: Book with his id doesn't exist
     example:
-      id: Harum optio assumenda doloremque sit.
-      message: Ut dolorem numquam totam.
-      success: false
+      id: Tempore vel.
+      message: Autem nesciunt consectetur.
+      success: true
     required:
     - message
-    - id
     - success
+    - id
   CrudGetBookResponseBody:
     title: CrudGetBookResponseBody
     type: object
     properties:
       id:
         type: string
-        example: Perferendis voluptate dignissimos aut rerum.
+        example: Dignissimos tempore.
       name:
         type: string
-        example: Accusamus dolores quia suscipit dolorum ad dolores.
+        example: Molestias possimus sunt voluptas nihil tenetur eos.
       price:
         type: number
-        example: 0.2757119478915782
+        example: 0.30450652951559226
         format: double
       success:
         type: boolean
-        example: false
+        example: true
     example:
-      id: Rerum consectetur corporis consequatur possimus.
-      name: Nobis beatae eos praesentium dolores ut.
-      price: 0.4332170588773193
-      success: false
+      id: Officiis accusamus provident.
+      name: Rerum sapiente commodi odit repellat.
+      price: 0.7918525550880594
+      success: true
     required:
     - id
     - name
     - price
     - success
+  CrudGetBookUnauthorizedResponseBody:
+    title: CrudGetBookUnauthorizedResponseBody
+    type: string
+    description: Identifiers are invalid
+    example: Ut aut.
   CrudGetBookUnknownErrorResponseBody:
     title: CrudGetBookUnknownErrorResponseBody
     type: object
@@ -433,14 +672,152 @@ definitions:
       message:
         type: string
         description: Returning error
-        example: Tempore molestiae quia rerum alias et.
+        example: Tenetur et sit beatae voluptas expedita.
       success:
         type: boolean
+        default: false
+        example: true
+    description: Error not identified
+    example:
+      message: Beatae dignissimos odio veritatis quam reprehenderit aliquam.
+      success: false
+    required:
+    - message
+    - success
+  CrudSignupEmailAlreadyExistResponseBody:
+    title: CrudSignupEmailAlreadyExistResponseBody
+    type: object
+    properties:
+      message:
+        type: string
+        description: Returning error
+        default: Email_Already_Exist
+        example: Quisquam consequatur in a minus rerum unde.
+      success:
+        type: boolean
+        default: false
+        example: true
+    example:
+      message: Nobis aliquam voluptates accusantium.
+      success: false
+    required:
+    - message
+    - success
+  CrudSignupIDDoesntExistResponseBody:
+    title: CrudSignupIDDoesntExistResponseBody
+    type: object
+    properties:
+      id:
+        type: string
+        example: Architecto quibusdam aliquam dolorum culpa.
+      message:
+        type: string
+        description: Returning error
+        example: Rem aut quis dolores beatae.
+      success:
+        type: boolean
+        default: false
+        example: false
+    example:
+      id: Natus dolor aut voluptatibus.
+      message: Omnis quaerat voluptatem possimus sit voluptatem.
+      success: false
+    required:
+    - message
+    - success
+    - id
+  CrudSignupRequestBody:
+    title: CrudSignupRequestBody
+    type: object
+    properties:
+      email:
+        type: string
+        example: lucio@white.info
+        format: email
+      firstname:
+        type: string
+        example: pjy
+        minLength: 3
+      lastname:
+        type: string
+        example: fqq
+        minLength: 3
+      password:
+        type: string
+        example: th7
+        minLength: 7
+    description: Use client ID and client secret to oAuth
+    example:
+      email: juvenal@greenholt.com
+      firstname: 7sk
+      lastname: xqs
+      password: euo
+    required:
+    - firstname
+    - lastname
+    - password
+    - email
+  CrudSignupResponseBody:
+    title: CrudSignupResponseBody
+    type: object
+    properties:
+      access_token:
+        type: string
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      refresh_token:
+        type: string
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      success:
+        type: boolean
+        example: true
+    example:
+      access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      success: false
+    required:
+    - access_token
+    - refresh_token
+    - success
+  CrudSignupUnauthorizedResponseBody:
+    title: CrudSignupUnauthorizedResponseBody
+    type: string
+    description: Identifiers are invalid
+    example: Impedit culpa tempora.
+  CrudSignupUnknownErrorResponseBody:
+    title: CrudSignupUnknownErrorResponseBody
+    type: object
+    properties:
+      message:
+        type: string
+        description: Returning error
+        example: Eaque autem.
+      success:
+        type: boolean
+        default: false
         example: false
     description: Error not identified
     example:
-      message: Distinctio sit autem perferendis eos.
+      message: In quia autem mollitia tempora vitae rerum.
       success: false
+    required:
+    - message
+    - success
+  CrudUpdateBookEmailAlreadyExistResponseBody:
+    title: CrudUpdateBookEmailAlreadyExistResponseBody
+    type: object
+    properties:
+      message:
+        type: string
+        description: Returning error
+        default: Email_Already_Exist
+        example: Recusandae illum aliquam veniam hic vel.
+      success:
+        type: boolean
+        default: false
+        example: true
+    example:
+      message: Quam harum accusantium doloremque dicta eaque dolores.
+      success: true
     required:
     - message
     - success
@@ -450,38 +827,37 @@ definitions:
     properties:
       id:
         type: string
-        description: Wrong Id
-        example: Consequatur autem dicta veritatis.
+        example: Natus placeat nesciunt quidem omnis optio.
       message:
         type: string
         description: Returning error
-        example: Nobis corporis.
+        example: Incidunt quia dolor rem unde sint.
       success:
         type: boolean
-        example: false
-    description: Book with his id doesn't exist
+        default: false
+        example: true
     example:
-      id: Iste quibusdam reprehenderit architecto.
-      message: Accusantium unde occaecati ipsum quo.
+      id: Amet expedita dolorem.
+      message: Qui aut harum repellat dignissimos soluta.
       success: false
     required:
     - message
-    - id
     - success
+    - id
   CrudUpdateBookRequestBody:
     title: CrudUpdateBookRequestBody
     type: object
     properties:
       name:
         type: string
-        example: Quam natus dolorem nesciunt.
+        example: Aut est dolore.
       price:
         type: number
-        example: 0.5342692968236854
+        example: 0.1808893433760366
         format: double
     example:
-      name: A architecto officiis eum magni sunt.
-      price: 0.3357116920525142
+      name: Aliquid optio sint necessitatibus velit.
+      price: 0.25007170140442475
     required:
     - name
     - price
@@ -491,27 +867,32 @@ definitions:
     properties:
       id:
         type: string
-        example: Ea culpa totam quisquam optio qui.
+        example: Qui unde ullam maxime.
       name:
         type: string
-        example: Officiis minima nemo.
+        example: Voluptatum beatae cumque nihil reiciendis consequatur sed.
       price:
         type: number
-        example: 0.5206026884085437
+        example: 0.9763477696414419
         format: double
       success:
         type: boolean
-        example: false
+        example: true
     example:
-      id: Quis laudantium laboriosam culpa facilis corporis incidunt.
-      name: Aut et nam.
-      price: 0.4717179279897648
-      success: false
+      id: Vitae vitae ullam in dolorem nisi laborum.
+      name: Nam recusandae eos a porro rerum.
+      price: 0.20893069095545222
+      success: true
     required:
     - id
     - name
     - price
     - success
+  CrudUpdateBookUnauthorizedResponseBody:
+    title: CrudUpdateBookUnauthorizedResponseBody
+    type: string
+    description: Identifiers are invalid
+    example: Deleniti nam consequatur et maxime.
   CrudUpdateBookUnknownErrorResponseBody:
     title: CrudUpdateBookUnknownErrorResponseBody
     type: object
@@ -519,14 +900,15 @@ definitions:
       message:
         type: string
         description: Returning error
-        example: Consequatur dolores veniam cumque fuga.
+        example: Nesciunt blanditiis deserunt dolores mollitia quia qui.
       success:
         type: boolean
+        default: false
         example: false
     description: Error not identified
     example:
-      message: Quos assumenda dolorum.
-      success: false
+      message: Natus dolores modi libero ut.
+      success: true
     required:
     - message
     - success

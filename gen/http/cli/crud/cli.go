@@ -23,13 +23,13 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `crud (get-book|update-book|get-all-books|delete-book|create-book)
+	return `crud (get-book|update-book|get-all-books|delete-book|create-book|signup)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` crud get-book --id "77EB7E77-465C-FCC6-CEC6-11F6C8938D24"` + "\n" +
+	return os.Args[0] + ` crud get-book --id "74C53540-E974-ABFF-2565-6BF99F9017B2"` + "\n" +
 		""
 }
 
@@ -59,6 +59,9 @@ func ParseEndpoint(
 
 		crudCreateBookFlags    = flag.NewFlagSet("create-book", flag.ExitOnError)
 		crudCreateBookBodyFlag = crudCreateBookFlags.String("body", "REQUIRED", "")
+
+		crudSignupFlags    = flag.NewFlagSet("signup", flag.ExitOnError)
+		crudSignupBodyFlag = crudSignupFlags.String("body", "REQUIRED", "")
 	)
 	crudFlags.Usage = crudUsage
 	crudGetBookFlags.Usage = crudGetBookUsage
@@ -66,6 +69,7 @@ func ParseEndpoint(
 	crudGetAllBooksFlags.Usage = crudGetAllBooksUsage
 	crudDeleteBookFlags.Usage = crudDeleteBookUsage
 	crudCreateBookFlags.Usage = crudCreateBookUsage
+	crudSignupFlags.Usage = crudSignupUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -116,6 +120,9 @@ func ParseEndpoint(
 			case "create-book":
 				epf = crudCreateBookFlags
 
+			case "signup":
+				epf = crudSignupFlags
+
 			}
 
 		}
@@ -156,6 +163,9 @@ func ParseEndpoint(
 			case "create-book":
 				endpoint = c.CreateBook()
 				data, err = crudc.BuildCreateBookPayload(*crudCreateBookBodyFlag)
+			case "signup":
+				endpoint = c.Signup()
+				data, err = crudc.BuildSignupPayload(*crudSignupBodyFlag)
 			}
 		}
 	}
@@ -178,6 +188,7 @@ COMMAND:
     get-all-books: Read All Books
     delete-book: Delete Book
     create-book: Create Book
+    signup: signup
 
 Additional help:
     %[1]s crud COMMAND --help
@@ -190,7 +201,7 @@ Read Book
     -id STRING: 
 
 Example:
-    %[1]s crud get-book --id "77EB7E77-465C-FCC6-CEC6-11F6C8938D24"
+    %[1]s crud get-book --id "74C53540-E974-ABFF-2565-6BF99F9017B2"
 `, os.Args[0])
 }
 
@@ -203,9 +214,9 @@ Update One Book
 
 Example:
     %[1]s crud update-book --body '{
-      "name": "Vitae nesciunt.",
-      "price": 0.3857041479314441
-   }' --id "FB1E8AC6-4FA4-C883-ED5A-54960E88F5FE"
+      "name": "Sint voluptas in.",
+      "price": 0.6399601382054029
+   }' --id "2C91774A-6D4A-67B6-DC43-6AED849DACC1"
 `, os.Args[0])
 }
 
@@ -226,7 +237,7 @@ Delete Book
     -id STRING: 
 
 Example:
-    %[1]s crud delete-book --id "5E3B665E-1239-9C12-9643-FFC1E6C04697"
+    %[1]s crud delete-book --id "1265498D-5A84-134A-1C7A-ED5B4B92788E"
 `, os.Args[0])
 }
 
@@ -238,8 +249,24 @@ Create Book
 
 Example:
     %[1]s crud create-book --body '{
-      "name": "6u7",
-      "price": 0.4237253387372549
+      "name": "j71",
+      "price": 0.023143062949744986
+   }'
+`, os.Args[0])
+}
+
+func crudSignupUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud signup -body JSON
+
+signup
+    -body JSON: 
+
+Example:
+    %[1]s crud signup --body '{
+      "email": "cordia.muller@ferry.name",
+      "firstname": "o2q",
+      "lastname": "ei1",
+      "password": "wi5"
    }'
 `, os.Args[0])
 }

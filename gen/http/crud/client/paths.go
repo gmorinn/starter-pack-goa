@@ -35,3 +35,8 @@ func DeleteBookCrudPath(id string) string {
 func CreateBookCrudPath() string {
 	return "/book/add"
 }
+
+// SignupCrudPath returns the URL path to the crud service signup HTTP endpoint.
+func SignupCrudPath() string {
+	return "/signup"
+}

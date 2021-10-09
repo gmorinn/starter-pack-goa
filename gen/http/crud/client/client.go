@@ -37,6 +37,9 @@ type Client struct {
 	// endpoint.
 	CreateBookDoer goahttp.Doer
 
+	// Signup Doer is the HTTP client used to make requests to the signup endpoint.
+	SignupDoer goahttp.Doer
+
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -62,6 +65,7 @@ func NewClient(
 		GetAllBooksDoer:     doer,
 		DeleteBookDoer:      doer,
 		CreateBookDoer:      doer,
+		SignupDoer:          doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -170,6 +174,30 @@ func (c *Client) CreateBook() goa.Endpoint {
 		resp, err := c.CreateBookDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("crud", "createBook", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Signup returns an endpoint that makes HTTP requests to the crud service
+// signup server.
+func (c *Client) Signup() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeSignupRequest(c.encoder)
+		decodeResponse = DecodeSignupResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildSignupRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.SignupDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("crud", "signup", err)
 		}
 		return decodeResponse(resp)
 	}
