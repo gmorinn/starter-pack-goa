@@ -11,6 +11,7 @@ import (
 	"context"
 
 	goa "goa.design/goa/v3/pkg"
+	"goa.design/goa/v3/security"
 )
 
 // The principe of CRUD API with GET, PUT, POST, DELETE
@@ -31,6 +32,12 @@ type Service interface {
 	Signin(context.Context, *SigninPayload) (res *Sign, err error)
 }
 
+// Auther defines the authorization functions to be implemented by the service.
+type Auther interface {
+	// JWTAuth implements the authorization logic for the JWT security scheme.
+	JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error)
+}
+
 // ServiceName is the name of the service as defined in the design. This is the
 // same value that is set in the endpoint request contexts under the ServiceKey
 // key.
@@ -44,6 +51,8 @@ var MethodNames = [7]string{"getBook", "updateBook", "getAllBooks", "deleteBook"
 // GetBookPayload is the payload type of the crud service getBook method.
 type GetBookPayload struct {
 	ID string
+	// JWT used for authentication
+	JWTToken *string
 }
 
 // GetBookResult is the result type of the crud service getBook method.
@@ -146,6 +155,9 @@ type EmailAlreadyExist struct {
 	Success bool
 }
 
+// Token scopes are invalid
+type InvalidScopes string
+
 // Error returns an error description.
 func (e Unauthorized) Error() string {
 	return "Identifiers are invalid"
@@ -184,6 +196,16 @@ func (e *EmailAlreadyExist) Error() string {
 // ErrorName returns "emailAlreadyExist".
 func (e *EmailAlreadyExist) ErrorName() string {
 	return "email_already_exist"
+}
+
+// Error returns an error description.
+func (e InvalidScopes) Error() string {
+	return "Token scopes are invalid"
+}
+
+// ErrorName returns "invalid-scopes".
+func (e InvalidScopes) ErrorName() string {
+	return "invalid-scopes"
 }
 
 // MakeTimeout builds a goa.ServiceError from an error.

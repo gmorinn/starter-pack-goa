@@ -18,7 +18,7 @@ import (
 
 // BuildGetBookPayload builds the payload for the crud getBook endpoint from
 // CLI flags.
-func BuildGetBookPayload(crudGetBookID string) (*crud.GetBookPayload, error) {
+func BuildGetBookPayload(crudGetBookID string, crudGetBookJWTToken string) (*crud.GetBookPayload, error) {
 	var err error
 	var id string
 	{
@@ -29,8 +29,15 @@ func BuildGetBookPayload(crudGetBookID string) (*crud.GetBookPayload, error) {
 			return nil, err
 		}
 	}
+	var jwtToken *string
+	{
+		if crudGetBookJWTToken != "" {
+			jwtToken = &crudGetBookJWTToken
+		}
+	}
 	v := &crud.GetBookPayload{}
 	v.ID = id
+	v.JWTToken = jwtToken
 
 	return v, nil
 }
@@ -43,7 +50,7 @@ func BuildUpdateBookPayload(crudUpdateBookBody string, crudUpdateBookID string) 
 	{
 		err = json.Unmarshal([]byte(crudUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.08062031473621718\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.907140683484096\n   }'")
 		}
 	}
 	var id string
@@ -91,7 +98,7 @@ func BuildCreateBookPayload(crudCreateBookBody string) (*crud.CreateBookPayload,
 	{
 		err = json.Unmarshal([]byte(crudCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.13037940184325017\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.5598850343195235\n   }'")
 		}
 		if utf8.RuneCountInString(body.Name) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))
@@ -119,7 +126,7 @@ func BuildSignupPayload(crudSignupBody string) (*crud.SignupPayload, error) {
 	{
 		err = json.Unmarshal([]byte(crudSignupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"idq\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"edi\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
@@ -157,7 +164,7 @@ func BuildSigninPayload(crudSigninBody string) (*crud.SigninPayload, error) {
 	{
 		err = json.Unmarshal([]byte(crudSigninBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"password\": \"jmq\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"password\": \"rm7\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 

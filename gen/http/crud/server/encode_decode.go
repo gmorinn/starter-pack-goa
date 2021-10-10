@@ -12,6 +12,7 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"strings"
 
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -34,18 +35,30 @@ func EncodeGetBookResponse(encoder func(context.Context, http.ResponseWriter) go
 func DecodeGetBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id  string
-			err error
+			id       string
+			jwtToken *string
+			err      error
 
 			params = mux.Vars(r)
 		)
 		id = params["id"]
 		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
 
+		jwtTokenRaw := r.Header.Get("Authorization")
+		if jwtTokenRaw != "" {
+			jwtToken = &jwtTokenRaw
+		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetBookPayload(id)
+		payload := NewGetBookPayload(id, jwtToken)
+		if payload.JWTToken != nil {
+			if strings.Contains(*payload.JWTToken, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.JWTToken, " ", 2)[1]
+				payload.JWTToken = &cred
+			}
+		}
 
 		return payload, nil
 	}
@@ -96,6 +109,18 @@ func EncodeGetBookError(encoder func(context.Context, http.ResponseWriter) goaht
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "invalid-scopes":
+			res := v.(crud.InvalidScopes)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetBookInvalidScopesResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "unauthorized":
 			res := v.(crud.Unauthorized)
@@ -210,6 +235,18 @@ func EncodeUpdateBookError(encoder func(context.Context, http.ResponseWriter) go
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
+		case "invalid-scopes":
+			res := v.(crud.InvalidScopes)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUpdateBookInvalidScopesResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
 		case "unauthorized":
 			res := v.(crud.Unauthorized)
 			enc := encoder(ctx, w)
@@ -285,6 +322,18 @@ func EncodeGetAllBooksError(encoder func(context.Context, http.ResponseWriter) g
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "invalid-scopes":
+			res := v.(crud.InvalidScopes)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetAllBooksInvalidScopesResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "unauthorized":
 			res := v.(crud.Unauthorized)
@@ -383,6 +432,18 @@ func EncodeDeleteBookError(encoder func(context.Context, http.ResponseWriter) go
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "invalid-scopes":
+			res := v.(crud.InvalidScopes)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDeleteBookInvalidScopesResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "unauthorized":
 			res := v.(crud.Unauthorized)
@@ -485,6 +546,18 @@ func EncodeCreateBookError(encoder func(context.Context, http.ResponseWriter) go
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
+		case "invalid-scopes":
+			res := v.(crud.InvalidScopes)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewCreateBookInvalidScopesResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
 		case "unauthorized":
 			res := v.(crud.Unauthorized)
 			enc := encoder(ctx, w)
@@ -586,6 +659,18 @@ func EncodeSignupError(encoder func(context.Context, http.ResponseWriter) goahtt
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
+		case "invalid-scopes":
+			res := v.(crud.InvalidScopes)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewSignupInvalidScopesResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
 		case "unauthorized":
 			res := v.(crud.Unauthorized)
 			enc := encoder(ctx, w)
@@ -686,6 +771,18 @@ func EncodeSigninError(encoder func(context.Context, http.ResponseWriter) goahtt
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "invalid-scopes":
+			res := v.(crud.InvalidScopes)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewSigninInvalidScopesResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusForbidden)
 			return enc.Encode(body)
 		case "unauthorized":
 			res := v.(crud.Unauthorized)

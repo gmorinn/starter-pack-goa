@@ -121,6 +121,10 @@ type GetBookUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// GetBookInvalidScopesResponseBody is the type of the "crud" service "getBook"
+// endpoint HTTP response body for the "invalid-scopes" error.
+type GetBookInvalidScopesResponseBody string
+
 // GetBookUnauthorizedResponseBody is the type of the "crud" service "getBook"
 // endpoint HTTP response body for the "unauthorized" error.
 type GetBookUnauthorizedResponseBody string
@@ -148,6 +152,10 @@ type UpdateBookUnknownErrorResponseBody struct {
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
+
+// UpdateBookInvalidScopesResponseBody is the type of the "crud" service
+// "updateBook" endpoint HTTP response body for the "invalid-scopes" error.
+type UpdateBookInvalidScopesResponseBody string
 
 // UpdateBookUnauthorizedResponseBody is the type of the "crud" service
 // "updateBook" endpoint HTTP response body for the "unauthorized" error.
@@ -178,6 +186,10 @@ type GetAllBooksUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// GetAllBooksInvalidScopesResponseBody is the type of the "crud" service
+// "getAllBooks" endpoint HTTP response body for the "invalid-scopes" error.
+type GetAllBooksInvalidScopesResponseBody string
+
 // GetAllBooksUnauthorizedResponseBody is the type of the "crud" service
 // "getAllBooks" endpoint HTTP response body for the "unauthorized" error.
 type GetAllBooksUnauthorizedResponseBody string
@@ -205,6 +217,10 @@ type DeleteBookUnknownErrorResponseBody struct {
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
+
+// DeleteBookInvalidScopesResponseBody is the type of the "crud" service
+// "deleteBook" endpoint HTTP response body for the "invalid-scopes" error.
+type DeleteBookInvalidScopesResponseBody string
 
 // DeleteBookUnauthorizedResponseBody is the type of the "crud" service
 // "deleteBook" endpoint HTTP response body for the "unauthorized" error.
@@ -234,6 +250,10 @@ type CreateBookUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// CreateBookInvalidScopesResponseBody is the type of the "crud" service
+// "createBook" endpoint HTTP response body for the "invalid-scopes" error.
+type CreateBookInvalidScopesResponseBody string
+
 // CreateBookUnauthorizedResponseBody is the type of the "crud" service
 // "createBook" endpoint HTTP response body for the "unauthorized" error.
 type CreateBookUnauthorizedResponseBody string
@@ -262,6 +282,10 @@ type SignupUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// SignupInvalidScopesResponseBody is the type of the "crud" service "signup"
+// endpoint HTTP response body for the "invalid-scopes" error.
+type SignupInvalidScopesResponseBody string
+
 // SignupUnauthorizedResponseBody is the type of the "crud" service "signup"
 // endpoint HTTP response body for the "unauthorized" error.
 type SignupUnauthorizedResponseBody string
@@ -289,6 +313,10 @@ type SigninUnknownErrorResponseBody struct {
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
+
+// SigninInvalidScopesResponseBody is the type of the "crud" service "signin"
+// endpoint HTTP response body for the "invalid-scopes" error.
+type SigninInvalidScopesResponseBody string
 
 // SigninUnauthorizedResponseBody is the type of the "crud" service "signin"
 // endpoint HTTP response body for the "unauthorized" error.
@@ -391,6 +419,14 @@ func NewGetBookUnknownError(body *GetBookUnknownErrorResponseBody) *crud.Unknown
 	return v
 }
 
+// NewGetBookInvalidScopes builds a crud service getBook endpoint
+// invalid-scopes error.
+func NewGetBookInvalidScopes(body GetBookInvalidScopesResponseBody) crud.InvalidScopes {
+	v := crud.InvalidScopes(body)
+
+	return v
+}
+
 // NewGetBookUnauthorized builds a crud service getBook endpoint unauthorized
 // error.
 func NewGetBookUnauthorized(body GetBookUnauthorizedResponseBody) crud.Unauthorized {
@@ -443,6 +479,14 @@ func NewUpdateBookUnknownError(body *UpdateBookUnknownErrorResponseBody) *crud.U
 		ErrorCode: *body.ErrorCode,
 		Success:   *body.Success,
 	}
+
+	return v
+}
+
+// NewUpdateBookInvalidScopes builds a crud service updateBook endpoint
+// invalid-scopes error.
+func NewUpdateBookInvalidScopes(body UpdateBookInvalidScopesResponseBody) crud.InvalidScopes {
+	v := crud.InvalidScopes(body)
 
 	return v
 }
@@ -504,6 +548,14 @@ func NewGetAllBooksUnknownError(body *GetAllBooksUnknownErrorResponseBody) *crud
 	return v
 }
 
+// NewGetAllBooksInvalidScopes builds a crud service getAllBooks endpoint
+// invalid-scopes error.
+func NewGetAllBooksInvalidScopes(body GetAllBooksInvalidScopesResponseBody) crud.InvalidScopes {
+	v := crud.InvalidScopes(body)
+
+	return v
+}
+
 // NewGetAllBooksUnauthorized builds a crud service getAllBooks endpoint
 // unauthorized error.
 func NewGetAllBooksUnauthorized(body GetAllBooksUnauthorizedResponseBody) crud.Unauthorized {
@@ -553,6 +605,14 @@ func NewDeleteBookUnknownError(body *DeleteBookUnknownErrorResponseBody) *crud.U
 		ErrorCode: *body.ErrorCode,
 		Success:   *body.Success,
 	}
+
+	return v
+}
+
+// NewDeleteBookInvalidScopes builds a crud service deleteBook endpoint
+// invalid-scopes error.
+func NewDeleteBookInvalidScopes(body DeleteBookInvalidScopesResponseBody) crud.InvalidScopes {
+	v := crud.InvalidScopes(body)
 
 	return v
 }
@@ -607,6 +667,14 @@ func NewCreateBookUnknownError(body *CreateBookUnknownErrorResponseBody) *crud.U
 		ErrorCode: *body.ErrorCode,
 		Success:   *body.Success,
 	}
+
+	return v
+}
+
+// NewCreateBookInvalidScopes builds a crud service createBook endpoint
+// invalid-scopes error.
+func NewCreateBookInvalidScopes(body CreateBookInvalidScopesResponseBody) crud.InvalidScopes {
+	v := crud.InvalidScopes(body)
 
 	return v
 }
@@ -666,6 +734,14 @@ func NewSignupUnknownError(body *SignupUnknownErrorResponseBody) *crud.UnknownEr
 	return v
 }
 
+// NewSignupInvalidScopes builds a crud service signup endpoint invalid-scopes
+// error.
+func NewSignupInvalidScopes(body SignupInvalidScopesResponseBody) crud.InvalidScopes {
+	v := crud.InvalidScopes(body)
+
+	return v
+}
+
 // NewSignupUnauthorized builds a crud service signup endpoint unauthorized
 // error.
 func NewSignupUnauthorized(body SignupUnauthorizedResponseBody) crud.Unauthorized {
@@ -717,6 +793,14 @@ func NewSigninUnknownError(body *SigninUnknownErrorResponseBody) *crud.UnknownEr
 		ErrorCode: *body.ErrorCode,
 		Success:   *body.Success,
 	}
+
+	return v
+}
+
+// NewSigninInvalidScopes builds a crud service signin endpoint invalid-scopes
+// error.
+func NewSigninInvalidScopes(body SigninInvalidScopesResponseBody) crud.InvalidScopes {
+	v := crud.InvalidScopes(body)
 
 	return v
 }

@@ -29,7 +29,7 @@ func UsageCommands() string {
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"` + "\n" +
+	return os.Args[0] + ` crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Rerum dolores quis."` + "\n" +
 		""
 }
 
@@ -45,8 +45,9 @@ func ParseEndpoint(
 	var (
 		crudFlags = flag.NewFlagSet("crud", flag.ContinueOnError)
 
-		crudGetBookFlags  = flag.NewFlagSet("get-book", flag.ExitOnError)
-		crudGetBookIDFlag = crudGetBookFlags.String("id", "REQUIRED", "")
+		crudGetBookFlags        = flag.NewFlagSet("get-book", flag.ExitOnError)
+		crudGetBookIDFlag       = crudGetBookFlags.String("id", "REQUIRED", "")
+		crudGetBookJWTTokenFlag = crudGetBookFlags.String("jwt-token", "", "")
 
 		crudUpdateBookFlags    = flag.NewFlagSet("update-book", flag.ExitOnError)
 		crudUpdateBookBodyFlag = crudUpdateBookFlags.String("body", "REQUIRED", "")
@@ -157,7 +158,7 @@ func ParseEndpoint(
 			switch epn {
 			case "get-book":
 				endpoint = c.GetBook()
-				data, err = crudc.BuildGetBookPayload(*crudGetBookIDFlag)
+				data, err = crudc.BuildGetBookPayload(*crudGetBookIDFlag, *crudGetBookJWTTokenFlag)
 			case "update-book":
 				endpoint = c.UpdateBook()
 				data, err = crudc.BuildUpdateBookPayload(*crudUpdateBookBodyFlag, *crudUpdateBookIDFlag)
@@ -206,13 +207,14 @@ Additional help:
 `, os.Args[0])
 }
 func crudGetBookUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud get-book -id STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud get-book -id STRING -jwt-token STRING
 
 Get one item
     -id STRING: 
+    -jwt-token STRING: 
 
 Example:
-    %[1]s crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
+    %[1]s crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Rerum dolores quis."
 `, os.Args[0])
 }
 
@@ -226,7 +228,7 @@ Update one item
 Example:
     %[1]s crud update-book --body '{
       "name": "Guillaume",
-      "price": 0.08062031473621718
+      "price": 0.907140683484096
    }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
 `, os.Args[0])
 }
@@ -261,7 +263,7 @@ Create one item
 Example:
     %[1]s crud create-book --body '{
       "name": "Guillaume",
-      "price": 0.13037940184325017
+      "price": 0.5598850343195235
    }'
 `, os.Args[0])
 }
@@ -277,7 +279,7 @@ Example:
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
-      "password": "idq"
+      "password": "edi"
    }'
 `, os.Args[0])
 }
@@ -291,7 +293,7 @@ signin
 Example:
     %[1]s crud signin --body '{
       "email": "guillaume@epitech.eu",
-      "password": "jmq"
+      "password": "rm7"
    }'
 `, os.Args[0])
 }

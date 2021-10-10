@@ -14,6 +14,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
+	"goa.design/goa/v3/security"
 )
 
 // crud service example implementation.
@@ -36,6 +37,19 @@ func NewCrud(logger *log.Logger) crud.Service {
 	return &crudsrvc{logger, store, cnf}
 }
 
+var (
+	// ErrUnauthorized is the error returned by Login when the request credentials
+	// are invalid.
+	ErrUnauthorized error = crud.Unauthorized("invalid username and password combination")
+
+	// ErrInvalidToken is the error returned when the JWT token is invalid.
+	ErrInvalidToken error = crud.Unauthorized("invalid token")
+
+	// ErrInvalidTokenScopes is the error returned when the scopes provided in
+	// the JWT token claims are invalid.
+	ErrInvalidTokenScopes error = crud.InvalidScopes("invalid scopes in token")
+)
+
 func Error_ID(msg, id string, err error) *crud.IDDoesntExist {
 	return &crud.IDDoesntExist{
 		Err: err.Error(),
@@ -54,6 +68,43 @@ func ErrorEmail() *crud.EmailAlreadyExist {
 	return &crud.EmailAlreadyExist{
 		Message: "EMAIL_ALREADY_EXIST",
 	}
+}
+
+func (s *crudsrvc) JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error) {
+
+	claims := make(jwt.MapClaims)
+
+	// authorize request
+	// 1. parse JWT token, token key is hardcoded to "secret" in this example
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		b := ([]byte(s.config.Security.Secret))
+		return b, nil
+	})
+	if err != nil {
+		return ctx, ErrInvalidToken
+	}
+
+	// 2. validate provided "scopes" claim
+	if claims["scopes"] == nil {
+		return ctx, ErrInvalidTokenScopes
+	}
+	scopes, ok := claims["scopes"].([]interface{})
+	if !ok {
+		return ctx, ErrInvalidTokenScopes
+	}
+	scopesInToken := make([]string, len(scopes))
+	for _, scp := range scopes {
+		scopesInToken = append(scopesInToken, scp.(string))
+	}
+	if err := schema.Validate(scopesInToken); err != nil {
+		return ctx, crud.InvalidScopes(err.Error())
+	}
+
+	// 3. add authInfo to context
+	ctx = contextWithAuthInfo(ctx, authInfo{
+		claims: claims,
+	})
+	return ctx, nil
 }
 
 // Read Book
@@ -176,18 +227,22 @@ func (s *crudsrvc) Signup(ctx context.Context, p *crud.SignupPayload) (res *crud
 		return nil, ErrorResponse("ERROR_CREATE_USER", err)
 	}
 
-	claims := make(jwt.MapClaims)
-	claims["id"] = user.ID.String()
-	claims["exp"] = time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.AccessTokenDuration))).Unix()
-	t, err := generateJWT(claims, s.config.Security.Secret)
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":     user.ID.String(),
+		"exp":    time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.AccessTokenDuration))).Unix(),
+		"scopes": []string{"api:read", "api:write"},
+	})
+	t, err := accessToken.SignedString(s.config.Security.Secret)
 	if err != nil {
 		return nil, ErrorResponse("ERROR_GENERATE_ACCESS_JWT", err)
 	}
 
-	expt := time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.RefreshTokenDuration)))
-	exp := expt.Unix()
-	claims["exp"] = exp
-	r, err := generateJWT(claims, s.config.Security.Secret)
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":     user.ID.String(),
+		"exp":    time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.RefreshTokenDuration))).Unix(),
+		"scopes": []string{"api:read", "api:write"},
+	})
+	r, err := refreshToken.SignedString(s.config.Security.Secret)
 	if err != nil {
 		return nil, ErrorResponse("ERROR_GENERATE_REFRESH_JWT", err)
 	}
@@ -201,6 +256,7 @@ func (s *crudsrvc) Signup(ctx context.Context, p *crud.SignupPayload) (res *crud
 }
 
 func (s *crudsrvc) Signin(ctx context.Context, p *crud.SigninPayload) (res *crud.Sign, err error) {
+	// Request Login
 	arg := db.LoginUserParams{
 		Email: p.Email,
 		Crypt: p.Password,
@@ -210,18 +266,24 @@ func (s *crudsrvc) Signin(ctx context.Context, p *crud.SigninPayload) (res *crud
 		return nil, ErrorResponse("ERROR_LOGIN_USER", err)
 	}
 
-	claims := make(jwt.MapClaims)
-	claims["id"] = user.ID.String()
-	claims["exp"] = time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.AccessTokenDuration))).Unix()
-	t, err := generateJWT(claims, s.config.Security.Secret)
+	// Generate access token
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":     user.ID.String(),
+		"exp":    time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.AccessTokenDuration))).Unix(),
+		"scopes": []string{"api:read", "api:write"},
+	})
+	t, err := accessToken.SignedString([]byte(s.config.Security.Secret))
 	if err != nil {
 		return nil, ErrorResponse("ERROR_GENERATE_ACCESS_JWT", err)
 	}
 
-	expt := time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.RefreshTokenDuration)))
-	exp := expt.Unix()
-	claims["exp"] = exp
-	r, err := generateJWT(claims, s.config.Security.Secret)
+	// Generate refresh token
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":     user.ID.String(),
+		"exp":    time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.config.Security.RefreshTokenDuration))).Unix(),
+		"scopes": []string{"api:read", "api:write"},
+	})
+	r, err := refreshToken.SignedString([]byte(s.config.Security.Secret))
 	if err != nil {
 		return nil, ErrorResponse("ERROR_GENERATE_REFRESH_JWT", err)
 	}

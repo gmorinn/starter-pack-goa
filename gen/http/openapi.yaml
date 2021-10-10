@@ -26,6 +26,11 @@ paths:
         required: true
         type: string
         format: uuid
+      - name: Authorization
+        in: header
+        description: JWT used for authentication
+        required: false
+        type: string
       responses:
         "200":
           description: OK response.
@@ -47,6 +52,10 @@ paths:
           description: Unauthorized response.
           schema:
             $ref: '#/definitions/CrudGetBookUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/CrudGetBookInvalidScopesResponseBody'
         "500":
           description: Internal Server Error response.
           schema:
@@ -57,6 +66,8 @@ paths:
             - error_code
       schemes:
       - http
+      security:
+      - jwt_header_Authorization: []
     put:
       tags:
       - crud
@@ -98,6 +109,10 @@ paths:
           description: Unauthorized response.
           schema:
             $ref: '#/definitions/CrudUpdateBookUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/CrudUpdateBookInvalidScopesResponseBody'
         "500":
           description: Internal Server Error response.
           schema:
@@ -143,6 +158,10 @@ paths:
           description: Unauthorized response.
           schema:
             $ref: '#/definitions/CrudCreateBookUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/CrudCreateBookInvalidScopesResponseBody'
         "500":
           description: Internal Server Error response.
           schema:
@@ -184,6 +203,10 @@ paths:
           description: Unauthorized response.
           schema:
             $ref: '#/definitions/CrudDeleteBookUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/CrudDeleteBookInvalidScopesResponseBody'
         "500":
           description: Internal Server Error response.
           schema:
@@ -220,6 +243,10 @@ paths:
           description: Unauthorized response.
           schema:
             $ref: '#/definitions/CrudGetAllBooksUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/CrudGetAllBooksInvalidScopesResponseBody'
         "500":
           description: Internal Server Error response.
           schema:
@@ -279,6 +306,10 @@ paths:
           description: Unauthorized response.
           schema:
             $ref: '#/definitions/CrudSigninUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/CrudSigninInvalidScopesResponseBody'
         "500":
           description: Internal Server Error response.
           schema:
@@ -327,6 +358,10 @@ paths:
           description: Unauthorized response.
           schema:
             $ref: '#/definitions/CrudSignupUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/CrudSignupInvalidScopesResponseBody'
         "500":
           description: Internal Server Error response.
           schema:
@@ -351,12 +386,12 @@ definitions:
         example: Guillaume
       price:
         type: number
-        example: 0.2670335353665682
+        example: 0.16196037412826506
         format: double
     example:
       id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
       name: Guillaume
-      price: 0.5897367695669078
+      price: 0.19147719662531468
     required:
     - id
     - name
@@ -367,14 +402,14 @@ definitions:
     properties:
       message:
         type: string
-        example: Officiis minima nemo.
+        example: Sit nihil dignissimos est consequatur quia.
       success:
         type: boolean
         default: false
         example: false
     description: When email already exist
     example:
-      message: Blanditiis quis laudantium laboriosam culpa facilis.
+      message: Vel ut et cumque.
       success: false
     required:
     - message
@@ -386,23 +421,28 @@ definitions:
       err:
         type: string
         description: Returning error
-        example: Nobis beatae eos praesentium dolores ut.
+        example: Quia quam natus dolorem nesciunt.
       id:
         type: string
-        example: Officiis tempore dolorem tenetur consectetur accusantium consequatur.
+        example: Et a architecto officiis eum magni.
       success:
         type: boolean
         default: false
         example: true
     description: When ID doesn't exist
     example:
-      err: Et fugit porro repellendus.
-      id: Magnam ut dolorem.
-      success: true
+      err: Consectetur et et nihil ut qui et.
+      id: Distinctio reiciendis quasi perspiciatis.
+      success: false
     required:
     - err
     - success
     - id
+  CrudCreateBookInvalidScopesResponseBody:
+    title: CrudCreateBookInvalidScopesResponseBody
+    type: string
+    description: Token scopes are invalid
+    example: Odio cumque minus qui.
   CrudCreateBookRequestBody:
     title: CrudCreateBookRequestBody
     type: object
@@ -414,11 +454,11 @@ definitions:
         maxLength: 10
       price:
         type: number
-        example: 0.7929523909662713
+        example: 0.7158829429452753
         format: double
     example:
       name: Guillaume
-      price: 0.2026970560492407
+      price: 0.6810453528626984
     required:
     - name
     - price
@@ -430,12 +470,12 @@ definitions:
         $ref: '#/definitions/BookResponseResponseBody'
       success:
         type: boolean
-        example: true
+        example: false
     example:
       book:
         id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
-        price: 0.2993168197570513
+        price: 0.2692364234446434
       success: true
     required:
     - book
@@ -444,25 +484,25 @@ definitions:
     title: CrudCreateBookUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Consequatur repellendus rerum consectetur corporis consequatur possimus.
+    example: Ut quos assumenda dolorum.
   CrudCreateBookUnknownErrorResponseBody:
     title: CrudCreateBookUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Consequatur harum optio assumenda doloremque sit est.
+        example: Quasi aspernatur dolor nam ipsum in a.
       error_code:
         type: string
-        example: Tempore molestiae quia rerum alias et.
+        example: Quod eos incidunt quibusdam atque.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
-      err: Distinctio sit autem perferendis eos.
-      error_code: Libero ea culpa totam quisquam optio.
+      err: Autem a quas ut ea aut.
+      error_code: Et unde quod.
       success: true
     required:
     - err
@@ -474,15 +514,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Dignissimos aut rerum dolor.
+        example: Dicta veritatis dolor incidunt accusantium.
       success:
         type: boolean
         default: false
         example: true
     description: When email already exist
     example:
-      message: Quia suscipit.
-      success: false
+      message: Ipsum quo est iste quibusdam.
+      success: true
     required:
     - message
     - success
@@ -493,23 +533,28 @@ definitions:
       err:
         type: string
         description: Returning error
-        example: Cumque dolorum.
+        example: Non tempore molestiae quia.
       id:
         type: string
-        example: Deserunt ipsum.
+        example: Alias et et quibusdam distinctio sit.
       success:
         type: boolean
         default: false
         example: true
     description: When ID doesn't exist
     example:
-      err: Aut dolores.
-      id: A autem.
-      success: true
+      err: Eos asperiores.
+      id: Ea culpa totam quisquam optio qui.
+      success: false
     required:
     - err
     - success
     - id
+  CrudDeleteBookInvalidScopesResponseBody:
+    title: CrudDeleteBookInvalidScopesResponseBody
+    type: string
+    description: Token scopes are invalid
+    example: Voluptatum rem consequatur dolores veniam.
   CrudDeleteBookResponseBody:
     title: CrudDeleteBookResponseBody
     type: object
@@ -518,33 +563,33 @@ definitions:
         type: boolean
         example: true
     example:
-      success: false
+      success: true
     required:
     - success
   CrudDeleteBookUnauthorizedResponseBody:
     title: CrudDeleteBookUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Magni labore.
+    example: Totam consequatur harum optio assumenda doloremque sit.
   CrudDeleteBookUnknownErrorResponseBody:
     title: CrudDeleteBookUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Laudantium corporis ut.
+        example: Minima nemo et.
       error_code:
         type: string
-        example: In ipsum.
+        example: Blanditiis quis laudantium laboriosam culpa facilis.
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
-      err: Molestias voluptatum odio.
-      error_code: Quis repellendus ut delectus distinctio quia et.
-      success: true
+      err: Ipsa aut et nam nisi.
+      error_code: Ipsam nobis corporis tempora.
+      success: false
     required:
     - err
     - success
@@ -555,15 +600,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Excepturi aut.
+        example: Tempore dolorem tenetur.
       success:
         type: boolean
         default: false
         example: true
     description: When email already exist
     example:
-      message: Quo ut numquam eos laborum non.
-      success: true
+      message: Consequatur eos repellat et fugit.
+      success: false
     required:
     - message
     - success
@@ -574,23 +619,28 @@ definitions:
       err:
         type: string
         description: Returning error
-        example: Id molestias.
+        example: In ipsum.
       id:
         type: string
-        example: Autem itaque rerum est tenetur molestias.
+        example: Dolorum molestias voluptatum.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: When ID doesn't exist
     example:
-      err: Nobis doloribus nulla eos corrupti.
-      id: Voluptas odit veniam quaerat sint consequatur.
+      err: Quis repellendus ut delectus distinctio quia et.
+      id: Voluptate dignissimos aut rerum dolor.
       success: true
     required:
     - err
     - success
     - id
+  CrudGetAllBooksInvalidScopesResponseBody:
+    title: CrudGetAllBooksInvalidScopesResponseBody
+    type: string
+    description: Token scopes are invalid
+    example: Et magnam.
   CrudGetAllBooksResponseBody:
     title: CrudGetAllBooksResponseBody
     type: object
@@ -602,10 +652,13 @@ definitions:
         example:
         - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
-          price: 0.2993168197570513
+          price: 0.2692364234446434
         - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
-          price: 0.2993168197570513
+          price: 0.2692364234446434
+        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 0.2692364234446434
       success:
         type: boolean
         example: true
@@ -613,14 +666,14 @@ definitions:
       books:
       - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
-        price: 0.2993168197570513
+        price: 0.2692364234446434
       - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
-        price: 0.2993168197570513
+        price: 0.2692364234446434
       - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
-        price: 0.2993168197570513
-      success: false
+        price: 0.2692364234446434
+      success: true
     required:
     - books
     - success
@@ -628,25 +681,25 @@ definitions:
     title: CrudGetAllBooksUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Iusto enim ad excepturi.
+    example: Recusandae voluptatem laudantium corporis ut.
   CrudGetAllBooksUnknownErrorResponseBody:
     title: CrudGetAllBooksUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Facere ad.
+        example: Quia suscipit.
       error_code:
         type: string
-        example: Eveniet accusantium et et et est.
+        example: Ad dolores aperiam.
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
-      err: Harum alias.
-      error_code: Et quia et est quis voluptate.
+      err: Rerum consectetur corporis consequatur possimus.
+      error_code: Nobis beatae eos praesentium dolores ut.
       success: false
     required:
     - err
@@ -658,14 +711,14 @@ definitions:
     properties:
       message:
         type: string
-        example: Accusantium repudiandae possimus autem.
+        example: Repellat quia adipisci totam enim delectus et.
       success:
         type: boolean
         default: false
         example: true
     description: When email already exist
     example:
-      message: Quod fugit et.
+      message: Omnis et.
       success: false
     required:
     - message
@@ -677,44 +730,49 @@ definitions:
       err:
         type: string
         description: Returning error
-        example: Minima iusto voluptatem est.
+        example: Velit rem.
       id:
         type: string
-        example: Voluptas vitae nesciunt voluptatem.
+        example: Molestiae cumque officia cumque facere blanditiis.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: When ID doesn't exist
     example:
-      err: Quasi sed nihil molestiae.
-      id: Sit ut.
+      err: Quidem cupiditate excepturi sint.
+      id: In ut nam fugiat dicta explicabo.
       success: true
     required:
     - err
     - success
     - id
+  CrudGetBookInvalidScopesResponseBody:
+    title: CrudGetBookInvalidScopesResponseBody
+    type: string
+    description: Token scopes are invalid
+    example: Minus iure non est harum ad sequi.
   CrudGetBookResponseBody:
     title: CrudGetBookResponseBody
     type: object
     properties:
       id:
         type: string
-        example: Consequatur minima fugiat porro eveniet.
+        example: Dolorum ea voluptas.
       name:
         type: string
-        example: Velit consequuntur eum ut corrupti.
+        example: Dolorem officiis necessitatibus nisi voluptatum debitis.
       price:
         type: number
-        example: 0.6309571725745455
+        example: 0.6923152507017585
         format: double
       success:
         type: boolean
         example: false
     example:
-      id: Facere aliquam explicabo.
-      name: Mollitia voluptatibus quas.
-      price: 0.8653630533300949
+      id: Autem qui vel quod fugit et animi.
+      name: Ut mollitia tenetur.
+      price: 0.2900222266458365
       success: true
     required:
     - id
@@ -725,26 +783,26 @@ definitions:
     title: CrudGetBookUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Ut placeat voluptas est debitis magnam quis.
+    example: Sed provident soluta molestiae illum autem adipisci.
   CrudGetBookUnknownErrorResponseBody:
     title: CrudGetBookUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Neque molestiae temporibus ipsa.
+        example: Eos incidunt et fuga.
       error_code:
         type: string
-        example: Impedit sequi omnis sint dignissimos blanditiis molestiae.
+        example: Reprehenderit dolore a minus animi reiciendis.
       success:
         type: boolean
         default: false
         example: true
     description: Error not identified (500)
     example:
-      err: Totam nihil dolorum ea voluptas dolorum.
-      error_code: Officiis necessitatibus nisi.
-      success: true
+      err: Voluptas beatae dolor.
+      error_code: Officiis incidunt maxime sequi sit.
+      success: false
     required:
     - err
     - success
@@ -755,14 +813,14 @@ definitions:
     properties:
       message:
         type: string
-        example: Tempore quam molestias possimus sunt voluptas nihil.
+        example: Quia dolor rem unde sint.
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: When email already exist
     example:
-      message: Tenetur eius nihil officiis accusamus provident.
+      message: Placeat nesciunt quidem omnis optio debitis.
       success: true
     required:
     - message
@@ -774,23 +832,28 @@ definitions:
       err:
         type: string
         description: Returning error
-        example: Et unde quod.
+        example: Rerum id quia ut reprehenderit modi voluptas.
       id:
         type: string
-        example: Officiis sit nihil dignissimos.
+        example: Laborum qui unde ullam maxime maxime voluptatum.
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: When ID doesn't exist
     example:
-      err: Quia optio et vel ut.
-      id: Cumque cumque totam odio cumque minus.
+      err: Nihil reiciendis.
+      id: Sed voluptatem eos sequi vitae vitae.
       success: true
     required:
     - err
     - success
     - id
+  CrudSigninInvalidScopesResponseBody:
+    title: CrudSigninInvalidScopesResponseBody
+    type: string
+    description: Token scopes are invalid
+    example: Aut harum repellat dignissimos.
   CrudSigninRequestBody:
     title: CrudSigninRequestBody
     type: object
@@ -801,11 +864,11 @@ definitions:
         format: email
       password:
         type: string
-        example: gzn
+        example: ne7
         minLength: 8
     example:
       email: guillaume@epitech.eu
-      password: b4p
+      password: dwp
     required:
     - password
     - email
@@ -821,11 +884,11 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: true
+        example: false
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: true
+      success: false
     required:
     - access_token
     - refresh_token
@@ -834,25 +897,25 @@ definitions:
     title: CrudSigninUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Officiis autem a quas ut ea aut.
+    example: Tenetur eos odio sed.
   CrudSigninUnknownErrorResponseBody:
     title: CrudSigninUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Omnis nam ex quos sunt.
+        example: Dolorem nisi laborum sit nam.
       error_code:
         type: string
-        example: Aliquam quia asperiores eum.
+        example: Eos a porro.
       success:
         type: boolean
         default: false
         example: false
     description: Error not identified (500)
     example:
-      err: Voluptas maxime.
-      error_code: Labore voluptatem eius.
+      err: Sit rem.
+      error_code: Nam consequatur et maxime.
       success: false
     required:
     - err
@@ -864,15 +927,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Consectetur et et nihil ut qui et.
+        example: Autem nesciunt consectetur.
       success:
         type: boolean
         default: false
         example: false
     description: When email already exist
     example:
-      message: Reiciendis quasi perspiciatis architecto sapiente quasi aspernatur.
-      success: false
+      message: Vel ipsa recusandae tenetur.
+      success: true
     required:
     - message
     - success
@@ -883,23 +946,28 @@ definitions:
       err:
         type: string
         description: Returning error
-        example: Nobis corporis.
+        example: Eum et nam voluptas maxime facilis.
       id:
         type: string
-        example: Consequatur autem dicta veritatis.
+        example: Voluptatem eius iusto dignissimos.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: When ID doesn't exist
     example:
-      err: Accusantium unde occaecati ipsum quo.
-      id: Iste quibusdam reprehenderit architecto.
-      success: false
+      err: Molestias possimus sunt voluptas nihil tenetur eos.
+      id: Eius nihil.
+      success: true
     required:
     - err
     - success
     - id
+  CrudSignupInvalidScopesResponseBody:
+    title: CrudSignupInvalidScopesResponseBody
+    type: string
+    description: Token scopes are invalid
+    example: Beatae voluptas.
   CrudSignupRequestBody:
     title: CrudSignupRequestBody
     type: object
@@ -919,14 +987,14 @@ definitions:
         minLength: 3
       password:
         type: string
-        example: 4ro
+        example: 6nz
         minLength: 8
     description: Use client ID and client secret to oAuth
     example:
       email: guillaume@epitech.eu
       firstname: Guillaume
       lastname: Morin
-      password: k3t
+      password: a9r
     required:
     - firstname
     - lastname
@@ -948,7 +1016,7 @@ definitions:
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: true
+      success: false
     required:
     - access_token
     - refresh_token
@@ -957,25 +1025,25 @@ definitions:
     title: CrudSignupUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Nisi omnis.
+    example: Sunt odit aliquam quia.
   CrudSignupUnknownErrorResponseBody:
     title: CrudSignupUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Consequatur dolores veniam cumque fuga.
+        example: Provident ipsam rerum sapiente commodi.
       error_code:
         type: string
-        example: Ut quos assumenda dolorum.
+        example: Repellat assumenda ut iure.
       success:
         type: boolean
         default: false
         example: false
     description: Error not identified (500)
     example:
-      err: Quam natus dolorem nesciunt.
-      error_code: Et a architecto officiis eum magni.
+      err: Adipisci consequatur velit corrupti architecto accusamus.
+      error_code: Dolor atque odit.
       success: true
     required:
     - err
@@ -987,15 +1055,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Harum ad sequi accusantium id sed.
+        example: Numquam eos laborum non.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: When email already exist
     example:
-      message: Sed vel odio et dignissimos.
-      success: false
+      message: Voluptas alias.
+      success: true
     required:
     - message
     - success
@@ -1006,23 +1074,28 @@ definitions:
       err:
         type: string
         description: Returning error
-        example: In ut nam fugiat dicta explicabo.
+        example: Rerum est tenetur molestias aut culpa nobis.
       id:
         type: string
-        example: Fuga eos incidunt et fuga illo reprehenderit.
+        example: Nulla eos.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: When ID doesn't exist
     example:
-      err: Minus animi reiciendis dolor excepturi voluptas.
-      id: Dolor atque officiis incidunt maxime sequi.
+      err: Voluptas odit veniam quaerat sint consequatur.
+      id: Autem facere ad non.
       success: false
     required:
     - err
     - success
     - id
+  CrudUpdateBookInvalidScopesResponseBody:
+    title: CrudUpdateBookInvalidScopesResponseBody
+    type: string
+    description: Token scopes are invalid
+    example: Est cumque dolorum fugiat.
   CrudUpdateBookRequestBody:
     title: CrudUpdateBookRequestBody
     type: object
@@ -1032,11 +1105,11 @@ definitions:
         example: Guillaume
       price:
         type: number
-        example: 0.006907510638914587
+        example: 0.4189841669177319
         format: double
     example:
       name: Guillaume
-      price: 0.8095703924833015
+      price: 0.8101171082310289
     required:
     - name
     - price
@@ -1046,21 +1119,21 @@ definitions:
     properties:
       id:
         type: string
-        example: Ut mollitia tenetur.
+        example: Id sed consequatur occaecati sed.
       name:
         type: string
-        example: Aliquam qui sed.
+        example: Odio et dignissimos aliquid ea inventore.
       price:
         type: number
-        example: 0.0033257296738615255
+        example: 0.2670335353665682
         format: double
       success:
         type: boolean
-        example: false
+        example: true
     example:
-      id: Illum autem adipisci nulla velit rem enim.
-      name: Cumque officia cumque facere.
-      price: 0.04498330358577093
+      id: Omnis ratione est.
+      name: Iusto enim ad excepturi.
+      price: 0.798046265194759
       success: true
     required:
     - id
@@ -1071,27 +1144,38 @@ definitions:
     title: CrudUpdateBookUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Quidem cupiditate excepturi sint.
+    example: Pariatur autem.
   CrudUpdateBookUnknownErrorResponseBody:
     title: CrudUpdateBookUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Debitis repellat quia.
+        example: Et et.
       error_code:
         type: string
-        example: Totam enim.
+        example: Est quas atque.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
-      err: Repellendus repellendus.
-      error_code: Et porro minus minus iure.
+      err: Est et quia et est.
+      error_code: Voluptate molestiae et excepturi aut debitis voluptatem.
       success: true
     required:
     - err
     - success
     - error_code
+securityDefinitions:
+  jwt_header_Authorization:
+    type: apiKey
+    description: |-
+      Secures endpoint by requiring a valid JWT token retrieved via the signin endpoint. Supports scopes "api:read" and "api:write".
+
+      **Security Scopes**:
+        * `api:read`: Read-only access
+        * `api:write`: Read and write access
+    name: Authorization
+    in: header

@@ -14,6 +14,20 @@ var _ = API("basic", func() {
 	})
 })
 
+// JWTAuth defines a security scheme that uses JWT tokens.
+var JWTAuth = JWTSecurity("jwt", func() {
+	Description(`Secures endpoint by requiring a valid JWT token retrieved via the signin endpoint. Supports scopes "api:read" and "api:write".`)
+	Scope("api:read", "Read-only access")
+	Scope("api:write", "Read and write access")
+})
+
+// OAuth2Auth defines a security scheme that uses OAuth2 tokens.
+var OAuth2Auth = OAuth2Security("oauth2", func() {
+	AuthorizationCodeFlow("/authorization", "/token", "/refresh")
+	Description(`Secures endpoint by requiring a valid OAuth2 token retrieved via the signin endpoint. Supports scopes "api:read" and "api:write".`)
+	Scope("api:read", "Read-only access")
+})
+
 // Service describes a service
 var _ = Service("crud", func() {
 	Description("The principe of CRUD API with GET, PUT, POST, DELETE")
@@ -26,20 +40,29 @@ var _ = Service("crud", func() {
 	Error("id_doesnt_exist", idDoesntExist, "When ID doesn't exist")
 	Error("unknown_error", unknownError, "Error not identified (500)")
 	Error("email_already_exist", emailAlreadyExist, "When email already exist")
+	Error("invalid-scopes", String, "Token scopes are invalid")
 
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)
 		Response("id_doesnt_exist", StatusInternalServerError)
 		Response("email_already_exist", StatusBadRequest)
 		Response("unknown_error", StatusInternalServerError)
+		Response("invalid-scopes", StatusForbidden)
+
 	})
 
 	Method("getBook", func() {
 		Description("Get one item")
+
+		Security(JWTAuth)
+
 		Payload(func() {
 			Attribute("id", String, func() {
 				Format(FormatUUID)
 				Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
+			})
+			TokenField(1, "jwtToken", String, func() {
+				Description("JWT used for authentication")
 			})
 			Required("id")
 		})
@@ -55,6 +78,7 @@ var _ = Service("crud", func() {
 			Attribute("success", Boolean)
 			Required("id", "name", "price", "success")
 		})
+
 	})
 
 	Method("updateBook", func() {
