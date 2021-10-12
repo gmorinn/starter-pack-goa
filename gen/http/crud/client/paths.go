@@ -36,12 +36,7 @@ func CreateBookCrudPath() string {
 	return "/book/add"
 }
 
-// SignupCrudPath returns the URL path to the crud service signup HTTP endpoint.
-func SignupCrudPath() string {
-	return "/signup"
-}
-
-// SigninCrudPath returns the URL path to the crud service signin HTTP endpoint.
-func SigninCrudPath() string {
-	return "/signin"
+// OAuthCrudPath returns the URL path to the crud service oAuth HTTP endpoint.
+func OAuthCrudPath() string {
+	return "/authorization"
 }

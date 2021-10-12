@@ -74,18 +74,6 @@ func EncodeGetBookError(encoder func(context.Context, http.ResponseWriter) goaht
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "email_already_exist":
-			res := v.(*crud.EmailAlreadyExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewGetBookEmailAlreadyExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
 		case "id_doesnt_exist":
 			res := v.(*crud.IDDoesntExist)
 			enc := encoder(ctx, w)
@@ -110,7 +98,7 @@ func EncodeGetBookError(encoder func(context.Context, http.ResponseWriter) goaht
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
-		case "invalid-scopes":
+		case "invalid_scopes":
 			res := v.(crud.InvalidScopes)
 			enc := encoder(ctx, w)
 			var body interface{}
@@ -199,18 +187,6 @@ func EncodeUpdateBookError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "email_already_exist":
-			res := v.(*crud.EmailAlreadyExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewUpdateBookEmailAlreadyExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
 		case "id_doesnt_exist":
 			res := v.(*crud.IDDoesntExist)
 			enc := encoder(ctx, w)
@@ -235,7 +211,7 @@ func EncodeUpdateBookError(encoder func(context.Context, http.ResponseWriter) go
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
-		case "invalid-scopes":
+		case "invalid_scopes":
 			res := v.(crud.InvalidScopes)
 			enc := encoder(ctx, w)
 			var body interface{}
@@ -287,18 +263,6 @@ func EncodeGetAllBooksError(encoder func(context.Context, http.ResponseWriter) g
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "email_already_exist":
-			res := v.(*crud.EmailAlreadyExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewGetAllBooksEmailAlreadyExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
 		case "id_doesnt_exist":
 			res := v.(*crud.IDDoesntExist)
 			enc := encoder(ctx, w)
@@ -323,7 +287,7 @@ func EncodeGetAllBooksError(encoder func(context.Context, http.ResponseWriter) g
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
-		case "invalid-scopes":
+		case "invalid_scopes":
 			res := v.(crud.InvalidScopes)
 			enc := encoder(ctx, w)
 			var body interface{}
@@ -397,18 +361,6 @@ func EncodeDeleteBookError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "email_already_exist":
-			res := v.(*crud.EmailAlreadyExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewDeleteBookEmailAlreadyExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
 		case "id_doesnt_exist":
 			res := v.(*crud.IDDoesntExist)
 			enc := encoder(ctx, w)
@@ -433,7 +385,7 @@ func EncodeDeleteBookError(encoder func(context.Context, http.ResponseWriter) go
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
-		case "invalid-scopes":
+		case "invalid_scopes":
 			res := v.(crud.InvalidScopes)
 			enc := encoder(ctx, w)
 			var body interface{}
@@ -510,18 +462,6 @@ func EncodeCreateBookError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "email_already_exist":
-			res := v.(*crud.EmailAlreadyExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewCreateBookEmailAlreadyExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
 		case "id_doesnt_exist":
 			res := v.(*crud.IDDoesntExist)
 			enc := encoder(ctx, w)
@@ -546,7 +486,7 @@ func EncodeCreateBookError(encoder func(context.Context, http.ResponseWriter) go
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
-		case "invalid-scopes":
+		case "invalid_scopes":
 			res := v.(crud.InvalidScopes)
 			enc := encoder(ctx, w)
 			var body interface{}
@@ -576,24 +516,24 @@ func EncodeCreateBookError(encoder func(context.Context, http.ResponseWriter) go
 	}
 }
 
-// EncodeSignupResponse returns an encoder for responses returned by the crud
-// signup endpoint.
-func EncodeSignupResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeOAuthResponse returns an encoder for responses returned by the crud
+// oAuth endpoint.
+func EncodeOAuthResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res, _ := v.(*crud.Sign)
+		res, _ := v.(*crud.OAuthResponse)
 		enc := encoder(ctx, w)
-		body := NewSignupResponseBody(res)
+		body := NewOAuthResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
 
-// DecodeSignupRequest returns a decoder for requests sent to the crud signup
+// DecodeOAuthRequest returns a decoder for requests sent to the crud oAuth
 // endpoint.
-func DecodeSignupRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+func DecodeOAuthRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			body SignupRequestBody
+			body OAuthRequestBody
 			err  error
 		)
 		err = decoder(r).Decode(&body)
@@ -603,19 +543,19 @@ func DecodeSignupRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.
 			}
 			return nil, goa.DecodePayloadError(err.Error())
 		}
-		err = ValidateSignupRequestBody(&body)
+		err = ValidateOAuthRequestBody(&body)
 		if err != nil {
 			return nil, err
 		}
-		payload := NewSignupPayload(&body)
+		payload := NewOAuthPayload(&body)
 
 		return payload, nil
 	}
 }
 
-// EncodeSignupError returns an encoder for errors returned by the signup crud
+// EncodeOAuthError returns an encoder for errors returned by the oAuth crud
 // endpoint.
-func EncodeSignupError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+func EncodeOAuthError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -623,18 +563,6 @@ func EncodeSignupError(encoder func(context.Context, http.ResponseWriter) goahtt
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "email_already_exist":
-			res := v.(*crud.EmailAlreadyExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewSignupEmailAlreadyExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
 		case "id_doesnt_exist":
 			res := v.(*crud.IDDoesntExist)
 			enc := encoder(ctx, w)
@@ -642,7 +570,7 @@ func EncodeSignupError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewSignupIDDoesntExistResponseBody(res)
+				body = NewOAuthIDDoesntExistResponseBody(res)
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -654,19 +582,19 @@ func EncodeSignupError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewSignupUnknownErrorResponseBody(res)
+				body = NewOAuthUnknownErrorResponseBody(res)
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
-		case "invalid-scopes":
+		case "invalid_scopes":
 			res := v.(crud.InvalidScopes)
 			enc := encoder(ctx, w)
 			var body interface{}
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewSignupInvalidScopesResponseBody(res)
+				body = NewOAuthInvalidScopesResponseBody(res)
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusForbidden)
@@ -678,120 +606,7 @@ func EncodeSignupError(encoder func(context.Context, http.ResponseWriter) goahtt
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewSignupUnauthorizedResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusUnauthorized)
-			return enc.Encode(body)
-		default:
-			return encodeError(ctx, w, v)
-		}
-	}
-}
-
-// EncodeSigninResponse returns an encoder for responses returned by the crud
-// signin endpoint.
-func EncodeSigninResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
-	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res, _ := v.(*crud.Sign)
-		enc := encoder(ctx, w)
-		body := NewSigninResponseBody(res)
-		w.WriteHeader(http.StatusOK)
-		return enc.Encode(body)
-	}
-}
-
-// DecodeSigninRequest returns a decoder for requests sent to the crud signin
-// endpoint.
-func DecodeSigninRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
-	return func(r *http.Request) (interface{}, error) {
-		var (
-			body SigninRequestBody
-			err  error
-		)
-		err = decoder(r).Decode(&body)
-		if err != nil {
-			if err == io.EOF {
-				return nil, goa.MissingPayloadError()
-			}
-			return nil, goa.DecodePayloadError(err.Error())
-		}
-		err = ValidateSigninRequestBody(&body)
-		if err != nil {
-			return nil, err
-		}
-		payload := NewSigninPayload(&body)
-
-		return payload, nil
-	}
-}
-
-// EncodeSigninError returns an encoder for errors returned by the signin crud
-// endpoint.
-func EncodeSigninError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
-	encodeError := goahttp.ErrorEncoder(encoder, formatter)
-	return func(ctx context.Context, w http.ResponseWriter, v error) error {
-		en, ok := v.(ErrorNamer)
-		if !ok {
-			return encodeError(ctx, w, v)
-		}
-		switch en.ErrorName() {
-		case "email_already_exist":
-			res := v.(*crud.EmailAlreadyExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewSigninEmailAlreadyExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
-		case "id_doesnt_exist":
-			res := v.(*crud.IDDoesntExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewSigninIDDoesntExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
-		case "unknown_error":
-			res := v.(*crud.UnknownError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewSigninUnknownErrorResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
-		case "invalid-scopes":
-			res := v.(crud.InvalidScopes)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewSigninInvalidScopesResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusForbidden)
-			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(crud.Unauthorized)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewSigninUnauthorizedResponseBody(res)
+				body = NewOAuthUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusUnauthorized)

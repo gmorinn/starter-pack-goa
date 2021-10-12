@@ -21,8 +21,7 @@ type Endpoints struct {
 	GetAllBooks goa.Endpoint
 	DeleteBook  goa.Endpoint
 	CreateBook  goa.Endpoint
-	Signup      goa.Endpoint
-	Signin      goa.Endpoint
+	OAuth       goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "crud" service with endpoints.
@@ -35,8 +34,7 @@ func NewEndpoints(s Service) *Endpoints {
 		GetAllBooks: NewGetAllBooksEndpoint(s),
 		DeleteBook:  NewDeleteBookEndpoint(s),
 		CreateBook:  NewCreateBookEndpoint(s),
-		Signup:      NewSignupEndpoint(s),
-		Signin:      NewSigninEndpoint(s),
+		OAuth:       NewOAuthEndpoint(s),
 	}
 }
 
@@ -47,8 +45,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.GetAllBooks = m(e.GetAllBooks)
 	e.DeleteBook = m(e.DeleteBook)
 	e.CreateBook = m(e.CreateBook)
-	e.Signup = m(e.Signup)
-	e.Signin = m(e.Signin)
+	e.OAuth = m(e.OAuth)
 }
 
 // NewGetBookEndpoint returns an endpoint function that calls the method
@@ -109,20 +106,11 @@ func NewCreateBookEndpoint(s Service) goa.Endpoint {
 	}
 }
 
-// NewSignupEndpoint returns an endpoint function that calls the method
-// "signup" of service "crud".
-func NewSignupEndpoint(s Service) goa.Endpoint {
+// NewOAuthEndpoint returns an endpoint function that calls the method "oAuth"
+// of service "crud".
+func NewOAuthEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*SignupPayload)
-		return s.Signup(ctx, p)
-	}
-}
-
-// NewSigninEndpoint returns an endpoint function that calls the method
-// "signin" of service "crud".
-func NewSigninEndpoint(s Service) goa.Endpoint {
-	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*SigninPayload)
-		return s.Signin(ctx, p)
+		p := req.(*OAuthPayload)
+		return s.OAuth(ctx, p)
 	}
 }

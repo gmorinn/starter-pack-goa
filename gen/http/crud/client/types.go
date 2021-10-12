@@ -27,20 +27,12 @@ type CreateBookRequestBody struct {
 	Price float64 `form:"price" json:"price" xml:"price"`
 }
 
-// SignupRequestBody is the type of the "crud" service "signup" endpoint HTTP
+// OAuthRequestBody is the type of the "crud" service "oAuth" endpoint HTTP
 // request body.
-type SignupRequestBody struct {
-	Firstname string `form:"firstname" json:"firstname" xml:"firstname"`
-	Lastname  string `form:"lastname" json:"lastname" xml:"lastname"`
-	Password  string `form:"password" json:"password" xml:"password"`
-	Email     string `form:"email" json:"email" xml:"email"`
-}
-
-// SigninRequestBody is the type of the "crud" service "signin" endpoint HTTP
-// request body.
-type SigninRequestBody struct {
-	Email    string `form:"email" json:"email" xml:"email"`
-	Password string `form:"password" json:"password" xml:"password"`
+type OAuthRequestBody struct {
+	GrantType    string `form:"grant_type" json:"grant_type" xml:"grant_type"`
+	ClientID     string `form:"client_id" json:"client_id" xml:"client_id"`
+	ClientSecret string `form:"client_secret" json:"client_secret" xml:"client_secret"`
 }
 
 // GetBookResponseBody is the type of the "crud" service "getBook" endpoint
@@ -81,27 +73,13 @@ type CreateBookResponseBody struct {
 	Success *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
-// SignupResponseBody is the type of the "crud" service "signup" endpoint HTTP
+// OAuthResponseBody is the type of the "crud" service "oAuth" endpoint HTTP
 // response body.
-type SignupResponseBody struct {
-	AccessToken  *string `form:"access_token,omitempty" json:"access_token,omitempty" xml:"access_token,omitempty"`
-	RefreshToken *string `form:"refresh_token,omitempty" json:"refresh_token,omitempty" xml:"refresh_token,omitempty"`
-	Success      *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// SigninResponseBody is the type of the "crud" service "signin" endpoint HTTP
-// response body.
-type SigninResponseBody struct {
-	AccessToken  *string `form:"access_token,omitempty" json:"access_token,omitempty" xml:"access_token,omitempty"`
-	RefreshToken *string `form:"refresh_token,omitempty" json:"refresh_token,omitempty" xml:"refresh_token,omitempty"`
-	Success      *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// GetBookEmailAlreadyExistResponseBody is the type of the "crud" service
-// "getBook" endpoint HTTP response body for the "email_already_exist" error.
-type GetBookEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+type OAuthResponseBody struct {
+	AccessToken *string `form:"access_token,omitempty" json:"access_token,omitempty" xml:"access_token,omitempty"`
+	TokenType   *string `form:"token_type,omitempty" json:"token_type,omitempty" xml:"token_type,omitempty"`
+	ExpiresIn   *int64  `form:"expires_in,omitempty" json:"expires_in,omitempty" xml:"expires_in,omitempty"`
+	Success     *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // GetBookIDDoesntExistResponseBody is the type of the "crud" service "getBook"
@@ -122,19 +100,12 @@ type GetBookUnknownErrorResponseBody struct {
 }
 
 // GetBookInvalidScopesResponseBody is the type of the "crud" service "getBook"
-// endpoint HTTP response body for the "invalid-scopes" error.
+// endpoint HTTP response body for the "invalid_scopes" error.
 type GetBookInvalidScopesResponseBody string
 
 // GetBookUnauthorizedResponseBody is the type of the "crud" service "getBook"
 // endpoint HTTP response body for the "unauthorized" error.
 type GetBookUnauthorizedResponseBody string
-
-// UpdateBookEmailAlreadyExistResponseBody is the type of the "crud" service
-// "updateBook" endpoint HTTP response body for the "email_already_exist" error.
-type UpdateBookEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
 
 // UpdateBookIDDoesntExistResponseBody is the type of the "crud" service
 // "updateBook" endpoint HTTP response body for the "id_doesnt_exist" error.
@@ -154,20 +125,12 @@ type UpdateBookUnknownErrorResponseBody struct {
 }
 
 // UpdateBookInvalidScopesResponseBody is the type of the "crud" service
-// "updateBook" endpoint HTTP response body for the "invalid-scopes" error.
+// "updateBook" endpoint HTTP response body for the "invalid_scopes" error.
 type UpdateBookInvalidScopesResponseBody string
 
 // UpdateBookUnauthorizedResponseBody is the type of the "crud" service
 // "updateBook" endpoint HTTP response body for the "unauthorized" error.
 type UpdateBookUnauthorizedResponseBody string
-
-// GetAllBooksEmailAlreadyExistResponseBody is the type of the "crud" service
-// "getAllBooks" endpoint HTTP response body for the "email_already_exist"
-// error.
-type GetAllBooksEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
 
 // GetAllBooksIDDoesntExistResponseBody is the type of the "crud" service
 // "getAllBooks" endpoint HTTP response body for the "id_doesnt_exist" error.
@@ -187,19 +150,12 @@ type GetAllBooksUnknownErrorResponseBody struct {
 }
 
 // GetAllBooksInvalidScopesResponseBody is the type of the "crud" service
-// "getAllBooks" endpoint HTTP response body for the "invalid-scopes" error.
+// "getAllBooks" endpoint HTTP response body for the "invalid_scopes" error.
 type GetAllBooksInvalidScopesResponseBody string
 
 // GetAllBooksUnauthorizedResponseBody is the type of the "crud" service
 // "getAllBooks" endpoint HTTP response body for the "unauthorized" error.
 type GetAllBooksUnauthorizedResponseBody string
-
-// DeleteBookEmailAlreadyExistResponseBody is the type of the "crud" service
-// "deleteBook" endpoint HTTP response body for the "email_already_exist" error.
-type DeleteBookEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
 
 // DeleteBookIDDoesntExistResponseBody is the type of the "crud" service
 // "deleteBook" endpoint HTTP response body for the "id_doesnt_exist" error.
@@ -219,19 +175,12 @@ type DeleteBookUnknownErrorResponseBody struct {
 }
 
 // DeleteBookInvalidScopesResponseBody is the type of the "crud" service
-// "deleteBook" endpoint HTTP response body for the "invalid-scopes" error.
+// "deleteBook" endpoint HTTP response body for the "invalid_scopes" error.
 type DeleteBookInvalidScopesResponseBody string
 
 // DeleteBookUnauthorizedResponseBody is the type of the "crud" service
 // "deleteBook" endpoint HTTP response body for the "unauthorized" error.
 type DeleteBookUnauthorizedResponseBody string
-
-// CreateBookEmailAlreadyExistResponseBody is the type of the "crud" service
-// "createBook" endpoint HTTP response body for the "email_already_exist" error.
-type CreateBookEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
 
 // CreateBookIDDoesntExistResponseBody is the type of the "crud" service
 // "createBook" endpoint HTTP response body for the "id_doesnt_exist" error.
@@ -251,76 +200,37 @@ type CreateBookUnknownErrorResponseBody struct {
 }
 
 // CreateBookInvalidScopesResponseBody is the type of the "crud" service
-// "createBook" endpoint HTTP response body for the "invalid-scopes" error.
+// "createBook" endpoint HTTP response body for the "invalid_scopes" error.
 type CreateBookInvalidScopesResponseBody string
 
 // CreateBookUnauthorizedResponseBody is the type of the "crud" service
 // "createBook" endpoint HTTP response body for the "unauthorized" error.
 type CreateBookUnauthorizedResponseBody string
 
-// SignupEmailAlreadyExistResponseBody is the type of the "crud" service
-// "signup" endpoint HTTP response body for the "email_already_exist" error.
-type SignupEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// SignupIDDoesntExistResponseBody is the type of the "crud" service "signup"
+// OAuthIDDoesntExistResponseBody is the type of the "crud" service "oAuth"
 // endpoint HTTP response body for the "id_doesnt_exist" error.
-type SignupIDDoesntExistResponseBody struct {
+type OAuthIDDoesntExistResponseBody struct {
 	// Returning error
 	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	ID      *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
-// SignupUnknownErrorResponseBody is the type of the "crud" service "signup"
+// OAuthUnknownErrorResponseBody is the type of the "crud" service "oAuth"
 // endpoint HTTP response body for the "unknown_error" error.
-type SignupUnknownErrorResponseBody struct {
+type OAuthUnknownErrorResponseBody struct {
 	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
-// SignupInvalidScopesResponseBody is the type of the "crud" service "signup"
-// endpoint HTTP response body for the "invalid-scopes" error.
-type SignupInvalidScopesResponseBody string
+// OAuthInvalidScopesResponseBody is the type of the "crud" service "oAuth"
+// endpoint HTTP response body for the "invalid_scopes" error.
+type OAuthInvalidScopesResponseBody string
 
-// SignupUnauthorizedResponseBody is the type of the "crud" service "signup"
+// OAuthUnauthorizedResponseBody is the type of the "crud" service "oAuth"
 // endpoint HTTP response body for the "unauthorized" error.
-type SignupUnauthorizedResponseBody string
-
-// SigninEmailAlreadyExistResponseBody is the type of the "crud" service
-// "signin" endpoint HTTP response body for the "email_already_exist" error.
-type SigninEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// SigninIDDoesntExistResponseBody is the type of the "crud" service "signin"
-// endpoint HTTP response body for the "id_doesnt_exist" error.
-type SigninIDDoesntExistResponseBody struct {
-	// Returning error
-	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ID      *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// SigninUnknownErrorResponseBody is the type of the "crud" service "signin"
-// endpoint HTTP response body for the "unknown_error" error.
-type SigninUnknownErrorResponseBody struct {
-	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
-	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// SigninInvalidScopesResponseBody is the type of the "crud" service "signin"
-// endpoint HTTP response body for the "invalid-scopes" error.
-type SigninInvalidScopesResponseBody string
-
-// SigninUnauthorizedResponseBody is the type of the "crud" service "signin"
-// endpoint HTTP response body for the "unauthorized" error.
-type SigninUnauthorizedResponseBody string
+type OAuthUnauthorizedResponseBody string
 
 // BookResponseResponseBody is used to define fields on response body types.
 type BookResponseResponseBody struct {
@@ -349,24 +259,13 @@ func NewCreateBookRequestBody(p *crud.CreateBookPayload) *CreateBookRequestBody 
 	return body
 }
 
-// NewSignupRequestBody builds the HTTP request body from the payload of the
-// "signup" endpoint of the "crud" service.
-func NewSignupRequestBody(p *crud.SignupPayload) *SignupRequestBody {
-	body := &SignupRequestBody{
-		Firstname: p.Firstname,
-		Lastname:  p.Lastname,
-		Password:  p.Password,
-		Email:     p.Email,
-	}
-	return body
-}
-
-// NewSigninRequestBody builds the HTTP request body from the payload of the
-// "signin" endpoint of the "crud" service.
-func NewSigninRequestBody(p *crud.SigninPayload) *SigninRequestBody {
-	body := &SigninRequestBody{
-		Email:    p.Email,
-		Password: p.Password,
+// NewOAuthRequestBody builds the HTTP request body from the payload of the
+// "oAuth" endpoint of the "crud" service.
+func NewOAuthRequestBody(p *crud.OAuthPayload) *OAuthRequestBody {
+	body := &OAuthRequestBody{
+		GrantType:    p.GrantType,
+		ClientID:     p.ClientID,
+		ClientSecret: p.ClientSecret,
 	}
 	return body
 }
@@ -378,17 +277,6 @@ func NewGetBookResultOK(body *GetBookResponseBody) *crud.GetBookResult {
 		ID:      *body.ID,
 		Name:    *body.Name,
 		Price:   *body.Price,
-		Success: *body.Success,
-	}
-
-	return v
-}
-
-// NewGetBookEmailAlreadyExist builds a crud service getBook endpoint
-// email_already_exist error.
-func NewGetBookEmailAlreadyExist(body *GetBookEmailAlreadyExistResponseBody) *crud.EmailAlreadyExist {
-	v := &crud.EmailAlreadyExist{
-		Message: *body.Message,
 		Success: *body.Success,
 	}
 
@@ -420,7 +308,7 @@ func NewGetBookUnknownError(body *GetBookUnknownErrorResponseBody) *crud.Unknown
 }
 
 // NewGetBookInvalidScopes builds a crud service getBook endpoint
-// invalid-scopes error.
+// invalid_scopes error.
 func NewGetBookInvalidScopes(body GetBookInvalidScopesResponseBody) crud.InvalidScopes {
 	v := crud.InvalidScopes(body)
 
@@ -442,17 +330,6 @@ func NewUpdateBookResultOK(body *UpdateBookResponseBody) *crud.UpdateBookResult 
 		ID:      *body.ID,
 		Name:    *body.Name,
 		Price:   *body.Price,
-		Success: *body.Success,
-	}
-
-	return v
-}
-
-// NewUpdateBookEmailAlreadyExist builds a crud service updateBook endpoint
-// email_already_exist error.
-func NewUpdateBookEmailAlreadyExist(body *UpdateBookEmailAlreadyExistResponseBody) *crud.EmailAlreadyExist {
-	v := &crud.EmailAlreadyExist{
-		Message: *body.Message,
 		Success: *body.Success,
 	}
 
@@ -484,7 +361,7 @@ func NewUpdateBookUnknownError(body *UpdateBookUnknownErrorResponseBody) *crud.U
 }
 
 // NewUpdateBookInvalidScopes builds a crud service updateBook endpoint
-// invalid-scopes error.
+// invalid_scopes error.
 func NewUpdateBookInvalidScopes(body UpdateBookInvalidScopesResponseBody) crud.InvalidScopes {
 	v := crud.InvalidScopes(body)
 
@@ -508,17 +385,6 @@ func NewGetAllBooksResultOK(body *GetAllBooksResponseBody) *crud.GetAllBooksResu
 	v.Books = make([]*crud.BookResponse, len(body.Books))
 	for i, val := range body.Books {
 		v.Books[i] = unmarshalBookResponseResponseBodyToCrudBookResponse(val)
-	}
-
-	return v
-}
-
-// NewGetAllBooksEmailAlreadyExist builds a crud service getAllBooks endpoint
-// email_already_exist error.
-func NewGetAllBooksEmailAlreadyExist(body *GetAllBooksEmailAlreadyExistResponseBody) *crud.EmailAlreadyExist {
-	v := &crud.EmailAlreadyExist{
-		Message: *body.Message,
-		Success: *body.Success,
 	}
 
 	return v
@@ -549,7 +415,7 @@ func NewGetAllBooksUnknownError(body *GetAllBooksUnknownErrorResponseBody) *crud
 }
 
 // NewGetAllBooksInvalidScopes builds a crud service getAllBooks endpoint
-// invalid-scopes error.
+// invalid_scopes error.
 func NewGetAllBooksInvalidScopes(body GetAllBooksInvalidScopesResponseBody) crud.InvalidScopes {
 	v := crud.InvalidScopes(body)
 
@@ -568,17 +434,6 @@ func NewGetAllBooksUnauthorized(body GetAllBooksUnauthorizedResponseBody) crud.U
 // from a HTTP "OK" response.
 func NewDeleteBookResultOK(body *DeleteBookResponseBody) *crud.DeleteBookResult {
 	v := &crud.DeleteBookResult{
-		Success: *body.Success,
-	}
-
-	return v
-}
-
-// NewDeleteBookEmailAlreadyExist builds a crud service deleteBook endpoint
-// email_already_exist error.
-func NewDeleteBookEmailAlreadyExist(body *DeleteBookEmailAlreadyExistResponseBody) *crud.EmailAlreadyExist {
-	v := &crud.EmailAlreadyExist{
-		Message: *body.Message,
 		Success: *body.Success,
 	}
 
@@ -610,7 +465,7 @@ func NewDeleteBookUnknownError(body *DeleteBookUnknownErrorResponseBody) *crud.U
 }
 
 // NewDeleteBookInvalidScopes builds a crud service deleteBook endpoint
-// invalid-scopes error.
+// invalid_scopes error.
 func NewDeleteBookInvalidScopes(body DeleteBookInvalidScopesResponseBody) crud.InvalidScopes {
 	v := crud.InvalidScopes(body)
 
@@ -632,17 +487,6 @@ func NewCreateBookResultCreated(body *CreateBookResponseBody) *crud.CreateBookRe
 		Success: *body.Success,
 	}
 	v.Book = unmarshalBookResponseResponseBodyToCrudBookResponse(body.Book)
-
-	return v
-}
-
-// NewCreateBookEmailAlreadyExist builds a crud service createBook endpoint
-// email_already_exist error.
-func NewCreateBookEmailAlreadyExist(body *CreateBookEmailAlreadyExistResponseBody) *crud.EmailAlreadyExist {
-	v := &crud.EmailAlreadyExist{
-		Message: *body.Message,
-		Success: *body.Success,
-	}
 
 	return v
 }
@@ -672,7 +516,7 @@ func NewCreateBookUnknownError(body *CreateBookUnknownErrorResponseBody) *crud.U
 }
 
 // NewCreateBookInvalidScopes builds a crud service createBook endpoint
-// invalid-scopes error.
+// invalid_scopes error.
 func NewCreateBookInvalidScopes(body CreateBookInvalidScopesResponseBody) crud.InvalidScopes {
 	v := crud.InvalidScopes(body)
 
@@ -687,32 +531,22 @@ func NewCreateBookUnauthorized(body CreateBookUnauthorizedResponseBody) crud.Una
 	return v
 }
 
-// NewSignupSignOK builds a "crud" service "signup" endpoint result from a HTTP
-// "OK" response.
-func NewSignupSignOK(body *SignupResponseBody) *crud.Sign {
-	v := &crud.Sign{
-		AccessToken:  *body.AccessToken,
-		RefreshToken: *body.RefreshToken,
-		Success:      *body.Success,
+// NewOAuthResponseOK builds a "crud" service "oAuth" endpoint result from a
+// HTTP "OK" response.
+func NewOAuthResponseOK(body *OAuthResponseBody) *crud.OAuthResponse {
+	v := &crud.OAuthResponse{
+		AccessToken: body.AccessToken,
+		TokenType:   body.TokenType,
+		ExpiresIn:   body.ExpiresIn,
+		Success:     body.Success,
 	}
 
 	return v
 }
 
-// NewSignupEmailAlreadyExist builds a crud service signup endpoint
-// email_already_exist error.
-func NewSignupEmailAlreadyExist(body *SignupEmailAlreadyExistResponseBody) *crud.EmailAlreadyExist {
-	v := &crud.EmailAlreadyExist{
-		Message: *body.Message,
-		Success: *body.Success,
-	}
-
-	return v
-}
-
-// NewSignupIDDoesntExist builds a crud service signup endpoint id_doesnt_exist
+// NewOAuthIDDoesntExist builds a crud service oAuth endpoint id_doesnt_exist
 // error.
-func NewSignupIDDoesntExist(body *SignupIDDoesntExistResponseBody) *crud.IDDoesntExist {
+func NewOAuthIDDoesntExist(body *OAuthIDDoesntExistResponseBody) *crud.IDDoesntExist {
 	v := &crud.IDDoesntExist{
 		Err:     *body.Err,
 		ID:      *body.ID,
@@ -722,9 +556,9 @@ func NewSignupIDDoesntExist(body *SignupIDDoesntExistResponseBody) *crud.IDDoesn
 	return v
 }
 
-// NewSignupUnknownError builds a crud service signup endpoint unknown_error
+// NewOAuthUnknownError builds a crud service oAuth endpoint unknown_error
 // error.
-func NewSignupUnknownError(body *SignupUnknownErrorResponseBody) *crud.UnknownError {
+func NewOAuthUnknownError(body *OAuthUnknownErrorResponseBody) *crud.UnknownError {
 	v := &crud.UnknownError{
 		Err:       *body.Err,
 		ErrorCode: *body.ErrorCode,
@@ -734,80 +568,16 @@ func NewSignupUnknownError(body *SignupUnknownErrorResponseBody) *crud.UnknownEr
 	return v
 }
 
-// NewSignupInvalidScopes builds a crud service signup endpoint invalid-scopes
+// NewOAuthInvalidScopes builds a crud service oAuth endpoint invalid_scopes
 // error.
-func NewSignupInvalidScopes(body SignupInvalidScopesResponseBody) crud.InvalidScopes {
+func NewOAuthInvalidScopes(body OAuthInvalidScopesResponseBody) crud.InvalidScopes {
 	v := crud.InvalidScopes(body)
 
 	return v
 }
 
-// NewSignupUnauthorized builds a crud service signup endpoint unauthorized
-// error.
-func NewSignupUnauthorized(body SignupUnauthorizedResponseBody) crud.Unauthorized {
-	v := crud.Unauthorized(body)
-
-	return v
-}
-
-// NewSigninSignOK builds a "crud" service "signin" endpoint result from a HTTP
-// "OK" response.
-func NewSigninSignOK(body *SigninResponseBody) *crud.Sign {
-	v := &crud.Sign{
-		AccessToken:  *body.AccessToken,
-		RefreshToken: *body.RefreshToken,
-		Success:      *body.Success,
-	}
-
-	return v
-}
-
-// NewSigninEmailAlreadyExist builds a crud service signin endpoint
-// email_already_exist error.
-func NewSigninEmailAlreadyExist(body *SigninEmailAlreadyExistResponseBody) *crud.EmailAlreadyExist {
-	v := &crud.EmailAlreadyExist{
-		Message: *body.Message,
-		Success: *body.Success,
-	}
-
-	return v
-}
-
-// NewSigninIDDoesntExist builds a crud service signin endpoint id_doesnt_exist
-// error.
-func NewSigninIDDoesntExist(body *SigninIDDoesntExistResponseBody) *crud.IDDoesntExist {
-	v := &crud.IDDoesntExist{
-		Err:     *body.Err,
-		ID:      *body.ID,
-		Success: *body.Success,
-	}
-
-	return v
-}
-
-// NewSigninUnknownError builds a crud service signin endpoint unknown_error
-// error.
-func NewSigninUnknownError(body *SigninUnknownErrorResponseBody) *crud.UnknownError {
-	v := &crud.UnknownError{
-		Err:       *body.Err,
-		ErrorCode: *body.ErrorCode,
-		Success:   *body.Success,
-	}
-
-	return v
-}
-
-// NewSigninInvalidScopes builds a crud service signin endpoint invalid-scopes
-// error.
-func NewSigninInvalidScopes(body SigninInvalidScopesResponseBody) crud.InvalidScopes {
-	v := crud.InvalidScopes(body)
-
-	return v
-}
-
-// NewSigninUnauthorized builds a crud service signin endpoint unauthorized
-// error.
-func NewSigninUnauthorized(body SigninUnauthorizedResponseBody) crud.Unauthorized {
+// NewOAuthUnauthorized builds a crud service oAuth endpoint unauthorized error.
+func NewOAuthUnauthorized(body OAuthUnauthorizedResponseBody) crud.Unauthorized {
 	v := crud.Unauthorized(body)
 
 	return v
@@ -894,46 +664,6 @@ func ValidateCreateBookResponseBody(body *CreateBookResponseBody) (err error) {
 	return
 }
 
-// ValidateSignupResponseBody runs the validations defined on SignupResponseBody
-func ValidateSignupResponseBody(body *SignupResponseBody) (err error) {
-	if body.AccessToken == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("access_token", "body"))
-	}
-	if body.RefreshToken == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("refresh_token", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	return
-}
-
-// ValidateSigninResponseBody runs the validations defined on SigninResponseBody
-func ValidateSigninResponseBody(body *SigninResponseBody) (err error) {
-	if body.AccessToken == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("access_token", "body"))
-	}
-	if body.RefreshToken == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("refresh_token", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	return
-}
-
-// ValidateGetBookEmailAlreadyExistResponseBody runs the validations defined on
-// getBook_email_already_exist_response_body
-func ValidateGetBookEmailAlreadyExistResponseBody(body *GetBookEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	return
-}
-
 // ValidateGetBookIDDoesntExistResponseBody runs the validations defined on
 // getBook_id_doesnt_exist_response_body
 func ValidateGetBookIDDoesntExistResponseBody(body *GetBookIDDoesntExistResponseBody) (err error) {
@@ -960,18 +690,6 @@ func ValidateGetBookUnknownErrorResponseBody(body *GetBookUnknownErrorResponseBo
 	}
 	if body.ErrorCode == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
-	}
-	return
-}
-
-// ValidateUpdateBookEmailAlreadyExistResponseBody runs the validations defined
-// on updateBook_email_already_exist_response_body
-func ValidateUpdateBookEmailAlreadyExistResponseBody(body *UpdateBookEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
 	}
 	return
 }
@@ -1006,18 +724,6 @@ func ValidateUpdateBookUnknownErrorResponseBody(body *UpdateBookUnknownErrorResp
 	return
 }
 
-// ValidateGetAllBooksEmailAlreadyExistResponseBody runs the validations
-// defined on getAllBooks_email_already_exist_response_body
-func ValidateGetAllBooksEmailAlreadyExistResponseBody(body *GetAllBooksEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	return
-}
-
 // ValidateGetAllBooksIDDoesntExistResponseBody runs the validations defined on
 // getAllBooks_id_doesnt_exist_response_body
 func ValidateGetAllBooksIDDoesntExistResponseBody(body *GetAllBooksIDDoesntExistResponseBody) (err error) {
@@ -1044,18 +750,6 @@ func ValidateGetAllBooksUnknownErrorResponseBody(body *GetAllBooksUnknownErrorRe
 	}
 	if body.ErrorCode == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
-	}
-	return
-}
-
-// ValidateDeleteBookEmailAlreadyExistResponseBody runs the validations defined
-// on deleteBook_email_already_exist_response_body
-func ValidateDeleteBookEmailAlreadyExistResponseBody(body *DeleteBookEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
 	}
 	return
 }
@@ -1090,18 +784,6 @@ func ValidateDeleteBookUnknownErrorResponseBody(body *DeleteBookUnknownErrorResp
 	return
 }
 
-// ValidateCreateBookEmailAlreadyExistResponseBody runs the validations defined
-// on createBook_email_already_exist_response_body
-func ValidateCreateBookEmailAlreadyExistResponseBody(body *CreateBookEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	return
-}
-
 // ValidateCreateBookIDDoesntExistResponseBody runs the validations defined on
 // createBook_id_doesnt_exist_response_body
 func ValidateCreateBookIDDoesntExistResponseBody(body *CreateBookIDDoesntExistResponseBody) (err error) {
@@ -1132,21 +814,9 @@ func ValidateCreateBookUnknownErrorResponseBody(body *CreateBookUnknownErrorResp
 	return
 }
 
-// ValidateSignupEmailAlreadyExistResponseBody runs the validations defined on
-// signup_email_already_exist_response_body
-func ValidateSignupEmailAlreadyExistResponseBody(body *SignupEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	return
-}
-
-// ValidateSignupIDDoesntExistResponseBody runs the validations defined on
-// signup_id_doesnt_exist_response_body
-func ValidateSignupIDDoesntExistResponseBody(body *SignupIDDoesntExistResponseBody) (err error) {
+// ValidateOAuthIDDoesntExistResponseBody runs the validations defined on
+// oAuth_id_doesnt_exist_response_body
+func ValidateOAuthIDDoesntExistResponseBody(body *OAuthIDDoesntExistResponseBody) (err error) {
 	if body.Err == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}
@@ -1159,51 +829,9 @@ func ValidateSignupIDDoesntExistResponseBody(body *SignupIDDoesntExistResponseBo
 	return
 }
 
-// ValidateSignupUnknownErrorResponseBody runs the validations defined on
-// signup_unknown_error_response_body
-func ValidateSignupUnknownErrorResponseBody(body *SignupUnknownErrorResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ErrorCode == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
-	}
-	return
-}
-
-// ValidateSigninEmailAlreadyExistResponseBody runs the validations defined on
-// signin_email_already_exist_response_body
-func ValidateSigninEmailAlreadyExistResponseBody(body *SigninEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	return
-}
-
-// ValidateSigninIDDoesntExistResponseBody runs the validations defined on
-// signin_id_doesnt_exist_response_body
-func ValidateSigninIDDoesntExistResponseBody(body *SigninIDDoesntExistResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	return
-}
-
-// ValidateSigninUnknownErrorResponseBody runs the validations defined on
-// signin_unknown_error_response_body
-func ValidateSigninUnknownErrorResponseBody(body *SigninUnknownErrorResponseBody) (err error) {
+// ValidateOAuthUnknownErrorResponseBody runs the validations defined on
+// oAuth_unknown_error_response_body
+func ValidateOAuthUnknownErrorResponseBody(body *OAuthUnknownErrorResponseBody) (err error) {
 	if body.Err == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}

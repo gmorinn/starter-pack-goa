@@ -9,6 +9,7 @@ package cli
 
 import (
 	crudc "api_crud/gen/http/crud/client"
+	jwttokenc "api_crud/gen/http/jwt_token/client"
 	"flag"
 	"fmt"
 	"net/http"
@@ -23,13 +24,20 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `crud (get-book|update-book|get-all-books|delete-book|create-book|signup|signin)
+	return `crud (get-book|update-book|get-all-books|delete-book|create-book|o-auth)
+jwt-token (signup|signin)
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Rerum dolores quis."` + "\n" +
+	return os.Args[0] + ` crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Provident possimus."` + "\n" +
+		os.Args[0] + ` jwt-token signup --body '{
+      "email": "guillaume@epitech.eu",
+      "firstname": "Guillaume",
+      "lastname": "Morin",
+      "password": "8aj"
+   }'` + "\n" +
 		""
 }
 
@@ -61,11 +69,16 @@ func ParseEndpoint(
 		crudCreateBookFlags    = flag.NewFlagSet("create-book", flag.ExitOnError)
 		crudCreateBookBodyFlag = crudCreateBookFlags.String("body", "REQUIRED", "")
 
-		crudSignupFlags    = flag.NewFlagSet("signup", flag.ExitOnError)
-		crudSignupBodyFlag = crudSignupFlags.String("body", "REQUIRED", "")
+		crudOAuthFlags    = flag.NewFlagSet("o-auth", flag.ExitOnError)
+		crudOAuthBodyFlag = crudOAuthFlags.String("body", "REQUIRED", "")
 
-		crudSigninFlags    = flag.NewFlagSet("signin", flag.ExitOnError)
-		crudSigninBodyFlag = crudSigninFlags.String("body", "REQUIRED", "")
+		jwtTokenFlags = flag.NewFlagSet("jwt-token", flag.ContinueOnError)
+
+		jwtTokenSignupFlags    = flag.NewFlagSet("signup", flag.ExitOnError)
+		jwtTokenSignupBodyFlag = jwtTokenSignupFlags.String("body", "REQUIRED", "")
+
+		jwtTokenSigninFlags    = flag.NewFlagSet("signin", flag.ExitOnError)
+		jwtTokenSigninBodyFlag = jwtTokenSigninFlags.String("body", "REQUIRED", "")
 	)
 	crudFlags.Usage = crudUsage
 	crudGetBookFlags.Usage = crudGetBookUsage
@@ -73,8 +86,11 @@ func ParseEndpoint(
 	crudGetAllBooksFlags.Usage = crudGetAllBooksUsage
 	crudDeleteBookFlags.Usage = crudDeleteBookUsage
 	crudCreateBookFlags.Usage = crudCreateBookUsage
-	crudSignupFlags.Usage = crudSignupUsage
-	crudSigninFlags.Usage = crudSigninUsage
+	crudOAuthFlags.Usage = crudOAuthUsage
+
+	jwtTokenFlags.Usage = jwtTokenUsage
+	jwtTokenSignupFlags.Usage = jwtTokenSignupUsage
+	jwtTokenSigninFlags.Usage = jwtTokenSigninUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -93,6 +109,8 @@ func ParseEndpoint(
 		switch svcn {
 		case "crud":
 			svcf = crudFlags
+		case "jwt-token":
+			svcf = jwtTokenFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -125,11 +143,18 @@ func ParseEndpoint(
 			case "create-book":
 				epf = crudCreateBookFlags
 
+			case "o-auth":
+				epf = crudOAuthFlags
+
+			}
+
+		case "jwt-token":
+			switch epn {
 			case "signup":
-				epf = crudSignupFlags
+				epf = jwtTokenSignupFlags
 
 			case "signin":
-				epf = crudSigninFlags
+				epf = jwtTokenSigninFlags
 
 			}
 
@@ -171,12 +196,19 @@ func ParseEndpoint(
 			case "create-book":
 				endpoint = c.CreateBook()
 				data, err = crudc.BuildCreateBookPayload(*crudCreateBookBodyFlag)
+			case "o-auth":
+				endpoint = c.OAuth()
+				data, err = crudc.BuildOAuthPayload(*crudOAuthBodyFlag)
+			}
+		case "jwt-token":
+			c := jwttokenc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
 			case "signup":
 				endpoint = c.Signup()
-				data, err = crudc.BuildSignupPayload(*crudSignupBodyFlag)
+				data, err = jwttokenc.BuildSignupPayload(*jwtTokenSignupBodyFlag)
 			case "signin":
 				endpoint = c.Signin()
-				data, err = crudc.BuildSigninPayload(*crudSigninBodyFlag)
+				data, err = jwttokenc.BuildSigninPayload(*jwtTokenSigninBodyFlag)
 			}
 		}
 	}
@@ -199,8 +231,7 @@ COMMAND:
     get-all-books: Read All items
     delete-book: Delete one item by ID
     create-book: Create one item
-    signup: signup
-    signin: signin
+    o-auth: oAuth
 
 Additional help:
     %[1]s crud COMMAND --help
@@ -214,7 +245,7 @@ Get one item
     -jwt-token STRING: 
 
 Example:
-    %[1]s crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Rerum dolores quis."
+    %[1]s crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Provident possimus."
 `, os.Args[0])
 }
 
@@ -228,7 +259,7 @@ Update one item
 Example:
     %[1]s crud update-book --body '{
       "name": "Guillaume",
-      "price": 0.907140683484096
+      "price": 0.18062393525003903
    }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
 `, os.Args[0])
 }
@@ -263,37 +294,67 @@ Create one item
 Example:
     %[1]s crud create-book --body '{
       "name": "Guillaume",
-      "price": 0.5598850343195235
+      "price": 0.35125155826859417
    }'
 `, os.Args[0])
 }
 
-func crudSignupUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud signup -body JSON
+func crudOAuthUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud o-auth -body JSON
+
+oAuth
+    -body JSON: 
+
+Example:
+    %[1]s crud o-auth --body '{
+      "client_id": "00000",
+      "client_secret": "99999",
+      "grant_type": "Laborum qui animi eum ea."
+   }'
+`, os.Args[0])
+}
+
+// jwt-tokenUsage displays the usage of the jwt-token command and its
+// subcommands.
+func jwtTokenUsage() {
+	fmt.Fprintf(os.Stderr, `Use Token to authenticate. Signin and Signup
+Usage:
+    %[1]s [globalflags] jwt-token COMMAND [flags]
+
+COMMAND:
+    signup: signup
+    signin: signin
+
+Additional help:
+    %[1]s jwt-token COMMAND --help
+`, os.Args[0])
+}
+func jwtTokenSignupUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token signup -body JSON
 
 signup
     -body JSON: 
 
 Example:
-    %[1]s crud signup --body '{
+    %[1]s jwt-token signup --body '{
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
-      "password": "edi"
+      "password": "8aj"
    }'
 `, os.Args[0])
 }
 
-func crudSigninUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud signin -body JSON
+func jwtTokenSigninUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token signin -body JSON
 
 signin
     -body JSON: 
 
 Example:
-    %[1]s crud signin --body '{
+    %[1]s jwt-token signin --body '{
       "email": "guillaume@epitech.eu",
-      "password": "rm7"
+      "password": "pq7"
    }'
 `, os.Args[0])
 }

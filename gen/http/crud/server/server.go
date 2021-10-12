@@ -24,8 +24,7 @@ type Server struct {
 	GetAllBooks http.Handler
 	DeleteBook  http.Handler
 	CreateBook  http.Handler
-	Signup      http.Handler
-	Signin      http.Handler
+	OAuth       http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -66,16 +65,14 @@ func New(
 			{"GetAllBooks", "GET", "/books"},
 			{"DeleteBook", "DELETE", "/book/remove/{id}"},
 			{"CreateBook", "POST", "/book/add"},
-			{"Signup", "POST", "/signup"},
-			{"Signin", "POST", "/signin"},
+			{"OAuth", "POST", "/authorization"},
 		},
 		GetBook:     NewGetBookHandler(e.GetBook, mux, decoder, encoder, errhandler, formatter),
 		UpdateBook:  NewUpdateBookHandler(e.UpdateBook, mux, decoder, encoder, errhandler, formatter),
 		GetAllBooks: NewGetAllBooksHandler(e.GetAllBooks, mux, decoder, encoder, errhandler, formatter),
 		DeleteBook:  NewDeleteBookHandler(e.DeleteBook, mux, decoder, encoder, errhandler, formatter),
 		CreateBook:  NewCreateBookHandler(e.CreateBook, mux, decoder, encoder, errhandler, formatter),
-		Signup:      NewSignupHandler(e.Signup, mux, decoder, encoder, errhandler, formatter),
-		Signin:      NewSigninHandler(e.Signin, mux, decoder, encoder, errhandler, formatter),
+		OAuth:       NewOAuthHandler(e.OAuth, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -89,8 +86,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.GetAllBooks = m(s.GetAllBooks)
 	s.DeleteBook = m(s.DeleteBook)
 	s.CreateBook = m(s.CreateBook)
-	s.Signup = m(s.Signup)
-	s.Signin = m(s.Signin)
+	s.OAuth = m(s.OAuth)
 }
 
 // Mount configures the mux to serve the crud endpoints.
@@ -100,8 +96,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetAllBooksHandler(mux, h.GetAllBooks)
 	MountDeleteBookHandler(mux, h.DeleteBook)
 	MountCreateBookHandler(mux, h.CreateBook)
-	MountSignupHandler(mux, h.Signup)
-	MountSigninHandler(mux, h.Signin)
+	MountOAuthHandler(mux, h.OAuth)
 }
 
 // MountGetBookHandler configures the mux to serve the "crud" service "getBook"
@@ -352,21 +347,21 @@ func NewCreateBookHandler(
 	})
 }
 
-// MountSignupHandler configures the mux to serve the "crud" service "signup"
+// MountOAuthHandler configures the mux to serve the "crud" service "oAuth"
 // endpoint.
-func MountSignupHandler(mux goahttp.Muxer, h http.Handler) {
+func MountOAuthHandler(mux goahttp.Muxer, h http.Handler) {
 	f, ok := h.(http.HandlerFunc)
 	if !ok {
 		f = func(w http.ResponseWriter, r *http.Request) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/signup", f)
+	mux.Handle("POST", "/authorization", f)
 }
 
-// NewSignupHandler creates a HTTP handler which loads the HTTP request and
-// calls the "crud" service "signup" endpoint.
-func NewSignupHandler(
+// NewOAuthHandler creates a HTTP handler which loads the HTTP request and
+// calls the "crud" service "oAuth" endpoint.
+func NewOAuthHandler(
 	endpoint goa.Endpoint,
 	mux goahttp.Muxer,
 	decoder func(*http.Request) goahttp.Decoder,
@@ -375,64 +370,13 @@ func NewSignupHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeSignupRequest(mux, decoder)
-		encodeResponse = EncodeSignupResponse(encoder)
-		encodeError    = EncodeSignupError(encoder, formatter)
+		decodeRequest  = DecodeOAuthRequest(mux, decoder)
+		encodeResponse = EncodeOAuthResponse(encoder)
+		encodeError    = EncodeOAuthError(encoder, formatter)
 	)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "signup")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "crud")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
-}
-
-// MountSigninHandler configures the mux to serve the "crud" service "signin"
-// endpoint.
-func MountSigninHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("POST", "/signin", f)
-}
-
-// NewSigninHandler creates a HTTP handler which loads the HTTP request and
-// calls the "crud" service "signin" endpoint.
-func NewSigninHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeSigninRequest(mux, decoder)
-		encodeResponse = EncodeSigninResponse(encoder)
-		encodeError    = EncodeSigninError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "signin")
+		ctx = context.WithValue(ctx, goa.MethodKey, "oAuth")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "crud")
 		payload, err := decodeRequest(r)
 		if err != nil {

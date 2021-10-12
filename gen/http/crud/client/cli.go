@@ -50,7 +50,7 @@ func BuildUpdateBookPayload(crudUpdateBookBody string, crudUpdateBookID string) 
 	{
 		err = json.Unmarshal([]byte(crudUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.907140683484096\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.18062393525003903\n   }'")
 		}
 	}
 	var id string
@@ -98,7 +98,7 @@ func BuildCreateBookPayload(crudCreateBookBody string) (*crud.CreateBookPayload,
 	{
 		err = json.Unmarshal([]byte(crudCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.5598850343195235\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.35125155826859417\n   }'")
 		}
 		if utf8.RuneCountInString(body.Name) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))
@@ -118,66 +118,21 @@ func BuildCreateBookPayload(crudCreateBookBody string) (*crud.CreateBookPayload,
 	return v, nil
 }
 
-// BuildSignupPayload builds the payload for the crud signup endpoint from CLI
+// BuildOAuthPayload builds the payload for the crud oAuth endpoint from CLI
 // flags.
-func BuildSignupPayload(crudSignupBody string) (*crud.SignupPayload, error) {
+func BuildOAuthPayload(crudOAuthBody string) (*crud.OAuthPayload, error) {
 	var err error
-	var body SignupRequestBody
+	var body OAuthRequestBody
 	{
-		err = json.Unmarshal([]byte(crudSignupBody), &body)
+		err = json.Unmarshal([]byte(crudOAuthBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"edi\"\n   }'")
-		}
-		if utf8.RuneCountInString(body.Firstname) < 3 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
-		}
-		if utf8.RuneCountInString(body.Firstname) > 15 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 15, false))
-		}
-		if utf8.RuneCountInString(body.Lastname) < 3 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.lastname", body.Lastname, utf8.RuneCountInString(body.Lastname), 3, true))
-		}
-		if utf8.RuneCountInString(body.Password) < 8 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 8, true))
-		}
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
-
-		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"client_id\": \"00000\",\n      \"client_secret\": \"99999\",\n      \"grant_type\": \"Laborum qui animi eum ea.\"\n   }'")
 		}
 	}
-	v := &crud.SignupPayload{
-		Firstname: body.Firstname,
-		Lastname:  body.Lastname,
-		Password:  body.Password,
-		Email:     body.Email,
-	}
-
-	return v, nil
-}
-
-// BuildSigninPayload builds the payload for the crud signin endpoint from CLI
-// flags.
-func BuildSigninPayload(crudSigninBody string) (*crud.SigninPayload, error) {
-	var err error
-	var body SigninRequestBody
-	{
-		err = json.Unmarshal([]byte(crudSigninBody), &body)
-		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"password\": \"rm7\"\n   }'")
-		}
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
-
-		if utf8.RuneCountInString(body.Password) < 8 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 8, true))
-		}
-		if err != nil {
-			return nil, err
-		}
-	}
-	v := &crud.SigninPayload{
-		Email:    body.Email,
-		Password: body.Password,
+	v := &crud.OAuthPayload{
+		GrantType:    body.GrantType,
+		ClientID:     body.ClientID,
+		ClientSecret: body.ClientSecret,
 	}
 
 	return v, nil

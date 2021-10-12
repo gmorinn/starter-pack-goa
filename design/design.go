@@ -21,7 +21,7 @@ var JWTAuth = JWTSecurity("jwt", func() {
 	Scope("api:write", "Read and write access")
 })
 
-// OAuth2Auth defines a security scheme that uses OAuth2 tokens.
+// // OAuth2Auth defines a security scheme that uses OAuth2 tokens.
 var OAuth2Auth = OAuth2Security("oauth2", func() {
 	AuthorizationCodeFlow("/authorization", "/token", "/refresh")
 	Description(`Secures endpoint by requiring a valid OAuth2 token retrieved via the signin endpoint. Supports scopes "api:read" and "api:write".`)
@@ -39,16 +39,13 @@ var _ = Service("crud", func() {
 	Error("unauthorized", String, "Identifiers are invalid")
 	Error("id_doesnt_exist", idDoesntExist, "When ID doesn't exist")
 	Error("unknown_error", unknownError, "Error not identified (500)")
-	Error("email_already_exist", emailAlreadyExist, "When email already exist")
-	Error("invalid-scopes", String, "Token scopes are invalid")
+	Error("invalid_scopes", String, "Token scopes are invalid")
 
 	HTTP(func() {
 		Response("unauthorized", StatusUnauthorized)
 		Response("id_doesnt_exist", StatusInternalServerError)
-		Response("email_already_exist", StatusBadRequest)
 		Response("unknown_error", StatusInternalServerError)
-		Response("invalid-scopes", StatusForbidden)
-
+		Response("invalid_scopes", StatusForbidden)
 	})
 
 	Method("getBook", func() {
@@ -161,63 +158,31 @@ var _ = Service("crud", func() {
 		})
 	})
 
-	Method("signup", func() {
-		Description("signup")
+	Method("oAuth", func() {
+		Description("oAuth")
 
 		Payload(func() {
-			Description("Use client ID and client secret to oAuth")
-			Attribute("firstname", String, func() {
-				MinLength(3)
-				MaxLength(15)
-				Example("Guillaume")
+			Attribute("grant_type", String)
+			Attribute("client_id", String, func() {
+				Example("00000")
 			})
-			Attribute("lastname", String, func() {
-				MinLength(3)
-				Example("Morin")
+			Attribute("client_secret", String, func() {
+				Example("99999")
 			})
-			Attribute("password", String, func() {
-				MinLength(8)
-
-			})
-			Attribute("email", String, func() {
-				Format(FormatEmail)
-				Example("guillaume@epitech.eu")
-			})
-			Required("firstname", "lastname", "password", "email")
+			Required("grant_type", "client_id", "client_secret")
 		})
 
-		Result(Sign)
+		Result(oAuthResponse)
 
 		HTTP(func() {
-			POST("/signup")
-			Response(StatusOK)
-		})
-	})
-
-	Method("signin", func() {
-		Description("signin")
-
-		Payload(func() {
-			Attribute("email", String, func() {
-				Format(FormatEmail)
-				Example("guillaume@epitech.eu")
-			})
-			Attribute("password", String, func() {
-				MinLength(8)
-			})
-			Required("password", "email")
-		})
-
-		Result(Sign)
-
-		HTTP(func() {
-			POST("/signin")
+			POST("/authorization")
 			Response(StatusOK)
 		})
 	})
 
 })
 
+// Download Postman
 var _ = Service("openapi", func() {
 	Files("/openapi.json", "openapi3.json")
 })
@@ -244,14 +209,6 @@ var idDoesntExist = Type("IdDoesntExist", func() {
 	Required("err", "success", "id")
 })
 
-var emailAlreadyExist = Type("emailAlreadyExist", func() {
-	Field(1, "message", String)
-	Field(2, "success", Boolean, func() {
-		Default(false)
-	})
-	Required("message", "success")
-})
-
 var unknownError = Type("unknownError", func() {
 	Field(1, "err", String)
 	Field(2, "error_code", String)
@@ -261,13 +218,9 @@ var unknownError = Type("unknownError", func() {
 	Required("err", "success", "error_code")
 })
 
-var Sign = Type("Sign", func() {
-	Field(1, "access_token", String, func() {
-		Example("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
-	})
-	Field(2, "refresh_token", String, func() {
-		Example("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
-	})
-	Field(3, "success", Boolean)
-	Required("access_token", "refresh_token", "success")
+var oAuthResponse = Type("oAuthResponse", func() {
+	Field(1, "access_token", String)
+	Field(2, "token_type", String)
+	Field(3, "expires_in", Int64)
+	Field(4, "success", Boolean)
 })

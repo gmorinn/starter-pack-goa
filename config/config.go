@@ -34,10 +34,12 @@ type Security struct {
 	Secret               string
 	AccessTokenDuration  int
 	RefreshTokenDuration int
+	OAuthID              string
+	OAuthSecret          string
 }
 
-// Get return config
-func Get() *API {
+// New config api return config
+func New() *API {
 	var config API
 	err := godotenv.Load(os.ExpandEnv("$GOPATH/src/api_crud/.env"))
 
@@ -55,6 +57,9 @@ func Get() *API {
 	config.Database.User = os.Getenv("POSTGRES_USER")
 	config.Database.Password = os.Getenv("POSTGRES_PASSWORD")
 	config.Database.Port, _ = getenvInt("POSTGRES_PORT")
+
+	config.Security.OAuthID = os.Getenv("API_OAUTH_ID")
+	config.Security.OAuthSecret = os.Getenv("API_OAUTH_SECRET")
 
 	config.Security.Secret = os.Getenv("API_SECRET")
 	config.Security.AccessTokenDuration, _ = getenvInt("API_ACCESS_TOKEN")

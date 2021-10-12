@@ -2,6 +2,7 @@ package main
 
 import (
 	basic "api_crud"
+	"api_crud/api"
 	crud "api_crud/gen/crud"
 	"context"
 	"flag"
@@ -35,12 +36,19 @@ func main() {
 		logger = log.New(os.Stderr, "[basic] ", log.Ltime)
 	}
 
+	var (
+		server *api.Server
+	)
+	{
+		server = api.NewServer()
+	}
+
 	// Initialize the services.
 	var (
 		crudSvc crud.Service
 	)
 	{
-		crudSvc = basic.NewCrud(logger)
+		crudSvc = basic.NewCrud(logger, server)
 	}
 
 	// Wrap the services in endpoints that can be invoked from other services

@@ -26,10 +26,8 @@ type Service interface {
 	DeleteBook(context.Context, *DeleteBookPayload) (res *DeleteBookResult, err error)
 	// Create one item
 	CreateBook(context.Context, *CreateBookPayload) (res *CreateBookResult, err error)
-	// signup
-	Signup(context.Context, *SignupPayload) (res *Sign, err error)
-	// signin
-	Signin(context.Context, *SigninPayload) (res *Sign, err error)
+	// oAuth
+	OAuth(context.Context, *OAuthPayload) (res *OAuthResponse, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -46,7 +44,7 @@ const ServiceName = "crud"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [7]string{"getBook", "updateBook", "getAllBooks", "deleteBook", "createBook", "signup", "signin"}
+var MethodNames = [6]string{"getBook", "updateBook", "getAllBooks", "deleteBook", "createBook", "oAuth"}
 
 // GetBookPayload is the payload type of the crud service getBook method.
 type GetBookPayload struct {
@@ -106,25 +104,19 @@ type CreateBookResult struct {
 	Success bool
 }
 
-// Use client ID and client secret to oAuth
-type SignupPayload struct {
-	Firstname string
-	Lastname  string
-	Password  string
-	Email     string
+// OAuthPayload is the payload type of the crud service oAuth method.
+type OAuthPayload struct {
+	GrantType    string
+	ClientID     string
+	ClientSecret string
 }
 
-// Sign is the result type of the crud service signup method.
-type Sign struct {
-	AccessToken  string
-	RefreshToken string
-	Success      bool
-}
-
-// SigninPayload is the payload type of the crud service signin method.
-type SigninPayload struct {
-	Email    string
-	Password string
+// OAuthResponse is the result type of the crud service oAuth method.
+type OAuthResponse struct {
+	AccessToken *string
+	TokenType   *string
+	ExpiresIn   *int64
+	Success     *bool
 }
 
 type BookResponse struct {
@@ -148,11 +140,6 @@ type UnknownError struct {
 	Err       string
 	ErrorCode string
 	Success   bool
-}
-
-type EmailAlreadyExist struct {
-	Message string
-	Success bool
 }
 
 // Token scopes are invalid
@@ -189,23 +176,13 @@ func (e *UnknownError) ErrorName() string {
 }
 
 // Error returns an error description.
-func (e *EmailAlreadyExist) Error() string {
-	return ""
-}
-
-// ErrorName returns "emailAlreadyExist".
-func (e *EmailAlreadyExist) ErrorName() string {
-	return "email_already_exist"
-}
-
-// Error returns an error description.
 func (e InvalidScopes) Error() string {
 	return "Token scopes are invalid"
 }
 
-// ErrorName returns "invalid-scopes".
+// ErrorName returns "invalid_scopes".
 func (e InvalidScopes) ErrorName() string {
-	return "invalid-scopes"
+	return "invalid_scopes"
 }
 
 // MakeTimeout builds a goa.ServiceError from an error.

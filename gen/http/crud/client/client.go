@@ -37,11 +37,8 @@ type Client struct {
 	// endpoint.
 	CreateBookDoer goahttp.Doer
 
-	// Signup Doer is the HTTP client used to make requests to the signup endpoint.
-	SignupDoer goahttp.Doer
-
-	// Signin Doer is the HTTP client used to make requests to the signin endpoint.
-	SigninDoer goahttp.Doer
+	// OAuth Doer is the HTTP client used to make requests to the oAuth endpoint.
+	OAuthDoer goahttp.Doer
 
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
@@ -68,8 +65,7 @@ func NewClient(
 		GetAllBooksDoer:     doer,
 		DeleteBookDoer:      doer,
 		CreateBookDoer:      doer,
-		SignupDoer:          doer,
-		SigninDoer:          doer,
+		OAuthDoer:           doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -188,15 +184,15 @@ func (c *Client) CreateBook() goa.Endpoint {
 	}
 }
 
-// Signup returns an endpoint that makes HTTP requests to the crud service
-// signup server.
-func (c *Client) Signup() goa.Endpoint {
+// OAuth returns an endpoint that makes HTTP requests to the crud service oAuth
+// server.
+func (c *Client) OAuth() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeSignupRequest(c.encoder)
-		decodeResponse = DecodeSignupResponse(c.decoder, c.RestoreResponseBody)
+		encodeRequest  = EncodeOAuthRequest(c.encoder)
+		decodeResponse = DecodeOAuthResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildSignupRequest(ctx, v)
+		req, err := c.BuildOAuthRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
@@ -204,33 +200,9 @@ func (c *Client) Signup() goa.Endpoint {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.SignupDoer.Do(req)
+		resp, err := c.OAuthDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("crud", "signup", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// Signin returns an endpoint that makes HTTP requests to the crud service
-// signin server.
-func (c *Client) Signin() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeSigninRequest(c.encoder)
-		decodeResponse = DecodeSigninResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildSigninRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.SigninDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("crud", "signin", err)
+			return nil, goahttp.ErrRequestError("crud", "oAuth", err)
 		}
 		return decodeResponse(resp)
 	}

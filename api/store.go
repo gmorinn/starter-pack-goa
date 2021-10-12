@@ -1,10 +1,13 @@
 package api
 
 import (
+	"api_crud/config"
 	sqlc "api_crud/internal/db"
 	"context"
 	"database/sql"
 	"fmt"
+
+	"log"
 )
 
 type Store struct {
@@ -36,4 +39,26 @@ func (store *Store) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) er
 		return err
 	}
 	return tx.Commit()
+}
+
+type Server struct {
+	Store  *Store
+	Config *config.API
+}
+
+func NewServer() *Server {
+	cnf := config.New()
+	source := fmt.Sprintf("user=%s password=%s host=%s port=%v dbname=%s sslmode=disable TimeZone=%s", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database, cnf.TZ)
+	pg, err := sql.Open("postgres", source)
+	if err != nil {
+		log.Fatal(err)
+	}
+	store := NewStore(pg)
+
+	server := Server{
+		Store:  store,
+		Config: cnf,
+	}
+
+	return &server
 }
