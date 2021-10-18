@@ -55,6 +55,8 @@ func EncodeSignupRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // DecodeSignupResponse may return the following errors:
 //	- "email_already_exist" (type *jwttoken.EmailAlreadyExist): http.StatusBadRequest
 //	- "unknown_error" (type *jwttoken.UnknownError): http.StatusInternalServerError
+//	- "invalid_scopes" (type jwttoken.InvalidScopes): http.StatusForbidden
+//	- "unauthorized" (type jwttoken.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeSignupResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -114,6 +116,26 @@ func DecodeSignupResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 				return nil, goahttp.ErrValidationError("jwtToken", "signup", err)
 			}
 			return nil, NewSignupUnknownError(&body)
+		case http.StatusForbidden:
+			var (
+				body SignupInvalidScopesResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "signup", err)
+			}
+			return nil, NewSignupInvalidScopes(body)
+		case http.StatusUnauthorized:
+			var (
+				body SignupUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "signup", err)
+			}
+			return nil, NewSignupUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("jwtToken", "signup", resp.StatusCode, string(body))
@@ -158,6 +180,8 @@ func EncodeSigninRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 // DecodeSigninResponse may return the following errors:
 //	- "email_already_exist" (type *jwttoken.EmailAlreadyExist): http.StatusBadRequest
 //	- "unknown_error" (type *jwttoken.UnknownError): http.StatusInternalServerError
+//	- "invalid_scopes" (type jwttoken.InvalidScopes): http.StatusForbidden
+//	- "unauthorized" (type jwttoken.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeSigninResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -217,6 +241,26 @@ func DecodeSigninResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 				return nil, goahttp.ErrValidationError("jwtToken", "signin", err)
 			}
 			return nil, NewSigninUnknownError(&body)
+		case http.StatusForbidden:
+			var (
+				body SigninInvalidScopesResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "signin", err)
+			}
+			return nil, NewSigninInvalidScopes(body)
+		case http.StatusUnauthorized:
+			var (
+				body SigninUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "signin", err)
+			}
+			return nil, NewSigninUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("jwtToken", "signin", resp.StatusCode, string(body))

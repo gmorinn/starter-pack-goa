@@ -7,6 +7,12 @@ import (
 	"database/sql"
 	"fmt"
 
+	oerrors "gopkg.in/oauth2.v3/errors"
+	"gopkg.in/oauth2.v3/manage"
+	"gopkg.in/oauth2.v3/models"
+	oserver "gopkg.in/oauth2.v3/server"
+	"gopkg.in/oauth2.v3/store"
+
 	"log"
 )
 
@@ -44,21 +50,70 @@ func (store *Store) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) er
 type Server struct {
 	Store  *Store
 	Config *config.API
+	Oauth  *oserver.Server
 }
 
 func NewServer() *Server {
 	cnf := config.New()
-	source := fmt.Sprintf("user=%s password=%s host=%s port=%v dbname=%s sslmode=disable TimeZone=%s", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database, cnf.TZ)
+	source := fmt.Sprintf("user=%s password=%s host=%s port=%v dbname=%s sslmode=disable", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database)
 	pg, err := sql.Open("postgres", source)
 	if err != nil {
 		log.Fatal(err)
 	}
 	store := NewStore(pg)
 
-	server := Server{
-		Store:  store,
-		Config: cnf,
+	server := &Server{Store: store}
+	server.Config = cnf
+
+	server.Oauth = server.oAuth()
+
+	return server
+}
+
+// oAuth manage and store oAuth token
+func (server *Server) oAuth() *oserver.Server {
+	manager := manage.NewDefaultManager()
+	manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
+
+	// token store
+	manager.MustTokenStorage(store.NewFileTokenStore("data.db"))
+
+	// client store
+	clientStore := store.NewClientStore()
+	manager.MapClientStorage(clientStore)
+
+	srv := oserver.NewDefaultServer(manager)
+	srv.SetAllowGetAccessRequest(false)
+	srv.SetClientInfoHandler(oserver.ClientFormHandler)
+	manager.SetRefreshTokenCfg(manage.DefaultRefreshTokenCfg)
+
+	srv.SetInternalErrorHandler(func(err error) (re *oerrors.Response) {
+		log.Println("Internal Error:", err.Error())
+		return re
+	})
+
+	srv.SetResponseErrorHandler(func(re *oerrors.Response) {
+		log.Println("Response Error:", re.Error.Error())
+	})
+
+	// client domain
+	var domain string
+	if server.Config.SSL {
+		domain = fmt.Sprintf("https://%s", server.Config.Host)
+	} else {
+		domain = fmt.Sprintf("http://%s", server.Config.Host)
 	}
 
-	return &server
+	// client store
+	err := clientStore.Set(server.Config.Security.OAuthID, &models.Client{
+		ID:     server.Config.Security.OAuthID,
+		Secret: server.Config.Security.OAuthSecret,
+		Domain: domain,
+	})
+
+	if err != nil {
+		log.Println("clientStore", err)
+	}
+
+	return srv
 }

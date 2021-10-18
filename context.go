@@ -40,17 +40,3 @@ func contextAuthInfo(ctx context.Context) (auth authInfo) {
 	auth, _ = ctx.Value(ctxValueClaims).(authInfo)
 	return
 }
-
-// generateJWT return jwt or error
-func generateJWT(cc jwt.MapClaims, secret string) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := token.Claims.(jwt.MapClaims)
-	for k, c := range cc {
-		claims[k] = c
-	}
-	t, err := token.SignedString([]byte(secret))
-	if err != nil {
-		return "", err
-	}
-	return t, nil
-}

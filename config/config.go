@@ -4,17 +4,19 @@ import (
 	"log"
 	"os"
 	"strconv"
-
-	"github.com/joho/godotenv"
+	"strings"
 )
 
 // API represent api
 type API struct {
+	Mode     string
+	Domain   string
 	TZ       string
 	SSL      bool
 	Host     string
 	Port     int
 	Cert     string
+	Cors     []string
 	Key      string
 	Security Security
 	Database Database
@@ -41,16 +43,19 @@ type Security struct {
 // New config api return config
 func New() *API {
 	var config API
-	err := godotenv.Load(os.ExpandEnv("$GOPATH/src/api_crud/.env"))
 
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	config.Mode = os.Getenv("API_MODE")
+	config.Domain = os.Getenv("API_DOMAIN")
 
 	config.TZ = os.Getenv("TZ")
 	config.Port, _ = getenvInt("API_PORT")
 	config.SSL, _ = getenvBool("API_SSL")
 	config.Host = os.Getenv("API_HOST")
+
+	config.Cors = getenvSliceString("API_CORS")
+
+	config.Cert = os.Getenv("API_CERT")
+	config.Key = os.Getenv("API_KEY")
 
 	config.Database.Host = os.Getenv("POSTGRES_HOST")
 	config.Database.Database = os.Getenv("POSTGRES_DB")
@@ -86,4 +91,10 @@ func getenvBool(key string) (bool, error) {
 		return false, err
 	}
 	return v, nil
+}
+
+func getenvSliceString(key string) []string {
+	s := os.Getenv(key)
+	v := strings.Split(s, ",")
+	return v
 }

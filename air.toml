@@ -1,0 +1,6 @@
+[build]
+cmd = "go build -o ./bin/api ."
+bin = "./bin/api"
+exclude_dir = ["public", "tmp", "vendor", "bin"]
+[misc]
+clean_on_exit = true

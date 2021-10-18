@@ -20,18 +20,16 @@ type Client struct {
 	GetAllBooksEndpoint goa.Endpoint
 	DeleteBookEndpoint  goa.Endpoint
 	CreateBookEndpoint  goa.Endpoint
-	OAuthEndpoint       goa.Endpoint
 }
 
 // NewClient initializes a "crud" service client given the endpoints.
-func NewClient(getBook, updateBook, getAllBooks, deleteBook, createBook, oAuth goa.Endpoint) *Client {
+func NewClient(getBook, updateBook, getAllBooks, deleteBook, createBook goa.Endpoint) *Client {
 	return &Client{
 		GetBookEndpoint:     getBook,
 		UpdateBookEndpoint:  updateBook,
 		GetAllBooksEndpoint: getAllBooks,
 		DeleteBookEndpoint:  deleteBook,
 		CreateBookEndpoint:  createBook,
-		OAuthEndpoint:       oAuth,
 	}
 }
 
@@ -83,14 +81,4 @@ func (c *Client) CreateBook(ctx context.Context, p *CreateBookPayload) (res *Cre
 		return
 	}
 	return ires.(*CreateBookResult), nil
-}
-
-// OAuth calls the "oAuth" endpoint of the "crud" service.
-func (c *Client) OAuth(ctx context.Context, p *OAuthPayload) (res *OAuthResponse, err error) {
-	var ires interface{}
-	ires, err = c.OAuthEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*OAuthResponse), nil
 }

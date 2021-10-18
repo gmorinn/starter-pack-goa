@@ -61,6 +61,14 @@ type SignupUnknownErrorResponseBody struct {
 	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
+// SignupInvalidScopesResponseBody is the type of the "jwtToken" service
+// "signup" endpoint HTTP response body for the "invalid_scopes" error.
+type SignupInvalidScopesResponseBody string
+
+// SignupUnauthorizedResponseBody is the type of the "jwtToken" service
+// "signup" endpoint HTTP response body for the "unauthorized" error.
+type SignupUnauthorizedResponseBody string
+
 // SigninEmailAlreadyExistResponseBody is the type of the "jwtToken" service
 // "signin" endpoint HTTP response body for the "email_already_exist" error.
 type SigninEmailAlreadyExistResponseBody struct {
@@ -75,6 +83,14 @@ type SigninUnknownErrorResponseBody struct {
 	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
 	Success   bool   `form:"success" json:"success" xml:"success"`
 }
+
+// SigninInvalidScopesResponseBody is the type of the "jwtToken" service
+// "signin" endpoint HTTP response body for the "invalid_scopes" error.
+type SigninInvalidScopesResponseBody string
+
+// SigninUnauthorizedResponseBody is the type of the "jwtToken" service
+// "signin" endpoint HTTP response body for the "unauthorized" error.
+type SigninUnauthorizedResponseBody string
 
 // NewSignupResponseBody builds the HTTP response body from the result of the
 // "signup" endpoint of the "jwtToken" service.
@@ -119,6 +135,20 @@ func NewSignupUnknownErrorResponseBody(res *jwttoken.UnknownError) *SignupUnknow
 	return body
 }
 
+// NewSignupInvalidScopesResponseBody builds the HTTP response body from the
+// result of the "signup" endpoint of the "jwtToken" service.
+func NewSignupInvalidScopesResponseBody(res jwttoken.InvalidScopes) SignupInvalidScopesResponseBody {
+	body := SignupInvalidScopesResponseBody(res)
+	return body
+}
+
+// NewSignupUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "signup" endpoint of the "jwtToken" service.
+func NewSignupUnauthorizedResponseBody(res jwttoken.Unauthorized) SignupUnauthorizedResponseBody {
+	body := SignupUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewSigninEmailAlreadyExistResponseBody builds the HTTP response body from
 // the result of the "signin" endpoint of the "jwtToken" service.
 func NewSigninEmailAlreadyExistResponseBody(res *jwttoken.EmailAlreadyExist) *SigninEmailAlreadyExistResponseBody {
@@ -137,6 +167,20 @@ func NewSigninUnknownErrorResponseBody(res *jwttoken.UnknownError) *SigninUnknow
 		ErrorCode: res.ErrorCode,
 		Success:   res.Success,
 	}
+	return body
+}
+
+// NewSigninInvalidScopesResponseBody builds the HTTP response body from the
+// result of the "signin" endpoint of the "jwtToken" service.
+func NewSigninInvalidScopesResponseBody(res jwttoken.InvalidScopes) SigninInvalidScopesResponseBody {
+	body := SigninInvalidScopesResponseBody(res)
+	return body
+}
+
+// NewSigninUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "signin" endpoint of the "jwtToken" service.
+func NewSigninUnauthorizedResponseBody(res jwttoken.Unauthorized) SigninUnauthorizedResponseBody {
+	body := SigninUnauthorizedResponseBody(res)
 	return body
 }
 

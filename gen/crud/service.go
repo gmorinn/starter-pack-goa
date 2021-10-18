@@ -26,8 +26,6 @@ type Service interface {
 	DeleteBook(context.Context, *DeleteBookPayload) (res *DeleteBookResult, err error)
 	// Create one item
 	CreateBook(context.Context, *CreateBookPayload) (res *CreateBookResult, err error)
-	// oAuth
-	OAuth(context.Context, *OAuthPayload) (res *OAuthResponse, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -44,7 +42,7 @@ const ServiceName = "crud"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"getBook", "updateBook", "getAllBooks", "deleteBook", "createBook", "oAuth"}
+var MethodNames = [5]string{"getBook", "updateBook", "getAllBooks", "deleteBook", "createBook"}
 
 // GetBookPayload is the payload type of the crud service getBook method.
 type GetBookPayload struct {
@@ -104,29 +102,11 @@ type CreateBookResult struct {
 	Success bool
 }
 
-// OAuthPayload is the payload type of the crud service oAuth method.
-type OAuthPayload struct {
-	GrantType    string
-	ClientID     string
-	ClientSecret string
-}
-
-// OAuthResponse is the result type of the crud service oAuth method.
-type OAuthResponse struct {
-	AccessToken *string
-	TokenType   *string
-	ExpiresIn   *int64
-	Success     *bool
-}
-
 type BookResponse struct {
 	ID    string
 	Name  string
 	Price float64
 }
-
-// Identifiers are invalid
-type Unauthorized string
 
 // IdDoesntExist is the error returned when 0 book have the id corresponding
 type IDDoesntExist struct {
@@ -140,19 +120,6 @@ type UnknownError struct {
 	Err       string
 	ErrorCode string
 	Success   bool
-}
-
-// Token scopes are invalid
-type InvalidScopes string
-
-// Error returns an error description.
-func (e Unauthorized) Error() string {
-	return "Identifiers are invalid"
-}
-
-// ErrorName returns "unauthorized".
-func (e Unauthorized) ErrorName() string {
-	return "unauthorized"
 }
 
 // Error returns an error description.
@@ -173,16 +140,6 @@ func (e *UnknownError) Error() string {
 // ErrorName returns "unknownError".
 func (e *UnknownError) ErrorName() string {
 	return "unknown_error"
-}
-
-// Error returns an error description.
-func (e InvalidScopes) Error() string {
-	return "Token scopes are invalid"
-}
-
-// ErrorName returns "invalid_scopes".
-func (e InvalidScopes) ErrorName() string {
-	return "invalid_scopes"
 }
 
 // MakeTimeout builds a goa.ServiceError from an error.

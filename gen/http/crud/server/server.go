@@ -24,7 +24,6 @@ type Server struct {
 	GetAllBooks http.Handler
 	DeleteBook  http.Handler
 	CreateBook  http.Handler
-	OAuth       http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -65,14 +64,12 @@ func New(
 			{"GetAllBooks", "GET", "/books"},
 			{"DeleteBook", "DELETE", "/book/remove/{id}"},
 			{"CreateBook", "POST", "/book/add"},
-			{"OAuth", "POST", "/authorization"},
 		},
 		GetBook:     NewGetBookHandler(e.GetBook, mux, decoder, encoder, errhandler, formatter),
 		UpdateBook:  NewUpdateBookHandler(e.UpdateBook, mux, decoder, encoder, errhandler, formatter),
 		GetAllBooks: NewGetAllBooksHandler(e.GetAllBooks, mux, decoder, encoder, errhandler, formatter),
 		DeleteBook:  NewDeleteBookHandler(e.DeleteBook, mux, decoder, encoder, errhandler, formatter),
 		CreateBook:  NewCreateBookHandler(e.CreateBook, mux, decoder, encoder, errhandler, formatter),
-		OAuth:       NewOAuthHandler(e.OAuth, mux, decoder, encoder, errhandler, formatter),
 	}
 }
 
@@ -86,7 +83,6 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.GetAllBooks = m(s.GetAllBooks)
 	s.DeleteBook = m(s.DeleteBook)
 	s.CreateBook = m(s.CreateBook)
-	s.OAuth = m(s.OAuth)
 }
 
 // Mount configures the mux to serve the crud endpoints.
@@ -96,7 +92,6 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetAllBooksHandler(mux, h.GetAllBooks)
 	MountDeleteBookHandler(mux, h.DeleteBook)
 	MountCreateBookHandler(mux, h.CreateBook)
-	MountOAuthHandler(mux, h.OAuth)
 }
 
 // MountGetBookHandler configures the mux to serve the "crud" service "getBook"
@@ -326,57 +321,6 @@ func NewCreateBookHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "createBook")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "crud")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
-}
-
-// MountOAuthHandler configures the mux to serve the "crud" service "oAuth"
-// endpoint.
-func MountOAuthHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := h.(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("POST", "/authorization", f)
-}
-
-// NewOAuthHandler creates a HTTP handler which loads the HTTP request and
-// calls the "crud" service "oAuth" endpoint.
-func NewOAuthHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeOAuthRequest(mux, decoder)
-		encodeResponse = EncodeOAuthResponse(encoder)
-		encodeError    = EncodeOAuthError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "oAuth")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "crud")
 		payload, err := decodeRequest(r)
 		if err != nil {

@@ -2,15 +2,26 @@ package design
 
 import . "goa.design/goa/v3/dsl"
 
+// JWTAuth defines a security scheme that uses JWT tokens.
+var JWTAuth = JWTSecurity("jwt", func() {
+	Description(`Secures endpoint by requiring a valid JWT token retrieved via the signin endpoint. Supports scopes "api:read" and "api:write".`)
+	Scope("api:read", "Read-only access")
+	Scope("api:write", "Read and write access")
+})
+
 var _ = Service("jwtToken", func() {
 	Description("Use Token to authenticate. Signin and Signup")
 
 	Error("email_already_exist", emailAlreadyExist, "When email already exist")
 	Error("unknown_error", unknownError, "Error not identified (500)")
+	Error("invalid_scopes", String, "Token scopes are invalid")
+	Error("unauthorized", String, "Identifiers are invalid")
 
 	HTTP(func() {
 		Response("email_already_exist", StatusBadRequest)
 		Response("unknown_error", StatusInternalServerError)
+		Response("invalid_scopes", StatusForbidden)
+		Response("unauthorized", StatusUnauthorized)
 	})
 
 	Method("signup", func() {

@@ -14,20 +14,6 @@ var _ = API("basic", func() {
 	})
 })
 
-// JWTAuth defines a security scheme that uses JWT tokens.
-var JWTAuth = JWTSecurity("jwt", func() {
-	Description(`Secures endpoint by requiring a valid JWT token retrieved via the signin endpoint. Supports scopes "api:read" and "api:write".`)
-	Scope("api:read", "Read-only access")
-	Scope("api:write", "Read and write access")
-})
-
-// // OAuth2Auth defines a security scheme that uses OAuth2 tokens.
-var OAuth2Auth = OAuth2Security("oauth2", func() {
-	AuthorizationCodeFlow("/authorization", "/token", "/refresh")
-	Description(`Secures endpoint by requiring a valid OAuth2 token retrieved via the signin endpoint. Supports scopes "api:read" and "api:write".`)
-	Scope("api:read", "Read-only access")
-})
-
 // Service describes a service
 var _ = Service("crud", func() {
 	Description("The principe of CRUD API with GET, PUT, POST, DELETE")
@@ -36,16 +22,12 @@ var _ = Service("crud", func() {
 		Timeout()
 	})
 
-	Error("unauthorized", String, "Identifiers are invalid")
 	Error("id_doesnt_exist", idDoesntExist, "When ID doesn't exist")
 	Error("unknown_error", unknownError, "Error not identified (500)")
-	Error("invalid_scopes", String, "Token scopes are invalid")
 
 	HTTP(func() {
-		Response("unauthorized", StatusUnauthorized)
 		Response("id_doesnt_exist", StatusInternalServerError)
 		Response("unknown_error", StatusInternalServerError)
-		Response("invalid_scopes", StatusForbidden)
 	})
 
 	Method("getBook", func() {
@@ -157,29 +139,6 @@ var _ = Service("crud", func() {
 			Required("book", "success")
 		})
 	})
-
-	Method("oAuth", func() {
-		Description("oAuth")
-
-		Payload(func() {
-			Attribute("grant_type", String)
-			Attribute("client_id", String, func() {
-				Example("00000")
-			})
-			Attribute("client_secret", String, func() {
-				Example("99999")
-			})
-			Required("grant_type", "client_id", "client_secret")
-		})
-
-		Result(oAuthResponse)
-
-		HTTP(func() {
-			POST("/authorization")
-			Response(StatusOK)
-		})
-	})
-
 })
 
 // Download Postman
@@ -216,11 +175,4 @@ var unknownError = Type("unknownError", func() {
 		Default(false)
 	})
 	Required("err", "success", "error_code")
-})
-
-var oAuthResponse = Type("oAuthResponse", func() {
-	Field(1, "access_token", String)
-	Field(2, "token_type", String)
-	Field(3, "expires_in", Int64)
-	Field(4, "success", Boolean)
 })

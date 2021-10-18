@@ -35,8 +35,3 @@ func DeleteBookCrudPath(id string) string {
 func CreateBookCrudPath() string {
 	return "/book/add"
 }
-
-// OAuthCrudPath returns the URL path to the crud service oAuth HTTP endpoint.
-func OAuthCrudPath() string {
-	return "/authorization"
-}

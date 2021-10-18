@@ -21,7 +21,6 @@ type Endpoints struct {
 	GetAllBooks goa.Endpoint
 	DeleteBook  goa.Endpoint
 	CreateBook  goa.Endpoint
-	OAuth       goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "crud" service with endpoints.
@@ -34,7 +33,6 @@ func NewEndpoints(s Service) *Endpoints {
 		GetAllBooks: NewGetAllBooksEndpoint(s),
 		DeleteBook:  NewDeleteBookEndpoint(s),
 		CreateBook:  NewCreateBookEndpoint(s),
-		OAuth:       NewOAuthEndpoint(s),
 	}
 }
 
@@ -45,7 +43,6 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.GetAllBooks = m(e.GetAllBooks)
 	e.DeleteBook = m(e.DeleteBook)
 	e.CreateBook = m(e.CreateBook)
-	e.OAuth = m(e.OAuth)
 }
 
 // NewGetBookEndpoint returns an endpoint function that calls the method
@@ -103,14 +100,5 @@ func NewCreateBookEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*CreateBookPayload)
 		return s.CreateBook(ctx, p)
-	}
-}
-
-// NewOAuthEndpoint returns an endpoint function that calls the method "oAuth"
-// of service "crud".
-func NewOAuthEndpoint(s Service) goa.Endpoint {
-	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*OAuthPayload)
-		return s.OAuth(ctx, p)
 	}
 }

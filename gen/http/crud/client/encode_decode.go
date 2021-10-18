@@ -70,8 +70,6 @@ func EncodeGetBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*htt
 // DecodeGetBookResponse may return the following errors:
 //	- "id_doesnt_exist" (type *crud.IDDoesntExist): http.StatusInternalServerError
 //	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
-//	- "invalid_scopes" (type crud.InvalidScopes): http.StatusForbidden
-//	- "unauthorized" (type crud.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeGetBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -138,26 +136,6 @@ func DecodeGetBookResponse(decoder func(*http.Response) goahttp.Decoder, restore
 				body, _ := ioutil.ReadAll(resp.Body)
 				return nil, goahttp.ErrInvalidResponse("crud", "getBook", resp.StatusCode, string(body))
 			}
-		case http.StatusForbidden:
-			var (
-				body GetBookInvalidScopesResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "getBook", err)
-			}
-			return nil, NewGetBookInvalidScopes(body)
-		case http.StatusUnauthorized:
-			var (
-				body GetBookUnauthorizedResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "getBook", err)
-			}
-			return nil, NewGetBookUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("crud", "getBook", resp.StatusCode, string(body))
@@ -212,8 +190,6 @@ func EncodeUpdateBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // DecodeUpdateBookResponse may return the following errors:
 //	- "id_doesnt_exist" (type *crud.IDDoesntExist): http.StatusInternalServerError
 //	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
-//	- "invalid_scopes" (type crud.InvalidScopes): http.StatusForbidden
-//	- "unauthorized" (type crud.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeUpdateBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -280,26 +256,6 @@ func DecodeUpdateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 				body, _ := ioutil.ReadAll(resp.Body)
 				return nil, goahttp.ErrInvalidResponse("crud", "updateBook", resp.StatusCode, string(body))
 			}
-		case http.StatusForbidden:
-			var (
-				body UpdateBookInvalidScopesResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "updateBook", err)
-			}
-			return nil, NewUpdateBookInvalidScopes(body)
-		case http.StatusUnauthorized:
-			var (
-				body UpdateBookUnauthorizedResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "updateBook", err)
-			}
-			return nil, NewUpdateBookUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("crud", "updateBook", resp.StatusCode, string(body))
@@ -328,8 +284,6 @@ func (c *Client) BuildGetAllBooksRequest(ctx context.Context, v interface{}) (*h
 // DecodeGetAllBooksResponse may return the following errors:
 //	- "id_doesnt_exist" (type *crud.IDDoesntExist): http.StatusInternalServerError
 //	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
-//	- "invalid_scopes" (type crud.InvalidScopes): http.StatusForbidden
-//	- "unauthorized" (type crud.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeGetAllBooksResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -396,26 +350,6 @@ func DecodeGetAllBooksResponse(decoder func(*http.Response) goahttp.Decoder, res
 				body, _ := ioutil.ReadAll(resp.Body)
 				return nil, goahttp.ErrInvalidResponse("crud", "getAllBooks", resp.StatusCode, string(body))
 			}
-		case http.StatusForbidden:
-			var (
-				body GetAllBooksInvalidScopesResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "getAllBooks", err)
-			}
-			return nil, NewGetAllBooksInvalidScopes(body)
-		case http.StatusUnauthorized:
-			var (
-				body GetAllBooksUnauthorizedResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "getAllBooks", err)
-			}
-			return nil, NewGetAllBooksUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("crud", "getAllBooks", resp.StatusCode, string(body))
@@ -454,8 +388,6 @@ func (c *Client) BuildDeleteBookRequest(ctx context.Context, v interface{}) (*ht
 // DecodeDeleteBookResponse may return the following errors:
 //	- "id_doesnt_exist" (type *crud.IDDoesntExist): http.StatusInternalServerError
 //	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
-//	- "invalid_scopes" (type crud.InvalidScopes): http.StatusForbidden
-//	- "unauthorized" (type crud.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeDeleteBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -522,26 +454,6 @@ func DecodeDeleteBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 				body, _ := ioutil.ReadAll(resp.Body)
 				return nil, goahttp.ErrInvalidResponse("crud", "deleteBook", resp.StatusCode, string(body))
 			}
-		case http.StatusForbidden:
-			var (
-				body DeleteBookInvalidScopesResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "deleteBook", err)
-			}
-			return nil, NewDeleteBookInvalidScopes(body)
-		case http.StatusUnauthorized:
-			var (
-				body DeleteBookUnauthorizedResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "deleteBook", err)
-			}
-			return nil, NewDeleteBookUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("crud", "deleteBook", resp.StatusCode, string(body))
@@ -586,8 +498,6 @@ func EncodeCreateBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // DecodeCreateBookResponse may return the following errors:
 //	- "id_doesnt_exist" (type *crud.IDDoesntExist): http.StatusInternalServerError
 //	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
-//	- "invalid_scopes" (type crud.InvalidScopes): http.StatusForbidden
-//	- "unauthorized" (type crud.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
 func DecodeCreateBookResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
@@ -654,157 +564,9 @@ func DecodeCreateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 				body, _ := ioutil.ReadAll(resp.Body)
 				return nil, goahttp.ErrInvalidResponse("crud", "createBook", resp.StatusCode, string(body))
 			}
-		case http.StatusForbidden:
-			var (
-				body CreateBookInvalidScopesResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "createBook", err)
-			}
-			return nil, NewCreateBookInvalidScopes(body)
-		case http.StatusUnauthorized:
-			var (
-				body CreateBookUnauthorizedResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "createBook", err)
-			}
-			return nil, NewCreateBookUnauthorized(body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("crud", "createBook", resp.StatusCode, string(body))
-		}
-	}
-}
-
-// BuildOAuthRequest instantiates a HTTP request object with method and path
-// set to call the "crud" service "oAuth" endpoint
-func (c *Client) BuildOAuthRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: OAuthCrudPath()}
-	req, err := http.NewRequest("POST", u.String(), nil)
-	if err != nil {
-		return nil, goahttp.ErrInvalidURL("crud", "oAuth", u.String(), err)
-	}
-	if ctx != nil {
-		req = req.WithContext(ctx)
-	}
-
-	return req, nil
-}
-
-// EncodeOAuthRequest returns an encoder for requests sent to the crud oAuth
-// server.
-func EncodeOAuthRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
-	return func(req *http.Request, v interface{}) error {
-		p, ok := v.(*crud.OAuthPayload)
-		if !ok {
-			return goahttp.ErrInvalidType("crud", "oAuth", "*crud.OAuthPayload", v)
-		}
-		body := NewOAuthRequestBody(p)
-		if err := encoder(req).Encode(&body); err != nil {
-			return goahttp.ErrEncodingError("crud", "oAuth", err)
-		}
-		return nil
-	}
-}
-
-// DecodeOAuthResponse returns a decoder for responses returned by the crud
-// oAuth endpoint. restoreBody controls whether the response body should be
-// restored after having been read.
-// DecodeOAuthResponse may return the following errors:
-//	- "id_doesnt_exist" (type *crud.IDDoesntExist): http.StatusInternalServerError
-//	- "unknown_error" (type *crud.UnknownError): http.StatusInternalServerError
-//	- "invalid_scopes" (type crud.InvalidScopes): http.StatusForbidden
-//	- "unauthorized" (type crud.Unauthorized): http.StatusUnauthorized
-//	- error: internal error
-func DecodeOAuthResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
-	return func(resp *http.Response) (interface{}, error) {
-		if restoreBody {
-			b, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				return nil, err
-			}
-			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
-			defer func() {
-				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
-			}()
-		} else {
-			defer resp.Body.Close()
-		}
-		switch resp.StatusCode {
-		case http.StatusOK:
-			var (
-				body OAuthResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "oAuth", err)
-			}
-			res := NewOAuthResponseOK(&body)
-			return res, nil
-		case http.StatusInternalServerError:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "id_doesnt_exist":
-				var (
-					body OAuthIDDoesntExistResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("crud", "oAuth", err)
-				}
-				err = ValidateOAuthIDDoesntExistResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("crud", "oAuth", err)
-				}
-				return nil, NewOAuthIDDoesntExist(&body)
-			case "unknown_error":
-				var (
-					body OAuthUnknownErrorResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("crud", "oAuth", err)
-				}
-				err = ValidateOAuthUnknownErrorResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("crud", "oAuth", err)
-				}
-				return nil, NewOAuthUnknownError(&body)
-			default:
-				body, _ := ioutil.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("crud", "oAuth", resp.StatusCode, string(body))
-			}
-		case http.StatusForbidden:
-			var (
-				body OAuthInvalidScopesResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "oAuth", err)
-			}
-			return nil, NewOAuthInvalidScopes(body)
-		case http.StatusUnauthorized:
-			var (
-				body OAuthUnauthorizedResponseBody
-				err  error
-			)
-			err = decoder(resp).Decode(&body)
-			if err != nil {
-				return nil, goahttp.ErrDecodingError("crud", "oAuth", err)
-			}
-			return nil, NewOAuthUnauthorized(body)
-		default:
-			body, _ := ioutil.ReadAll(resp.Body)
-			return nil, goahttp.ErrInvalidResponse("crud", "oAuth", resp.StatusCode, string(body))
 		}
 	}
 }

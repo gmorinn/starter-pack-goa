@@ -37,9 +37,6 @@ type Client struct {
 	// endpoint.
 	CreateBookDoer goahttp.Doer
 
-	// OAuth Doer is the HTTP client used to make requests to the oAuth endpoint.
-	OAuthDoer goahttp.Doer
-
 	// RestoreResponseBody controls whether the response bodies are reset after
 	// decoding so they can be read again.
 	RestoreResponseBody bool
@@ -65,7 +62,6 @@ func NewClient(
 		GetAllBooksDoer:     doer,
 		DeleteBookDoer:      doer,
 		CreateBookDoer:      doer,
-		OAuthDoer:           doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
 		host:                host,
@@ -179,30 +175,6 @@ func (c *Client) CreateBook() goa.Endpoint {
 		resp, err := c.CreateBookDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("crud", "createBook", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// OAuth returns an endpoint that makes HTTP requests to the crud service oAuth
-// server.
-func (c *Client) OAuth() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeOAuthRequest(c.encoder)
-		decodeResponse = DecodeOAuthResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildOAuthRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.OAuthDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("crud", "oAuth", err)
 		}
 		return decodeResponse(resp)
 	}

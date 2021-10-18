@@ -10,6 +10,7 @@ package cli
 import (
 	crudc "api_crud/gen/http/crud/client"
 	jwttokenc "api_crud/gen/http/jwt_token/client"
+	oauthc "api_crud/gen/http/o_auth/client"
 	"flag"
 	"fmt"
 	"net/http"
@@ -24,20 +25,22 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `crud (get-book|update-book|get-all-books|delete-book|create-book|o-auth)
+	return `crud (get-book|update-book|get-all-books|delete-book|create-book)
 jwt-token (signup|signin)
+o-auth o-auth
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Provident possimus."` + "\n" +
+	return os.Args[0] + ` crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Voluptatem et reiciendis."` + "\n" +
 		os.Args[0] + ` jwt-token signup --body '{
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
-      "password": "8aj"
+      "password": "map"
    }'` + "\n" +
+		os.Args[0] + ` o-auth o-auth --client-id "Error beatae accusantium qui accusantium voluptates et." --client-secret "Nisi molestiae." --grant-type "Et voluptas rerum tempore."` + "\n" +
 		""
 }
 
@@ -69,9 +72,6 @@ func ParseEndpoint(
 		crudCreateBookFlags    = flag.NewFlagSet("create-book", flag.ExitOnError)
 		crudCreateBookBodyFlag = crudCreateBookFlags.String("body", "REQUIRED", "")
 
-		crudOAuthFlags    = flag.NewFlagSet("o-auth", flag.ExitOnError)
-		crudOAuthBodyFlag = crudOAuthFlags.String("body", "REQUIRED", "")
-
 		jwtTokenFlags = flag.NewFlagSet("jwt-token", flag.ContinueOnError)
 
 		jwtTokenSignupFlags    = flag.NewFlagSet("signup", flag.ExitOnError)
@@ -79,6 +79,13 @@ func ParseEndpoint(
 
 		jwtTokenSigninFlags    = flag.NewFlagSet("signin", flag.ExitOnError)
 		jwtTokenSigninBodyFlag = jwtTokenSigninFlags.String("body", "REQUIRED", "")
+
+		oAuthFlags = flag.NewFlagSet("o-auth", flag.ContinueOnError)
+
+		oAuthOAuthFlags            = flag.NewFlagSet("o-auth", flag.ExitOnError)
+		oAuthOAuthClientIDFlag     = oAuthOAuthFlags.String("client-id", "REQUIRED", "")
+		oAuthOAuthClientSecretFlag = oAuthOAuthFlags.String("client-secret", "REQUIRED", "")
+		oAuthOAuthGrantTypeFlag    = oAuthOAuthFlags.String("grant-type", "REQUIRED", "")
 	)
 	crudFlags.Usage = crudUsage
 	crudGetBookFlags.Usage = crudGetBookUsage
@@ -86,11 +93,13 @@ func ParseEndpoint(
 	crudGetAllBooksFlags.Usage = crudGetAllBooksUsage
 	crudDeleteBookFlags.Usage = crudDeleteBookUsage
 	crudCreateBookFlags.Usage = crudCreateBookUsage
-	crudOAuthFlags.Usage = crudOAuthUsage
 
 	jwtTokenFlags.Usage = jwtTokenUsage
 	jwtTokenSignupFlags.Usage = jwtTokenSignupUsage
 	jwtTokenSigninFlags.Usage = jwtTokenSigninUsage
+
+	oAuthFlags.Usage = oAuthUsage
+	oAuthOAuthFlags.Usage = oAuthOAuthUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
 		return nil, nil, err
@@ -111,6 +120,8 @@ func ParseEndpoint(
 			svcf = crudFlags
 		case "jwt-token":
 			svcf = jwtTokenFlags
+		case "o-auth":
+			svcf = oAuthFlags
 		default:
 			return nil, nil, fmt.Errorf("unknown service %q", svcn)
 		}
@@ -143,9 +154,6 @@ func ParseEndpoint(
 			case "create-book":
 				epf = crudCreateBookFlags
 
-			case "o-auth":
-				epf = crudOAuthFlags
-
 			}
 
 		case "jwt-token":
@@ -155,6 +163,13 @@ func ParseEndpoint(
 
 			case "signin":
 				epf = jwtTokenSigninFlags
+
+			}
+
+		case "o-auth":
+			switch epn {
+			case "o-auth":
+				epf = oAuthOAuthFlags
 
 			}
 
@@ -196,9 +211,6 @@ func ParseEndpoint(
 			case "create-book":
 				endpoint = c.CreateBook()
 				data, err = crudc.BuildCreateBookPayload(*crudCreateBookBodyFlag)
-			case "o-auth":
-				endpoint = c.OAuth()
-				data, err = crudc.BuildOAuthPayload(*crudOAuthBodyFlag)
 			}
 		case "jwt-token":
 			c := jwttokenc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -209,6 +221,13 @@ func ParseEndpoint(
 			case "signin":
 				endpoint = c.Signin()
 				data, err = jwttokenc.BuildSigninPayload(*jwtTokenSigninBodyFlag)
+			}
+		case "o-auth":
+			c := oauthc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "o-auth":
+				endpoint = c.OAuth()
+				data, err = oauthc.BuildOAuthPayload(*oAuthOAuthClientIDFlag, *oAuthOAuthClientSecretFlag, *oAuthOAuthGrantTypeFlag)
 			}
 		}
 	}
@@ -231,7 +250,6 @@ COMMAND:
     get-all-books: Read All items
     delete-book: Delete one item by ID
     create-book: Create one item
-    o-auth: oAuth
 
 Additional help:
     %[1]s crud COMMAND --help
@@ -245,7 +263,7 @@ Get one item
     -jwt-token STRING: 
 
 Example:
-    %[1]s crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Provident possimus."
+    %[1]s crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Voluptatem et reiciendis."
 `, os.Args[0])
 }
 
@@ -259,7 +277,7 @@ Update one item
 Example:
     %[1]s crud update-book --body '{
       "name": "Guillaume",
-      "price": 0.18062393525003903
+      "price": 0.1253396498855919
    }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
 `, os.Args[0])
 }
@@ -294,22 +312,7 @@ Create one item
 Example:
     %[1]s crud create-book --body '{
       "name": "Guillaume",
-      "price": 0.35125155826859417
-   }'
-`, os.Args[0])
-}
-
-func crudOAuthUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud o-auth -body JSON
-
-oAuth
-    -body JSON: 
-
-Example:
-    %[1]s crud o-auth --body '{
-      "client_id": "00000",
-      "client_secret": "99999",
-      "grant_type": "Laborum qui animi eum ea."
+      "price": 0.1436730351084788
    }'
 `, os.Args[0])
 }
@@ -340,7 +343,7 @@ Example:
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
-      "password": "8aj"
+      "password": "map"
    }'
 `, os.Args[0])
 }
@@ -354,7 +357,33 @@ signin
 Example:
     %[1]s jwt-token signin --body '{
       "email": "guillaume@epitech.eu",
-      "password": "pq7"
+      "password": "sa2"
    }'
+`, os.Args[0])
+}
+
+// o-authUsage displays the usage of the o-auth command and its subcommands.
+func oAuthUsage() {
+	fmt.Fprintf(os.Stderr, `Oauth to authentificate
+Usage:
+    %[1]s [globalflags] o-auth COMMAND [flags]
+
+COMMAND:
+    o-auth: oAuth
+
+Additional help:
+    %[1]s o-auth COMMAND --help
+`, os.Args[0])
+}
+func oAuthOAuthUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] o-auth o-auth -client-id STRING -client-secret STRING -grant-type STRING
+
+oAuth
+    -client-id STRING: 
+    -client-secret STRING: 
+    -grant-type STRING: 
+
+Example:
+    %[1]s o-auth o-auth --client-id "Error beatae accusantium qui accusantium voluptates et." --client-secret "Nisi molestiae." --grant-type "Et voluptas rerum tempore."
 `, os.Args[0])
 }

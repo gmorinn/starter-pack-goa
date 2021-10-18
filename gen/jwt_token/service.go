@@ -61,6 +61,12 @@ type UnknownError struct {
 	Success   bool
 }
 
+// Token scopes are invalid
+type InvalidScopes string
+
+// Identifiers are invalid
+type Unauthorized string
+
 // Error returns an error description.
 func (e *EmailAlreadyExist) Error() string {
 	return ""
@@ -79,4 +85,24 @@ func (e *UnknownError) Error() string {
 // ErrorName returns "unknownError".
 func (e *UnknownError) ErrorName() string {
 	return "unknown_error"
+}
+
+// Error returns an error description.
+func (e InvalidScopes) Error() string {
+	return "Token scopes are invalid"
+}
+
+// ErrorName returns "invalid_scopes".
+func (e InvalidScopes) ErrorName() string {
+	return "invalid_scopes"
+}
+
+// Error returns an error description.
+func (e Unauthorized) Error() string {
+	return "Identifiers are invalid"
+}
+
+// ErrorName returns "unauthorized".
+func (e Unauthorized) ErrorName() string {
+	return "unauthorized"
 }

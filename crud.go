@@ -7,10 +7,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
-	"goa.design/goa/v3/security"
 )
 
 type crudsrvc struct {
@@ -21,12 +19,6 @@ type crudsrvc struct {
 func NewCrud(logger *log.Logger, server *api.Server) crud.Service {
 	return &crudsrvc{logger, server}
 }
-
-var (
-	ErrInvalidToken error = crud.Unauthorized("invalid token")
-
-	ErrInvalidTokenScopes error = crud.InvalidScopes("invalid scopes in token")
-)
 
 func Error_ID(msg, id string, err error) *crud.IDDoesntExist {
 	return &crud.IDDoesntExist{
@@ -40,43 +32,6 @@ func ErrorResponse(msg string, err error) *crud.UnknownError {
 		Err:       err.Error(),
 		ErrorCode: msg,
 	}
-}
-
-func (s *crudsrvc) JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error) {
-
-	claims := make(jwt.MapClaims)
-
-	// authorize request
-	// 1. parse JWT token, token key is hardcoded to "secret" in this example
-	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		b := ([]byte(s.server.Config.Security.Secret))
-		return b, nil
-	})
-	if err != nil {
-		return ctx, ErrInvalidToken
-	}
-
-	// 2. validate provided "scopes" claim
-	if claims["scopes"] == nil {
-		return ctx, ErrInvalidTokenScopes
-	}
-	scopes, ok := claims["scopes"].([]interface{})
-	if !ok {
-		return ctx, ErrInvalidTokenScopes
-	}
-	scopesInToken := make([]string, len(scopes))
-	for _, scp := range scopes {
-		scopesInToken = append(scopesInToken, scp.(string))
-	}
-	if err := schema.Validate(scopesInToken); err != nil {
-		return ctx, crud.InvalidScopes(err.Error())
-	}
-
-	// 3. add authInfo to context
-	ctx = contextWithAuthInfo(ctx, authInfo{
-		claims: claims,
-	})
-	return ctx, nil
 }
 
 // Read Book
@@ -178,17 +133,21 @@ func (s *crudsrvc) UpdateBook(ctx context.Context, p *crud.UpdateBookPayload) (r
 	return &response, nil
 }
 
-func (s *crudsrvc) OAuth(ctx context.Context, p *crud.OAuthPayload) (res *crud.OAuthResponse, err error) {
-	if p.GrantType != "grant_type" {
-		return nil, ErrorResponse("OAUTH", nil)
-	}
-	if p.ClientID != s.server.Config.Security.OAuthID {
+// func (s *crudsrvc) OAuth(ctx context.Context, p *crud.ShowPayload) (res *crud.OAuthResponse, err error) {
+// 	clientID := p.ClientID
+// 	clientSecret := p.ClientSecret
+// 	grantType := p.GrantType
 
-	}
-	// token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-	// 	"access_token": time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.server.Config.Security.AccessTokenDuration))).Unix(),
-	// 	"expires_in":   time.Now().Add(time.Duration(time.Hour * 2)).Unix(),
-	// 	"token_type":   "Bearer",
-	// })
-	return nil, nil
-}
+// 	if clientID != "" {
+// 		return nil, err
+// 	}
+// 	if clientSecret != "" {
+// 		return nil, err
+// 	}
+
+// 	if grantType != "client_credentials" {
+// 		return nil, err
+// 	}
+
+// 	return nil, nil
+// }

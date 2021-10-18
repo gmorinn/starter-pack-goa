@@ -50,7 +50,7 @@ func BuildUpdateBookPayload(crudUpdateBookBody string, crudUpdateBookID string) 
 	{
 		err = json.Unmarshal([]byte(crudUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.18062393525003903\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.1253396498855919\n   }'")
 		}
 	}
 	var id string
@@ -98,7 +98,7 @@ func BuildCreateBookPayload(crudCreateBookBody string) (*crud.CreateBookPayload,
 	{
 		err = json.Unmarshal([]byte(crudCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.35125155826859417\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.1436730351084788\n   }'")
 		}
 		if utf8.RuneCountInString(body.Name) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))
@@ -113,26 +113,6 @@ func BuildCreateBookPayload(crudCreateBookBody string) (*crud.CreateBookPayload,
 	v := &crud.CreateBookPayload{
 		Name:  body.Name,
 		Price: body.Price,
-	}
-
-	return v, nil
-}
-
-// BuildOAuthPayload builds the payload for the crud oAuth endpoint from CLI
-// flags.
-func BuildOAuthPayload(crudOAuthBody string) (*crud.OAuthPayload, error) {
-	var err error
-	var body OAuthRequestBody
-	{
-		err = json.Unmarshal([]byte(crudOAuthBody), &body)
-		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"client_id\": \"00000\",\n      \"client_secret\": \"99999\",\n      \"grant_type\": \"Laborum qui animi eum ea.\"\n   }'")
-		}
-	}
-	v := &crud.OAuthPayload{
-		GrantType:    body.GrantType,
-		ClientID:     body.ClientID,
-		ClientSecret: body.ClientSecret,
 	}
 
 	return v, nil
