@@ -5,6 +5,7 @@ import (
 	"api_crud/api"
 	crud "api_crud/gen/crud"
 	jwttoken "api_crud/gen/jwt_token"
+	oauth "api_crud/gen/o_auth"
 	"context"
 	"flag"
 	"fmt"
@@ -41,11 +42,13 @@ func main() {
 	var (
 		crudSvc     crud.Service
 		jwtTokenSvc jwttoken.Service
+		oAuthSvc    oauth.Service
 		server      *api.Server
 	)
 	{
 		server = api.NewServer()
 		crudSvc = basic.NewCrud(logger, server)
+		oAuthSvc = basic.NewOAuth(logger, server)
 		jwtTokenSvc = basic.NewJWTToken(logger, server)
 	}
 
@@ -54,10 +57,12 @@ func main() {
 	var (
 		crudEndpoints     *crud.Endpoints
 		jwtTokenEndpoints *jwttoken.Endpoints
+		oAuthEndpoints    *oauth.Endpoints
 	)
 	{
 		crudEndpoints = crud.NewEndpoints(crudSvc)
 		jwtTokenEndpoints = jwttoken.NewEndpoints(jwtTokenSvc)
+		oAuthEndpoints = oauth.NewEndpoints(oAuthSvc)
 	}
 
 	// Create channel used by both the signal handler and server goroutines
@@ -101,7 +106,7 @@ func main() {
 			} else if u.Port() == "" {
 				u.Host = net.JoinHostPort(u.Host, "80")
 			}
-			handleHTTPServer(ctx, u, crudEndpoints, jwtTokenEndpoints, &wg, errc, logger, *dbgF)
+			handleHTTPServer(ctx, u, crudEndpoints, jwtTokenEndpoints, oAuthEndpoints, &wg, errc, logger, *dbgF)
 		}
 
 	default:

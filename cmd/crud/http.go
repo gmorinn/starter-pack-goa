@@ -4,8 +4,10 @@ import (
 	crud "api_crud/gen/crud"
 	crudsvr "api_crud/gen/http/crud/server"
 	jwttokensvr "api_crud/gen/http/jwt_token/server"
+	oauthsvr "api_crud/gen/http/o_auth/server"
 	openapisvr "api_crud/gen/http/openapi/server"
 	jwttoken "api_crud/gen/jwt_token"
+	oauth "api_crud/gen/o_auth"
 	"context"
 	"log"
 	"net/http"
@@ -21,7 +23,7 @@ import (
 
 // handleHTTPServer starts configures and starts a HTTP server on the given
 // URL. It shuts down the server if any error is received in the error channel.
-func handleHTTPServer(ctx context.Context, u *url.URL, crudEndpoints *crud.Endpoints, jwtTokenEndpoints *jwttoken.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
+func handleHTTPServer(ctx context.Context, u *url.URL, crudEndpoints *crud.Endpoints, jwtTokenEndpoints *jwttoken.Endpoints, oAuthEndpoints *oauth.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
 
 	// Setup goa log adapter.
 	var (
@@ -55,17 +57,20 @@ func handleHTTPServer(ctx context.Context, u *url.URL, crudEndpoints *crud.Endpo
 		openapiServer  *openapisvr.Server
 		crudServer     *crudsvr.Server
 		jwtTokenServer *jwttokensvr.Server
+		oAuthServer    *oauthsvr.Server
 	)
 	{
 		eh := errorHandler(logger)
 		openapiServer = openapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("../../gen/http"))
 		crudServer = crudsvr.New(crudEndpoints, mux, dec, enc, eh, nil)
 		jwtTokenServer = jwttokensvr.New(jwtTokenEndpoints, mux, dec, enc, eh, nil)
+		oAuthServer = oauthsvr.New(oAuthEndpoints, mux, dec, enc, eh, nil)
 		if debug {
 			servers := goahttp.Servers{
 				openapiServer,
 				crudServer,
 				jwtTokenServer,
+				oAuthServer,
 			}
 			servers.Use(httpmdlwr.Debug(mux, os.Stdout))
 		}
@@ -74,6 +79,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, crudEndpoints *crud.Endpo
 	openapisvr.Mount(mux, openapiServer)
 	crudsvr.Mount(mux, crudServer)
 	jwttokensvr.Mount(mux, jwtTokenServer)
+	oauthsvr.Mount(mux, oAuthServer)
 
 	// Wrap the multiplexer with additional middlewares. Middlewares mounted
 	// here apply to all the service endpoints.
@@ -93,6 +99,9 @@ func handleHTTPServer(ctx context.Context, u *url.URL, crudEndpoints *crud.Endpo
 		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 	for _, m := range jwtTokenServer.Mounts {
+		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
+	}
+	for _, m := range oAuthServer.Mounts {
 		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 

@@ -10,7 +10,9 @@ var _ = API("basic", func() {
 	Description("Exemple for api crud")
 	Version("1.0")
 	Server("crud", func() {
-		Host("localhost", func() { URI("http://localhost:8088") })
+		Host("localhost", func() {
+			URI("http://localhost:8088")
+		})
 	})
 })
 
