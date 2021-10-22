@@ -17,15 +17,15 @@ type Book struct {
 }
 
 type RefreshToken struct {
-	ID        uuid.UUID      `json:"id"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt sql.NullTime   `json:"deleted_at"`
-	Ip        string         `json:"ip"`
-	UserAgent sql.NullString `json:"user_agent"`
-	Token     string         `json:"token"`
-	ExpirOn   time.Time      `json:"expir_on"`
-	UserID    uuid.UUID      `json:"user_id"`
+	ID        uuid.UUID    `json:"id"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	DeletedAt sql.NullTime `json:"deleted_at"`
+	Ip        string       `json:"ip"`
+	UserAgent string       `json:"user_agent"`
+	Token     string       `json:"token"`
+	ExpirOn   time.Time    `json:"expir_on"`
+	UserID    uuid.UUID    `json:"user_id"`
 }
 
 type User struct {

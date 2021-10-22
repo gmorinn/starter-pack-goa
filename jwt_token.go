@@ -39,7 +39,7 @@ var (
 	ErrInvalidTokenScopes error = jwttoken.InvalidScopes("invalid scopes in token")
 )
 
-func (s *crudsrvc) JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error) {
+func (s *booksrvc) JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error) {
 
 	claims := make(jwt.MapClaims)
 
@@ -113,14 +113,21 @@ func (s *jwtTokensrvc) Signup(ctx context.Context, p *jwttoken.SignupPayload) (r
 		return nil, s.ErrorResponse("ERROR_GENERATE_ACCESS_JWT", err)
 	}
 
+	expt := time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.server.Config.Security.RefreshTokenDuration)))
+	exp := expt.Unix()
+
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":     user.ID.String(),
-		"exp":    time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.server.Config.Security.RefreshTokenDuration))).Unix(),
+		"exp":    exp,
 		"scopes": []string{"api:read", "api:write"},
 	})
 	r, err := refreshToken.SignedString(s.server.Config.Security.Secret)
 	if err != nil {
 		return nil, s.ErrorResponse("ERROR_GENERATE_REFRESH_JWT", err)
+	}
+
+	if err := s.server.StoreRefresh(ctx, r, expt, user.ID); err != nil {
+		return nil, s.ErrorResponse("ERROR_REFRESH_TOKEN", err)
 	}
 
 	response := jwttoken.Sign{
@@ -152,15 +159,22 @@ func (s *jwtTokensrvc) Signin(ctx context.Context, p *jwttoken.SigninPayload) (r
 		return nil, s.ErrorResponse("ERROR_GENERATE_ACCESS_JWT", err)
 	}
 
+	expt := time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.server.Config.Security.RefreshTokenDuration)))
+	exp := expt.Unix()
+
 	// Generate refresh token
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":     user.ID.String(),
-		"exp":    time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.server.Config.Security.RefreshTokenDuration))).Unix(),
+		"exp":    exp,
 		"scopes": []string{"api:read", "api:write"},
 	})
 	r, err := refreshToken.SignedString([]byte(s.server.Config.Security.Secret))
 	if err != nil {
 		return nil, s.ErrorResponse("ERROR_GENERATE_REFRESH_JWT", err)
+	}
+
+	if err := s.server.StoreRefresh(ctx, r, expt, user.ID); err != nil {
+		return nil, s.ErrorResponse("ERROR_REFRESH_TOKEN", err)
 	}
 
 	response := jwttoken.Sign{
@@ -171,15 +185,57 @@ func (s *jwtTokensrvc) Signin(ctx context.Context, p *jwttoken.SigninPayload) (r
 	return &response, nil
 }
 
-// func NewOAuth2ClientBasicAuthMiddleware() goa.Middleware {
-// 	return func(h goa.Handler) goa.Handler {
-// 		return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-// 			// Retrieve basic auth info, TBD these are urlencoded as per the spec...
-// 			clientID, clientSecret, ok := req.BasicAuth()
-// 			if !ok {
-// 				// return clientID, clientSecret, re
-// 			}
+func (s *jwtTokensrvc) Refresh(ctx context.Context, p *jwttoken.RefreshPayload) (res *jwttoken.Sign, err error) {
+	token, err := jwt.Parse(p.RefreshToken, func(token *jwt.Token) (interface{}, error) {
+		b := ([]byte(s.server.Config.Security.Secret))
+		return b, nil
+	})
 
-// 		}
-// 	}
-// }
+	if err != nil {
+		return nil, s.ErrorResponse("TOKEN_ERROR", err)
+	}
+
+	if !token.Valid {
+		return nil, s.ErrorResponse("TOKEN_IS_NOT_VALID", err)
+	}
+
+	refresh, err := s.server.Store.GetRefreshToken(ctx, p.RefreshToken)
+	if err != nil {
+		return nil, s.ErrorResponse("FIND_REFRESH_TOKEN", err)
+	}
+
+	// Generate access token
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":     refresh.UserID.String(),
+		"exp":    time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.server.Config.Security.AccessTokenDuration))).Unix(),
+		"scopes": []string{"api:read", "api:write"},
+	})
+	t, err := accessToken.SignedString([]byte(s.server.Config.Security.Secret))
+	if err != nil {
+		return nil, s.ErrorResponse("ERROR_GENERATE_ACCESS_JWT", err)
+	}
+
+	expt := time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.server.Config.Security.RefreshTokenDuration)))
+	exp := expt.Unix()
+	// Generate refresh token
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":     refresh.UserID.String(),
+		"exp":    exp,
+		"scopes": []string{"api:read", "api:write"},
+	})
+	r, err := refreshToken.SignedString([]byte(s.server.Config.Security.Secret))
+	if err != nil {
+		return nil, s.ErrorResponse("GENERATE_JWT_REFRESH", err)
+	}
+
+	if err := s.server.StoreRefresh(ctx, r, expt, refresh.UserID); err != nil {
+		return nil, s.ErrorResponse("ERROR_REFRESH_TOKEN", err)
+	}
+
+	response := jwttoken.Sign{
+		AccessToken:  t,
+		RefreshToken: r,
+		Success:      true,
+	}
+	return &response, nil
+}

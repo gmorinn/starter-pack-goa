@@ -30,6 +30,12 @@ type SigninRequestBody struct {
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
+// RefreshRequestBody is the type of the "jwtToken" service "refresh" endpoint
+// HTTP request body.
+type RefreshRequestBody struct {
+	RefreshToken *string `form:"refresh_token,omitempty" json:"refresh_token,omitempty" xml:"refresh_token,omitempty"`
+}
+
 // SignupResponseBody is the type of the "jwtToken" service "signup" endpoint
 // HTTP response body.
 type SignupResponseBody struct {
@@ -41,6 +47,14 @@ type SignupResponseBody struct {
 // SigninResponseBody is the type of the "jwtToken" service "signin" endpoint
 // HTTP response body.
 type SigninResponseBody struct {
+	AccessToken  string `form:"access_token" json:"access_token" xml:"access_token"`
+	RefreshToken string `form:"refresh_token" json:"refresh_token" xml:"refresh_token"`
+	Success      bool   `form:"success" json:"success" xml:"success"`
+}
+
+// RefreshResponseBody is the type of the "jwtToken" service "refresh" endpoint
+// HTTP response body.
+type RefreshResponseBody struct {
 	AccessToken  string `form:"access_token" json:"access_token" xml:"access_token"`
 	RefreshToken string `form:"refresh_token" json:"refresh_token" xml:"refresh_token"`
 	Success      bool   `form:"success" json:"success" xml:"success"`
@@ -92,6 +106,29 @@ type SigninInvalidScopesResponseBody string
 // "signin" endpoint HTTP response body for the "unauthorized" error.
 type SigninUnauthorizedResponseBody string
 
+// RefreshEmailAlreadyExistResponseBody is the type of the "jwtToken" service
+// "refresh" endpoint HTTP response body for the "email_already_exist" error.
+type RefreshEmailAlreadyExistResponseBody struct {
+	Message string `form:"message" json:"message" xml:"message"`
+	Success bool   `form:"success" json:"success" xml:"success"`
+}
+
+// RefreshUnknownErrorResponseBody is the type of the "jwtToken" service
+// "refresh" endpoint HTTP response body for the "unknown_error" error.
+type RefreshUnknownErrorResponseBody struct {
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
+}
+
+// RefreshInvalidScopesResponseBody is the type of the "jwtToken" service
+// "refresh" endpoint HTTP response body for the "invalid_scopes" error.
+type RefreshInvalidScopesResponseBody string
+
+// RefreshUnauthorizedResponseBody is the type of the "jwtToken" service
+// "refresh" endpoint HTTP response body for the "unauthorized" error.
+type RefreshUnauthorizedResponseBody string
+
 // NewSignupResponseBody builds the HTTP response body from the result of the
 // "signup" endpoint of the "jwtToken" service.
 func NewSignupResponseBody(res *jwttoken.Sign) *SignupResponseBody {
@@ -107,6 +144,17 @@ func NewSignupResponseBody(res *jwttoken.Sign) *SignupResponseBody {
 // "signin" endpoint of the "jwtToken" service.
 func NewSigninResponseBody(res *jwttoken.Sign) *SigninResponseBody {
 	body := &SigninResponseBody{
+		AccessToken:  res.AccessToken,
+		RefreshToken: res.RefreshToken,
+		Success:      res.Success,
+	}
+	return body
+}
+
+// NewRefreshResponseBody builds the HTTP response body from the result of the
+// "refresh" endpoint of the "jwtToken" service.
+func NewRefreshResponseBody(res *jwttoken.Sign) *RefreshResponseBody {
+	body := &RefreshResponseBody{
 		AccessToken:  res.AccessToken,
 		RefreshToken: res.RefreshToken,
 		Success:      res.Success,
@@ -184,6 +232,41 @@ func NewSigninUnauthorizedResponseBody(res jwttoken.Unauthorized) SigninUnauthor
 	return body
 }
 
+// NewRefreshEmailAlreadyExistResponseBody builds the HTTP response body from
+// the result of the "refresh" endpoint of the "jwtToken" service.
+func NewRefreshEmailAlreadyExistResponseBody(res *jwttoken.EmailAlreadyExist) *RefreshEmailAlreadyExistResponseBody {
+	body := &RefreshEmailAlreadyExistResponseBody{
+		Message: res.Message,
+		Success: res.Success,
+	}
+	return body
+}
+
+// NewRefreshUnknownErrorResponseBody builds the HTTP response body from the
+// result of the "refresh" endpoint of the "jwtToken" service.
+func NewRefreshUnknownErrorResponseBody(res *jwttoken.UnknownError) *RefreshUnknownErrorResponseBody {
+	body := &RefreshUnknownErrorResponseBody{
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
+	}
+	return body
+}
+
+// NewRefreshInvalidScopesResponseBody builds the HTTP response body from the
+// result of the "refresh" endpoint of the "jwtToken" service.
+func NewRefreshInvalidScopesResponseBody(res jwttoken.InvalidScopes) RefreshInvalidScopesResponseBody {
+	body := RefreshInvalidScopesResponseBody(res)
+	return body
+}
+
+// NewRefreshUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "refresh" endpoint of the "jwtToken" service.
+func NewRefreshUnauthorizedResponseBody(res jwttoken.Unauthorized) RefreshUnauthorizedResponseBody {
+	body := RefreshUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewSignupPayload builds a jwtToken service signup endpoint payload.
 func NewSignupPayload(body *SignupRequestBody) *jwttoken.SignupPayload {
 	v := &jwttoken.SignupPayload{
@@ -201,6 +284,15 @@ func NewSigninPayload(body *SigninRequestBody) *jwttoken.SigninPayload {
 	v := &jwttoken.SigninPayload{
 		Email:    *body.Email,
 		Password: *body.Password,
+	}
+
+	return v
+}
+
+// NewRefreshPayload builds a jwtToken service refresh endpoint payload.
+func NewRefreshPayload(body *RefreshRequestBody) *jwttoken.RefreshPayload {
+	v := &jwttoken.RefreshPayload{
+		RefreshToken: *body.RefreshToken,
 	}
 
 	return v
@@ -261,6 +353,14 @@ func ValidateSigninRequestBody(body *SigninRequestBody) (err error) {
 		if utf8.RuneCountInString(*body.Password) < 8 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 8, true))
 		}
+	}
+	return
+}
+
+// ValidateRefreshRequestBody runs the validations defined on RefreshRequestBody
+func ValidateRefreshRequestBody(body *RefreshRequestBody) (err error) {
+	if body.RefreshToken == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("refresh_token", "body"))
 	}
 	return
 }

@@ -3,7 +3,7 @@ package main
 import (
 	basic "api_crud"
 	"api_crud/api"
-	crud "api_crud/gen/crud"
+	"api_crud/gen/book"
 	jwttoken "api_crud/gen/jwt_token"
 	oauth "api_crud/gen/o_auth"
 	"context"
@@ -37,17 +37,16 @@ func main() {
 	{
 		logger = log.New(os.Stderr, "[basic] ", log.Ltime)
 	}
-
 	// Initialize the services.
 	var (
-		crudSvc     crud.Service
+		bookSvc     book.Service
 		jwtTokenSvc jwttoken.Service
 		oAuthSvc    oauth.Service
 		server      *api.Server
 	)
 	{
 		server = api.NewServer()
-		crudSvc = basic.NewCrud(logger, server)
+		bookSvc = basic.NewBook(logger, server)
 		oAuthSvc = basic.NewOAuth(logger, server)
 		jwtTokenSvc = basic.NewJWTToken(logger, server)
 	}
@@ -55,12 +54,12 @@ func main() {
 	// Wrap the services in endpoints that can be invoked from other services
 	// potentially running in different processes.
 	var (
-		crudEndpoints     *crud.Endpoints
+		bookEndpoints     *book.Endpoints
 		jwtTokenEndpoints *jwttoken.Endpoints
 		oAuthEndpoints    *oauth.Endpoints
 	)
 	{
-		crudEndpoints = crud.NewEndpoints(crudSvc)
+		bookEndpoints = book.NewEndpoints(bookSvc)
 		jwtTokenEndpoints = jwttoken.NewEndpoints(jwtTokenSvc)
 		oAuthEndpoints = oauth.NewEndpoints(oAuthSvc)
 	}
@@ -106,7 +105,7 @@ func main() {
 			} else if u.Port() == "" {
 				u.Host = net.JoinHostPort(u.Host, "80")
 			}
-			handleHTTPServer(ctx, u, crudEndpoints, jwtTokenEndpoints, oAuthEndpoints, &wg, errc, logger, *dbgF)
+			handleHTTPServer(ctx, u, bookEndpoints, jwtTokenEndpoints, oAuthEndpoints, &wg, errc, logger, *dbgF)
 		}
 
 	default:

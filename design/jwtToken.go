@@ -79,6 +79,24 @@ var _ = Service("jwtToken", func() {
 		})
 	})
 
+	Method("refresh", func() {
+		Description("Refresh Token")
+
+		Payload(func() {
+			Attribute("refresh_token", String, func() {
+				Example("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
+			})
+			Required("refresh_token")
+		})
+
+		Result(Sign)
+
+		HTTP(func() {
+			POST("/resfresh")
+			Response(StatusOK)
+		})
+	})
+
 })
 
 var emailAlreadyExist = Type("emailAlreadyExist", func() {

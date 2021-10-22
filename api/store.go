@@ -2,11 +2,16 @@ package api
 
 import (
 	"api_crud/config"
+	"api_crud/internal/db"
 	sqlc "api_crud/internal/db"
 	"context"
 	"database/sql"
 	"fmt"
+	"time"
 
+	"github.com/google/uuid"
+	_ "github.com/lib/pq"
+	"github.com/robfig/cron/v3"
 	oerrors "gopkg.in/oauth2.v3/errors"
 	"gopkg.in/oauth2.v3/manage"
 	"gopkg.in/oauth2.v3/models"
@@ -48,9 +53,10 @@ func (store *Store) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) er
 }
 
 type Server struct {
-	Store  *Store
-	Config *config.API
-	Oauth  *oserver.Server
+	Store    *Store
+	Config   *config.API
+	Oauth    *oserver.Server
+	cronTask *cron.Cron
 }
 
 func NewServer() *Server {
@@ -64,10 +70,16 @@ func NewServer() *Server {
 
 	server := &Server{Store: store}
 	server.Config = cnf
-
 	server.Oauth = server.oAuth()
-
+	server.runCron(&server.cronTask, server.Config)
+	initCron(server)
 	return server
+}
+
+func initCron(server *Server) {
+	c := cron.New()
+	c.AddFunc("@hourly", func() { server.Store.DeleteOldRefreshToken(context.Background()) })
+	c.Start()
 }
 
 // oAuth manage and store oAuth token
@@ -116,4 +128,15 @@ func (server *Server) oAuth() *oserver.Server {
 	}
 
 	return srv
+}
+
+// storeRefresh store refres_token into database
+func (server *Server) StoreRefresh(ctx context.Context, token string, exp time.Time, userID uuid.UUID) error {
+	return server.Store.CreateRefreshToken(ctx, db.CreateRefreshTokenParams{
+		Ip:        "À COMPLÉTER",
+		UserAgent: "À COMPLÉTER",
+		Token:     token,
+		ExpirOn:   exp,
+		UserID:    userID,
+	})
 }

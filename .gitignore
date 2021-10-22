@@ -1,0 +1,8 @@
+key.pem
+cert.pem
+tmp
+.DS_Store
+bin/*
+public/uploads
+data.db
+api.log

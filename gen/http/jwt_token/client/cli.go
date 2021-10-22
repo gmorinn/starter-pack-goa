@@ -80,3 +80,21 @@ func BuildSigninPayload(jwtTokenSigninBody string) (*jwttoken.SigninPayload, err
 
 	return v, nil
 }
+
+// BuildRefreshPayload builds the payload for the jwtToken refresh endpoint
+// from CLI flags.
+func BuildRefreshPayload(jwtTokenRefreshBody string) (*jwttoken.RefreshPayload, error) {
+	var err error
+	var body RefreshRequestBody
+	{
+		err = json.Unmarshal([]byte(jwtTokenRefreshBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ\"\n   }'")
+		}
+	}
+	v := &jwttoken.RefreshPayload{
+		RefreshToken: body.RefreshToken,
+	}
+
+	return v, nil
+}

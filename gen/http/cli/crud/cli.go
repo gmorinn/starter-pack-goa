@@ -8,7 +8,7 @@
 package cli
 
 import (
-	crudc "api_crud/gen/http/crud/client"
+	bookc "api_crud/gen/http/book/client"
 	jwttokenc "api_crud/gen/http/jwt_token/client"
 	oauthc "api_crud/gen/http/o_auth/client"
 	"flag"
@@ -25,22 +25,22 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `crud (get-book|update-book|get-all-books|delete-book|create-book)
-jwt-token (signup|signin)
+	return `book (get-book|update-book|get-all-books|delete-book|create-book)
+jwt-token (signup|signin|refresh)
 o-auth o-auth
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Voluptatem et reiciendis."` + "\n" +
+	return os.Args[0] + ` book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Voluptatem et reiciendis."` + "\n" +
 		os.Args[0] + ` jwt-token signup --body '{
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
       "password": "map"
    }'` + "\n" +
-		os.Args[0] + ` o-auth o-auth --client-id "Error beatae accusantium qui accusantium voluptates et." --client-secret "Nisi molestiae." --grant-type "Et voluptas rerum tempore."` + "\n" +
+		os.Args[0] + ` o-auth o-auth --client-id "Quaerat reprehenderit facere aliquam." --client-secret "Voluptatem mollitia voluptatibus quas." --grant-type "Hic sapiente."` + "\n" +
 		""
 }
 
@@ -54,23 +54,23 @@ func ParseEndpoint(
 	restore bool,
 ) (goa.Endpoint, interface{}, error) {
 	var (
-		crudFlags = flag.NewFlagSet("crud", flag.ContinueOnError)
+		bookFlags = flag.NewFlagSet("book", flag.ContinueOnError)
 
-		crudGetBookFlags        = flag.NewFlagSet("get-book", flag.ExitOnError)
-		crudGetBookIDFlag       = crudGetBookFlags.String("id", "REQUIRED", "")
-		crudGetBookJWTTokenFlag = crudGetBookFlags.String("jwt-token", "", "")
+		bookGetBookFlags        = flag.NewFlagSet("get-book", flag.ExitOnError)
+		bookGetBookIDFlag       = bookGetBookFlags.String("id", "REQUIRED", "")
+		bookGetBookJWTTokenFlag = bookGetBookFlags.String("jwt-token", "", "")
 
-		crudUpdateBookFlags    = flag.NewFlagSet("update-book", flag.ExitOnError)
-		crudUpdateBookBodyFlag = crudUpdateBookFlags.String("body", "REQUIRED", "")
-		crudUpdateBookIDFlag   = crudUpdateBookFlags.String("id", "REQUIRED", "")
+		bookUpdateBookFlags    = flag.NewFlagSet("update-book", flag.ExitOnError)
+		bookUpdateBookBodyFlag = bookUpdateBookFlags.String("body", "REQUIRED", "")
+		bookUpdateBookIDFlag   = bookUpdateBookFlags.String("id", "REQUIRED", "")
 
-		crudGetAllBooksFlags = flag.NewFlagSet("get-all-books", flag.ExitOnError)
+		bookGetAllBooksFlags = flag.NewFlagSet("get-all-books", flag.ExitOnError)
 
-		crudDeleteBookFlags  = flag.NewFlagSet("delete-book", flag.ExitOnError)
-		crudDeleteBookIDFlag = crudDeleteBookFlags.String("id", "REQUIRED", "")
+		bookDeleteBookFlags  = flag.NewFlagSet("delete-book", flag.ExitOnError)
+		bookDeleteBookIDFlag = bookDeleteBookFlags.String("id", "REQUIRED", "")
 
-		crudCreateBookFlags    = flag.NewFlagSet("create-book", flag.ExitOnError)
-		crudCreateBookBodyFlag = crudCreateBookFlags.String("body", "REQUIRED", "")
+		bookCreateBookFlags    = flag.NewFlagSet("create-book", flag.ExitOnError)
+		bookCreateBookBodyFlag = bookCreateBookFlags.String("body", "REQUIRED", "")
 
 		jwtTokenFlags = flag.NewFlagSet("jwt-token", flag.ContinueOnError)
 
@@ -80,6 +80,9 @@ func ParseEndpoint(
 		jwtTokenSigninFlags    = flag.NewFlagSet("signin", flag.ExitOnError)
 		jwtTokenSigninBodyFlag = jwtTokenSigninFlags.String("body", "REQUIRED", "")
 
+		jwtTokenRefreshFlags    = flag.NewFlagSet("refresh", flag.ExitOnError)
+		jwtTokenRefreshBodyFlag = jwtTokenRefreshFlags.String("body", "REQUIRED", "")
+
 		oAuthFlags = flag.NewFlagSet("o-auth", flag.ContinueOnError)
 
 		oAuthOAuthFlags            = flag.NewFlagSet("o-auth", flag.ExitOnError)
@@ -87,16 +90,17 @@ func ParseEndpoint(
 		oAuthOAuthClientSecretFlag = oAuthOAuthFlags.String("client-secret", "REQUIRED", "")
 		oAuthOAuthGrantTypeFlag    = oAuthOAuthFlags.String("grant-type", "REQUIRED", "")
 	)
-	crudFlags.Usage = crudUsage
-	crudGetBookFlags.Usage = crudGetBookUsage
-	crudUpdateBookFlags.Usage = crudUpdateBookUsage
-	crudGetAllBooksFlags.Usage = crudGetAllBooksUsage
-	crudDeleteBookFlags.Usage = crudDeleteBookUsage
-	crudCreateBookFlags.Usage = crudCreateBookUsage
+	bookFlags.Usage = bookUsage
+	bookGetBookFlags.Usage = bookGetBookUsage
+	bookUpdateBookFlags.Usage = bookUpdateBookUsage
+	bookGetAllBooksFlags.Usage = bookGetAllBooksUsage
+	bookDeleteBookFlags.Usage = bookDeleteBookUsage
+	bookCreateBookFlags.Usage = bookCreateBookUsage
 
 	jwtTokenFlags.Usage = jwtTokenUsage
 	jwtTokenSignupFlags.Usage = jwtTokenSignupUsage
 	jwtTokenSigninFlags.Usage = jwtTokenSigninUsage
+	jwtTokenRefreshFlags.Usage = jwtTokenRefreshUsage
 
 	oAuthFlags.Usage = oAuthUsage
 	oAuthOAuthFlags.Usage = oAuthOAuthUsage
@@ -116,8 +120,8 @@ func ParseEndpoint(
 	{
 		svcn = flag.Arg(0)
 		switch svcn {
-		case "crud":
-			svcf = crudFlags
+		case "book":
+			svcf = bookFlags
 		case "jwt-token":
 			svcf = jwtTokenFlags
 		case "o-auth":
@@ -137,22 +141,22 @@ func ParseEndpoint(
 	{
 		epn = svcf.Arg(0)
 		switch svcn {
-		case "crud":
+		case "book":
 			switch epn {
 			case "get-book":
-				epf = crudGetBookFlags
+				epf = bookGetBookFlags
 
 			case "update-book":
-				epf = crudUpdateBookFlags
+				epf = bookUpdateBookFlags
 
 			case "get-all-books":
-				epf = crudGetAllBooksFlags
+				epf = bookGetAllBooksFlags
 
 			case "delete-book":
-				epf = crudDeleteBookFlags
+				epf = bookDeleteBookFlags
 
 			case "create-book":
-				epf = crudCreateBookFlags
+				epf = bookCreateBookFlags
 
 			}
 
@@ -163,6 +167,9 @@ func ParseEndpoint(
 
 			case "signin":
 				epf = jwtTokenSigninFlags
+
+			case "refresh":
+				epf = jwtTokenRefreshFlags
 
 			}
 
@@ -193,24 +200,24 @@ func ParseEndpoint(
 	)
 	{
 		switch svcn {
-		case "crud":
-			c := crudc.NewClient(scheme, host, doer, enc, dec, restore)
+		case "book":
+			c := bookc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
 			case "get-book":
 				endpoint = c.GetBook()
-				data, err = crudc.BuildGetBookPayload(*crudGetBookIDFlag, *crudGetBookJWTTokenFlag)
+				data, err = bookc.BuildGetBookPayload(*bookGetBookIDFlag, *bookGetBookJWTTokenFlag)
 			case "update-book":
 				endpoint = c.UpdateBook()
-				data, err = crudc.BuildUpdateBookPayload(*crudUpdateBookBodyFlag, *crudUpdateBookIDFlag)
+				data, err = bookc.BuildUpdateBookPayload(*bookUpdateBookBodyFlag, *bookUpdateBookIDFlag)
 			case "get-all-books":
 				endpoint = c.GetAllBooks()
 				data = nil
 			case "delete-book":
 				endpoint = c.DeleteBook()
-				data, err = crudc.BuildDeleteBookPayload(*crudDeleteBookIDFlag)
+				data, err = bookc.BuildDeleteBookPayload(*bookDeleteBookIDFlag)
 			case "create-book":
 				endpoint = c.CreateBook()
-				data, err = crudc.BuildCreateBookPayload(*crudCreateBookBodyFlag)
+				data, err = bookc.BuildCreateBookPayload(*bookCreateBookBodyFlag)
 			}
 		case "jwt-token":
 			c := jwttokenc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -221,6 +228,9 @@ func ParseEndpoint(
 			case "signin":
 				endpoint = c.Signin()
 				data, err = jwttokenc.BuildSigninPayload(*jwtTokenSigninBodyFlag)
+			case "refresh":
+				endpoint = c.Refresh()
+				data, err = jwttokenc.BuildRefreshPayload(*jwtTokenRefreshBodyFlag)
 			}
 		case "o-auth":
 			c := oauthc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -238,11 +248,11 @@ func ParseEndpoint(
 	return endpoint, data, nil
 }
 
-// crudUsage displays the usage of the crud command and its subcommands.
-func crudUsage() {
+// bookUsage displays the usage of the book command and its subcommands.
+func bookUsage() {
 	fmt.Fprintf(os.Stderr, `The principe of CRUD API with GET, PUT, POST, DELETE
 Usage:
-    %[1]s [globalflags] crud COMMAND [flags]
+    %[1]s [globalflags] book COMMAND [flags]
 
 COMMAND:
     get-book: Get one item
@@ -252,65 +262,65 @@ COMMAND:
     create-book: Create one item
 
 Additional help:
-    %[1]s crud COMMAND --help
+    %[1]s book COMMAND --help
 `, os.Args[0])
 }
-func crudGetBookUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud get-book -id STRING -jwt-token STRING
+func bookGetBookUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] book get-book -id STRING -jwt-token STRING
 
 Get one item
     -id STRING: 
     -jwt-token STRING: 
 
 Example:
-    %[1]s crud get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Voluptatem et reiciendis."
+    %[1]s book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --jwt-token "Voluptatem et reiciendis."
 `, os.Args[0])
 }
 
-func crudUpdateBookUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud update-book -body JSON -id STRING
+func bookUpdateBookUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] book update-book -body JSON -id STRING
 
 Update one item
     -body JSON: 
     -id STRING: 
 
 Example:
-    %[1]s crud update-book --body '{
+    %[1]s book update-book --body '{
       "name": "Guillaume",
       "price": 0.1253396498855919
    }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
 `, os.Args[0])
 }
 
-func crudGetAllBooksUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud get-all-books
+func bookGetAllBooksUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] book get-all-books
 
 Read All items
 
 Example:
-    %[1]s crud get-all-books
+    %[1]s book get-all-books
 `, os.Args[0])
 }
 
-func crudDeleteBookUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud delete-book -id STRING
+func bookDeleteBookUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] book delete-book -id STRING
 
 Delete one item by ID
     -id STRING: 
 
 Example:
-    %[1]s crud delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
+    %[1]s book delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
 `, os.Args[0])
 }
 
-func crudCreateBookUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] crud create-book -body JSON
+func bookCreateBookUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] book create-book -body JSON
 
 Create one item
     -body JSON: 
 
 Example:
-    %[1]s crud create-book --body '{
+    %[1]s book create-book --body '{
       "name": "Guillaume",
       "price": 0.1436730351084788
    }'
@@ -327,6 +337,7 @@ Usage:
 COMMAND:
     signup: signup
     signin: signin
+    refresh: Refresh Token
 
 Additional help:
     %[1]s jwt-token COMMAND --help
@@ -362,6 +373,19 @@ Example:
 `, os.Args[0])
 }
 
+func jwtTokenRefreshUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token refresh -body JSON
+
+Refresh Token
+    -body JSON: 
+
+Example:
+    %[1]s jwt-token refresh --body '{
+      "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
+   }'
+`, os.Args[0])
+}
+
 // o-authUsage displays the usage of the o-auth command and its subcommands.
 func oAuthUsage() {
 	fmt.Fprintf(os.Stderr, `Oauth to authentificate
@@ -384,6 +408,6 @@ oAuth
     -grant-type STRING: 
 
 Example:
-    %[1]s o-auth o-auth --client-id "Error beatae accusantium qui accusantium voluptates et." --client-secret "Nisi molestiae." --grant-type "Et voluptas rerum tempore."
+    %[1]s o-auth o-auth --client-id "Quaerat reprehenderit facere aliquam." --client-secret "Voluptatem mollitia voluptatibus quas." --grant-type "Hic sapiente."
 `, os.Args[0])
 }
