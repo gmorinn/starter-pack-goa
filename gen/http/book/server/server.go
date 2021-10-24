@@ -62,15 +62,15 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"GetBook", "GET", "/book/{id}"},
-			{"UpdateBook", "PUT", "/book/{id}"},
-			{"GetAllBooks", "GET", "/books"},
-			{"DeleteBook", "DELETE", "/book/remove/{id}"},
-			{"CreateBook", "POST", "/book/add"},
-			{"CORS", "OPTIONS", "/book/{id}"},
-			{"CORS", "OPTIONS", "/books"},
-			{"CORS", "OPTIONS", "/book/remove/{id}"},
-			{"CORS", "OPTIONS", "/book/add"},
+			{"GetBook", "GET", "/web/book/{id}"},
+			{"UpdateBook", "PUT", "/web/book/{id}"},
+			{"GetAllBooks", "GET", "/web/books"},
+			{"DeleteBook", "DELETE", "/web/book/remove/{id}"},
+			{"CreateBook", "POST", "/web/book/add"},
+			{"CORS", "OPTIONS", "/web/book/{id}"},
+			{"CORS", "OPTIONS", "/web/books"},
+			{"CORS", "OPTIONS", "/web/book/remove/{id}"},
+			{"CORS", "OPTIONS", "/web/book/add"},
 		},
 		GetBook:     NewGetBookHandler(e.GetBook, mux, decoder, encoder, errhandler, formatter),
 		UpdateBook:  NewUpdateBookHandler(e.UpdateBook, mux, decoder, encoder, errhandler, formatter),
@@ -113,7 +113,7 @@ func MountGetBookHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/book/{id}", f)
+	mux.Handle("GET", "/web/book/{id}", f)
 }
 
 // NewGetBookHandler creates a HTTP handler which loads the HTTP request and
@@ -164,7 +164,7 @@ func MountUpdateBookHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("PUT", "/book/{id}", f)
+	mux.Handle("PUT", "/web/book/{id}", f)
 }
 
 // NewUpdateBookHandler creates a HTTP handler which loads the HTTP request and
@@ -215,7 +215,7 @@ func MountGetAllBooksHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/books", f)
+	mux.Handle("GET", "/web/books", f)
 }
 
 // NewGetAllBooksHandler creates a HTTP handler which loads the HTTP request
@@ -259,7 +259,7 @@ func MountDeleteBookHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("DELETE", "/book/remove/{id}", f)
+	mux.Handle("DELETE", "/web/book/remove/{id}", f)
 }
 
 // NewDeleteBookHandler creates a HTTP handler which loads the HTTP request and
@@ -310,7 +310,7 @@ func MountCreateBookHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/book/add", f)
+	mux.Handle("POST", "/web/book/add", f)
 }
 
 // NewCreateBookHandler creates a HTTP handler which loads the HTTP request and
@@ -362,10 +362,10 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/book/{id}", f)
-	mux.Handle("OPTIONS", "/books", f)
-	mux.Handle("OPTIONS", "/book/remove/{id}", f)
-	mux.Handle("OPTIONS", "/book/add", f)
+	mux.Handle("OPTIONS", "/web/book/{id}", f)
+	mux.Handle("OPTIONS", "/web/books", f)
+	mux.Handle("OPTIONS", "/web/book/remove/{id}", f)
+	mux.Handle("OPTIONS", "/web/book/add", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

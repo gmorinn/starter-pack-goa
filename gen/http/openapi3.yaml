@@ -2,6 +2,13 @@ openapi: 3.0.3
 info:
   title: Basic CRUD
   description: Stater Pack
+  contact:
+    name: Guillaume Morin
+    url: https://guillaume-morin.fr
+    email: guillaume.morin@epitech.eu
+  license:
+    name: Apache License Version 2.0
+    url: https://guillaume-morin.fr
   version: "1.0"
 servers:
 - url: https://localhost:8088
@@ -90,201 +97,6 @@ paths:
               example:
                 err: Nihil ut quasi sed nihil molestiae.
                 error_code: Sit ut.
-                success: true
-  /book/{id}:
-    get:
-      tags:
-      - book
-      summary: getBook book
-      description: Get one item
-      operationId: book#getBook
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          format: uuid
-        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-      responses:
-        "200":
-          description: OK response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetBookResponseBody'
-              example:
-                id: Autem qui iste voluptas at est.
-                name: Laboriosam cupiditate nam nam facilis.
-                price: 0.2922005819792663
-                success: true
-        "500":
-          description: Internal Server Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IDDoesntExist'
-              example:
-                err: Consectetur minus aut autem id voluptatum qui.
-                error_code: Culpa ut qui commodi quibusdam et.
-                success: true
-      security:
-      - jwt_header_Authorization:
-        - api:read
-        - api:write
-    put:
-      tags:
-      - book
-      summary: updateBook book
-      description: Update one item
-      operationId: book#updateBook
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          format: uuid
-        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateBookRequestBody'
-            example:
-              name: Guillaume
-              price: 0.1253396498855919
-      responses:
-        "200":
-          description: OK response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetBookResponseBody'
-              example:
-                id: Ut alias delectus et est.
-                name: Ipsam et unde repellendus quaerat.
-                price: 0.2921791502674916
-                success: false
-        "500":
-          description: Internal Server Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IDDoesntExist'
-              example:
-                err: Et dolore assumenda nihil impedit hic aut.
-                error_code: Minima nam quis.
-                success: false
-  /book/add:
-    post:
-      tags:
-      - book
-      summary: createBook book
-      description: Create one item
-      operationId: book#createBook
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateBookRequestBody'
-            example:
-              name: Guillaume
-              price: 0.1436730351084788
-      responses:
-        "201":
-          description: Created response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateBookResponseBody'
-              example:
-                book:
-                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 0.4805611818105851
-                success: true
-        "500":
-          description: Internal Server Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IDDoesntExist'
-              example:
-                err: Aut voluptatibus nisi voluptas corporis.
-                error_code: Dolor expedita quidem.
-                success: false
-  /book/remove/{id}:
-    delete:
-      tags:
-      - book
-      summary: deleteBook book
-      description: Delete one item by ID
-      operationId: book#deleteBook
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          format: uuid
-        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-      responses:
-        "200":
-          description: OK response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeleteBookResponseBody'
-              example:
-                success: true
-        "500":
-          description: Internal Server Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IDDoesntExist'
-              example:
-                err: Maxime eveniet.
-                error_code: Laboriosam eligendi animi delectus.
-                success: false
-  /books:
-    get:
-      tags:
-      - book
-      summary: getAllBooks book
-      description: Read All items
-      operationId: book#getAllBooks
-      responses:
-        "200":
-          description: OK response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetAllBooksResponseBody'
-              example:
-                books:
-                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 0.4805611818105851
-                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 0.4805611818105851
-                success: false
-        "500":
-          description: Internal Server Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IDDoesntExist'
-              example:
-                err: Cumque voluptatem adipisci.
-                error_code: Tenetur dignissimos.
                 success: true
   /openapi.json:
     get:
@@ -475,6 +287,201 @@ paths:
               example:
                 err: Et iusto rerum nisi dolore.
                 error_code: Error voluptatem consectetur inventore nostrum repudiandae.
+                success: true
+  /web/book/{id}:
+    get:
+      tags:
+      - book
+      summary: getBook book
+      description: Get one item
+      operationId: book#getBook
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          format: uuid
+        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBookResponseBody'
+              example:
+                id: Autem qui iste voluptas at est.
+                name: Laboriosam cupiditate nam nam facilis.
+                price: 0.2922005819792663
+                success: true
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDDoesntExist'
+              example:
+                err: Consectetur minus aut autem id voluptatum qui.
+                error_code: Culpa ut qui commodi quibusdam et.
+                success: true
+      security:
+      - jwt_header_Authorization:
+        - api:read
+        - api:write
+    put:
+      tags:
+      - book
+      summary: updateBook book
+      description: Update one item
+      operationId: book#updateBook
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          format: uuid
+        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookRequestBody'
+            example:
+              name: Guillaume
+              price: 0.1253396498855919
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetBookResponseBody'
+              example:
+                id: Ut alias delectus et est.
+                name: Ipsam et unde repellendus quaerat.
+                price: 0.2921791502674916
+                success: false
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDDoesntExist'
+              example:
+                err: Et dolore assumenda nihil impedit hic aut.
+                error_code: Minima nam quis.
+                success: false
+  /web/book/add:
+    post:
+      tags:
+      - book
+      summary: createBook book
+      description: Create one item
+      operationId: book#createBook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookRequestBody'
+            example:
+              name: Guillaume
+              price: 0.1436730351084788
+      responses:
+        "201":
+          description: Created response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBookResponseBody'
+              example:
+                book:
+                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 0.4805611818105851
+                success: true
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDDoesntExist'
+              example:
+                err: Aut voluptatibus nisi voluptas corporis.
+                error_code: Dolor expedita quidem.
+                success: false
+  /web/book/remove/{id}:
+    delete:
+      tags:
+      - book
+      summary: deleteBook book
+      description: Delete one item by ID
+      operationId: book#deleteBook
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          format: uuid
+        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteBookResponseBody'
+              example:
+                success: true
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDDoesntExist'
+              example:
+                err: Maxime eveniet.
+                error_code: Laboriosam eligendi animi delectus.
+                success: false
+  /web/books:
+    get:
+      tags:
+      - book
+      summary: getAllBooks book
+      description: Read All items
+      operationId: book#getAllBooks
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllBooksResponseBody'
+              example:
+                books:
+                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 0.4805611818105851
+                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 0.4805611818105851
+                success: false
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IDDoesntExist'
+              example:
+                err: Cumque voluptatem adipisci.
+                error_code: Tenetur dignissimos.
                 success: true
 components:
   schemas:

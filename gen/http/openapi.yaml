@@ -2,6 +2,13 @@ swagger: "2.0"
 info:
   title: Basic CRUD
   description: Stater Pack
+  contact:
+    name: Guillaume Morin
+    email: guillaume.morin@epitech.eu
+    url: https://guillaume-morin.fr
+  license:
+    name: Apache License Version 2.0
+    url: https://guillaume-morin.fr
   version: "1.0"
 host: localhost:8088
 consumes:
@@ -58,175 +65,6 @@ paths:
           description: Internal Server Error response.
           schema:
             $ref: '#/definitions/OAuthOAuthUnknownErrorResponseBody'
-            required:
-            - err
-            - success
-            - error_code
-      schemes:
-      - https
-  /book/{id}:
-    get:
-      tags:
-      - book
-      summary: getBook book
-      description: Get one item
-      operationId: book#getBook
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: string
-        format: uuid
-      - name: Authorization
-        in: header
-        description: JWT used for authentication
-        required: false
-        type: string
-      responses:
-        "200":
-          description: OK response.
-          schema:
-            $ref: '#/definitions/BookGetBookResponseBody'
-            required:
-            - id
-            - name
-            - price
-            - success
-        "500":
-          description: Internal Server Error response.
-          schema:
-            $ref: '#/definitions/BookGetBookUnknownErrorResponseBody'
-            required:
-            - err
-            - success
-            - error_code
-      schemes:
-      - https
-      security:
-      - jwt_header_Authorization: []
-    put:
-      tags:
-      - book
-      summary: updateBook book
-      description: Update one item
-      operationId: book#updateBook
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: string
-        format: uuid
-      - name: UpdateBookRequestBody
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/BookUpdateBookRequestBody'
-          required:
-          - name
-          - price
-      responses:
-        "200":
-          description: OK response.
-          schema:
-            $ref: '#/definitions/BookUpdateBookResponseBody'
-            required:
-            - id
-            - name
-            - price
-            - success
-        "500":
-          description: Internal Server Error response.
-          schema:
-            $ref: '#/definitions/BookUpdateBookUnknownErrorResponseBody'
-            required:
-            - err
-            - success
-            - error_code
-      schemes:
-      - https
-  /book/add:
-    post:
-      tags:
-      - book
-      summary: createBook book
-      description: Create one item
-      operationId: book#createBook
-      parameters:
-      - name: CreateBookRequestBody
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/BookCreateBookRequestBody'
-          required:
-          - name
-          - price
-      responses:
-        "201":
-          description: Created response.
-          schema:
-            $ref: '#/definitions/BookCreateBookResponseBody'
-            required:
-            - book
-            - success
-        "500":
-          description: Internal Server Error response.
-          schema:
-            $ref: '#/definitions/BookCreateBookUnknownErrorResponseBody'
-            required:
-            - err
-            - success
-            - error_code
-      schemes:
-      - https
-  /book/remove/{id}:
-    delete:
-      tags:
-      - book
-      summary: deleteBook book
-      description: Delete one item by ID
-      operationId: book#deleteBook
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: string
-        format: uuid
-      responses:
-        "200":
-          description: OK response.
-          schema:
-            $ref: '#/definitions/BookDeleteBookResponseBody'
-            required:
-            - success
-        "500":
-          description: Internal Server Error response.
-          schema:
-            $ref: '#/definitions/BookDeleteBookUnknownErrorResponseBody'
-            required:
-            - err
-            - success
-            - error_code
-      schemes:
-      - https
-  /books:
-    get:
-      tags:
-      - book
-      summary: getAllBooks book
-      description: Read All items
-      operationId: book#getAllBooks
-      responses:
-        "200":
-          description: OK response.
-          schema:
-            $ref: '#/definitions/BookGetAllBooksResponseBody'
-            required:
-            - books
-            - success
-        "500":
-          description: Internal Server Error response.
-          schema:
-            $ref: '#/definitions/BookGetAllBooksUnknownErrorResponseBody'
             required:
             - err
             - success
@@ -391,6 +229,175 @@ paths:
           description: Internal Server Error response.
           schema:
             $ref: '#/definitions/JWTTokenSignupUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - https
+  /web/book/{id}:
+    get:
+      tags:
+      - book
+      summary: getBook book
+      description: Get one item
+      operationId: book#getBook
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        format: uuid
+      - name: Authorization
+        in: header
+        description: JWT used for authentication
+        required: false
+        type: string
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/BookGetBookResponseBody'
+            required:
+            - id
+            - name
+            - price
+            - success
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/BookGetBookUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - https
+      security:
+      - jwt_header_Authorization: []
+    put:
+      tags:
+      - book
+      summary: updateBook book
+      description: Update one item
+      operationId: book#updateBook
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        format: uuid
+      - name: UpdateBookRequestBody
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/BookUpdateBookRequestBody'
+          required:
+          - name
+          - price
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/BookUpdateBookResponseBody'
+            required:
+            - id
+            - name
+            - price
+            - success
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/BookUpdateBookUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - https
+  /web/book/add:
+    post:
+      tags:
+      - book
+      summary: createBook book
+      description: Create one item
+      operationId: book#createBook
+      parameters:
+      - name: CreateBookRequestBody
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/BookCreateBookRequestBody'
+          required:
+          - name
+          - price
+      responses:
+        "201":
+          description: Created response.
+          schema:
+            $ref: '#/definitions/BookCreateBookResponseBody'
+            required:
+            - book
+            - success
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/BookCreateBookUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - https
+  /web/book/remove/{id}:
+    delete:
+      tags:
+      - book
+      summary: deleteBook book
+      description: Delete one item by ID
+      operationId: book#deleteBook
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        format: uuid
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/BookDeleteBookResponseBody'
+            required:
+            - success
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/BookDeleteBookUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - https
+  /web/books:
+    get:
+      tags:
+      - book
+      summary: getAllBooks book
+      description: Read All items
+      operationId: book#getAllBooks
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/BookGetAllBooksResponseBody'
+            required:
+            - books
+            - success
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/BookGetAllBooksUnknownErrorResponseBody'
             required:
             - err
             - success

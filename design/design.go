@@ -14,7 +14,7 @@ var _ = API("basic", func() {
 	// Get .env
 	cnf := config.New()
 
-	cors.Origin("/.*localhost.*/", func() {
+	cors.Origin("/.*"+cnf.Domain+".*/", func() {
 		cors.Methods("POST", "GET", "PUT", "OPTIONS", "DELETE", "PATCH")
 		cors.Credentials()
 		cors.Headers("Authorization", "Content-Type", "jwtToken")
@@ -28,6 +28,18 @@ var _ = API("basic", func() {
 			URI(cnf.Host)
 		})
 	})
+
+	Contact(func() {
+		Name("Guillaume Morin")
+		Email("guillaume.morin@epitech.eu")
+		URL("https://guillaume-morin.fr")
+	})
+
+	License(func() {
+		Name("Apache License Version 2.0")
+		URL("https://guillaume-morin.fr")
+	})
+
 })
 
 // Download Postman

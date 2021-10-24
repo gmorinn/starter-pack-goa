@@ -13,25 +13,25 @@ import (
 
 // GetBookBookPath returns the URL path to the book service getBook HTTP endpoint.
 func GetBookBookPath(id string) string {
-	return fmt.Sprintf("/book/%v", id)
+	return fmt.Sprintf("/web/book/%v", id)
 }
 
 // UpdateBookBookPath returns the URL path to the book service updateBook HTTP endpoint.
 func UpdateBookBookPath(id string) string {
-	return fmt.Sprintf("/book/%v", id)
+	return fmt.Sprintf("/web/book/%v", id)
 }
 
 // GetAllBooksBookPath returns the URL path to the book service getAllBooks HTTP endpoint.
 func GetAllBooksBookPath() string {
-	return "/books"
+	return "/web/books"
 }
 
 // DeleteBookBookPath returns the URL path to the book service deleteBook HTTP endpoint.
 func DeleteBookBookPath(id string) string {
-	return fmt.Sprintf("/book/remove/%v", id)
+	return fmt.Sprintf("/web/book/remove/%v", id)
 }
 
 // CreateBookBookPath returns the URL path to the book service createBook HTTP endpoint.
 func CreateBookBookPath() string {
-	return "/book/add"
+	return "/web/book/add"
 }

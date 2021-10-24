@@ -14,6 +14,7 @@ var _ = Service("book", func() {
 	Error("unknown_error", unknownError, "Error not identified (500)")
 
 	HTTP(func() {
+		Path("/web")
 		Response("id_doesnt_exist", StatusInternalServerError)
 		Response("unknown_error", StatusInternalServerError)
 	})
