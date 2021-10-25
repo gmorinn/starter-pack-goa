@@ -11,18 +11,21 @@ import (
 // API describes the global properties of the API server.
 var _ = API("basic", func() {
 
-	// Get .env
-	cnf := config.New()
-
-	cors.Origin("/.*"+cnf.Domain+".*/", func() {
-		cors.Methods("POST", "GET", "PUT", "OPTIONS", "DELETE", "PATCH")
-		cors.Credentials()
-		cors.Headers("Authorization", "Content-Type", "jwtToken")
-	})
-
 	Title("Basic CRUD")
 	Description("Stater Pack")
 	Version("1.0")
+
+	// Get .env
+	cnf := config.New()
+
+	cors.Origin("*", func() {
+		cors.Headers("Authorization", "Content-Type", "jwtToken")
+		cors.Methods("POST", "GET", "PUT", "OPTIONS", "DELETE", "PATCH")
+		cors.Expose("Content-Type", "Origin")
+		cors.MaxAge(100)
+		cors.Credentials()
+	})
+
 	Server("crud", func() {
 		Host(cnf.Domain, func() {
 			URI(cnf.Host)

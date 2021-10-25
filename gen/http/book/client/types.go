@@ -82,6 +82,10 @@ type GetBookUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// GetBookUnauthorizedResponseBody is the type of the "book" service "getBook"
+// endpoint HTTP response body for the "unauthorized" error.
+type GetBookUnauthorizedResponseBody string
+
 // UpdateBookIDDoesntExistResponseBody is the type of the "book" service
 // "updateBook" endpoint HTTP response body for the "id_doesnt_exist" error.
 type UpdateBookIDDoesntExistResponseBody struct {
@@ -98,6 +102,10 @@ type UpdateBookUnknownErrorResponseBody struct {
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
+
+// UpdateBookUnauthorizedResponseBody is the type of the "book" service
+// "updateBook" endpoint HTTP response body for the "unauthorized" error.
+type UpdateBookUnauthorizedResponseBody string
 
 // GetAllBooksIDDoesntExistResponseBody is the type of the "book" service
 // "getAllBooks" endpoint HTTP response body for the "id_doesnt_exist" error.
@@ -116,6 +124,10 @@ type GetAllBooksUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// GetAllBooksUnauthorizedResponseBody is the type of the "book" service
+// "getAllBooks" endpoint HTTP response body for the "unauthorized" error.
+type GetAllBooksUnauthorizedResponseBody string
+
 // DeleteBookIDDoesntExistResponseBody is the type of the "book" service
 // "deleteBook" endpoint HTTP response body for the "id_doesnt_exist" error.
 type DeleteBookIDDoesntExistResponseBody struct {
@@ -133,6 +145,10 @@ type DeleteBookUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// DeleteBookUnauthorizedResponseBody is the type of the "book" service
+// "deleteBook" endpoint HTTP response body for the "unauthorized" error.
+type DeleteBookUnauthorizedResponseBody string
+
 // CreateBookIDDoesntExistResponseBody is the type of the "book" service
 // "createBook" endpoint HTTP response body for the "id_doesnt_exist" error.
 type CreateBookIDDoesntExistResponseBody struct {
@@ -149,6 +165,10 @@ type CreateBookUnknownErrorResponseBody struct {
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
+
+// CreateBookUnauthorizedResponseBody is the type of the "book" service
+// "createBook" endpoint HTTP response body for the "unauthorized" error.
+type CreateBookUnauthorizedResponseBody string
 
 // BookResponseResponseBody is used to define fields on response body types.
 type BookResponseResponseBody struct {
@@ -214,6 +234,14 @@ func NewGetBookUnknownError(body *GetBookUnknownErrorResponseBody) *book.Unknown
 	return v
 }
 
+// NewGetBookUnauthorized builds a book service getBook endpoint unauthorized
+// error.
+func NewGetBookUnauthorized(body GetBookUnauthorizedResponseBody) book.Unauthorized {
+	v := book.Unauthorized(body)
+
+	return v
+}
+
 // NewUpdateBookResultOK builds a "book" service "updateBook" endpoint result
 // from a HTTP "OK" response.
 func NewUpdateBookResultOK(body *UpdateBookResponseBody) *book.UpdateBookResult {
@@ -247,6 +275,14 @@ func NewUpdateBookUnknownError(body *UpdateBookUnknownErrorResponseBody) *book.U
 		ErrorCode: *body.ErrorCode,
 		Success:   *body.Success,
 	}
+
+	return v
+}
+
+// NewUpdateBookUnauthorized builds a book service updateBook endpoint
+// unauthorized error.
+func NewUpdateBookUnauthorized(body UpdateBookUnauthorizedResponseBody) book.Unauthorized {
+	v := book.Unauthorized(body)
 
 	return v
 }
@@ -289,6 +325,14 @@ func NewGetAllBooksUnknownError(body *GetAllBooksUnknownErrorResponseBody) *book
 	return v
 }
 
+// NewGetAllBooksUnauthorized builds a book service getAllBooks endpoint
+// unauthorized error.
+func NewGetAllBooksUnauthorized(body GetAllBooksUnauthorizedResponseBody) book.Unauthorized {
+	v := book.Unauthorized(body)
+
+	return v
+}
+
 // NewDeleteBookResultOK builds a "book" service "deleteBook" endpoint result
 // from a HTTP "OK" response.
 func NewDeleteBookResultOK(body *DeleteBookResponseBody) *book.DeleteBookResult {
@@ -319,6 +363,14 @@ func NewDeleteBookUnknownError(body *DeleteBookUnknownErrorResponseBody) *book.U
 		ErrorCode: *body.ErrorCode,
 		Success:   *body.Success,
 	}
+
+	return v
+}
+
+// NewDeleteBookUnauthorized builds a book service deleteBook endpoint
+// unauthorized error.
+func NewDeleteBookUnauthorized(body DeleteBookUnauthorizedResponseBody) book.Unauthorized {
+	v := book.Unauthorized(body)
 
 	return v
 }
@@ -354,6 +406,14 @@ func NewCreateBookUnknownError(body *CreateBookUnknownErrorResponseBody) *book.U
 		ErrorCode: *body.ErrorCode,
 		Success:   *body.Success,
 	}
+
+	return v
+}
+
+// NewCreateBookUnauthorized builds a book service createBook endpoint
+// unauthorized error.
+func NewCreateBookUnauthorized(body CreateBookUnauthorizedResponseBody) book.Unauthorized {
+	v := book.Unauthorized(body)
 
 	return v
 }

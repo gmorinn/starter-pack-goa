@@ -35,15 +35,20 @@ func EncodeGetBookResponse(encoder func(context.Context, http.ResponseWriter) go
 func DecodeGetBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id       string
-			jwtToken *string
-			err      error
+			id         string
+			oauthToken *string
+			jwtToken   *string
+			err        error
 
 			params = mux.Vars(r)
 		)
 		id = params["id"]
 		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
 
+		oauthTokenRaw := r.Header.Get("Authorization")
+		if oauthTokenRaw != "" {
+			oauthToken = &oauthTokenRaw
+		}
 		jwtTokenRaw := r.Header.Get("Authorization")
 		if jwtTokenRaw != "" {
 			jwtToken = &jwtTokenRaw
@@ -51,7 +56,14 @@ func DecodeGetBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetBookPayload(id, jwtToken)
+		payload := NewGetBookPayload(id, oauthToken, jwtToken)
+		if payload.OauthToken != nil {
+			if strings.Contains(*payload.OauthToken, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.OauthToken, " ", 2)[1]
+				payload.OauthToken = &cred
+			}
+		}
 		if payload.JWTToken != nil {
 			if strings.Contains(*payload.JWTToken, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")
@@ -97,6 +109,18 @@ func EncodeGetBookError(encoder func(context.Context, http.ResponseWriter) goaht
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(book.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetBookUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -187,6 +211,18 @@ func EncodeUpdateBookError(encoder func(context.Context, http.ResponseWriter) go
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
 			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(book.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUpdateBookUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
 		}
@@ -238,6 +274,18 @@ func EncodeGetAllBooksError(encoder func(context.Context, http.ResponseWriter) g
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(book.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetAllBooksUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -312,6 +360,18 @@ func EncodeDeleteBookError(encoder func(context.Context, http.ResponseWriter) go
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(book.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDeleteBookUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)
@@ -389,6 +449,18 @@ func EncodeCreateBookError(encoder func(context.Context, http.ResponseWriter) go
 			}
 			w.Header().Set("goa-error", res.ErrorName())
 			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		case "unauthorized":
+			res := v.(book.Unauthorized)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewCreateBookUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusUnauthorized)
 			return enc.Encode(body)
 		default:
 			return encodeError(ctx, w, v)

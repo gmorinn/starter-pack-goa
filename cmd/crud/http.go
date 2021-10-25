@@ -23,7 +23,7 @@ import (
 
 // handleHTTPServer starts configures and starts a HTTP server on the given
 // URL. It shuts down the server if any error is received in the error channel.
-func handleHTTPServer(ctx context.Context, u *url.URL, bookEndpoints *book.Endpoints, jwtTokenEndpoints *jwttoken.Endpoints, oAuthEndpoints *oauth.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
+func handleHTTPServer(ctx context.Context, u *url.URL, jwtTokenEndpoints *jwttoken.Endpoints, bookEndpoints *book.Endpoints, oAuthEndpoints *oauth.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
 
 	// Setup goa log adapter.
 	var (
@@ -55,21 +55,21 @@ func handleHTTPServer(ctx context.Context, u *url.URL, bookEndpoints *book.Endpo
 	// responses.
 	var (
 		openapiServer  *openapisvr.Server
-		bookServer     *booksvr.Server
 		jwtTokenServer *jwttokensvr.Server
+		bookServer     *booksvr.Server
 		oAuthServer    *oauthsvr.Server
 	)
 	{
 		eh := errorHandler(logger)
 		openapiServer = openapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("../../gen/http"))
-		bookServer = booksvr.New(bookEndpoints, mux, dec, enc, eh, nil)
 		jwtTokenServer = jwttokensvr.New(jwtTokenEndpoints, mux, dec, enc, eh, nil)
+		bookServer = booksvr.New(bookEndpoints, mux, dec, enc, eh, nil)
 		oAuthServer = oauthsvr.New(oAuthEndpoints, mux, dec, enc, eh, nil)
 		if debug {
 			servers := goahttp.Servers{
 				openapiServer,
-				bookServer,
 				jwtTokenServer,
+				bookServer,
 				oAuthServer,
 			}
 			servers.Use(httpmdlwr.Debug(mux, os.Stdout))
@@ -77,8 +77,8 @@ func handleHTTPServer(ctx context.Context, u *url.URL, bookEndpoints *book.Endpo
 	}
 	// Configure the mux.
 	openapisvr.Mount(mux, openapiServer)
-	booksvr.Mount(mux, bookServer)
 	jwttokensvr.Mount(mux, jwtTokenServer)
+	booksvr.Mount(mux, bookServer)
 	oauthsvr.Mount(mux, oAuthServer)
 
 	// Wrap the multiplexer with additional middlewares. Middlewares mounted
@@ -95,10 +95,10 @@ func handleHTTPServer(ctx context.Context, u *url.URL, bookEndpoints *book.Endpo
 	for _, m := range openapiServer.Mounts {
 		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
-	for _, m := range bookServer.Mounts {
+	for _, m := range jwtTokenServer.Mounts {
 		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
-	for _, m := range jwtTokenServer.Mounts {
+	for _, m := range bookServer.Mounts {
 		logger.Printf("HTTP %q mounted on %s %s", m.Method, m.Verb, m.Pattern)
 	}
 	for _, m := range oAuthServer.Mounts {

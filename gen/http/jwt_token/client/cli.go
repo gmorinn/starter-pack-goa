@@ -24,7 +24,7 @@ func BuildSignupPayload(jwtTokenSignupBody string) (*jwttoken.SignupPayload, err
 	{
 		err = json.Unmarshal([]byte(jwtTokenSignupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"map\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"7da\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
@@ -62,7 +62,7 @@ func BuildSigninPayload(jwtTokenSigninBody string) (*jwttoken.SigninPayload, err
 	{
 		err = json.Unmarshal([]byte(jwtTokenSigninBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"password\": \"sa2\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"password\": \"wuf\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 

@@ -1,9 +1,8 @@
 package main
 
 import (
-	basic "api_crud"
 	"api_crud/api"
-	"api_crud/gen/book"
+	book "api_crud/gen/book"
 	jwttoken "api_crud/gen/jwt_token"
 	oauth "api_crud/gen/o_auth"
 	"context"
@@ -37,6 +36,7 @@ func main() {
 	{
 		logger = log.New(os.Stderr, "[basic] ", log.Ltime)
 	}
+
 	// Initialize the services.
 	var (
 		bookSvc     book.Service
@@ -46,9 +46,9 @@ func main() {
 	)
 	{
 		server = api.NewServer()
-		bookSvc = basic.NewBook(logger, server)
-		oAuthSvc = basic.NewOAuth(logger, server)
-		jwtTokenSvc = basic.NewJWTToken(logger, server)
+		bookSvc = api.NewBook(logger, server)
+		oAuthSvc = api.NewOAuth(logger, server)
+		jwtTokenSvc = api.NewJWTToken(logger, server)
 	}
 
 	// Wrap the services in endpoints that can be invoked from other services
@@ -83,7 +83,7 @@ func main() {
 	switch *hostF {
 	case "localhost":
 		{
-			addr := "http://localhost:8088"
+			addr := "https://localhost:8088"
 			u, err := url.Parse(addr)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "invalid URL %#v: %s\n", addr, err)
@@ -103,9 +103,9 @@ func main() {
 				}
 				u.Host = net.JoinHostPort(h, *httpPortF)
 			} else if u.Port() == "" {
-				u.Host = net.JoinHostPort(u.Host, "80")
+				u.Host = net.JoinHostPort(u.Host, "443")
 			}
-			handleHTTPServer(ctx, u, bookEndpoints, jwtTokenEndpoints, oAuthEndpoints, &wg, errc, logger, *dbgF)
+			handleHTTPServer(ctx, u, jwtTokenEndpoints, bookEndpoints, oAuthEndpoints, &wg, errc, logger, *dbgF)
 		}
 
 	default:

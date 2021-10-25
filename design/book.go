@@ -12,17 +12,19 @@ var _ = Service("book", func() {
 
 	Error("id_doesnt_exist", idDoesntExist, "When ID doesn't exist")
 	Error("unknown_error", unknownError, "Error not identified (500)")
+	Error("unauthorized", String, "Credentials are invalid")
 
 	HTTP(func() {
 		Path("/web")
 		Response("id_doesnt_exist", StatusInternalServerError)
 		Response("unknown_error", StatusInternalServerError)
+		Response("unauthorized", StatusUnauthorized)
 	})
 
 	Method("getBook", func() {
 		Description("Get one item")
 
-		Security(JWTAuth)
+		Security(OAuth2, JWTAuth)
 
 		Payload(func() {
 			Attribute("id", String, func() {
@@ -32,6 +34,7 @@ var _ = Service("book", func() {
 			TokenField(1, "jwtToken", String, func() {
 				Description("JWT used for authentication")
 			})
+			AccessTokenField(2, "oauth_token", String)
 			Required("id")
 		})
 

@@ -30,6 +30,8 @@ type Service interface {
 
 // Auther defines the authorization functions to be implemented by the service.
 type Auther interface {
+	// OAuth2Auth implements the authorization logic for the OAuth2 security scheme.
+	OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error)
 	// JWTAuth implements the authorization logic for the JWT security scheme.
 	JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error)
 }
@@ -48,7 +50,8 @@ var MethodNames = [5]string{"getBook", "updateBook", "getAllBooks", "deleteBook"
 type GetBookPayload struct {
 	ID string
 	// JWT used for authentication
-	JWTToken *string
+	JWTToken   *string
+	OauthToken *string
 }
 
 // GetBookResult is the result type of the book service getBook method.
@@ -122,6 +125,9 @@ type UnknownError struct {
 	Success   bool
 }
 
+// Credentials are invalid
+type Unauthorized string
+
 // Error returns an error description.
 func (e *IDDoesntExist) Error() string {
 	return "IdDoesntExist is the error returned when 0 book have the id corresponding"
@@ -140,6 +146,16 @@ func (e *UnknownError) Error() string {
 // ErrorName returns "unknownError".
 func (e *UnknownError) ErrorName() string {
 	return "unknown_error"
+}
+
+// Error returns an error description.
+func (e Unauthorized) Error() string {
+	return "Credentials are invalid"
+}
+
+// ErrorName returns "unauthorized".
+func (e Unauthorized) ErrorName() string {
+	return "unauthorized"
 }
 
 // MakeTimeout builds a goa.ServiceError from an error.

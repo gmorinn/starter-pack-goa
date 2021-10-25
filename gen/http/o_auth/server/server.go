@@ -11,7 +11,6 @@ import (
 	oauth "api_crud/gen/o_auth"
 	"context"
 	"net/http"
-	"regexp"
 
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -155,7 +154,6 @@ func NewCORSHandler() http.Handler {
 // HandleOAuthOrigin applies the CORS response headers corresponding to the
 // origin for the service oAuth.
 func HandleOAuthOrigin(h http.Handler) http.Handler {
-	spec0 := regexp.MustCompile(".*localhost.*")
 	origHndlr := h.(http.HandlerFunc)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -164,9 +162,11 @@ func HandleOAuthOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOriginRegexp(origin, spec0) {
+		if cors.MatchOrigin(origin, "*") {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
+			w.Header().Set("Access-Control-Expose-Headers", "Content-Type, Origin")
+			w.Header().Set("Access-Control-Max-Age", "100")
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request

@@ -2,6 +2,13 @@ package design
 
 import . "goa.design/goa/v3/dsl"
 
+var OAuth2 = OAuth2Security("OAuth2", func() {
+	Description("Use OAuth2 to authenticate")
+	ImplicitFlow("/authorization", "/refresh")
+	Scope("api:read", "Provides read access")
+	Scope("api:write", "Provides write access")
+})
+
 var _ = Service("oAuth", func() {
 	Description("Oauth to authentificate")
 
