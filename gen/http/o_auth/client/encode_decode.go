@@ -41,17 +41,9 @@ func EncodeOAuthRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.
 		if !ok {
 			return goahttp.ErrInvalidType("oAuth", "oAuth", "*oauth.OauthPayload", v)
 		}
-		{
-			head := p.ClientID
-			req.Header.Set("client_id", head)
-		}
-		{
-			head := p.ClientSecret
-			req.Header.Set("client_secret", head)
-		}
-		{
-			head := p.GrantType
-			req.Header.Set("grant_type", head)
+		body := NewOAuthRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("oAuth", "oAuth", err)
 		}
 		return nil
 	}
@@ -80,16 +72,20 @@ func DecodeOAuthResponse(decoder func(*http.Response) goahttp.Decoder, restoreBo
 			defer resp.Body.Close()
 		}
 		switch resp.StatusCode {
-		case http.StatusFound:
+		case http.StatusCreated:
 			var (
-				body OAuthFoundResponseBody
+				body OAuthCreatedResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("oAuth", "oAuth", err)
 			}
-			res := NewOAuthResponseFound(&body)
+			err = ValidateOAuthCreatedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("oAuth", "oAuth", err)
+			}
+			res := NewOAuthResponseCreated(&body)
 			return res, nil
 		case http.StatusInternalServerError:
 			var (

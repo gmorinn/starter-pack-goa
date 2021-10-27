@@ -2,7 +2,6 @@ package api
 
 import (
 	"api_crud/config"
-	"fmt"
 	"log"
 	"time"
 
@@ -20,9 +19,9 @@ func (server *Server) runCron(c **cron.Cron, config *config.API) {
 	// ctx := context.Background()
 	(*c) = cron.New()
 
-	(*c).AddFunc("@every 1s", func() {
-		fmt.Println("test!")
-	})
+	// (*c).AddFunc("@every 1s", func() {
+	// 	fmt.Println("test!")
+	// })
 
 	(*c).Start()
 	log.Printf("%+v\n", (*c).Entries())

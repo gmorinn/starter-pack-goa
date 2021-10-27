@@ -36,10 +36,10 @@ type OauthPayload struct {
 
 // OAuthResponse is the result type of the oAuth service oAuth method.
 type OAuthResponse struct {
-	AccessToken *string
-	TokenType   *string
-	ExpiresIn   *int64
-	Success     *bool
+	AccessToken string
+	TokenType   string
+	ExpiresIn   int64
+	Success     bool
 }
 
 type UnknownError struct {

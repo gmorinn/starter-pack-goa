@@ -32,8 +32,6 @@ type Service interface {
 type Auther interface {
 	// OAuth2Auth implements the authorization logic for the OAuth2 security scheme.
 	OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error)
-	// JWTAuth implements the authorization logic for the JWT security scheme.
-	JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -49,9 +47,8 @@ var MethodNames = [5]string{"getBook", "updateBook", "getAllBooks", "deleteBook"
 // GetBookPayload is the payload type of the book service getBook method.
 type GetBookPayload struct {
 	ID string
-	// JWT used for authentication
-	JWTToken   *string
-	OauthToken *string
+	// Use to generate Oauth
+	OauthToken string
 }
 
 // GetBookResult is the result type of the book service getBook method.
@@ -111,14 +108,6 @@ type BookResponse struct {
 	Price float64
 }
 
-// IdDoesntExist is the error returned when 0 book have the id corresponding
-type IDDoesntExist struct {
-	// Returning error
-	Err     string
-	ID      string
-	Success bool
-}
-
 type UnknownError struct {
 	Err       string
 	ErrorCode string
@@ -127,16 +116,6 @@ type UnknownError struct {
 
 // Credentials are invalid
 type Unauthorized string
-
-// Error returns an error description.
-func (e *IDDoesntExist) Error() string {
-	return "IdDoesntExist is the error returned when 0 book have the id corresponding"
-}
-
-// ErrorName returns "IdDoesntExist".
-func (e *IDDoesntExist) ErrorName() string {
-	return "id_doesnt_exist"
-}
 
 // Error returns an error description.
 func (e *UnknownError) Error() string {

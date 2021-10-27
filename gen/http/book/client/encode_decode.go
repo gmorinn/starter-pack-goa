@@ -14,7 +14,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 
 	goahttp "goa.design/goa/v3/http"
 )
@@ -52,22 +51,9 @@ func EncodeGetBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*htt
 		if !ok {
 			return goahttp.ErrInvalidType("book", "getBook", "*book.GetBookPayload", v)
 		}
-		if p.OauthToken != nil {
-			head := *p.OauthToken
-			if !strings.Contains(head, " ") {
-				req.Header.Set("Authorization", "Bearer "+head)
-			} else {
-				req.Header.Set("Authorization", head)
-			}
-		}
-		if p.JWTToken != nil {
-			head := *p.JWTToken
-			if !strings.Contains(head, " ") {
-				req.Header.Set("Authorization", "Bearer "+head)
-			} else {
-				req.Header.Set("Authorization", head)
-			}
-		}
+		values := req.URL.Query()
+		values.Add("oauth", p.OauthToken)
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }
@@ -76,7 +62,6 @@ func EncodeGetBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*htt
 // getBook endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
 // DecodeGetBookResponse may return the following errors:
-//	- "id_doesnt_exist" (type *book.IDDoesntExist): http.StatusInternalServerError
 //	- "unknown_error" (type *book.UnknownError): http.StatusInternalServerError
 //	- "unauthorized" (type book.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
@@ -111,40 +96,19 @@ func DecodeGetBookResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			res := NewGetBookResultOK(&body)
 			return res, nil
 		case http.StatusInternalServerError:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "id_doesnt_exist":
-				var (
-					body GetBookIDDoesntExistResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("book", "getBook", err)
-				}
-				err = ValidateGetBookIDDoesntExistResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("book", "getBook", err)
-				}
-				return nil, NewGetBookIDDoesntExist(&body)
-			case "unknown_error":
-				var (
-					body GetBookUnknownErrorResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("book", "getBook", err)
-				}
-				err = ValidateGetBookUnknownErrorResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("book", "getBook", err)
-				}
-				return nil, NewGetBookUnknownError(&body)
-			default:
-				body, _ := ioutil.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("book", "getBook", resp.StatusCode, string(body))
+			var (
+				body GetBookUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("book", "getBook", err)
 			}
+			err = ValidateGetBookUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("book", "getBook", err)
+			}
+			return nil, NewGetBookUnknownError(&body)
 		case http.StatusUnauthorized:
 			var (
 				body GetBookUnauthorizedResponseBody
@@ -207,7 +171,6 @@ func EncodeUpdateBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // book updateBook endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeUpdateBookResponse may return the following errors:
-//	- "id_doesnt_exist" (type *book.IDDoesntExist): http.StatusInternalServerError
 //	- "unknown_error" (type *book.UnknownError): http.StatusInternalServerError
 //	- "unauthorized" (type book.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
@@ -242,40 +205,19 @@ func DecodeUpdateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			res := NewUpdateBookResultOK(&body)
 			return res, nil
 		case http.StatusInternalServerError:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "id_doesnt_exist":
-				var (
-					body UpdateBookIDDoesntExistResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("book", "updateBook", err)
-				}
-				err = ValidateUpdateBookIDDoesntExistResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("book", "updateBook", err)
-				}
-				return nil, NewUpdateBookIDDoesntExist(&body)
-			case "unknown_error":
-				var (
-					body UpdateBookUnknownErrorResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("book", "updateBook", err)
-				}
-				err = ValidateUpdateBookUnknownErrorResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("book", "updateBook", err)
-				}
-				return nil, NewUpdateBookUnknownError(&body)
-			default:
-				body, _ := ioutil.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("book", "updateBook", resp.StatusCode, string(body))
+			var (
+				body UpdateBookUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("book", "updateBook", err)
 			}
+			err = ValidateUpdateBookUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("book", "updateBook", err)
+			}
+			return nil, NewUpdateBookUnknownError(&body)
 		case http.StatusUnauthorized:
 			var (
 				body UpdateBookUnauthorizedResponseBody
@@ -312,7 +254,6 @@ func (c *Client) BuildGetAllBooksRequest(ctx context.Context, v interface{}) (*h
 // book getAllBooks endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeGetAllBooksResponse may return the following errors:
-//	- "id_doesnt_exist" (type *book.IDDoesntExist): http.StatusInternalServerError
 //	- "unknown_error" (type *book.UnknownError): http.StatusInternalServerError
 //	- "unauthorized" (type book.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
@@ -347,40 +288,19 @@ func DecodeGetAllBooksResponse(decoder func(*http.Response) goahttp.Decoder, res
 			res := NewGetAllBooksResultOK(&body)
 			return res, nil
 		case http.StatusInternalServerError:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "id_doesnt_exist":
-				var (
-					body GetAllBooksIDDoesntExistResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("book", "getAllBooks", err)
-				}
-				err = ValidateGetAllBooksIDDoesntExistResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("book", "getAllBooks", err)
-				}
-				return nil, NewGetAllBooksIDDoesntExist(&body)
-			case "unknown_error":
-				var (
-					body GetAllBooksUnknownErrorResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("book", "getAllBooks", err)
-				}
-				err = ValidateGetAllBooksUnknownErrorResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("book", "getAllBooks", err)
-				}
-				return nil, NewGetAllBooksUnknownError(&body)
-			default:
-				body, _ := ioutil.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("book", "getAllBooks", resp.StatusCode, string(body))
+			var (
+				body GetAllBooksUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("book", "getAllBooks", err)
 			}
+			err = ValidateGetAllBooksUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("book", "getAllBooks", err)
+			}
+			return nil, NewGetAllBooksUnknownError(&body)
 		case http.StatusUnauthorized:
 			var (
 				body GetAllBooksUnauthorizedResponseBody
@@ -427,7 +347,6 @@ func (c *Client) BuildDeleteBookRequest(ctx context.Context, v interface{}) (*ht
 // book deleteBook endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeDeleteBookResponse may return the following errors:
-//	- "id_doesnt_exist" (type *book.IDDoesntExist): http.StatusInternalServerError
 //	- "unknown_error" (type *book.UnknownError): http.StatusInternalServerError
 //	- "unauthorized" (type book.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
@@ -462,40 +381,19 @@ func DecodeDeleteBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			res := NewDeleteBookResultOK(&body)
 			return res, nil
 		case http.StatusInternalServerError:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "id_doesnt_exist":
-				var (
-					body DeleteBookIDDoesntExistResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("book", "deleteBook", err)
-				}
-				err = ValidateDeleteBookIDDoesntExistResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("book", "deleteBook", err)
-				}
-				return nil, NewDeleteBookIDDoesntExist(&body)
-			case "unknown_error":
-				var (
-					body DeleteBookUnknownErrorResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("book", "deleteBook", err)
-				}
-				err = ValidateDeleteBookUnknownErrorResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("book", "deleteBook", err)
-				}
-				return nil, NewDeleteBookUnknownError(&body)
-			default:
-				body, _ := ioutil.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("book", "deleteBook", resp.StatusCode, string(body))
+			var (
+				body DeleteBookUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("book", "deleteBook", err)
 			}
+			err = ValidateDeleteBookUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("book", "deleteBook", err)
+			}
+			return nil, NewDeleteBookUnknownError(&body)
 		case http.StatusUnauthorized:
 			var (
 				body DeleteBookUnauthorizedResponseBody
@@ -548,7 +446,6 @@ func EncodeCreateBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 // book createBook endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
 // DecodeCreateBookResponse may return the following errors:
-//	- "id_doesnt_exist" (type *book.IDDoesntExist): http.StatusInternalServerError
 //	- "unknown_error" (type *book.UnknownError): http.StatusInternalServerError
 //	- "unauthorized" (type book.Unauthorized): http.StatusUnauthorized
 //	- error: internal error
@@ -583,40 +480,19 @@ func DecodeCreateBookResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			res := NewCreateBookResultCreated(&body)
 			return res, nil
 		case http.StatusInternalServerError:
-			en := resp.Header.Get("goa-error")
-			switch en {
-			case "id_doesnt_exist":
-				var (
-					body CreateBookIDDoesntExistResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("book", "createBook", err)
-				}
-				err = ValidateCreateBookIDDoesntExistResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("book", "createBook", err)
-				}
-				return nil, NewCreateBookIDDoesntExist(&body)
-			case "unknown_error":
-				var (
-					body CreateBookUnknownErrorResponseBody
-					err  error
-				)
-				err = decoder(resp).Decode(&body)
-				if err != nil {
-					return nil, goahttp.ErrDecodingError("book", "createBook", err)
-				}
-				err = ValidateCreateBookUnknownErrorResponseBody(&body)
-				if err != nil {
-					return nil, goahttp.ErrValidationError("book", "createBook", err)
-				}
-				return nil, NewCreateBookUnknownError(&body)
-			default:
-				body, _ := ioutil.ReadAll(resp.Body)
-				return nil, goahttp.ErrInvalidResponse("book", "createBook", resp.StatusCode, string(body))
+			var (
+				body CreateBookUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("book", "createBook", err)
 			}
+			err = ValidateCreateBookUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("book", "createBook", err)
+			}
+			return nil, NewCreateBookUnknownError(&body)
 		case http.StatusUnauthorized:
 			var (
 				body CreateBookUnauthorizedResponseBody

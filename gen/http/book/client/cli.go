@@ -18,7 +18,7 @@ import (
 
 // BuildGetBookPayload builds the payload for the book getBook endpoint from
 // CLI flags.
-func BuildGetBookPayload(bookGetBookID string, bookGetBookOauthToken string, bookGetBookJWTToken string) (*book.GetBookPayload, error) {
+func BuildGetBookPayload(bookGetBookID string, bookGetBookOauthToken string) (*book.GetBookPayload, error) {
 	var err error
 	var id string
 	{
@@ -29,22 +29,13 @@ func BuildGetBookPayload(bookGetBookID string, bookGetBookOauthToken string, boo
 			return nil, err
 		}
 	}
-	var oauthToken *string
+	var oauthToken string
 	{
-		if bookGetBookOauthToken != "" {
-			oauthToken = &bookGetBookOauthToken
-		}
-	}
-	var jwtToken *string
-	{
-		if bookGetBookJWTToken != "" {
-			jwtToken = &bookGetBookJWTToken
-		}
+		oauthToken = bookGetBookOauthToken
 	}
 	v := &book.GetBookPayload{}
 	v.ID = id
 	v.OauthToken = oauthToken
-	v.JWTToken = jwtToken
 
 	return v, nil
 }
@@ -57,7 +48,7 @@ func BuildUpdateBookPayload(bookUpdateBookBody string, bookUpdateBookID string) 
 	{
 		err = json.Unmarshal([]byte(bookUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.6417588031106173\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.491096594473004\n   }'")
 		}
 	}
 	var id string
@@ -105,7 +96,7 @@ func BuildCreateBookPayload(bookCreateBookBody string) (*book.CreateBookPayload,
 	{
 		err = json.Unmarshal([]byte(bookCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.33007935933518645\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.8877830776353945\n   }'")
 		}
 		if utf8.RuneCountInString(body.Name) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))

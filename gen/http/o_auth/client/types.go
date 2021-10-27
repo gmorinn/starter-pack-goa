@@ -13,9 +13,17 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// OAuthFoundResponseBody is the type of the "oAuth" service "oAuth" endpoint
+// OAuthRequestBody is the type of the "oAuth" service "oAuth" endpoint HTTP
+// request body.
+type OAuthRequestBody struct {
+	ClientID     string `form:"client_id" json:"client_id" xml:"client_id"`
+	ClientSecret string `form:"client_secret" json:"client_secret" xml:"client_secret"`
+	GrantType    string `form:"grant_type" json:"grant_type" xml:"grant_type"`
+}
+
+// OAuthCreatedResponseBody is the type of the "oAuth" service "oAuth" endpoint
 // HTTP response body.
-type OAuthFoundResponseBody struct {
+type OAuthCreatedResponseBody struct {
 	AccessToken *string `form:"access_token,omitempty" json:"access_token,omitempty" xml:"access_token,omitempty"`
 	TokenType   *string `form:"token_type,omitempty" json:"token_type,omitempty" xml:"token_type,omitempty"`
 	ExpiresIn   *int64  `form:"expires_in,omitempty" json:"expires_in,omitempty" xml:"expires_in,omitempty"`
@@ -46,14 +54,25 @@ type OAuthBadRequestResponseBody struct {
 	Success     *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
-// NewOAuthResponseFound builds a "oAuth" service "oAuth" endpoint result from
-// a HTTP "Found" response.
-func NewOAuthResponseFound(body *OAuthFoundResponseBody) *oauth.OAuthResponse {
+// NewOAuthRequestBody builds the HTTP request body from the payload of the
+// "oAuth" endpoint of the "oAuth" service.
+func NewOAuthRequestBody(p *oauth.OauthPayload) *OAuthRequestBody {
+	body := &OAuthRequestBody{
+		ClientID:     p.ClientID,
+		ClientSecret: p.ClientSecret,
+		GrantType:    p.GrantType,
+	}
+	return body
+}
+
+// NewOAuthResponseCreated builds a "oAuth" service "oAuth" endpoint result
+// from a HTTP "Created" response.
+func NewOAuthResponseCreated(body *OAuthCreatedResponseBody) *oauth.OAuthResponse {
 	v := &oauth.OAuthResponse{
-		AccessToken: body.AccessToken,
-		TokenType:   body.TokenType,
-		ExpiresIn:   body.ExpiresIn,
-		Success:     body.Success,
+		AccessToken: *body.AccessToken,
+		TokenType:   *body.TokenType,
+		ExpiresIn:   *body.ExpiresIn,
+		Success:     *body.Success,
 	}
 
 	return v
@@ -87,6 +106,24 @@ func NewOAuthUnauthorized(body OAuthUnauthorizedResponseBody) oauth.Unauthorized
 	return v
 }
 
+// ValidateOAuthCreatedResponseBody runs the validations defined on
+// OAuthCreatedResponseBody
+func ValidateOAuthCreatedResponseBody(body *OAuthCreatedResponseBody) (err error) {
+	if body.AccessToken == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("access_token", "body"))
+	}
+	if body.TokenType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("token_type", "body"))
+	}
+	if body.ExpiresIn == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("expires_in", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
 // ValidateOAuthUnknownErrorResponseBody runs the validations defined on
 // oAuth_unknown_error_response_body
 func ValidateOAuthUnknownErrorResponseBody(body *OAuthUnknownErrorResponseBody) (err error) {
@@ -98,6 +135,24 @@ func ValidateOAuthUnknownErrorResponseBody(body *OAuthUnknownErrorResponseBody) 
 	}
 	if body.ErrorCode == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
+// ValidateOAuthBadRequestResponseBody runs the validations defined on OAuthBad
+// RequestResponseBody
+func ValidateOAuthBadRequestResponseBody(body *OAuthBadRequestResponseBody) (err error) {
+	if body.AccessToken == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("access_token", "body"))
+	}
+	if body.TokenType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("token_type", "body"))
+	}
+	if body.ExpiresIn == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("expires_in", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
 	}
 	return
 }

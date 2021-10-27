@@ -18,7 +18,7 @@ type API struct {
 	Host     string
 	Port     int
 	Cert     string
-	Cors     []string
+	Cors     string
 	Key      string
 	Security Security
 	Database Database
@@ -60,7 +60,7 @@ func New() *API {
 	config.SSL, _ = getenvBool("API_SSL")
 	config.Host = os.Getenv("API_HOST")
 
-	config.Cors = getenvSliceString("API_CORS")
+	config.Cors = os.Getenv("API_CORS")
 
 	config.Cert = os.Getenv("API_CERT")
 	config.Key = os.Getenv("API_KEY")

@@ -12,7 +12,6 @@ import (
 	"context"
 	"io"
 	"net/http"
-	"strings"
 
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -36,8 +35,7 @@ func DecodeGetBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			id         string
-			oauthToken *string
-			jwtToken   *string
+			oauthToken string
 			err        error
 
 			params = mux.Vars(r)
@@ -45,32 +43,14 @@ func DecodeGetBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp
 		id = params["id"]
 		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
 
-		oauthTokenRaw := r.Header.Get("Authorization")
-		if oauthTokenRaw != "" {
-			oauthToken = &oauthTokenRaw
-		}
-		jwtTokenRaw := r.Header.Get("Authorization")
-		if jwtTokenRaw != "" {
-			jwtToken = &jwtTokenRaw
+		oauthToken = r.URL.Query().Get("oauth")
+		if oauthToken == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("oauth", "query string"))
 		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetBookPayload(id, oauthToken, jwtToken)
-		if payload.OauthToken != nil {
-			if strings.Contains(*payload.OauthToken, " ") {
-				// Remove authorization scheme prefix (e.g. "Bearer")
-				cred := strings.SplitN(*payload.OauthToken, " ", 2)[1]
-				payload.OauthToken = &cred
-			}
-		}
-		if payload.JWTToken != nil {
-			if strings.Contains(*payload.JWTToken, " ") {
-				// Remove authorization scheme prefix (e.g. "Bearer")
-				cred := strings.SplitN(*payload.JWTToken, " ", 2)[1]
-				payload.JWTToken = &cred
-			}
-		}
+		payload := NewGetBookPayload(id, oauthToken)
 
 		return payload, nil
 	}
@@ -86,18 +66,6 @@ func EncodeGetBookError(encoder func(context.Context, http.ResponseWriter) goaht
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "id_doesnt_exist":
-			res := v.(*book.IDDoesntExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewGetBookIDDoesntExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "unknown_error":
 			res := v.(*book.UnknownError)
 			enc := encoder(ctx, w)
@@ -187,18 +155,6 @@ func EncodeUpdateBookError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "id_doesnt_exist":
-			res := v.(*book.IDDoesntExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewUpdateBookIDDoesntExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "unknown_error":
 			res := v.(*book.UnknownError)
 			enc := encoder(ctx, w)
@@ -251,18 +207,6 @@ func EncodeGetAllBooksError(encoder func(context.Context, http.ResponseWriter) g
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "id_doesnt_exist":
-			res := v.(*book.IDDoesntExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewGetAllBooksIDDoesntExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "unknown_error":
 			res := v.(*book.UnknownError)
 			enc := encoder(ctx, w)
@@ -337,18 +281,6 @@ func EncodeDeleteBookError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "id_doesnt_exist":
-			res := v.(*book.IDDoesntExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewDeleteBookIDDoesntExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "unknown_error":
 			res := v.(*book.UnknownError)
 			enc := encoder(ctx, w)
@@ -426,18 +358,6 @@ func EncodeCreateBookError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 		switch en.ErrorName() {
-		case "id_doesnt_exist":
-			res := v.(*book.IDDoesntExist)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewCreateBookIDDoesntExistResponseBody(res)
-			}
-			w.Header().Set("goa-error", res.ErrorName())
-			w.WriteHeader(http.StatusInternalServerError)
-			return enc.Encode(body)
 		case "unknown_error":
 			res := v.(*book.UnknownError)
 			enc := encoder(ctx, w)

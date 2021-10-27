@@ -2,7 +2,7 @@ package api
 
 import (
 	book "api_crud/gen/book"
-	"api_crud/internal/db"
+	db "api_crud/internal"
 	"context"
 	"fmt"
 	"log"
@@ -17,14 +17,7 @@ type booksrvc struct {
 	server *Server
 }
 
-func Error_ID(msg, id string, err error) *book.IDDoesntExist {
-	return &book.IDDoesntExist{
-		Err: err.Error(),
-		ID:  id,
-	}
-}
-
-func ErrorResponse(msg string, err error) *book.UnknownError {
+func (s *booksrvc) ErrorResponse(msg string, err error) *book.UnknownError {
 	return &book.UnknownError{
 		Err:       err.Error(),
 		ErrorCode: msg,
@@ -38,14 +31,12 @@ func NewBook(logger *log.Logger, server *Server) book.Service {
 
 // Get one item
 func (s *booksrvc) GetBook(ctx context.Context, p *book.GetBookPayload) (res *book.GetBookResult, err error) {
-	var response book.GetBookResult
-
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		b, err := q.GetBook(ctx, uuid.MustParse(p.ID))
 		if err != nil {
 			return fmt.Errorf("ERROR_GET_BOOK_BY_ID %v", err)
 		}
-		response = book.GetBookResult{
+		res = &book.GetBookResult{
 			ID:      b.ID.String(),
 			Name:    b.Name,
 			Price:   b.Price,
@@ -55,16 +46,14 @@ func (s *booksrvc) GetBook(ctx context.Context, p *book.GetBookPayload) (res *bo
 	})
 
 	if err != nil {
-		return nil, ErrorResponse("TX_GET_BOOK", err)
+		return nil, s.ErrorResponse("TX_GET_BOOK", err)
 	}
 
-	return &response, nil
+	return res, nil
 }
 
 // Update one item
 func (s *booksrvc) UpdateBook(ctx context.Context, p *book.UpdateBookPayload) (res *book.UpdateBookResult, err error) {
-
-	var response book.UpdateBookResult
 
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		arg := db.UpdateBookParams{
@@ -79,7 +68,7 @@ func (s *booksrvc) UpdateBook(ctx context.Context, p *book.UpdateBookPayload) (r
 		if err != nil {
 			return fmt.Errorf("ERROR_GET_BOOK_BY_ID %v", err)
 		}
-		response = book.UpdateBookResult{
+		res = &book.UpdateBookResult{
 			ID:      newBook.ID.String(),
 			Name:    newBook.Name,
 			Price:   newBook.Price,
@@ -89,16 +78,14 @@ func (s *booksrvc) UpdateBook(ctx context.Context, p *book.UpdateBookPayload) (r
 	})
 
 	if err != nil {
-		return nil, ErrorResponse("TX_UPDATE_BOOK", err)
+		return nil, s.ErrorResponse("TX_UPDATE_BOOK", err)
 	}
 
-	return &response, nil
+	return res, nil
 }
 
 // Read All items
 func (s *booksrvc) GetAllBooks(ctx context.Context) (res *book.GetAllBooksResult, err error) {
-	var response book.GetAllBooksResult
-
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		books, err := s.server.Store.GetBooks(ctx)
 		if err != nil {
@@ -113,7 +100,7 @@ func (s *booksrvc) GetAllBooks(ctx context.Context) (res *book.GetAllBooksResult
 				Price: v.Price,
 			})
 		}
-		response = book.GetAllBooksResult{
+		res = &book.GetAllBooksResult{
 			Books:   BookResponse,
 			Success: true,
 		}
@@ -121,10 +108,10 @@ func (s *booksrvc) GetAllBooks(ctx context.Context) (res *book.GetAllBooksResult
 	})
 
 	if err != nil {
-		return nil, ErrorResponse("TX_GET_ALL_BOOKS", err)
+		return nil, s.ErrorResponse("TX_GET_ALL_BOOKS", err)
 	}
 
-	return &response, nil
+	return res, nil
 }
 
 // Delete one item by ID
@@ -136,14 +123,13 @@ func (s *booksrvc) DeleteBook(ctx context.Context, p *book.DeleteBookPayload) (r
 		return nil
 	})
 	if err != nil {
-		return nil, ErrorResponse("TX_DELETE_BOOK", err)
+		return nil, s.ErrorResponse("TX_DELETE_BOOK", err)
 	}
 	return &book.DeleteBookResult{Success: true}, nil
 }
 
 // Create one item
 func (s *booksrvc) CreateBook(ctx context.Context, p *book.CreateBookPayload) (res *book.CreateBookResult, err error) {
-	var response book.CreateBookResult
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		arg := db.CreateBookParams{
 			Price: p.Price,
@@ -158,7 +144,7 @@ func (s *booksrvc) CreateBook(ctx context.Context, p *book.CreateBookPayload) (r
 		if err != nil {
 			return fmt.Errorf("ERROR_GET_BOOK %v", err)
 		}
-		response = book.CreateBookResult{
+		res = &book.CreateBookResult{
 			Book: &book.BookResponse{
 				ID:    newBook.ID.String(),
 				Name:  newBook.Name,
@@ -170,8 +156,8 @@ func (s *booksrvc) CreateBook(ctx context.Context, p *book.CreateBookPayload) (r
 	})
 
 	if err != nil {
-		return nil, ErrorResponse("TX_CREATE_BOOK", err)
+		return nil, s.ErrorResponse("TX_CREATE_BOOK", err)
 	}
 
-	return &response, nil
+	return res, nil
 }

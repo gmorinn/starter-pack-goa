@@ -65,15 +65,6 @@ type CreateBookResponseBody struct {
 	Success *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
-// GetBookIDDoesntExistResponseBody is the type of the "book" service "getBook"
-// endpoint HTTP response body for the "id_doesnt_exist" error.
-type GetBookIDDoesntExistResponseBody struct {
-	// Returning error
-	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ID      *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
 // GetBookUnknownErrorResponseBody is the type of the "book" service "getBook"
 // endpoint HTTP response body for the "unknown_error" error.
 type GetBookUnknownErrorResponseBody struct {
@@ -85,15 +76,6 @@ type GetBookUnknownErrorResponseBody struct {
 // GetBookUnauthorizedResponseBody is the type of the "book" service "getBook"
 // endpoint HTTP response body for the "unauthorized" error.
 type GetBookUnauthorizedResponseBody string
-
-// UpdateBookIDDoesntExistResponseBody is the type of the "book" service
-// "updateBook" endpoint HTTP response body for the "id_doesnt_exist" error.
-type UpdateBookIDDoesntExistResponseBody struct {
-	// Returning error
-	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ID      *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
 
 // UpdateBookUnknownErrorResponseBody is the type of the "book" service
 // "updateBook" endpoint HTTP response body for the "unknown_error" error.
@@ -107,15 +89,6 @@ type UpdateBookUnknownErrorResponseBody struct {
 // "updateBook" endpoint HTTP response body for the "unauthorized" error.
 type UpdateBookUnauthorizedResponseBody string
 
-// GetAllBooksIDDoesntExistResponseBody is the type of the "book" service
-// "getAllBooks" endpoint HTTP response body for the "id_doesnt_exist" error.
-type GetAllBooksIDDoesntExistResponseBody struct {
-	// Returning error
-	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ID      *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
 // GetAllBooksUnknownErrorResponseBody is the type of the "book" service
 // "getAllBooks" endpoint HTTP response body for the "unknown_error" error.
 type GetAllBooksUnknownErrorResponseBody struct {
@@ -128,15 +101,6 @@ type GetAllBooksUnknownErrorResponseBody struct {
 // "getAllBooks" endpoint HTTP response body for the "unauthorized" error.
 type GetAllBooksUnauthorizedResponseBody string
 
-// DeleteBookIDDoesntExistResponseBody is the type of the "book" service
-// "deleteBook" endpoint HTTP response body for the "id_doesnt_exist" error.
-type DeleteBookIDDoesntExistResponseBody struct {
-	// Returning error
-	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ID      *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
 // DeleteBookUnknownErrorResponseBody is the type of the "book" service
 // "deleteBook" endpoint HTTP response body for the "unknown_error" error.
 type DeleteBookUnknownErrorResponseBody struct {
@@ -148,15 +112,6 @@ type DeleteBookUnknownErrorResponseBody struct {
 // DeleteBookUnauthorizedResponseBody is the type of the "book" service
 // "deleteBook" endpoint HTTP response body for the "unauthorized" error.
 type DeleteBookUnauthorizedResponseBody string
-
-// CreateBookIDDoesntExistResponseBody is the type of the "book" service
-// "createBook" endpoint HTTP response body for the "id_doesnt_exist" error.
-type CreateBookIDDoesntExistResponseBody struct {
-	// Returning error
-	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ID      *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
 
 // CreateBookUnknownErrorResponseBody is the type of the "book" service
 // "createBook" endpoint HTTP response body for the "unknown_error" error.
@@ -210,18 +165,6 @@ func NewGetBookResultOK(body *GetBookResponseBody) *book.GetBookResult {
 	return v
 }
 
-// NewGetBookIDDoesntExist builds a book service getBook endpoint
-// id_doesnt_exist error.
-func NewGetBookIDDoesntExist(body *GetBookIDDoesntExistResponseBody) *book.IDDoesntExist {
-	v := &book.IDDoesntExist{
-		Err:     *body.Err,
-		ID:      *body.ID,
-		Success: *body.Success,
-	}
-
-	return v
-}
-
 // NewGetBookUnknownError builds a book service getBook endpoint unknown_error
 // error.
 func NewGetBookUnknownError(body *GetBookUnknownErrorResponseBody) *book.UnknownError {
@@ -249,18 +192,6 @@ func NewUpdateBookResultOK(body *UpdateBookResponseBody) *book.UpdateBookResult 
 		ID:      *body.ID,
 		Name:    *body.Name,
 		Price:   *body.Price,
-		Success: *body.Success,
-	}
-
-	return v
-}
-
-// NewUpdateBookIDDoesntExist builds a book service updateBook endpoint
-// id_doesnt_exist error.
-func NewUpdateBookIDDoesntExist(body *UpdateBookIDDoesntExistResponseBody) *book.IDDoesntExist {
-	v := &book.IDDoesntExist{
-		Err:     *body.Err,
-		ID:      *body.ID,
 		Success: *body.Success,
 	}
 
@@ -301,18 +232,6 @@ func NewGetAllBooksResultOK(body *GetAllBooksResponseBody) *book.GetAllBooksResu
 	return v
 }
 
-// NewGetAllBooksIDDoesntExist builds a book service getAllBooks endpoint
-// id_doesnt_exist error.
-func NewGetAllBooksIDDoesntExist(body *GetAllBooksIDDoesntExistResponseBody) *book.IDDoesntExist {
-	v := &book.IDDoesntExist{
-		Err:     *body.Err,
-		ID:      *body.ID,
-		Success: *body.Success,
-	}
-
-	return v
-}
-
 // NewGetAllBooksUnknownError builds a book service getAllBooks endpoint
 // unknown_error error.
 func NewGetAllBooksUnknownError(body *GetAllBooksUnknownErrorResponseBody) *book.UnknownError {
@@ -337,18 +256,6 @@ func NewGetAllBooksUnauthorized(body GetAllBooksUnauthorizedResponseBody) book.U
 // from a HTTP "OK" response.
 func NewDeleteBookResultOK(body *DeleteBookResponseBody) *book.DeleteBookResult {
 	v := &book.DeleteBookResult{
-		Success: *body.Success,
-	}
-
-	return v
-}
-
-// NewDeleteBookIDDoesntExist builds a book service deleteBook endpoint
-// id_doesnt_exist error.
-func NewDeleteBookIDDoesntExist(body *DeleteBookIDDoesntExistResponseBody) *book.IDDoesntExist {
-	v := &book.IDDoesntExist{
-		Err:     *body.Err,
-		ID:      *body.ID,
 		Success: *body.Success,
 	}
 
@@ -382,18 +289,6 @@ func NewCreateBookResultCreated(body *CreateBookResponseBody) *book.CreateBookRe
 		Success: *body.Success,
 	}
 	v.Book = unmarshalBookResponseResponseBodyToBookBookResponse(body.Book)
-
-	return v
-}
-
-// NewCreateBookIDDoesntExist builds a book service createBook endpoint
-// id_doesnt_exist error.
-func NewCreateBookIDDoesntExist(body *CreateBookIDDoesntExistResponseBody) *book.IDDoesntExist {
-	v := &book.IDDoesntExist{
-		Err:     *body.Err,
-		ID:      *body.ID,
-		Success: *body.Success,
-	}
 
 	return v
 }
@@ -499,21 +394,6 @@ func ValidateCreateBookResponseBody(body *CreateBookResponseBody) (err error) {
 	return
 }
 
-// ValidateGetBookIDDoesntExistResponseBody runs the validations defined on
-// getBook_id_doesnt_exist_response_body
-func ValidateGetBookIDDoesntExistResponseBody(body *GetBookIDDoesntExistResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	return
-}
-
 // ValidateGetBookUnknownErrorResponseBody runs the validations defined on
 // getBook_unknown_error_response_body
 func ValidateGetBookUnknownErrorResponseBody(body *GetBookUnknownErrorResponseBody) (err error) {
@@ -525,21 +405,6 @@ func ValidateGetBookUnknownErrorResponseBody(body *GetBookUnknownErrorResponseBo
 	}
 	if body.ErrorCode == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
-	}
-	return
-}
-
-// ValidateUpdateBookIDDoesntExistResponseBody runs the validations defined on
-// updateBook_id_doesnt_exist_response_body
-func ValidateUpdateBookIDDoesntExistResponseBody(body *UpdateBookIDDoesntExistResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}
 	return
 }
@@ -559,21 +424,6 @@ func ValidateUpdateBookUnknownErrorResponseBody(body *UpdateBookUnknownErrorResp
 	return
 }
 
-// ValidateGetAllBooksIDDoesntExistResponseBody runs the validations defined on
-// getAllBooks_id_doesnt_exist_response_body
-func ValidateGetAllBooksIDDoesntExistResponseBody(body *GetAllBooksIDDoesntExistResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	return
-}
-
 // ValidateGetAllBooksUnknownErrorResponseBody runs the validations defined on
 // getAllBooks_unknown_error_response_body
 func ValidateGetAllBooksUnknownErrorResponseBody(body *GetAllBooksUnknownErrorResponseBody) (err error) {
@@ -589,21 +439,6 @@ func ValidateGetAllBooksUnknownErrorResponseBody(body *GetAllBooksUnknownErrorRe
 	return
 }
 
-// ValidateDeleteBookIDDoesntExistResponseBody runs the validations defined on
-// deleteBook_id_doesnt_exist_response_body
-func ValidateDeleteBookIDDoesntExistResponseBody(body *DeleteBookIDDoesntExistResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	return
-}
-
 // ValidateDeleteBookUnknownErrorResponseBody runs the validations defined on
 // deleteBook_unknown_error_response_body
 func ValidateDeleteBookUnknownErrorResponseBody(body *DeleteBookUnknownErrorResponseBody) (err error) {
@@ -615,21 +450,6 @@ func ValidateDeleteBookUnknownErrorResponseBody(body *DeleteBookUnknownErrorResp
 	}
 	if body.ErrorCode == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
-	}
-	return
-}
-
-// ValidateCreateBookIDDoesntExistResponseBody runs the validations defined on
-// createBook_id_doesnt_exist_response_body
-func ValidateCreateBookIDDoesntExistResponseBody(body *CreateBookIDDoesntExistResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}
 	return
 }

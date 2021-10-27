@@ -10,6 +10,7 @@ package server
 import (
 	oauth "api_crud/gen/o_auth"
 	"context"
+	"io"
 	"net/http"
 
 	goahttp "goa.design/goa/v3/http"
@@ -22,8 +23,8 @@ func EncodeOAuthResponse(encoder func(context.Context, http.ResponseWriter) goah
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res, _ := v.(*oauth.OAuthResponse)
 		enc := encoder(ctx, w)
-		body := NewOAuthFoundResponseBody(res)
-		w.WriteHeader(http.StatusFound)
+		body := NewOAuthCreatedResponseBody(res)
+		w.WriteHeader(http.StatusCreated)
 		return enc.Encode(body)
 	}
 }
@@ -33,27 +34,21 @@ func EncodeOAuthResponse(encoder func(context.Context, http.ResponseWriter) goah
 func DecodeOAuthRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			clientID     string
-			clientSecret string
-			grantType    string
-			err          error
+			body OAuthRequestBody
+			err  error
 		)
-		clientID = r.Header.Get("client_id")
-		if clientID == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("client_id", "header"))
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
 		}
-		clientSecret = r.Header.Get("client_secret")
-		if clientSecret == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("client_secret", "header"))
-		}
-		grantType = r.Header.Get("grant_type")
-		if grantType == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("grant_type", "header"))
-		}
+		err = ValidateOAuthRequestBody(&body)
 		if err != nil {
 			return nil, err
 		}
-		payload := NewOAuthOauthPayload(clientID, clientSecret, grantType)
+		payload := NewOAuthOauthPayload(&body)
 
 		return payload, nil
 	}

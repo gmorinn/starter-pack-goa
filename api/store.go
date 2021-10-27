@@ -2,8 +2,9 @@ package api
 
 import (
 	"api_crud/config"
-	"api_crud/internal/db"
-	sqlc "api_crud/internal/db"
+	db "api_crud/internal"
+	sqlc "api_crud/internal"
+
 	"context"
 	"database/sql"
 	"fmt"

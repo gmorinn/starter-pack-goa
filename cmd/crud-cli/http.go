@@ -1,7 +1,7 @@
 package main
 
 import (
-	cli "api_crud/gen/http/cli/crud"
+	cli "api_crud/gen/http/cli/starter_pack"
 	"net/http"
 	"time"
 

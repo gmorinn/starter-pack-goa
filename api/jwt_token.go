@@ -1,8 +1,9 @@
 package api
 
 import (
+	"api_crud/gen/book"
 	jwttoken "api_crud/gen/jwt_token"
-	"api_crud/internal/db"
+	db "api_crud/internal"
 	"context"
 	"log"
 	"time"
@@ -34,7 +35,7 @@ func (s *jwtTokensrvc) ErrorResponse(msg string, err error) *jwttoken.UnknownErr
 }
 
 var (
-	ErrInvalidToken       error = jwttoken.Unauthorized("invalid token")
+	ErrInvalidToken       error = book.Unauthorized("invalid token")
 	ErrInvalidTokenScopes error = jwttoken.InvalidScopes("invalid scopes in token")
 )
 

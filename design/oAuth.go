@@ -4,9 +4,8 @@ import . "goa.design/goa/v3/dsl"
 
 var OAuth2 = OAuth2Security("OAuth2", func() {
 	Description("Use OAuth2 to authenticate")
-	ImplicitFlow("/authorization", "/refresh")
+	ClientCredentialsFlow("/authorization", "/refresh")
 	Scope("api:read", "Provides read access")
-	Scope("api:write", "Provides write access")
 })
 
 var _ = Service("oAuth", func() {
@@ -28,19 +27,7 @@ var _ = Service("oAuth", func() {
 		Result(oAuthResponse)
 		HTTP(func() {
 			POST("/authorization")
-			Headers(func() {
-				Param("client_id", String, "The client identifier ID", func() {
-					Example("00000")
-				})
-				Param("client_secret", String, "The client identifier secret", func() {
-					Example("99999")
-				})
-				Param("grant_type", String, "The type of grant", func() {
-					Default("client_credentials")
-				})
-				Required("client_id", "client_secret", "grant_type")
-			})
-			Response(StatusFound)
+			Response(StatusCreated)
 			Response(StatusBadRequest)
 		})
 	})
@@ -59,4 +46,5 @@ var oAuthResponse = Type("oAuthResponse", func() {
 	Field(2, "token_type", String)
 	Field(3, "expires_in", Int64)
 	Field(4, "success", Boolean)
+	Required("access_token", "token_type", "expires_in", "success")
 })

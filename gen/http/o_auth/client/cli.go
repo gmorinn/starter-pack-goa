@@ -9,27 +9,26 @@ package client
 
 import (
 	oauth "api_crud/gen/o_auth"
+	"encoding/json"
+	"fmt"
 )
 
 // BuildOAuthPayload builds the payload for the oAuth oAuth endpoint from CLI
 // flags.
-func BuildOAuthPayload(oAuthOAuthClientID string, oAuthOAuthClientSecret string, oAuthOAuthGrantType string) (*oauth.OauthPayload, error) {
-	var clientID string
+func BuildOAuthPayload(oAuthOAuthBody string) (*oauth.OauthPayload, error) {
+	var err error
+	var body OAuthRequestBody
 	{
-		clientID = oAuthOAuthClientID
+		err = json.Unmarshal([]byte(oAuthOAuthBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"client_id\": \"Et sint sunt et quaerat hic distinctio.\",\n      \"client_secret\": \"Error beatae accusantium qui accusantium voluptates et.\",\n      \"grant_type\": \"Nisi molestiae.\"\n   }'")
+		}
 	}
-	var clientSecret string
-	{
-		clientSecret = oAuthOAuthClientSecret
+	v := &oauth.OauthPayload{
+		ClientID:     body.ClientID,
+		ClientSecret: body.ClientSecret,
+		GrantType:    body.GrantType,
 	}
-	var grantType string
-	{
-		grantType = oAuthOAuthGrantType
-	}
-	v := &oauth.OauthPayload{}
-	v.ClientID = clientID
-	v.ClientSecret = clientSecret
-	v.GrantType = grantType
 
 	return v, nil
 }

@@ -10,13 +10,11 @@ var _ = Service("book", func() {
 		Timeout()
 	})
 
-	Error("id_doesnt_exist", idDoesntExist, "When ID doesn't exist")
 	Error("unknown_error", unknownError, "Error not identified (500)")
 	Error("unauthorized", String, "Credentials are invalid")
 
 	HTTP(func() {
 		Path("/web")
-		Response("id_doesnt_exist", StatusInternalServerError)
 		Response("unknown_error", StatusInternalServerError)
 		Response("unauthorized", StatusUnauthorized)
 	})
@@ -24,22 +22,25 @@ var _ = Service("book", func() {
 	Method("getBook", func() {
 		Description("Get one item")
 
-		Security(OAuth2, JWTAuth)
+		Security(OAuth2)
 
 		Payload(func() {
 			Attribute("id", String, func() {
 				Format(FormatUUID)
 				Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
 			})
-			TokenField(1, "jwtToken", String, func() {
-				Description("JWT used for authentication")
+			// TokenField(1, "jwtToken", String, func() {
+			// 	Description("JWT used for authentication")
+			// })
+			AccessTokenField(1, "oauth_token", String, func() {
+				Description("Use to generate Oauth")
 			})
-			AccessTokenField(2, "oauth_token", String)
-			Required("id")
+			Required("id", "oauth_token")
 		})
 
 		HTTP(func() {
 			GET("/book/{id}")
+			Param("oauth_token:oauth") // OAuth token sent in query parameter "oauth"
 			Response(StatusOK)
 		})
 		Result(func() {
@@ -143,16 +144,6 @@ var BookResponse = Type("BookResponse", func() {
 	})
 	Attribute("price", Float64)
 	Required("id", "name", "price")
-})
-
-var idDoesntExist = Type("IdDoesntExist", func() {
-	Description("IdDoesntExist is the error returned when 0 book have the id corresponding")
-	Field(1, "err", String, "Returning error")
-	Field(2, "id", String)
-	Field(3, "success", Boolean, func() {
-		Default(false)
-	})
-	Required("err", "success", "id")
 })
 
 var unknownError = Type("unknownError", func() {

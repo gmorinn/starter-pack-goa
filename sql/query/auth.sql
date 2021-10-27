@@ -20,7 +20,7 @@ VALUES ($1, $2, $3, $4, $5);
 -- name: DeleteRefreshToken :exec
 UPDATE refresh_token
 SET deleted_at = NOW()
-WHERE id = $1;
+WHERE id = sqlc.arg('id');
 
 -- name: DeleteOldRefreshToken :exec
 UPDATE refresh_token
