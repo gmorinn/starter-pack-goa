@@ -1,4 +1,4 @@
-# GOA X GM
+# GOA X GM 🔥
 
 ### What is that ?
 A starter-pack to make its APIs in golang.
