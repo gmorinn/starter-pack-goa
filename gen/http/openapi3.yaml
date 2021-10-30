@@ -27,9 +27,9 @@ paths:
             schema:
               $ref: '#/components/schemas/OAuthRequestBody'
             example:
-              client_id: Voluptatem nihil ut quasi sed.
-              client_secret: Molestiae perferendis sit ut sit tempore.
-              grant_type: Molestiae temporibus ipsa aut impedit sequi.
+              client_id: Voluptate recusandae voluptas id quis consequatur quasi.
+              client_secret: Nihil sint consequatur.
+              grant_type: Laborum qui animi eum ea.
       responses:
         "201":
           description: Created response.
@@ -38,10 +38,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/OAuthResponse'
               example:
-                access_token: Sint dignissimos blanditiis.
-                expires_in: 2420678651817637711
-                success: true
-                token_type: Possimus reprehenderit totam nihil dolorum ea voluptas.
+                access_token: Quis assumenda et.
+                expires_in: 1053126883836734893
+                success: false
+                token_type: Nemo rerum vitae explicabo ullam.
         "400":
           description: Bad Request response.
           content:
@@ -49,24 +49,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/OAuthResponse'
               example:
-                access_token: Provident soluta molestiae illum.
-                expires_in: 5631362996882830786
-                success: false
-                token_type: Adipisci nulla.
+                access_token: Et nisi molestiae quasi et voluptas.
+                expires_in: 5889087040893018775
+                success: true
+                token_type: Tempore suscipit iusto.
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Ea ut mollitia tenetur et aliquam qui.
+              example: Labore error beatae accusantium qui accusantium voluptates.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Quod fugit et.
+              example: Quaerat hic.
         "500":
           description: Internal Server Error response.
           content:
@@ -74,9 +74,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                err: Necessitatibus nisi voluptatum.
-                error_code: Accusantium repudiandae possimus autem.
-                success: true
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
+                success: false
   /openapi.json:
     get:
       tags:
@@ -115,7 +115,7 @@ paths:
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-                success: true
+                success: false
         "400":
           description: Bad Request response.
           content:
@@ -123,22 +123,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Vel distinctio fuga eum.
-                success: true
+                message: Praesentium consequatur voluptas quasi laborum.
+                success: false
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Voluptas neque possimus.
+              example: Voluptate iure ut dolor ex omnis esse.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Aperiam laboriosam eligendi animi delectus asperiores.
+              example: Nihil impedit hic aut beatae minima nam.
         "500":
           description: Internal Server Error response.
           content:
@@ -146,8 +146,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                err: Ea totam.
-                error_code: Doloribus animi nihil assumenda qui.
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
                 success: true
   /signin:
     post:
@@ -164,7 +164,7 @@ paths:
               $ref: '#/components/schemas/SigninRequestBody'
             example:
               email: guillaume@epitech.eu
-              password: lqg
+              password: 8z9
       responses:
         "200":
           description: OK response.
@@ -175,7 +175,7 @@ paths:
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-                success: false
+                success: true
         "400":
           description: Bad Request response.
           content:
@@ -183,22 +183,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Hic aut beatae minima nam quis voluptate.
-                success: true
+                message: Delectus et est atque ipsam.
+                success: false
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Voluptatem adipisci culpa tenetur dignissimos.
+              example: Perferendis vel et.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Quo earum illo omnis.
+              example: Quaerat nemo neque voluptatibus quibusdam.
         "500":
           description: Internal Server Error response.
           content:
@@ -206,8 +206,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                err: Dolor ex.
-                error_code: Esse modi illum.
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
                 success: false
   /signup:
     post:
@@ -226,7 +226,7 @@ paths:
               email: guillaume@epitech.eu
               firstname: Guillaume
               lastname: Morin
-              password: 29z
+              password: xa4
       responses:
         "200":
           description: OK response.
@@ -245,22 +245,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Laudantium recusandae blanditiis.
-                success: true
+                message: Sunt id dolor delectus qui ducimus excepturi.
+                success: false
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Sint praesentium consequatur voluptas quasi.
+              example: Eveniet culpa ut qui commodi quibusdam.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Repellendus quaerat nemo neque voluptatibus quibusdam.
+              example: Ut consectetur.
         "500":
           description: Internal Server Error response.
           content:
@@ -268,8 +268,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                err: Culpa ut qui commodi quibusdam et.
-                error_code: Voluptas accusantium ut alias delectus.
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
                 success: false
   /web/book/{id}:
     get:
@@ -308,17 +308,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetBookResponseBody'
               example:
-                id: Dolor expedita quidem.
-                name: Officia accusantium illum architecto est.
-                price: 0.14001076458818595
-                success: false
+                id: Culpa tenetur dignissimos distinctio enim.
+                name: Distinctio fuga eum quia dicta ea.
+                price: 0.7031491747984722
+                success: true
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Rerum nisi.
+              example: Nihil assumenda qui maxime.
         "500":
           description: Internal Server Error response.
           content:
@@ -326,8 +326,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                err: Quia voluptatum voluptatem accusamus amet.
-                error_code: Aut odit aliquam aut perspiciatis amet commodi.
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
                 success: false
       security:
       - OAuth2_header_Authorization:
@@ -378,9 +378,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetBookResponseBody'
               example:
-                id: Dolores dicta ut.
-                name: Qui laboriosam laborum.
-                price: 0.179776689016404
+                id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                name: Père riche père pauvre
+                price: 14.5
                 success: true
         "401":
           description: Unauthorized response.
@@ -388,7 +388,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Qui animi eum ea.
+              example: Aperiam non esse vero autem a.
         "500":
           description: Internal Server Error response.
           content:
@@ -396,9 +396,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                err: Voluptate recusandae voluptas id quis consequatur quasi.
-                error_code: Nihil sint consequatur.
-                success: true
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -432,7 +432,7 @@ paths:
               $ref: '#/components/schemas/UpdateBookRequestBody'
             example:
               name: Guillaume
-              price: 0.4300793593351865
+              price: 0.8758777617583704
       responses:
         "201":
           description: Created response.
@@ -452,7 +452,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Est quos voluptas vitae.
+              example: Harum qui laboriosam laborum rerum excepturi.
         "500":
           description: Internal Server Error response.
           content:
@@ -460,9 +460,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                err: Voluptas est.
-                error_code: Magnam quis ullam minima.
-                success: false
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
+                success: true
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -504,14 +504,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeleteBookResponseBody'
               example:
-                success: true
+                success: false
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Reprehenderit facere aliquam.
+              example: Rerum nisi.
         "500":
           description: Internal Server Error response.
           content:
@@ -519,8 +519,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                err: Porro eveniet.
-                error_code: Velit consequuntur eum ut corrupti.
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
                 success: false
       security:
       - OAuth2_header_Authorization:
@@ -565,6 +565,9 @@ paths:
                 - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   name: Guillaume
                   price: 69
+                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 69
                 success: false
         "401":
           description: Unauthorized response.
@@ -572,7 +575,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Et nisi molestiae quasi et voluptas.
+              example: Architecto est commodi nihil praesentium quia voluptatum.
         "500":
           description: Internal Server Error response.
           content:
@@ -580,9 +583,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UnknownError'
               example:
-                err: Et quaerat hic distinctio labore error.
-                error_code: Accusantium qui accusantium.
-                success: false
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
+                success: true
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -635,9 +638,9 @@ components:
       properties:
         success:
           type: boolean
-          example: true
+          example: false
       example:
-        success: false
+        success: true
       required:
       - success
     EmailAlreadyExist:
@@ -645,14 +648,14 @@ components:
       properties:
         message:
           type: string
-          example: Sed voluptatem eos sequi vitae vitae.
+          example: Repellendus ut delectus distinctio.
         success:
           type: boolean
           default: false
-          example: true
+          example: false
       description: When email already exist
       example:
-        message: Dolorem nisi laborum sit nam.
+        message: Perferendis voluptate dignissimos aut rerum.
         success: false
       required:
       - message
@@ -677,7 +680,7 @@ components:
             price: 69
         success:
           type: boolean
-          example: true
+          example: false
       example:
         books:
         - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
@@ -698,22 +701,22 @@ components:
       properties:
         id:
           type: string
-          example: Soluta ipsa amet expedita dolorem qui inventore.
+          example: Eos praesentium dolores.
         name:
           type: string
-          example: Blanditiis deserunt.
+          example: Sed officiis tempore.
         price:
           type: number
-          example: 0.963899863297309
+          example: 0.7828627525691364
           format: double
         success:
           type: boolean
           example: true
       example:
-        id: Qui blanditiis alias natus dolores modi libero.
-        name: Ullam quia recusandae illum.
-        price: 0.34854181048385346
-        success: false
+        id: Accusantium consequatur eos repellat.
+        name: Fugit porro repellendus et magnam.
+        price: 0.7588428615922893
+        success: true
       required:
       - id
       - name
@@ -722,23 +725,23 @@ components:
     InvalidScopes:
       type: string
       description: Token scopes are invalid
-      example: Sint qui natus placeat nesciunt quidem.
+      example: Suscipit dolorum ad dolores aperiam consequatur.
     OAuthRequestBody:
       type: object
       properties:
         client_id:
           type: string
-          example: Eaque dolores ducimus quod aut.
+          example: Non tempore molestiae quia.
         client_secret:
           type: string
-          example: Dolore eveniet quibusdam.
+          example: Alias et et quibusdam distinctio sit.
         grant_type:
           type: string
-          example: Optio sint necessitatibus velit laudantium.
+          example: Perferendis eos.
       example:
-        client_id: Corrupti facere.
-        client_secret: Est molestias voluptas laborum iure hic.
-        grant_type: Doloremque delectus ipsam dolore beatae sed.
+        client_id: Libero ea culpa totam quisquam optio.
+        client_secret: Cupiditate officiis minima nemo et dolore blanditiis.
+        grant_type: Laudantium laboriosam culpa facilis corporis incidunt ipsa.
       required:
       - client_id
       - client_secret
@@ -748,22 +751,22 @@ components:
       properties:
         access_token:
           type: string
-          example: Dolor sit mollitia sequi officia ut.
+          example: Et nam nisi omnis ipsam nobis corporis.
         expires_in:
           type: integer
-          example: 8199019230444058317
+          example: 213457079657847711
           format: int64
         success:
           type: boolean
           example: true
         token_type:
           type: string
-          example: Error excepturi ut quae perferendis velit neque.
+          example: Consequatur autem dicta veritatis.
       example:
-        access_token: Qui id.
-        expires_in: 1426058027567817427
+        access_token: Unde occaecati ipsum quo est.
+        expires_in: 88363126347298003
         success: false
-        token_type: Quia praesentium omnis nobis eos.
+        token_type: Quibusdam reprehenderit.
       required:
       - access_token
       - token_type
@@ -794,7 +797,7 @@ components:
       example:
         access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-        success: false
+        success: true
       required:
       - access_token
       - refresh_token
@@ -808,11 +811,11 @@ components:
           format: email
         password:
           type: string
-          example: 4m4
+          example: c14
           minLength: 8
       example:
         email: guillaume@epitech.eu
-        password: e2i
+        password: 0n6
       required:
       - password
       - email
@@ -834,14 +837,14 @@ components:
           minLength: 3
         password:
           type: string
-          example: vfl
+          example: 2a6
           minLength: 8
       description: Use client ID and client secret to oAuth
       example:
         email: guillaume@epitech.eu
         firstname: Guillaume
         lastname: Morin
-        password: efy
+        password: 79w
       required:
       - firstname
       - lastname
@@ -852,19 +855,19 @@ components:
       properties:
         err:
           type: string
-          example: A porro rerum.
+          example: sql no rows affected
         error_code:
           type: string
-          example: Sit rem.
+          example: TX_UPDATE_ITEM
         success:
           type: boolean
           default: false
           example: true
       description: Error not identified (500)
       example:
-        err: Consequatur et.
-        error_code: Dolorum incidunt quia dolor.
-        success: true
+        err: sql no rows affected
+        error_code: TX_UPDATE_ITEM
+        success: false
       required:
       - err
       - success
