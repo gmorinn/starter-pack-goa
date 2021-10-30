@@ -6,15 +6,16 @@ We'll use Goa, it's a framework for building micro-services and APIs in Go using
 
 ### Why I use GOA DESIGN ?
 
-# Reason n°1: Postman updated every time the design file is modified
+### Reason n°1: Postman updated every time the design file is modified
 Just do:
 ```sh
 make api-goa
 ```
 File: openapi.json
-**And you will have a new postman with all the expected requests, payloads and authentication system**
+---------------------
+**You will have a new postman with all the expected requests, payloads and authentication system**
 
-# Reason n°2: Automatically updated online documentation without writing a single line of HTML, CSS and Javascript
+### Reason n°2: Automatically updated online documentation without writing a single line of HTML, CSS and Javascript
 Documentation is based on generated postman file
 Just do:
 ```sh
@@ -24,18 +25,18 @@ make api-doc
 - All possible requests
 ![](documentation/doc.png)
 
-# --------------------------
+--------------------------
 
 - All expected payloads for each request with examples
 ![](documentation/parameters.png)
 
 
-# --------------------------
+--------------------------
 
 - All responses to each request
 ![](documentation/response.png)
 
-# --------------------------
+--------------------------
 
 - All expected structures with their types (int, float, string, boolean)
 ![](documentation/struct.png)
