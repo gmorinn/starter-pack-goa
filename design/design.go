@@ -33,14 +33,14 @@ var _ = API("Project Name", func() {
 	})
 
 	Contact(func() {
-		Name("Thomas LEMAITRE")
-		Email("support@squirrel.fr")
-		URL("https://www.squirrel.fr/")
+		Name("Guillaume MORIN")
+		Email("guillaume.morin@epitech.eu")
+		URL("https://guillaume-morin.fr/")
 	})
 
 	License(func() {
 		Name("SQUIRREL X GM")
-		URL("https://www.squirrel.fr/")
+		URL("https://guillaume-morin.fr/")
 	})
 
 })

@@ -13,6 +13,7 @@ api-goa:
 	@echo -e "\n\t🔥GOA GM X SQUIRREL🔥\n\n\tLoading...⌛\n"
 	@goa gen $(DIR)/design
 	@cp -f gen/http/openapi.json ./documentation
+	@mv gen/http/openapi.json ./
 	@echo -e "\nEnjoy🐿️\n=> Documentation make api-doc"
 
 api-doc:

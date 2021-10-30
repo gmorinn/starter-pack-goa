@@ -62,7 +62,7 @@ type Server struct {
 
 func NewServer() *Server {
 	cnf := config.New()
-	source := fmt.Sprintf("user=%s password=%s host=%s port=%v dbname=%s sslmode=disable", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database)
+	source := fmt.Sprintf("user=%s password=%s host=%s port=%v dbname=%s sslmode=disable TimeZone=%s", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database, cnf.TZ)
 	pg, err := sql.Open("postgres", source)
 	if err != nil {
 		log.Fatal(err)

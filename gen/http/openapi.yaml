@@ -3,12 +3,12 @@ info:
   title: Starter Pack
   description: Best API REST building with GoaDesign
   contact:
-    name: Thomas LEMAITRE
-    email: support@squirrel.fr
-    url: https://www.squirrel.fr/
+    name: Guillaume MORIN
+    email: guillaume.morin@epitech.eu
+    url: https://guillaume-morin.fr/
   license:
     name: SQUIRREL X GM
-    url: https://www.squirrel.fr/
+    url: https://guillaume-morin.fr/
   version: "1.0"
 host: localhost:8088
 consumes:
