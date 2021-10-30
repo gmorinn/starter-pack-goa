@@ -54,7 +54,6 @@ var _ = Service("book", func() {
 			Attribute("success", Boolean)
 			Required("id", "name", "price", "success")
 		})
-
 	})
 
 	Method("updateBook", func() {
