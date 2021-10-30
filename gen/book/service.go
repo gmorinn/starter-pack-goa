@@ -21,7 +21,7 @@ type Service interface {
 	// Update one item
 	UpdateBook(context.Context, *UpdateBookPayload) (res *UpdateBookResult, err error)
 	// Get All items
-	GetAllBooks(context.Context, *GetAllBooksPayload) (res *GetAllBooksResult, err error)
+	GetAllBooks(context.Context) (res *GetAllBooksResult, err error)
 	// Delete one item by ID
 	DeleteBook(context.Context, *DeleteBookPayload) (res *DeleteBookResult, err error)
 	// Create one item
@@ -81,15 +81,6 @@ type UpdateBookResult struct {
 	Name    string
 	Price   float64
 	Success bool
-}
-
-// GetAllBooksPayload is the payload type of the book service getAllBooks
-// method.
-type GetAllBooksPayload struct {
-	// JWT used for authentication after Signin/Signup
-	JWTToken string
-	// Use to generate Oauth with /authorization
-	Oauth string
 }
 
 // GetAllBooksResult is the result type of the book service getAllBooks method.

@@ -54,9 +54,9 @@ func (c *Client) UpdateBook(ctx context.Context, p *UpdateBookPayload) (res *Upd
 }
 
 // GetAllBooks calls the "getAllBooks" endpoint of the "book" service.
-func (c *Client) GetAllBooks(ctx context.Context, p *GetAllBooksPayload) (res *GetAllBooksResult, err error) {
+func (c *Client) GetAllBooks(ctx context.Context) (res *GetAllBooksResult, err error) {
 	var ires interface{}
-	ires, err = c.GetAllBooksEndpoint(ctx, p)
+	ires, err = c.GetAllBooksEndpoint(ctx, nil)
 	if err != nil {
 		return
 	}

@@ -228,7 +228,6 @@ func NewGetAllBooksHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
-		decodeRequest  = DecodeGetAllBooksRequest(mux, decoder)
 		encodeResponse = EncodeGetAllBooksResponse(encoder)
 		encodeError    = EncodeGetAllBooksError(encoder, formatter)
 	)
@@ -236,14 +235,8 @@ func NewGetAllBooksHandler(
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "getAllBooks")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "book")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
+		var err error
+		res, err := endpoint(ctx, nil)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {
 				errhandler(ctx, w, err)

@@ -9,7 +9,7 @@ import (
 )
 
 // API describes the global properties of the API server.
-var _ = API("basic", func() {
+var _ = API("Project Name", func() {
 
 	// Get .env
 	cnf := config.New()
@@ -26,7 +26,7 @@ var _ = API("basic", func() {
 		cors.Credentials()
 	})
 
-	Server("starter-pack", func() {
+	Server("api", func() {
 		Host(cnf.Domain, func() {
 			URI(cnf.Host)
 		})

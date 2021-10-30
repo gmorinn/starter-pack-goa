@@ -126,15 +126,10 @@ func (c *Client) UpdateBook() goa.Endpoint {
 // getAllBooks server.
 func (c *Client) GetAllBooks() goa.Endpoint {
 	var (
-		encodeRequest  = EncodeGetAllBooksRequest(c.encoder)
 		decodeResponse = DecodeGetAllBooksResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
 		req, err := c.BuildGetAllBooksRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
 		if err != nil {
 			return nil, err
 		}

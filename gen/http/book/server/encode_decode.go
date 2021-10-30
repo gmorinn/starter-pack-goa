@@ -233,42 +233,6 @@ func EncodeGetAllBooksResponse(encoder func(context.Context, http.ResponseWriter
 	}
 }
 
-// DecodeGetAllBooksRequest returns a decoder for requests sent to the book
-// getAllBooks endpoint.
-func DecodeGetAllBooksRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
-	return func(r *http.Request) (interface{}, error) {
-		var (
-			oauth    string
-			jwtToken string
-			err      error
-		)
-		oauth = r.Header.Get("Authorization")
-		if oauth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
-		}
-		jwtToken = r.Header.Get("jwtToken")
-		if jwtToken == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("jwtToken", "header"))
-		}
-		if err != nil {
-			return nil, err
-		}
-		payload := NewGetAllBooksPayload(oauth, jwtToken)
-		if strings.Contains(payload.Oauth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Oauth, " ", 2)[1]
-			payload.Oauth = cred
-		}
-		if strings.Contains(payload.JWTToken, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.JWTToken, " ", 2)[1]
-			payload.JWTToken = cred
-		}
-
-		return payload, nil
-	}
-}
-
 // EncodeGetAllBooksError returns an encoder for errors returned by the
 // getAllBooks book endpoint.
 func EncodeGetAllBooksError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {

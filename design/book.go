@@ -110,24 +110,11 @@ var _ = Service("book", func() {
 
 	Method("getAllBooks", func() {
 		Description("Get All items")
-		Security(OAuth2, JWTAuth)
 		Payload(func() {
-			TokenField(1, "jwtToken", String, func() {
-				Description("JWT used for authentication after Signin/Signup")
-			})
-			AccessTokenField(2, "oauth", String, func() {
-				Description("Use to generate Oauth with /authorization")
-			})
 			Required("oauth", "jwtToken")
 		})
 		HTTP(func() {
 			GET("/books")
-			Header("oauth:Authorization", String, "OAuth token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
-			Header("jwtToken:jwtToken", String, "Jwt token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
 			Response(StatusOK)
 		})
 		Result(func() {

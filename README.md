@@ -16,8 +16,9 @@ File: openapi.json
 ---------------------
 You will have a new postman with all the expected requests, payloads and authentication system
 
-### Reason n°2: Automatically updated online documentation without writing a single line of HTML, CSS and Javascript
+### Reason n°2: Documentation automatically updated without writing a single line of HTML, CSS, and JavaScript
 Documentation is based on generated postman file
+
 Just do:
 ```sh
 make api-doc
@@ -109,15 +110,31 @@ It is from this GOA DSL that all the code will be generated.
 
 **For example:**
 
-We understand very clearly that this query:
+We understand very clearly that this request:
 
 => Create an item
 
-=> Attend Name, price, jwtToken, oauth as payload
+=> Attend name, price, jwtToken and oauth as payload
 
 => The route is /book/add
 
 => The response will return id, name, price and a success
 
+### Reason n°4: You can run your requests from the command line
+If you don't like Postman, no problem⛔
+Goa automatically generates the code to be able to test all your requests on your terminal
 
+Just do:
+```sh
+cd cmd/api-cli && go build -o cmd
+```
 
+![](documentation/cli.png)
+
+--------------------------
+
+**To start the server, do:**
+
+```sh
+make api-dev
+```

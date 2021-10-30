@@ -30,7 +30,7 @@ func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		GetBook:     NewGetBookEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		UpdateBook:  NewUpdateBookEndpoint(s, a.OAuth2Auth, a.JWTAuth),
-		GetAllBooks: NewGetAllBooksEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		GetAllBooks: NewGetAllBooksEndpoint(s),
 		DeleteBook:  NewDeleteBookEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		CreateBook:  NewCreateBookEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 	}
@@ -115,35 +115,9 @@ func NewUpdateBookEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, auth
 
 // NewGetAllBooksEndpoint returns an endpoint function that calls the method
 // "getAllBooks" of service "book".
-func NewGetAllBooksEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+func NewGetAllBooksEndpoint(s Service) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*GetAllBooksPayload)
-		var err error
-		sc := security.OAuth2Scheme{
-			Name:           "OAuth2",
-			Scopes:         []string{"api:read"},
-			RequiredScopes: []string{},
-			Flows: []*security.OAuthFlow{
-				&security.OAuthFlow{
-					Type:       "client_credentials",
-					TokenURL:   "/authorization",
-					RefreshURL: "/refresh",
-				},
-			},
-		}
-		ctx, err = authOAuth2Fn(ctx, p.Oauth, &sc)
-		if err == nil {
-			sc := security.JWTScheme{
-				Name:           "jwt",
-				Scopes:         []string{"api:read", "api:write"},
-				RequiredScopes: []string{},
-			}
-			ctx, err = authJWTFn(ctx, p.JWTToken, &sc)
-		}
-		if err != nil {
-			return nil, err
-		}
-		return s.GetAllBooks(ctx, p)
+		return s.GetAllBooks(ctx)
 	}
 }
 

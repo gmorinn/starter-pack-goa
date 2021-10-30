@@ -272,30 +272,6 @@ func (c *Client) BuildGetAllBooksRequest(ctx context.Context, v interface{}) (*h
 	return req, nil
 }
 
-// EncodeGetAllBooksRequest returns an encoder for requests sent to the book
-// getAllBooks server.
-func EncodeGetAllBooksRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
-	return func(req *http.Request, v interface{}) error {
-		p, ok := v.(*book.GetAllBooksPayload)
-		if !ok {
-			return goahttp.ErrInvalidType("book", "getAllBooks", "*book.GetAllBooksPayload", v)
-		}
-		{
-			head := p.Oauth
-			if !strings.Contains(head, " ") {
-				req.Header.Set("Authorization", "Bearer "+head)
-			} else {
-				req.Header.Set("Authorization", head)
-			}
-		}
-		{
-			head := p.JWTToken
-			req.Header.Set("jwtToken", head)
-		}
-		return nil
-	}
-}
-
 // DecodeGetAllBooksResponse returns a decoder for responses returned by the
 // book getAllBooks endpoint. restoreBody controls whether the response body
 // should be restored after having been read.

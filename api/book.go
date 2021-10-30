@@ -85,7 +85,7 @@ func (s *booksrvc) UpdateBook(ctx context.Context, p *book.UpdateBookPayload) (r
 }
 
 // Read All items
-func (s *booksrvc) GetAllBooks(ctx context.Context, p *book.GetAllBooksPayload) (res *book.GetAllBooksResult, err error) {
+func (s *booksrvc) GetAllBooks(ctx context.Context) (res *book.GetAllBooksResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		books, err := s.server.Store.GetBooks(ctx)
 		if err != nil {

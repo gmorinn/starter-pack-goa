@@ -310,15 +310,6 @@ func NewUpdateBookPayload(body *UpdateBookRequestBody, id string, oauth string, 
 	return v
 }
 
-// NewGetAllBooksPayload builds a book service getAllBooks endpoint payload.
-func NewGetAllBooksPayload(oauth string, jwtToken string) *book.GetAllBooksPayload {
-	v := &book.GetAllBooksPayload{}
-	v.Oauth = oauth
-	v.JWTToken = jwtToken
-
-	return v
-}
-
 // NewDeleteBookPayload builds a book service deleteBook endpoint payload.
 func NewDeleteBookPayload(id string, oauth string, jwtToken string) *book.DeleteBookPayload {
 	v := &book.DeleteBookPayload{}
