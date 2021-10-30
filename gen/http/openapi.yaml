@@ -73,7 +73,7 @@ paths:
             - success
             - error_code
       schemes:
-      - http
+      - https
   /openapi.json:
     get:
       tags:
@@ -90,7 +90,7 @@ paths:
           schema:
             type: file
       schemes:
-      - http
+      - https
   /resfresh:
     post:
       tags:
@@ -139,7 +139,7 @@ paths:
             - success
             - error_code
       schemes:
-      - http
+      - https
   /signin:
     post:
       tags:
@@ -189,7 +189,7 @@ paths:
             - success
             - error_code
       schemes:
-      - http
+      - https
   /signup:
     post:
       tags:
@@ -241,7 +241,7 @@ paths:
             - success
             - error_code
       schemes:
-      - http
+      - https
   /web/book/{id}:
     get:
       tags:
@@ -291,7 +291,7 @@ paths:
             - success
             - error_code
       schemes:
-      - http
+      - https
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
@@ -350,7 +350,7 @@ paths:
             - success
             - error_code
       schemes:
-      - http
+      - https
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
@@ -403,7 +403,7 @@ paths:
             - success
             - error_code
       schemes:
-      - http
+      - https
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
@@ -452,7 +452,7 @@ paths:
             - success
             - error_code
       schemes:
-      - http
+      - https
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
@@ -484,7 +484,7 @@ paths:
             - success
             - error_code
       schemes:
-      - http
+      - https
 definitions:
   BookCreateBookRequestBody:
     title: BookCreateBookRequestBody

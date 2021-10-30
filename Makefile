@@ -18,7 +18,7 @@ api-goa:
 api-doc:
 	@cd documentation && live-server
 
-api-ini:
+api-init:
 	@echo -e "\n\t🔑\n"
 	@go run $(GOROOT)/src/crypto/tls/generate_cert.go --host localhost
 
@@ -35,4 +35,4 @@ api-dev:
 	@echo "\n\t💣\n"
 	docker-compose -p $(DIR) up --build --force-recreate --remove-orphans
 
-.PHONY: api-ini api-gen show-schema api-dev backup-db
+.PHONY: api-init api-gen api-doc api-goa show-schema api-dev backup-db
