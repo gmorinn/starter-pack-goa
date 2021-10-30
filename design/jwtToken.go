@@ -25,7 +25,7 @@ var _ = Service("jwtToken", func() {
 	})
 
 	Method("signup", func() {
-		Description("signup")
+		Description("signup to generate jwt token")
 
 		Payload(func() {
 			Description("Use client ID and client secret to oAuth")
@@ -40,7 +40,6 @@ var _ = Service("jwtToken", func() {
 			})
 			Attribute("password", String, func() {
 				MinLength(8)
-
 			})
 			Attribute("email", String, func() {
 				Format(FormatEmail)

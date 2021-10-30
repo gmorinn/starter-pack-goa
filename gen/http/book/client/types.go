@@ -23,7 +23,9 @@ type UpdateBookRequestBody struct {
 // CreateBookRequestBody is the type of the "book" service "createBook"
 // endpoint HTTP request body.
 type CreateBookRequestBody struct {
-	Name  string  `form:"name" json:"name" xml:"name"`
+	// Name of the book
+	Name string `form:"name" json:"name" xml:"name"`
+	// Price of the book
 	Price float64 `form:"price" json:"price" xml:"price"`
 }
 
@@ -48,6 +50,7 @@ type UpdateBookResponseBody struct {
 // GetAllBooksResponseBody is the type of the "book" service "getAllBooks"
 // endpoint HTTP response body.
 type GetAllBooksResponseBody struct {
+	// Result is an array of object
 	Books   []*BookResponseResponseBody `form:"books,omitempty" json:"books,omitempty" xml:"books,omitempty"`
 	Success *bool                       `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
@@ -61,6 +64,7 @@ type DeleteBookResponseBody struct {
 // CreateBookResponseBody is the type of the "book" service "createBook"
 // endpoint HTTP response body.
 type CreateBookResponseBody struct {
+	// Result is an object
 	Book    *BookResponseResponseBody `form:"book,omitempty" json:"book,omitempty" xml:"book,omitempty"`
 	Success *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }

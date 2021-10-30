@@ -28,11 +28,11 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		GetBook:     NewGetBookEndpoint(s, a.OAuth2Auth),
-		UpdateBook:  NewUpdateBookEndpoint(s),
-		GetAllBooks: NewGetAllBooksEndpoint(s),
-		DeleteBook:  NewDeleteBookEndpoint(s),
-		CreateBook:  NewCreateBookEndpoint(s),
+		GetBook:     NewGetBookEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		UpdateBook:  NewUpdateBookEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		GetAllBooks: NewGetAllBooksEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		DeleteBook:  NewDeleteBookEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		CreateBook:  NewCreateBookEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 	}
 }
 
@@ -47,7 +47,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 
 // NewGetBookEndpoint returns an endpoint function that calls the method
 // "getBook" of service "book".
-func NewGetBookEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
+func NewGetBookEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*GetBookPayload)
 		var err error
@@ -63,7 +63,15 @@ func NewGetBookEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.End
 				},
 			},
 		}
-		ctx, err = authOAuth2Fn(ctx, p.OauthToken, &sc)
+		ctx, err = authOAuth2Fn(ctx, p.Oauth, &sc)
+		if err == nil {
+			sc := security.JWTScheme{
+				Name:           "jwt",
+				Scopes:         []string{"api:read", "api:write"},
+				RequiredScopes: []string{},
+			}
+			ctx, err = authJWTFn(ctx, p.JWTToken, &sc)
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -73,35 +81,136 @@ func NewGetBookEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.End
 
 // NewUpdateBookEndpoint returns an endpoint function that calls the method
 // "updateBook" of service "book".
-func NewUpdateBookEndpoint(s Service) goa.Endpoint {
+func NewUpdateBookEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*UpdateBookPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "OAuth2",
+			Scopes:         []string{"api:read"},
+			RequiredScopes: []string{},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:       "client_credentials",
+					TokenURL:   "/authorization",
+					RefreshURL: "/refresh",
+				},
+			},
+		}
+		ctx, err = authOAuth2Fn(ctx, p.Oauth, &sc)
+		if err == nil {
+			sc := security.JWTScheme{
+				Name:           "jwt",
+				Scopes:         []string{"api:read", "api:write"},
+				RequiredScopes: []string{},
+			}
+			ctx, err = authJWTFn(ctx, p.JWTToken, &sc)
+		}
+		if err != nil {
+			return nil, err
+		}
 		return s.UpdateBook(ctx, p)
 	}
 }
 
 // NewGetAllBooksEndpoint returns an endpoint function that calls the method
 // "getAllBooks" of service "book".
-func NewGetAllBooksEndpoint(s Service) goa.Endpoint {
+func NewGetAllBooksEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		return s.GetAllBooks(ctx)
+		p := req.(*GetAllBooksPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "OAuth2",
+			Scopes:         []string{"api:read"},
+			RequiredScopes: []string{},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:       "client_credentials",
+					TokenURL:   "/authorization",
+					RefreshURL: "/refresh",
+				},
+			},
+		}
+		ctx, err = authOAuth2Fn(ctx, p.Oauth, &sc)
+		if err == nil {
+			sc := security.JWTScheme{
+				Name:           "jwt",
+				Scopes:         []string{"api:read", "api:write"},
+				RequiredScopes: []string{},
+			}
+			ctx, err = authJWTFn(ctx, p.JWTToken, &sc)
+		}
+		if err != nil {
+			return nil, err
+		}
+		return s.GetAllBooks(ctx, p)
 	}
 }
 
 // NewDeleteBookEndpoint returns an endpoint function that calls the method
 // "deleteBook" of service "book".
-func NewDeleteBookEndpoint(s Service) goa.Endpoint {
+func NewDeleteBookEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*DeleteBookPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "OAuth2",
+			Scopes:         []string{"api:read"},
+			RequiredScopes: []string{},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:       "client_credentials",
+					TokenURL:   "/authorization",
+					RefreshURL: "/refresh",
+				},
+			},
+		}
+		ctx, err = authOAuth2Fn(ctx, p.Oauth, &sc)
+		if err == nil {
+			sc := security.JWTScheme{
+				Name:           "jwt",
+				Scopes:         []string{"api:read", "api:write"},
+				RequiredScopes: []string{},
+			}
+			ctx, err = authJWTFn(ctx, p.JWTToken, &sc)
+		}
+		if err != nil {
+			return nil, err
+		}
 		return s.DeleteBook(ctx, p)
 	}
 }
 
 // NewCreateBookEndpoint returns an endpoint function that calls the method
 // "createBook" of service "book".
-func NewCreateBookEndpoint(s Service) goa.Endpoint {
+func NewCreateBookEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*CreateBookPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "OAuth2",
+			Scopes:         []string{"api:read"},
+			RequiredScopes: []string{},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:       "client_credentials",
+					TokenURL:   "/authorization",
+					RefreshURL: "/refresh",
+				},
+			},
+		}
+		ctx, err = authOAuth2Fn(ctx, p.Oauth, &sc)
+		if err == nil {
+			sc := security.JWTScheme{
+				Name:           "jwt",
+				Scopes:         []string{"api:read", "api:write"},
+				RequiredScopes: []string{},
+			}
+			ctx, err = authJWTFn(ctx, p.JWTToken, &sc)
+		}
+		if err != nil {
+			return nil, err
+		}
 		return s.CreateBook(ctx, p)
 	}
 }

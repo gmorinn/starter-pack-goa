@@ -12,6 +12,7 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"strings"
 
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -34,23 +35,38 @@ func EncodeGetBookResponse(encoder func(context.Context, http.ResponseWriter) go
 func DecodeGetBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id         string
-			oauthToken string
-			err        error
+			id       string
+			oauth    string
+			jwtToken string
+			err      error
 
 			params = mux.Vars(r)
 		)
 		id = params["id"]
 		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
 
-		oauthToken = r.URL.Query().Get("oauth")
-		if oauthToken == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("oauth", "query string"))
+		oauth = r.Header.Get("Authorization")
+		if oauth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		jwtToken = r.Header.Get("jwtToken")
+		if jwtToken == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("jwtToken", "header"))
 		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetBookPayload(id, oauthToken)
+		payload := NewGetBookPayload(id, oauth, jwtToken)
+		if strings.Contains(payload.Oauth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Oauth, " ", 2)[1]
+			payload.Oauth = cred
+		}
+		if strings.Contains(payload.JWTToken, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.JWTToken, " ", 2)[1]
+			payload.JWTToken = cred
+		}
 
 		return payload, nil
 	}
@@ -129,17 +145,37 @@ func DecodeUpdateBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 		}
 
 		var (
-			id string
+			id       string
+			oauth    string
+			jwtToken string
 
 			params = mux.Vars(r)
 		)
 		id = params["id"]
 		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
 
+		oauth = r.Header.Get("Authorization")
+		if oauth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		jwtToken = r.Header.Get("jwtToken")
+		if jwtToken == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("jwtToken", "header"))
+		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewUpdateBookPayload(&body, id)
+		payload := NewUpdateBookPayload(&body, id, oauth, jwtToken)
+		if strings.Contains(payload.Oauth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Oauth, " ", 2)[1]
+			payload.Oauth = cred
+		}
+		if strings.Contains(payload.JWTToken, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.JWTToken, " ", 2)[1]
+			payload.JWTToken = cred
+		}
 
 		return payload, nil
 	}
@@ -194,6 +230,42 @@ func EncodeGetAllBooksResponse(encoder func(context.Context, http.ResponseWriter
 		body := NewGetAllBooksResponseBody(res)
 		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
+	}
+}
+
+// DecodeGetAllBooksRequest returns a decoder for requests sent to the book
+// getAllBooks endpoint.
+func DecodeGetAllBooksRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			oauth    string
+			jwtToken string
+			err      error
+		)
+		oauth = r.Header.Get("Authorization")
+		if oauth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		jwtToken = r.Header.Get("jwtToken")
+		if jwtToken == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("jwtToken", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewGetAllBooksPayload(oauth, jwtToken)
+		if strings.Contains(payload.Oauth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Oauth, " ", 2)[1]
+			payload.Oauth = cred
+		}
+		if strings.Contains(payload.JWTToken, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.JWTToken, " ", 2)[1]
+			payload.JWTToken = cred
+		}
+
+		return payload, nil
 	}
 }
 
@@ -254,18 +326,38 @@ func EncodeDeleteBookResponse(encoder func(context.Context, http.ResponseWriter)
 func DecodeDeleteBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id  string
-			err error
+			id       string
+			oauth    string
+			jwtToken string
+			err      error
 
 			params = mux.Vars(r)
 		)
 		id = params["id"]
 		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
 
+		oauth = r.Header.Get("Authorization")
+		if oauth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		jwtToken = r.Header.Get("jwtToken")
+		if jwtToken == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("jwtToken", "header"))
+		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewDeleteBookPayload(id)
+		payload := NewDeleteBookPayload(id, oauth, jwtToken)
+		if strings.Contains(payload.Oauth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Oauth, " ", 2)[1]
+			payload.Oauth = cred
+		}
+		if strings.Contains(payload.JWTToken, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.JWTToken, " ", 2)[1]
+			payload.JWTToken = cred
+		}
 
 		return payload, nil
 	}
@@ -342,7 +434,33 @@ func DecodeCreateBookRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 		if err != nil {
 			return nil, err
 		}
-		payload := NewCreateBookPayload(&body)
+
+		var (
+			oauth    string
+			jwtToken string
+		)
+		oauth = r.Header.Get("Authorization")
+		if oauth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		jwtToken = r.Header.Get("jwtToken")
+		if jwtToken == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("jwtToken", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewCreateBookPayload(&body, oauth, jwtToken)
+		if strings.Contains(payload.Oauth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Oauth, " ", 2)[1]
+			payload.Oauth = cred
+		}
+		if strings.Contains(payload.JWTToken, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.JWTToken, " ", 2)[1]
+			payload.JWTToken = cred
+		}
 
 		return payload, nil
 	}

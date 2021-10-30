@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	goahttp "goa.design/goa/v3/http"
 )
@@ -51,9 +52,18 @@ func EncodeGetBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*htt
 		if !ok {
 			return goahttp.ErrInvalidType("book", "getBook", "*book.GetBookPayload", v)
 		}
-		values := req.URL.Query()
-		values.Add("oauth", p.OauthToken)
-		req.URL.RawQuery = values.Encode()
+		{
+			head := p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		{
+			head := p.JWTToken
+			req.Header.Set("jwtToken", head)
+		}
 		return nil
 	}
 }
@@ -159,6 +169,18 @@ func EncodeUpdateBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 		if !ok {
 			return goahttp.ErrInvalidType("book", "updateBook", "*book.UpdateBookPayload", v)
 		}
+		{
+			head := p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		{
+			head := p.JWTToken
+			req.Header.Set("jwtToken", head)
+		}
 		body := NewUpdateBookRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
 			return goahttp.ErrEncodingError("book", "updateBook", err)
@@ -248,6 +270,30 @@ func (c *Client) BuildGetAllBooksRequest(ctx context.Context, v interface{}) (*h
 	}
 
 	return req, nil
+}
+
+// EncodeGetAllBooksRequest returns an encoder for requests sent to the book
+// getAllBooks server.
+func EncodeGetAllBooksRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*book.GetAllBooksPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("book", "getAllBooks", "*book.GetAllBooksPayload", v)
+		}
+		{
+			head := p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		{
+			head := p.JWTToken
+			req.Header.Set("jwtToken", head)
+		}
+		return nil
+	}
 }
 
 // DecodeGetAllBooksResponse returns a decoder for responses returned by the
@@ -343,6 +389,30 @@ func (c *Client) BuildDeleteBookRequest(ctx context.Context, v interface{}) (*ht
 	return req, nil
 }
 
+// EncodeDeleteBookRequest returns an encoder for requests sent to the book
+// deleteBook server.
+func EncodeDeleteBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*book.DeleteBookPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("book", "deleteBook", "*book.DeleteBookPayload", v)
+		}
+		{
+			head := p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		{
+			head := p.JWTToken
+			req.Header.Set("jwtToken", head)
+		}
+		return nil
+	}
+}
+
 // DecodeDeleteBookResponse returns a decoder for responses returned by the
 // book deleteBook endpoint. restoreBody controls whether the response body
 // should be restored after having been read.
@@ -433,6 +503,18 @@ func EncodeCreateBookRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 		p, ok := v.(*book.CreateBookPayload)
 		if !ok {
 			return goahttp.ErrInvalidType("book", "createBook", "*book.CreateBookPayload", v)
+		}
+		{
+			head := p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		{
+			head := p.JWTToken
+			req.Header.Set("jwtToken", head)
 		}
 		body := NewCreateBookRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {

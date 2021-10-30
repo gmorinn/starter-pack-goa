@@ -37,13 +37,13 @@ func UsageExamples() string {
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
-      "password": "7da"
+      "password": "29z"
    }'` + "\n" +
-		os.Args[0] + ` book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth-token "Enim vel distinctio fuga eum quia dicta."` + "\n" +
+		os.Args[0] + ` book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Veniam aperiam non esse vero autem a." --jwt-token "Aut voluptatibus nisi voluptas corporis."` + "\n" +
 		os.Args[0] + ` o-auth o-auth --body '{
-      "client_id": "Et sint sunt et quaerat hic distinctio.",
-      "client_secret": "Error beatae accusantium qui accusantium voluptates et.",
-      "grant_type": "Nisi molestiae."
+      "client_id": "Voluptatem nihil ut quasi sed.",
+      "client_secret": "Molestiae perferendis sit ut sit tempore.",
+      "grant_type": "Molestiae temporibus ipsa aut impedit sequi."
    }'` + "\n" +
 		""
 }
@@ -71,21 +71,30 @@ func ParseEndpoint(
 
 		bookFlags = flag.NewFlagSet("book", flag.ContinueOnError)
 
-		bookGetBookFlags          = flag.NewFlagSet("get-book", flag.ExitOnError)
-		bookGetBookIDFlag         = bookGetBookFlags.String("id", "REQUIRED", "")
-		bookGetBookOauthTokenFlag = bookGetBookFlags.String("oauth-token", "REQUIRED", "")
+		bookGetBookFlags        = flag.NewFlagSet("get-book", flag.ExitOnError)
+		bookGetBookIDFlag       = bookGetBookFlags.String("id", "REQUIRED", "Unique ID of the book")
+		bookGetBookOauthFlag    = bookGetBookFlags.String("oauth", "REQUIRED", "")
+		bookGetBookJWTTokenFlag = bookGetBookFlags.String("jwt-token", "REQUIRED", "")
 
-		bookUpdateBookFlags    = flag.NewFlagSet("update-book", flag.ExitOnError)
-		bookUpdateBookBodyFlag = bookUpdateBookFlags.String("body", "REQUIRED", "")
-		bookUpdateBookIDFlag   = bookUpdateBookFlags.String("id", "REQUIRED", "")
+		bookUpdateBookFlags        = flag.NewFlagSet("update-book", flag.ExitOnError)
+		bookUpdateBookBodyFlag     = bookUpdateBookFlags.String("body", "REQUIRED", "")
+		bookUpdateBookIDFlag       = bookUpdateBookFlags.String("id", "REQUIRED", "")
+		bookUpdateBookOauthFlag    = bookUpdateBookFlags.String("oauth", "REQUIRED", "")
+		bookUpdateBookJWTTokenFlag = bookUpdateBookFlags.String("jwt-token", "REQUIRED", "")
 
-		bookGetAllBooksFlags = flag.NewFlagSet("get-all-books", flag.ExitOnError)
+		bookGetAllBooksFlags        = flag.NewFlagSet("get-all-books", flag.ExitOnError)
+		bookGetAllBooksOauthFlag    = bookGetAllBooksFlags.String("oauth", "REQUIRED", "")
+		bookGetAllBooksJWTTokenFlag = bookGetAllBooksFlags.String("jwt-token", "REQUIRED", "")
 
-		bookDeleteBookFlags  = flag.NewFlagSet("delete-book", flag.ExitOnError)
-		bookDeleteBookIDFlag = bookDeleteBookFlags.String("id", "REQUIRED", "")
+		bookDeleteBookFlags        = flag.NewFlagSet("delete-book", flag.ExitOnError)
+		bookDeleteBookIDFlag       = bookDeleteBookFlags.String("id", "REQUIRED", "")
+		bookDeleteBookOauthFlag    = bookDeleteBookFlags.String("oauth", "REQUIRED", "")
+		bookDeleteBookJWTTokenFlag = bookDeleteBookFlags.String("jwt-token", "REQUIRED", "")
 
-		bookCreateBookFlags    = flag.NewFlagSet("create-book", flag.ExitOnError)
-		bookCreateBookBodyFlag = bookCreateBookFlags.String("body", "REQUIRED", "")
+		bookCreateBookFlags        = flag.NewFlagSet("create-book", flag.ExitOnError)
+		bookCreateBookBodyFlag     = bookCreateBookFlags.String("body", "REQUIRED", "")
+		bookCreateBookOauthFlag    = bookCreateBookFlags.String("oauth", "REQUIRED", "")
+		bookCreateBookJWTTokenFlag = bookCreateBookFlags.String("jwt-token", "REQUIRED", "")
 
 		oAuthFlags = flag.NewFlagSet("o-auth", flag.ContinueOnError)
 
@@ -220,19 +229,19 @@ func ParseEndpoint(
 			switch epn {
 			case "get-book":
 				endpoint = c.GetBook()
-				data, err = bookc.BuildGetBookPayload(*bookGetBookIDFlag, *bookGetBookOauthTokenFlag)
+				data, err = bookc.BuildGetBookPayload(*bookGetBookIDFlag, *bookGetBookOauthFlag, *bookGetBookJWTTokenFlag)
 			case "update-book":
 				endpoint = c.UpdateBook()
-				data, err = bookc.BuildUpdateBookPayload(*bookUpdateBookBodyFlag, *bookUpdateBookIDFlag)
+				data, err = bookc.BuildUpdateBookPayload(*bookUpdateBookBodyFlag, *bookUpdateBookIDFlag, *bookUpdateBookOauthFlag, *bookUpdateBookJWTTokenFlag)
 			case "get-all-books":
 				endpoint = c.GetAllBooks()
-				data = nil
+				data, err = bookc.BuildGetAllBooksPayload(*bookGetAllBooksOauthFlag, *bookGetAllBooksJWTTokenFlag)
 			case "delete-book":
 				endpoint = c.DeleteBook()
-				data, err = bookc.BuildDeleteBookPayload(*bookDeleteBookIDFlag)
+				data, err = bookc.BuildDeleteBookPayload(*bookDeleteBookIDFlag, *bookDeleteBookOauthFlag, *bookDeleteBookJWTTokenFlag)
 			case "create-book":
 				endpoint = c.CreateBook()
-				data, err = bookc.BuildCreateBookPayload(*bookCreateBookBodyFlag)
+				data, err = bookc.BuildCreateBookPayload(*bookCreateBookBodyFlag, *bookCreateBookOauthFlag, *bookCreateBookJWTTokenFlag)
 			}
 		case "o-auth":
 			c := oauthc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -258,7 +267,7 @@ Usage:
     %[1]s [globalflags] jwt-token COMMAND [flags]
 
 COMMAND:
-    signup: signup
+    signup: signup to generate jwt token
     signin: signin
     refresh: Refresh Token
 
@@ -269,7 +278,7 @@ Additional help:
 func jwtTokenSignupUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token signup -body JSON
 
-signup
+signup to generate jwt token
     -body JSON: 
 
 Example:
@@ -277,7 +286,7 @@ Example:
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
-      "password": "7da"
+      "password": "29z"
    }'
 `, os.Args[0])
 }
@@ -291,7 +300,7 @@ signin
 Example:
     %[1]s jwt-token signin --body '{
       "email": "guillaume@epitech.eu",
-      "password": "wuf"
+      "password": "lqg"
    }'
 `, os.Args[0])
 }
@@ -311,14 +320,14 @@ Example:
 
 // bookUsage displays the usage of the book command and its subcommands.
 func bookUsage() {
-	fmt.Fprintf(os.Stderr, `The principe of CRUD API with GET, PUT, POST, DELETE
+	fmt.Fprintf(os.Stderr, `The principe of CRUD API with GET, PUT, POST, DELETE with Table Book
 Usage:
     %[1]s [globalflags] book COMMAND [flags]
 
 COMMAND:
     get-book: Get one item
     update-book: Update one item
-    get-all-books: Read All items
+    get-all-books: Get All items
     delete-book: Delete one item by ID
     create-book: Create one item
 
@@ -327,64 +336,73 @@ Additional help:
 `, os.Args[0])
 }
 func bookGetBookUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] book get-book -id STRING -oauth-token STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] book get-book -id STRING -oauth STRING -jwt-token STRING
 
 Get one item
-    -id STRING: 
-    -oauth-token STRING: 
+    -id STRING: Unique ID of the book
+    -oauth STRING: 
+    -jwt-token STRING: 
 
 Example:
-    %[1]s book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth-token "Enim vel distinctio fuga eum quia dicta."
+    %[1]s book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Veniam aperiam non esse vero autem a." --jwt-token "Aut voluptatibus nisi voluptas corporis."
 `, os.Args[0])
 }
 
 func bookUpdateBookUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] book update-book -body JSON -id STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] book update-book -body JSON -id STRING -oauth STRING -jwt-token STRING
 
 Update one item
     -body JSON: 
     -id STRING: 
+    -oauth STRING: 
+    -jwt-token STRING: 
 
 Example:
     %[1]s book update-book --body '{
       "name": "Guillaume",
-      "price": 0.491096594473004
-   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
+      "price": 69
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Enim error voluptatem consectetur inventore nostrum." --jwt-token "Voluptatem nam provident sint ratione atque id."
 `, os.Args[0])
 }
 
 func bookGetAllBooksUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] book get-all-books
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] book get-all-books -oauth STRING -jwt-token STRING
 
-Read All items
+Get All items
+    -oauth STRING: 
+    -jwt-token STRING: 
 
 Example:
-    %[1]s book get-all-books
+    %[1]s book get-all-books --oauth "Quis assumenda et." --jwt-token "Nemo rerum vitae explicabo ullam."
 `, os.Args[0])
 }
 
 func bookDeleteBookUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] book delete-book -id STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] book delete-book -id STRING -oauth STRING -jwt-token STRING
 
 Delete one item by ID
     -id STRING: 
+    -oauth STRING: 
+    -jwt-token STRING: 
 
 Example:
-    %[1]s book delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
+    %[1]s book delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Tempore suscipit iusto." --jwt-token "Sapiente ratione ratione consequatur."
 `, os.Args[0])
 }
 
 func bookCreateBookUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] book create-book -body JSON
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] book create-book -body JSON -oauth STRING -jwt-token STRING
 
 Create one item
     -body JSON: 
+    -oauth STRING: 
+    -jwt-token STRING: 
 
 Example:
     %[1]s book create-book --body '{
       "name": "Guillaume",
-      "price": 0.8877830776353945
-   }'
+      "price": 0.4300793593351865
+   }' --oauth "Mollitia voluptatibus quas." --jwt-token "Hic sapiente."
 `, os.Args[0])
 }
 
@@ -409,9 +427,9 @@ oAuth
 
 Example:
     %[1]s o-auth o-auth --body '{
-      "client_id": "Et sint sunt et quaerat hic distinctio.",
-      "client_secret": "Error beatae accusantium qui accusantium voluptates et.",
-      "grant_type": "Nisi molestiae."
+      "client_id": "Voluptatem nihil ut quasi sed.",
+      "client_secret": "Molestiae perferendis sit ut sit tempore.",
+      "grant_type": "Molestiae temporibus ipsa aut impedit sequi."
    }'
 `, os.Args[0])
 }

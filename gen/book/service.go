@@ -14,14 +14,14 @@ import (
 	"goa.design/goa/v3/security"
 )
 
-// The principe of CRUD API with GET, PUT, POST, DELETE
+// The principe of CRUD API with GET, PUT, POST, DELETE with Table Book
 type Service interface {
 	// Get one item
 	GetBook(context.Context, *GetBookPayload) (res *GetBookResult, err error)
 	// Update one item
 	UpdateBook(context.Context, *UpdateBookPayload) (res *UpdateBookResult, err error)
-	// Read All items
-	GetAllBooks(context.Context) (res *GetAllBooksResult, err error)
+	// Get All items
+	GetAllBooks(context.Context, *GetAllBooksPayload) (res *GetAllBooksResult, err error)
 	// Delete one item by ID
 	DeleteBook(context.Context, *DeleteBookPayload) (res *DeleteBookResult, err error)
 	// Create one item
@@ -32,6 +32,8 @@ type Service interface {
 type Auther interface {
 	// OAuth2Auth implements the authorization logic for the OAuth2 security scheme.
 	OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error)
+	// JWTAuth implements the authorization logic for the JWT security scheme.
+	JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -46,9 +48,12 @@ var MethodNames = [5]string{"getBook", "updateBook", "getAllBooks", "deleteBook"
 
 // GetBookPayload is the payload type of the book service getBook method.
 type GetBookPayload struct {
+	// Unique ID of the book
 	ID string
-	// Use to generate Oauth
-	OauthToken string
+	// JWT used for authentication after Signin/Signup
+	JWTToken string
+	// Use to generate Oauth with /authorization
+	Oauth string
 }
 
 // GetBookResult is the result type of the book service getBook method.
@@ -64,6 +69,10 @@ type UpdateBookPayload struct {
 	ID    string
 	Name  string
 	Price float64
+	// JWT used for authentication after Signin/Signup
+	JWTToken string
+	// Use to generate Oauth with /authorization
+	Oauth string
 }
 
 // UpdateBookResult is the result type of the book service updateBook method.
@@ -74,8 +83,18 @@ type UpdateBookResult struct {
 	Success bool
 }
 
+// GetAllBooksPayload is the payload type of the book service getAllBooks
+// method.
+type GetAllBooksPayload struct {
+	// JWT used for authentication after Signin/Signup
+	JWTToken string
+	// Use to generate Oauth with /authorization
+	Oauth string
+}
+
 // GetAllBooksResult is the result type of the book service getAllBooks method.
 type GetAllBooksResult struct {
+	// Result is an array of object
 	Books   []*BookResponse
 	Success bool
 }
@@ -83,6 +102,10 @@ type GetAllBooksResult struct {
 // DeleteBookPayload is the payload type of the book service deleteBook method.
 type DeleteBookPayload struct {
 	ID string
+	// JWT used for authentication after Signin/Signup
+	JWTToken string
+	// Use to generate Oauth with /authorization
+	Oauth string
 }
 
 // DeleteBookResult is the result type of the book service deleteBook method.
@@ -92,12 +115,19 @@ type DeleteBookResult struct {
 
 // CreateBookPayload is the payload type of the book service createBook method.
 type CreateBookPayload struct {
-	Name  string
+	// Name of the book
+	Name string
+	// Price of the book
 	Price float64
+	// JWT used for authentication after Signin/Signup
+	JWTToken string
+	// Use to generate Oauth with /authorization
+	Oauth string
 }
 
 // CreateBookResult is the result type of the book service createBook method.
 type CreateBookResult struct {
+	// Result is an object
 	Book    *BookResponse
 	Success bool
 }

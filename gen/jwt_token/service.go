@@ -13,7 +13,7 @@ import (
 
 // Use Token to authenticate. Signin and Signup
 type Service interface {
-	// signup
+	// signup to generate jwt token
 	Signup(context.Context, *SignupPayload) (res *Sign, err error)
 	// signin
 	Signin(context.Context, *SigninPayload) (res *Sign, err error)

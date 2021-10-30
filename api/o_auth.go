@@ -70,6 +70,7 @@ func (s *oAuthsrvc) OAuth(ctx context.Context, p *oauth.OauthPayload) (res *oaut
 }
 
 func (s *booksrvc) OAuth2Auth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
+
 	claims := make(jwt.MapClaims)
 
 	// authorize request
@@ -106,7 +107,7 @@ func (s *booksrvc) OAuth2Auth(ctx context.Context, token string, scheme *securit
 
 	// 3. add authInfo to context
 	ctx = contextWithAuthInfo(ctx, authInfo{
-		claims: claims,
+		oAuth: claims,
 	})
 	return ctx, nil
 }

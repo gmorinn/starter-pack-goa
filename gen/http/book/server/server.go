@@ -228,6 +228,7 @@ func NewGetAllBooksHandler(
 	formatter func(err error) goahttp.Statuser,
 ) http.Handler {
 	var (
+		decodeRequest  = DecodeGetAllBooksRequest(mux, decoder)
 		encodeResponse = EncodeGetAllBooksResponse(encoder)
 		encodeError    = EncodeGetAllBooksError(encoder, formatter)
 	)
@@ -235,8 +236,14 @@ func NewGetAllBooksHandler(
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "getAllBooks")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "book")
-		var err error
-		res, err := endpoint(ctx, nil)
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
 		if err != nil {
 			if err := encodeError(ctx, w, err); err != nil {
 				errhandler(ctx, w, err)
@@ -385,7 +392,7 @@ func HandleBookOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOrigin(origin, "*") {
+		if cors.MatchOrigin(origin, "\"*\"") {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Content-Type, Origin")

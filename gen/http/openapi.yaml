@@ -195,7 +195,7 @@ paths:
       tags:
       - jwtToken
       summary: signup jwtToken
-      description: signup
+      description: signup to generate jwt token
       operationId: jwtToken#signup
       parameters:
       - name: SignupRequestBody
@@ -250,16 +250,24 @@ paths:
       description: Get one item
       operationId: book#getBook
       parameters:
-      - name: oauth
-        in: query
-        description: Use to generate Oauth
-        required: true
-        type: string
       - name: id
         in: path
+        description: Unique ID of the book
         required: true
         type: string
         format: uuid
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
       responses:
         "200":
           description: OK response.
@@ -285,7 +293,8 @@ paths:
       schemes:
       - https
       security:
-      - OAuth2_query_oauth: []
+      - OAuth2_header_Authorization: []
+        jwt_header_jwtToken: []
     put:
       tags:
       - book
@@ -298,6 +307,18 @@ paths:
         required: true
         type: string
         format: uuid
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
       - name: UpdateBookRequestBody
         in: body
         required: true
@@ -330,6 +351,9 @@ paths:
             - error_code
       schemes:
       - https
+      security:
+      - OAuth2_header_Authorization: []
+        jwt_header_jwtToken: []
   /web/book/add:
     post:
       tags:
@@ -338,6 +362,18 @@ paths:
       description: Create one item
       operationId: book#createBook
       parameters:
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
       - name: CreateBookRequestBody
         in: body
         required: true
@@ -368,6 +404,9 @@ paths:
             - error_code
       schemes:
       - https
+      security:
+      - OAuth2_header_Authorization: []
+        jwt_header_jwtToken: []
   /web/book/remove/{id}:
     delete:
       tags:
@@ -381,6 +420,18 @@ paths:
         required: true
         type: string
         format: uuid
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
       responses:
         "200":
           description: OK response.
@@ -402,13 +453,29 @@ paths:
             - error_code
       schemes:
       - https
+      security:
+      - OAuth2_header_Authorization: []
+        jwt_header_jwtToken: []
   /web/books:
     get:
       tags:
       - book
       summary: getAllBooks book
-      description: Read All items
+      description: Get All items
       operationId: book#getAllBooks
+      parameters:
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        required: true
+        type: string
+        pattern: ^Bearer [^ ]+$
       responses:
         "200":
           description: OK response.
@@ -431,6 +498,9 @@ paths:
             - error_code
       schemes:
       - https
+      security:
+      - OAuth2_header_Authorization: []
+        jwt_header_jwtToken: []
 definitions:
   BookCreateBookRequestBody:
     title: BookCreateBookRequestBody
@@ -438,16 +508,18 @@ definitions:
     properties:
       name:
         type: string
+        description: Name of the book
         example: Guillaume
         minLength: 3
         maxLength: 10
       price:
         type: number
-        example: 0.6915773002340172
-        format: double
+        description: Price of the book
+        example: 0.7133895835358962
+        minimum: 0.1
     example:
       name: Guillaume
-      price: 0.9258428168763809
+      price: 0.3608816199231498
     required:
     - name
     - price
@@ -459,13 +531,13 @@ definitions:
         $ref: '#/definitions/BookResponseResponseBody'
       success:
         type: boolean
-        example: false
+        example: true
     example:
       book:
         id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
-        price: 0.7758777617583704
-      success: true
+        price: 69
+      success: false
     required:
     - book
     - success
@@ -473,25 +545,25 @@ definitions:
     title: BookCreateBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Nobis ut quos assumenda.
+    example: Unde quod.
   BookCreateBookUnknownErrorResponseBody:
     title: BookCreateBookUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Corporis tempora consequatur autem dicta veritatis dolor.
+        example: Perspiciatis architecto sapiente quasi aspernatur dolor nam.
       error_code:
         type: string
-        example: Accusantium unde occaecati ipsum quo.
+        example: In a.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
-      err: Quibusdam reprehenderit.
-      error_code: Voluptatum rem consequatur dolores veniam.
+      err: Eos incidunt quibusdam atque odit officiis.
+      error_code: A quas ut ea aut.
       success: false
     required:
     - err
@@ -512,25 +584,25 @@ definitions:
     title: BookDeleteBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Ipsa aut et nam nisi.
+    example: Et et nihil ut qui et est.
   BookDeleteBookUnknownErrorResponseBody:
     title: BookDeleteBookUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Sit autem perferendis eos asperiores libero ea.
+        example: Dolores veniam cumque fuga nobis ut.
       error_code:
         type: string
-        example: Totam quisquam optio qui cupiditate.
+        example: Assumenda dolorum quo quia.
       success:
         type: boolean
         default: false
         example: false
     description: Error not identified (500)
     example:
-      err: Nemo et.
-      error_code: Blanditiis quis laudantium laboriosam culpa facilis.
+      err: Dolorem nesciunt reprehenderit et a architecto.
+      error_code: Eum magni sunt.
       success: false
     required:
     - err
@@ -544,16 +616,14 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/BookResponseResponseBody'
+        description: Result is an array of object
         example:
         - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
-          price: 0.7758777617583704
+          price: 69
         - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
-          price: 0.7758777617583704
-        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          name: Guillaume
-          price: 0.7758777617583704
+          price: 69
       success:
         type: boolean
         example: false
@@ -561,17 +631,14 @@ definitions:
       books:
       - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
-        price: 0.7758777617583704
+        price: 69
       - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
-        price: 0.7758777617583704
+        price: 69
       - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
-        price: 0.7758777617583704
-      - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-        name: Guillaume
-        price: 0.7758777617583704
-      success: false
+        price: 69
+      success: true
     required:
     - books
     - success
@@ -579,26 +646,26 @@ definitions:
     title: BookGetAllBooksUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Tempore molestiae quia rerum alias et.
+    example: Reprehenderit architecto.
   BookGetAllBooksUnknownErrorResponseBody:
     title: BookGetAllBooksUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Tempore dolorem tenetur.
+        example: Culpa facilis corporis incidunt ipsa.
       error_code:
         type: string
-        example: Accusantium consequatur eos repellat.
+        example: Et nam nisi omnis ipsam nobis corporis.
       success:
         type: boolean
         default: false
         example: true
     description: Error not identified (500)
     example:
-      err: Porro repellendus et magnam ut dolorem.
-      error_code: Totam consequatur harum optio assumenda doloremque sit.
-      success: false
+      err: Autem dicta veritatis.
+      error_code: Incidunt accusantium unde occaecati ipsum quo est.
+      success: true
     required:
     - err
     - success
@@ -609,22 +676,22 @@ definitions:
     properties:
       id:
         type: string
-        example: Odit veniam quaerat sint.
+        example: Labore est cumque dolorum fugiat deserunt ipsum.
       name:
         type: string
-        example: Quam autem.
+        example: Quia aut dolores laboriosam a autem recusandae.
       price:
         type: number
-        example: 0.9909542373671817
+        example: 0.19771088530504694
         format: double
       success:
         type: boolean
-        example: false
+        example: true
     example:
-      id: Eveniet accusantium et et et est.
-      name: Atque harum alias est.
-      price: 0.5144703672366026
-      success: false
+      id: Ut perspiciatis in ipsum neque.
+      name: Molestias voluptatum odio.
+      price: 0.10071005291239898
+      success: true
     required:
     - id
     - name
@@ -634,26 +701,26 @@ definitions:
     title: BookGetBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Est cumque dolorum fugiat.
+    example: Rerum consectetur corporis consequatur possimus.
   BookGetBookUnknownErrorResponseBody:
     title: BookGetBookUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Est quis voluptate.
+        example: Ut delectus distinctio quia et.
       error_code:
         type: string
-        example: Et excepturi aut debitis voluptatem quo.
+        example: Voluptate dignissimos aut rerum dolor.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
-      err: Eos laborum non consequatur.
-      error_code: Voluptas alias.
-      success: true
+      err: Quia suscipit.
+      error_code: Ad dolores aperiam.
+      success: false
     required:
     - err
     - success
@@ -671,12 +738,12 @@ definitions:
         example: Guillaume
       price:
         type: number
-        example: 0.33004909468851995
+        example: 69
         format: double
     example:
       id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
       name: Guillaume
-      price: 0.15958118596753526
+      price: 69
     required:
     - id
     - name
@@ -688,13 +755,15 @@ definitions:
       name:
         type: string
         example: Guillaume
+        minLength: 3
+        maxLength: 10
       price:
         type: number
-        example: 0.4466287596773351
-        format: double
+        example: 69
+        minimum: 0.1
     example:
       name: Guillaume
-      price: 0.9383176056629422
+      price: 69
     required:
     - name
     - price
@@ -704,22 +773,22 @@ definitions:
     properties:
       id:
         type: string
-        example: Ipsum quis quia aut dolores.
+        example: Nobis beatae eos praesentium dolores ut.
       name:
         type: string
-        example: A autem.
+        example: Officiis tempore dolorem tenetur consectetur accusantium consequatur.
       price:
         type: number
-        example: 0.6311900575047845
+        example: 0.6647046028705873
         format: double
       success:
         type: boolean
-        example: true
+        example: false
     example:
-      id: Corporis ut perspiciatis.
-      name: Ipsum neque dolorum molestias voluptatum.
-      price: 0.26683697615764523
-      success: true
+      id: Fugit porro repellendus et magnam.
+      name: Dolorem numquam totam consequatur.
+      price: 0.4447393742961892
+      success: false
     required:
     - id
     - name
@@ -729,25 +798,25 @@ definitions:
     title: BookUpdateBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Rerum consectetur corporis consequatur possimus.
+    example: Minima nemo et.
   BookUpdateBookUnknownErrorResponseBody:
     title: BookUpdateBookUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Repellendus ut delectus distinctio.
+        example: Doloremque sit est non tempore molestiae quia.
       error_code:
         type: string
-        example: Et perferendis voluptate dignissimos aut rerum dolor.
+        example: Alias et et quibusdam distinctio sit.
       success:
         type: boolean
         default: false
         example: true
     description: Error not identified (500)
     example:
-      err: Quia suscipit.
-      error_code: Ad dolores aperiam.
+      err: Eos asperiores.
+      error_code: Ea culpa totam quisquam optio qui.
       success: false
     required:
     - err
@@ -759,15 +828,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Repellendus omnis.
+        example: Quam autem.
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: When email already exist
     example:
-      message: Minus minus iure non est harum.
-      success: true
+      message: Non eveniet accusantium et.
+      success: false
     required:
     - message
     - success
@@ -775,7 +844,7 @@ definitions:
     title: JWTTokenRefreshInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Autem itaque rerum est tenetur molestias.
+    example: Eos laborum non consequatur.
   JWTTokenRefreshRequestBody:
     title: JWTTokenRefreshRequestBody
     type: object
@@ -803,7 +872,7 @@ definitions:
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: true
+      success: false
     required:
     - access_token
     - refresh_token
@@ -812,26 +881,26 @@ definitions:
     title: JWTTokenRefreshUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Culpa nobis doloribus nulla eos corrupti sit.
+    example: Voluptas alias.
   JWTTokenRefreshUnknownErrorResponseBody:
     title: JWTTokenRefreshUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Accusantium id sed consequatur occaecati sed vel.
+        example: Est quas atque.
       error_code:
         type: string
-        example: Et dignissimos aliquid.
+        example: Alias est et.
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
-      err: Et vero quod omnis ratione est ut.
-      error_code: Enim ad excepturi alias id.
-      success: true
+      err: Est quis voluptate.
+      error_code: Et excepturi aut debitis voluptatem quo.
+      success: false
     required:
     - err
     - success
@@ -842,15 +911,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Provident soluta molestiae illum.
+        example: Est harum ad sequi.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: When email already exist
     example:
-      message: Nulla velit rem enim molestiae.
-      success: false
+      message: Sed consequatur occaecati sed vel.
+      success: true
     required:
     - message
     - success
@@ -858,7 +927,7 @@ definitions:
     title: JWTTokenSigninInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: A minus animi reiciendis dolor excepturi.
+    example: Itaque rerum.
   JWTTokenSigninRequestBody:
     title: JWTTokenSigninRequestBody
     type: object
@@ -869,11 +938,11 @@ definitions:
         format: email
       password:
         type: string
-        example: b4e
+        example: bag
         minLength: 8
     example:
       email: guillaume@epitech.eu
-      password: ka2
+      password: pfq
     required:
     - password
     - email
@@ -889,7 +958,7 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: true
+        example: false
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
@@ -902,26 +971,26 @@ definitions:
     title: JWTTokenSigninUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Beatae dolor atque officiis incidunt maxime sequi.
+    example: Tenetur molestias aut culpa nobis.
   JWTTokenSigninUnknownErrorResponseBody:
     title: JWTTokenSigninUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Cumque facere blanditiis tempora.
+        example: Dignissimos aliquid.
       error_code:
         type: string
-        example: Quidem cupiditate excepturi sint.
+        example: Inventore et vero quod.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
-      err: Ut nam fugiat dicta.
-      error_code: Tempore fuga eos incidunt et fuga illo.
-      success: true
+      err: Est ut iusto enim ad.
+      error_code: Alias id molestias.
+      success: false
     required:
     - err
     - success
@@ -932,15 +1001,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Quasi sed nihil molestiae.
+        example: Officia cumque facere blanditiis tempora.
       success:
         type: boolean
         default: false
         example: true
     description: When email already exist
     example:
-      message: Ut sit tempore neque molestiae.
-      success: true
+      message: Cupiditate excepturi sint voluptas.
+      success: false
     required:
     - message
     - success
@@ -948,7 +1017,7 @@ definitions:
     title: JWTTokenSignupInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Accusantium repudiandae possimus autem.
+    example: Debitis repellat quia.
   JWTTokenSignupRequestBody:
     title: JWTTokenSignupRequestBody
     type: object
@@ -968,14 +1037,14 @@ definitions:
         minLength: 3
       password:
         type: string
-        example: "452"
+        example: eo9
         minLength: 8
     description: Use client ID and client secret to oAuth
     example:
       email: guillaume@epitech.eu
       firstname: Guillaume
       lastname: Morin
-      password: peu
+      password: qr7
     required:
     - firstname
     - lastname
@@ -993,7 +1062,7 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: false
+        example: true
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
@@ -1006,26 +1075,26 @@ definitions:
     title: JWTTokenSignupUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Vel quod.
+    example: Totam enim.
   JWTTokenSignupUnknownErrorResponseBody:
     title: JWTTokenSignupUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Aut impedit sequi.
+        example: Nam fugiat dicta explicabo.
       error_code:
         type: string
-        example: Sint dignissimos blanditiis.
+        example: Fuga eos incidunt et fuga illo reprehenderit.
       success:
         type: boolean
         default: false
         example: false
     description: Error not identified (500)
     example:
-      err: Reprehenderit totam nihil dolorum.
-      error_code: Voluptas dolorum dolorem officiis necessitatibus nisi.
-      success: true
+      err: Minus animi reiciendis dolor excepturi voluptas.
+      error_code: Dolor atque officiis incidunt maxime sequi.
+      success: false
     required:
     - err
     - success
@@ -1036,22 +1105,22 @@ definitions:
     properties:
       access_token:
         type: string
-        example: In a.
+        example: Odit aliquam quia asperiores eum et.
       expires_in:
         type: integer
-        example: 1708044702737275696
+        example: 7585087811689205471
         format: int64
       success:
         type: boolean
         example: true
       token_type:
         type: string
-        example: Quod eos incidunt quibusdam atque.
+        example: Voluptas maxime.
     example:
-      access_token: A quas ut ea aut.
-      expires_in: 5657520332482982112
-      success: false
-      token_type: Et unde quod.
+      access_token: Eius iusto dignissimos tempore.
+      expires_in: 2808577009373807003
+      success: true
+      token_type: Molestias possimus sunt voluptas nihil tenetur eos.
     required:
     - access_token
     - token_type
@@ -1063,22 +1132,22 @@ definitions:
     properties:
       access_token:
         type: string
-        example: Quam natus dolorem nesciunt.
+        example: Nihil dignissimos est.
       expires_in:
         type: integer
-        example: 1883773498804462422
+        example: 1186572592927452188
         format: int64
       success:
         type: boolean
         example: false
       token_type:
         type: string
-        example: Et a architecto officiis eum magni.
+        example: Quia optio et vel ut.
     example:
-      access_token: Et et nihil ut qui et est.
-      expires_in: 425567963383894931
-      success: false
-      token_type: Reiciendis quasi perspiciatis architecto sapiente quasi aspernatur.
+      access_token: Totam odio.
+      expires_in: 4055415584478623205
+      success: true
+      token_type: Minus qui doloribus omnis nam.
     required:
     - access_token
     - token_type
@@ -1088,24 +1157,24 @@ definitions:
     title: OAuthOAuthInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Sunt odit aliquam quia.
+    example: Autem nesciunt consectetur.
   OAuthOAuthRequestBody:
     title: OAuthOAuthRequestBody
     type: object
     properties:
       client_id:
         type: string
-        example: Voluptatem eius iusto dignissimos.
+        example: Recusandae tenetur et sit beatae voluptas.
       client_secret:
         type: string
-        example: Quam molestias possimus sunt.
+        example: Inventore voluptate beatae.
       grant_type:
         type: string
-        example: Nihil tenetur.
+        example: Odio veritatis quam reprehenderit.
     example:
-      client_id: Tenetur eius nihil officiis accusamus provident.
-      client_secret: Rerum sapiente commodi odit repellat.
-      grant_type: Ut iure ut aut adipisci consequatur velit.
+      client_id: Laborum tenetur.
+      client_secret: Odio sed illum rerum id quia.
+      grant_type: Reprehenderit modi voluptas quae laborum.
     required:
     - client_id
     - client_secret
@@ -1114,35 +1183,45 @@ definitions:
     title: OAuthOAuthUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Eum et nam voluptas maxime facilis.
+    example: Tempore vel.
   OAuthOAuthUnknownErrorResponseBody:
     title: OAuthOAuthUnknownErrorResponseBody
     type: object
     properties:
       err:
         type: string
-        example: Nihil dignissimos est.
+        example: Officiis accusamus provident.
       error_code:
         type: string
-        example: Quia optio et vel ut.
+        example: Rerum sapiente commodi odit repellat.
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
-      err: Cumque totam.
-      error_code: Cumque minus qui doloribus omnis nam.
-      success: false
+      err: Iure ut aut adipisci consequatur velit corrupti.
+      error_code: Accusamus eos dolor atque odit.
+      success: true
     required:
     - err
     - success
     - error_code
 securityDefinitions:
-  OAuth2_query_oauth:
+  OAuth2_header_Authorization:
     type: oauth2
     description: Use OAuth2 to authenticate
     flow: application
     tokenUrl: /authorization
     scopes:
       api:read: Provides read access
+  jwt_header_jwtToken:
+    type: apiKey
+    description: |-
+      Secures endpoint by requiring a valid JWT token retrieved via the signin endpoint. Supports scopes "api:read" and "api:write".
+
+      **Security Scopes**:
+        * `api:read`: Read-only access
+        * `api:write`: Read and write access
+    name: jwtToken
+    in: header

@@ -18,7 +18,7 @@ import (
 
 // BuildGetBookPayload builds the payload for the book getBook endpoint from
 // CLI flags.
-func BuildGetBookPayload(bookGetBookID string, bookGetBookOauthToken string) (*book.GetBookPayload, error) {
+func BuildGetBookPayload(bookGetBookID string, bookGetBookOauth string, bookGetBookJWTToken string) (*book.GetBookPayload, error) {
 	var err error
 	var id string
 	{
@@ -29,26 +29,43 @@ func BuildGetBookPayload(bookGetBookID string, bookGetBookOauthToken string) (*b
 			return nil, err
 		}
 	}
-	var oauthToken string
+	var oauth string
 	{
-		oauthToken = bookGetBookOauthToken
+		oauth = bookGetBookOauth
+	}
+	var jwtToken string
+	{
+		jwtToken = bookGetBookJWTToken
 	}
 	v := &book.GetBookPayload{}
 	v.ID = id
-	v.OauthToken = oauthToken
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
 
 	return v, nil
 }
 
 // BuildUpdateBookPayload builds the payload for the book updateBook endpoint
 // from CLI flags.
-func BuildUpdateBookPayload(bookUpdateBookBody string, bookUpdateBookID string) (*book.UpdateBookPayload, error) {
+func BuildUpdateBookPayload(bookUpdateBookBody string, bookUpdateBookID string, bookUpdateBookOauth string, bookUpdateBookJWTToken string) (*book.UpdateBookPayload, error) {
 	var err error
 	var body UpdateBookRequestBody
 	{
 		err = json.Unmarshal([]byte(bookUpdateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.491096594473004\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 69\n   }'")
+		}
+		if utf8.RuneCountInString(body.Name) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))
+		}
+		if utf8.RuneCountInString(body.Name) > 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 10, false))
+		}
+		if body.Price < 0.1 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.price", body.Price, 0.1, true))
+		}
+		if err != nil {
+			return nil, err
 		}
 	}
 	var id string
@@ -60,18 +77,46 @@ func BuildUpdateBookPayload(bookUpdateBookBody string, bookUpdateBookID string) 
 			return nil, err
 		}
 	}
+	var oauth string
+	{
+		oauth = bookUpdateBookOauth
+	}
+	var jwtToken string
+	{
+		jwtToken = bookUpdateBookJWTToken
+	}
 	v := &book.UpdateBookPayload{
 		Name:  body.Name,
 		Price: body.Price,
 	}
 	v.ID = id
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
+
+	return v, nil
+}
+
+// BuildGetAllBooksPayload builds the payload for the book getAllBooks endpoint
+// from CLI flags.
+func BuildGetAllBooksPayload(bookGetAllBooksOauth string, bookGetAllBooksJWTToken string) (*book.GetAllBooksPayload, error) {
+	var oauth string
+	{
+		oauth = bookGetAllBooksOauth
+	}
+	var jwtToken string
+	{
+		jwtToken = bookGetAllBooksJWTToken
+	}
+	v := &book.GetAllBooksPayload{}
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
 
 	return v, nil
 }
 
 // BuildDeleteBookPayload builds the payload for the book deleteBook endpoint
 // from CLI flags.
-func BuildDeleteBookPayload(bookDeleteBookID string) (*book.DeleteBookPayload, error) {
+func BuildDeleteBookPayload(bookDeleteBookID string, bookDeleteBookOauth string, bookDeleteBookJWTToken string) (*book.DeleteBookPayload, error) {
 	var err error
 	var id string
 	{
@@ -82,21 +127,31 @@ func BuildDeleteBookPayload(bookDeleteBookID string) (*book.DeleteBookPayload, e
 			return nil, err
 		}
 	}
+	var oauth string
+	{
+		oauth = bookDeleteBookOauth
+	}
+	var jwtToken string
+	{
+		jwtToken = bookDeleteBookJWTToken
+	}
 	v := &book.DeleteBookPayload{}
 	v.ID = id
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
 
 	return v, nil
 }
 
 // BuildCreateBookPayload builds the payload for the book createBook endpoint
 // from CLI flags.
-func BuildCreateBookPayload(bookCreateBookBody string) (*book.CreateBookPayload, error) {
+func BuildCreateBookPayload(bookCreateBookBody string, bookCreateBookOauth string, bookCreateBookJWTToken string) (*book.CreateBookPayload, error) {
 	var err error
 	var body CreateBookRequestBody
 	{
 		err = json.Unmarshal([]byte(bookCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.8877830776353945\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.4300793593351865\n   }'")
 		}
 		if utf8.RuneCountInString(body.Name) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))
@@ -104,14 +159,27 @@ func BuildCreateBookPayload(bookCreateBookBody string) (*book.CreateBookPayload,
 		if utf8.RuneCountInString(body.Name) > 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 10, false))
 		}
+		if body.Price < 0.1 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.price", body.Price, 0.1, true))
+		}
 		if err != nil {
 			return nil, err
 		}
+	}
+	var oauth string
+	{
+		oauth = bookCreateBookOauth
+	}
+	var jwtToken string
+	{
+		jwtToken = bookCreateBookJWTToken
 	}
 	v := &book.CreateBookPayload{
 		Name:  body.Name,
 		Price: body.Price,
 	}
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
 
 	return v, nil
 }

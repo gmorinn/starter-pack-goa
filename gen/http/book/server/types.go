@@ -24,7 +24,9 @@ type UpdateBookRequestBody struct {
 // CreateBookRequestBody is the type of the "book" service "createBook"
 // endpoint HTTP request body.
 type CreateBookRequestBody struct {
-	Name  *string  `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Name of the book
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// Price of the book
 	Price *float64 `form:"price,omitempty" json:"price,omitempty" xml:"price,omitempty"`
 }
 
@@ -49,6 +51,7 @@ type UpdateBookResponseBody struct {
 // GetAllBooksResponseBody is the type of the "book" service "getAllBooks"
 // endpoint HTTP response body.
 type GetAllBooksResponseBody struct {
+	// Result is an array of object
 	Books   []*BookResponseResponseBody `form:"books" json:"books" xml:"books"`
 	Success bool                        `form:"success" json:"success" xml:"success"`
 }
@@ -62,6 +65,7 @@ type DeleteBookResponseBody struct {
 // CreateBookResponseBody is the type of the "book" service "createBook"
 // endpoint HTTP response body.
 type CreateBookResponseBody struct {
+	// Result is an object
 	Book    *BookResponseResponseBody `form:"book" json:"book" xml:"book"`
 	Success bool                      `form:"success" json:"success" xml:"success"`
 }
@@ -284,39 +288,55 @@ func NewCreateBookUnauthorizedResponseBody(res book.Unauthorized) CreateBookUnau
 }
 
 // NewGetBookPayload builds a book service getBook endpoint payload.
-func NewGetBookPayload(id string, oauthToken string) *book.GetBookPayload {
+func NewGetBookPayload(id string, oauth string, jwtToken string) *book.GetBookPayload {
 	v := &book.GetBookPayload{}
 	v.ID = id
-	v.OauthToken = oauthToken
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
 
 	return v
 }
 
 // NewUpdateBookPayload builds a book service updateBook endpoint payload.
-func NewUpdateBookPayload(body *UpdateBookRequestBody, id string) *book.UpdateBookPayload {
+func NewUpdateBookPayload(body *UpdateBookRequestBody, id string, oauth string, jwtToken string) *book.UpdateBookPayload {
 	v := &book.UpdateBookPayload{
 		Name:  *body.Name,
 		Price: *body.Price,
 	}
 	v.ID = id
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
+
+	return v
+}
+
+// NewGetAllBooksPayload builds a book service getAllBooks endpoint payload.
+func NewGetAllBooksPayload(oauth string, jwtToken string) *book.GetAllBooksPayload {
+	v := &book.GetAllBooksPayload{}
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
 
 	return v
 }
 
 // NewDeleteBookPayload builds a book service deleteBook endpoint payload.
-func NewDeleteBookPayload(id string) *book.DeleteBookPayload {
+func NewDeleteBookPayload(id string, oauth string, jwtToken string) *book.DeleteBookPayload {
 	v := &book.DeleteBookPayload{}
 	v.ID = id
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
 
 	return v
 }
 
 // NewCreateBookPayload builds a book service createBook endpoint payload.
-func NewCreateBookPayload(body *CreateBookRequestBody) *book.CreateBookPayload {
+func NewCreateBookPayload(body *CreateBookRequestBody, oauth string, jwtToken string) *book.CreateBookPayload {
 	v := &book.CreateBookPayload{
 		Name:  *body.Name,
 		Price: *body.Price,
 	}
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
 
 	return v
 }
@@ -329,6 +349,21 @@ func ValidateUpdateBookRequestBody(body *UpdateBookRequestBody) (err error) {
 	}
 	if body.Price == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("price", "body"))
+	}
+	if body.Name != nil {
+		if utf8.RuneCountInString(*body.Name) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", *body.Name, utf8.RuneCountInString(*body.Name), 3, true))
+		}
+	}
+	if body.Name != nil {
+		if utf8.RuneCountInString(*body.Name) > 10 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", *body.Name, utf8.RuneCountInString(*body.Name), 10, false))
+		}
+	}
+	if body.Price != nil {
+		if *body.Price < 0.1 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.price", *body.Price, 0.1, true))
+		}
 	}
 	return
 }
@@ -350,6 +385,11 @@ func ValidateCreateBookRequestBody(body *CreateBookRequestBody) (err error) {
 	if body.Name != nil {
 		if utf8.RuneCountInString(*body.Name) > 10 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", *body.Name, utf8.RuneCountInString(*body.Name), 10, false))
+		}
+	}
+	if body.Price != nil {
+		if *body.Price < 0.1 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.price", *body.Price, 0.1, true))
 		}
 	}
 	return
