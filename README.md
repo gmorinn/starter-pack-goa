@@ -12,6 +12,7 @@ Just do:
 make api-goa
 ```
 File: openapi.json
+
 ---------------------
 You will have a new postman with all the expected requests, payloads and authentication system
 
@@ -23,22 +24,26 @@ make api-doc
 ```
 In this documentation you will have:
 - All possible requests
+
 ![](documentation/doc.png)
 
 --------------------------
 
 - All expected payloads for each request with examples
+
 ![](documentation/parameters.png)
 
 
 --------------------------
 
 - All responses to each request
+
 ![](documentation/response.png)
 
 --------------------------
 
 - All expected structures with their types (int, float, string, boolean)
+
 ![](documentation/struct.png)
 
 ### Reason n°3: 70% of your code is generated
@@ -79,27 +84,39 @@ It is from this GOA DSL that all the code will be generated.
 			Response(StatusCreated)
 		})
 		Result(func() {
-            Attribute("id", String, func() {
-				Format(FormatUUID)
-				Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
-			})
-			Attribute("name", String, func() {
-				Example("Guillaume")
-			})
-			Attribute("price", Float64, func() {
-				Example(69.0)
-			})
+			Attribute("book", BookResponse, "Result is an object")
 			Attribute("success", Boolean)
-			Required("id", "name", "price", "success")
+			Required("book", "success")
 		})
 	})
 })
 ```
+```go
+    var BookResponse = Type("BookResponse", func() {
+        Attribute("id", String, func() {
+            Format(FormatUUID)
+            Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
+        })
+        Attribute("name", String, func() {
+            Example("Guillaume")
+        })
+        Attribute("price", Float64, func() {
+            Example(69.0)
+        })
+        Required("id", "name", "price")
+    })
+```
+
 **For example:**
+
 We understand very clearly that this query:
+
 => Create an item
+
 => Attend Name, price, jwtToken, oauth as payload
+
 => The route is /book/add
+
 => The response will return id, name, price and a success
 
 
