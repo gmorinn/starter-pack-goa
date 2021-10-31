@@ -39,7 +39,7 @@ var _ = API("Project Name", func() {
 	})
 
 	License(func() {
-		Name("SQUIRREL X GM")
+		Name("GOA X GM")
 		URL("https://guillaume-morin.fr/")
 	})
 

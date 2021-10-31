@@ -7,7 +7,7 @@ info:
     email: guillaume.morin@epitech.eu
     url: https://guillaume-morin.fr/
   license:
-    name: SQUIRREL X GM
+    name: GOA X GM
     url: https://guillaume-morin.fr/
   version: "1.0"
 host: localhost:8088
@@ -73,7 +73,7 @@ paths:
             - success
             - error_code
       schemes:
-      - https
+      - http
   /openapi.json:
     get:
       tags:
@@ -90,7 +90,7 @@ paths:
           schema:
             type: file
       schemes:
-      - https
+      - http
   /resfresh:
     post:
       tags:
@@ -139,7 +139,7 @@ paths:
             - success
             - error_code
       schemes:
-      - https
+      - http
   /signin:
     post:
       tags:
@@ -189,7 +189,7 @@ paths:
             - success
             - error_code
       schemes:
-      - https
+      - http
   /signup:
     post:
       tags:
@@ -241,7 +241,7 @@ paths:
             - success
             - error_code
       schemes:
-      - https
+      - http
   /web/book/{id}:
     get:
       tags:
@@ -291,7 +291,7 @@ paths:
             - success
             - error_code
       schemes:
-      - https
+      - http
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
@@ -350,7 +350,7 @@ paths:
             - success
             - error_code
       schemes:
-      - https
+      - http
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
@@ -403,7 +403,7 @@ paths:
             - success
             - error_code
       schemes:
-      - https
+      - http
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
@@ -452,7 +452,7 @@ paths:
             - success
             - error_code
       schemes:
-      - https
+      - http
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
@@ -484,7 +484,7 @@ paths:
             - success
             - error_code
       schemes:
-      - https
+      - http
 definitions:
   BookCreateBookRequestBody:
     title: BookCreateBookRequestBody

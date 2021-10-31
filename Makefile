@@ -10,7 +10,7 @@ DIR=$(notdir $(shell pwd))
 export DIR
 
 api-goa:
-	@echo -e "\n\t🔥GOA GM X SQUIRREL🔥\n\n\tLoading...⌛\n"
+	@echo -e "\n\t🔥GOA X GM\n\n\tLoading...⌛\n"
 	@goa gen $(DIR)/design
 	@cp -f gen/http/openapi.json ./documentation
 	@mv gen/http/openapi.json ./
