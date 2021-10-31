@@ -30,7 +30,7 @@ api-gen:
 
 backup-db:
 	@echo -e "\n\t🐘\n"
-	@/usr/local/Cellar/libpq/13.2/bin/pg_dump --format=p -h 127.0.0.1 -d ${POSTGRES_DB} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -f ./backup.sql
+	@pg_dump --inserts -h  ${POSTGRES_HOST} -d ${POSTGRES_DB} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -f ./backup.sql
 
 api-dev:
 	@echo "\n\t💣\n"

@@ -138,5 +138,7 @@ cd cmd/api-cli && go build -o cmd
 **To start the server, do:**
 
 ```sh
-make init && make api-dev
+go build -o api-gm && ./api-gm
 ```
+
+For the moment you must connect your own database, a version with docker will be released soon.

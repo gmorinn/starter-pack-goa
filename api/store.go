@@ -13,11 +13,7 @@ import (
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 	"github.com/robfig/cron/v3"
-	oerrors "gopkg.in/oauth2.v3/errors"
-	"gopkg.in/oauth2.v3/manage"
-	"gopkg.in/oauth2.v3/models"
 	oserver "gopkg.in/oauth2.v3/server"
-	"gopkg.in/oauth2.v3/store"
 
 	"log"
 )
@@ -62,7 +58,7 @@ type Server struct {
 
 func NewServer() *Server {
 	cnf := config.New()
-	source := fmt.Sprintf("user=%s password=%s host=%s port=%v dbname=%s sslmode=disable TimeZone=%s", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database, cnf.TZ)
+	source := fmt.Sprintf("user=%s password=%s host=%s port=%v dbname=%s sslmode=disable", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database)
 	pg, err := sql.Open("postgres", source)
 	if err != nil {
 		log.Fatal(err)
@@ -71,7 +67,6 @@ func NewServer() *Server {
 
 	server := &Server{Store: store}
 	server.Config = cnf
-	server.Oauth = server.oAuth()
 	server.runCron(&server.cronTask, server.Config)
 	initCron(server)
 	return server
@@ -81,54 +76,6 @@ func initCron(server *Server) {
 	c := cron.New()
 	c.AddFunc("@hourly", func() { server.Store.DeleteOldRefreshToken(context.Background()) })
 	c.Start()
-}
-
-// oAuth manage and store oAuth token
-func (server *Server) oAuth() *oserver.Server {
-	manager := manage.NewDefaultManager()
-	manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
-
-	// token store
-	manager.MustTokenStorage(store.NewFileTokenStore("data.db"))
-
-	// client store
-	clientStore := store.NewClientStore()
-	manager.MapClientStorage(clientStore)
-
-	srv := oserver.NewDefaultServer(manager)
-	srv.SetAllowGetAccessRequest(false)
-	srv.SetClientInfoHandler(oserver.ClientFormHandler)
-	manager.SetRefreshTokenCfg(manage.DefaultRefreshTokenCfg)
-
-	srv.SetInternalErrorHandler(func(err error) (re *oerrors.Response) {
-		log.Println("Internal Error:", err.Error())
-		return re
-	})
-
-	srv.SetResponseErrorHandler(func(re *oerrors.Response) {
-		log.Println("Response Error:", re.Error.Error())
-	})
-
-	// client domain
-	var domain string
-	if server.Config.SSL {
-		domain = fmt.Sprintf("https://%s", server.Config.Host)
-	} else {
-		domain = fmt.Sprintf("http://%s", server.Config.Host)
-	}
-
-	// client store
-	err := clientStore.Set(server.Config.Security.OAuthID, &models.Client{
-		ID:     server.Config.Security.OAuthID,
-		Secret: server.Config.Security.OAuthSecret,
-		Domain: domain,
-	})
-
-	if err != nil {
-		log.Println("clientStore", err)
-	}
-
-	return srv
 }
 
 // storeRefresh store refres_token into database

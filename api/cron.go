@@ -19,8 +19,12 @@ func (server *Server) runCron(c **cron.Cron, config *config.API) {
 	// ctx := context.Background()
 	(*c) = cron.New()
 
-	// (*c).AddFunc("@every 1s", func() {
-	// 	fmt.Println("test!")
+	// (*c).AddFunc("@every 5s", func() {
+	// 	test, err := server.Store.GetBooks(ctx)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 	}
+	// 	fmt.Println(test)
 	// })
 
 	(*c).Start()
