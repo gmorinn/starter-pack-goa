@@ -1,28 +1,22 @@
--- name: GetRefreshToken :one
-SELECT *
-FROM refresh_token
-LEFT JOIN users u ON (u.id = refresh_token.user_id)
-WHERE refresh_token.token = $1
-AND refresh_token.deleted_at IS NULL;
+-- name: LoginUser :one
+SELECT id, firstname, lastname, email, role FROM users
+WHERE email = $1
+AND password = crypt($2, password)
+AND deleted_at IS NULL;
 
--- name: ListRefreshTokenByUserID :many
-SELECT * FROM refresh_token
-WHERE user_id = $1
-AND deleted_at IS NULL
-ORDER BY created_at
-LIMIT $1
-OFFSET $2;
+-- name: Signup :one
+INSERT INTO users (firstname, lastname, email, role, password) 
+VALUES ($1, $2, $3, $4, crypt($5, gen_salt('bf')))
+RETURNING *;
 
--- name: CreateRefreshToken :exec
-INSERT INTO refresh_token (ip, user_agent, token, expir_on, user_id) 
-VALUES ($1, $2, $3, $4, $5);
+-- name: ExistUserByEmail :one
+SELECT EXISTS(
+    SELECT * FROM users
+    WHERE email = $1
+    AND deleted_at IS NULL
+);
 
--- name: DeleteRefreshToken :exec
-UPDATE refresh_token
-SET deleted_at = NOW()
-WHERE id = sqlc.arg('id');
-
--- name: DeleteOldRefreshToken :exec
-UPDATE refresh_token
-SET deleted_at = NOW()
-WHERE expir_on < NOW();
+-- name: UpdateUserPassword :exec
+UPDATE users
+SET password = crypt($2, gen_salt('bf')), updated_at = NOW()
+WHERE id = $1;

@@ -77,9 +77,8 @@ type UpdateBookPayload struct {
 
 // UpdateBookResult is the result type of the book service updateBook method.
 type UpdateBookResult struct {
-	ID      string
-	Name    string
-	Price   float64
+	// Result is an Object
+	Book    *BookResponse
 	Success bool
 }
 

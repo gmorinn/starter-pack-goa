@@ -69,9 +69,11 @@ func (s *booksrvc) UpdateBook(ctx context.Context, p *book.UpdateBookPayload) (r
 			return fmt.Errorf("ERROR_GET_BOOK_BY_ID %v", err)
 		}
 		res = &book.UpdateBookResult{
-			ID:      newBook.ID.String(),
-			Name:    newBook.Name,
-			Price:   newBook.Price,
+			Book: &book.BookResponse{
+				ID:    newBook.ID.String(),
+				Name:  newBook.Name,
+				Price: newBook.Price,
+			},
 			Success: true,
 		}
 		return nil

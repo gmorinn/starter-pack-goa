@@ -42,10 +42,9 @@ type GetBookResponseBody struct {
 // UpdateBookResponseBody is the type of the "book" service "updateBook"
 // endpoint HTTP response body.
 type UpdateBookResponseBody struct {
-	ID      string  `form:"id" json:"id" xml:"id"`
-	Name    string  `form:"name" json:"name" xml:"name"`
-	Price   float64 `form:"price" json:"price" xml:"price"`
-	Success bool    `form:"success" json:"success" xml:"success"`
+	// Result is an Object
+	Book    *BookResponseResponseBody `form:"book" json:"book" xml:"book"`
+	Success bool                      `form:"success" json:"success" xml:"success"`
 }
 
 // GetAllBooksResponseBody is the type of the "book" service "getAllBooks"
@@ -153,10 +152,10 @@ func NewGetBookResponseBody(res *book.GetBookResult) *GetBookResponseBody {
 // the "updateBook" endpoint of the "book" service.
 func NewUpdateBookResponseBody(res *book.UpdateBookResult) *UpdateBookResponseBody {
 	body := &UpdateBookResponseBody{
-		ID:      res.ID,
-		Name:    res.Name,
-		Price:   res.Price,
 		Success: res.Success,
+	}
+	if res.Book != nil {
+		body.Book = marshalBookBookResponseToBookResponseResponseBody(res.Book)
 	}
 	return body
 }

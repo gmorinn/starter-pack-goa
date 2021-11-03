@@ -20,6 +20,7 @@ type API struct {
 	Cert     string
 	Cors     string
 	Key      string
+	FronHost string
 	Security Security
 	Database Database
 }
@@ -60,6 +61,8 @@ func New() *API {
 
 	config.Cert = os.Getenv("API_CERT")
 	config.Key = os.Getenv("API_KEY")
+
+	config.FronHost = os.Getenv("FRONT_HOST")
 
 	config.Database.Host = os.Getenv("POSTGRES_HOST")
 	config.Database.Database = os.Getenv("POSTGRES_DB")

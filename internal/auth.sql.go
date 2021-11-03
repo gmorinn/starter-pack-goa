@@ -5,103 +5,87 @@ package db
 
 import (
 	"context"
-	"database/sql"
-	"time"
 
 	"github.com/google/uuid"
 )
 
-const createRefreshToken = `-- name: CreateRefreshToken :exec
-INSERT INTO refresh_token (ip, user_agent, token, expir_on, user_id) 
-VALUES ($1, $2, $3, $4, $5)
+const existUserByEmail = `-- name: ExistUserByEmail :one
+SELECT EXISTS(
+    SELECT id, created_at, updated_at, role, deleted_at, email, password, lastname, firstname FROM users
+    WHERE email = $1
+    AND deleted_at IS NULL
+)
 `
 
-type CreateRefreshTokenParams struct {
-	Ip        string    `json:"ip"`
-	UserAgent string    `json:"user_agent"`
-	Token     string    `json:"token"`
-	ExpirOn   time.Time `json:"expir_on"`
-	UserID    uuid.UUID `json:"user_id"`
+func (q *Queries) ExistUserByEmail(ctx context.Context, email string) (bool, error) {
+	row := q.queryRow(ctx, q.existUserByEmailStmt, existUserByEmail, email)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
 }
 
-func (q *Queries) CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) error {
-	_, err := q.exec(ctx, q.createRefreshTokenStmt, createRefreshToken,
-		arg.Ip,
-		arg.UserAgent,
-		arg.Token,
-		arg.ExpirOn,
-		arg.UserID,
+const loginUser = `-- name: LoginUser :one
+SELECT id, firstname, lastname, email, role FROM users
+WHERE email = $1
+AND password = crypt($2, password)
+AND deleted_at IS NULL
+`
+
+type LoginUserParams struct {
+	Email string      `json:"email"`
+	Crypt interface{} `json:"crypt"`
+}
+
+type LoginUserRow struct {
+	ID        uuid.UUID `json:"id"`
+	Firstname string    `json:"firstname"`
+	Lastname  string    `json:"lastname"`
+	Email     string    `json:"email"`
+	Role      Role      `json:"role"`
+}
+
+func (q *Queries) LoginUser(ctx context.Context, arg LoginUserParams) (LoginUserRow, error) {
+	row := q.queryRow(ctx, q.loginUserStmt, loginUser, arg.Email, arg.Crypt)
+	var i LoginUserRow
+	err := row.Scan(
+		&i.ID,
+		&i.Firstname,
+		&i.Lastname,
+		&i.Email,
+		&i.Role,
 	)
-	return err
+	return i, err
 }
 
-const deleteOldRefreshToken = `-- name: DeleteOldRefreshToken :exec
-UPDATE refresh_token
-SET deleted_at = NOW()
-WHERE expir_on < NOW()
+const signup = `-- name: Signup :one
+INSERT INTO users (firstname, lastname, email, role, password) 
+VALUES ($1, $2, $3, $4, crypt($5, gen_salt('bf')))
+RETURNING id, created_at, updated_at, role, deleted_at, email, password, lastname, firstname
 `
 
-func (q *Queries) DeleteOldRefreshToken(ctx context.Context) error {
-	_, err := q.exec(ctx, q.deleteOldRefreshTokenStmt, deleteOldRefreshToken)
-	return err
+type SignupParams struct {
+	Firstname string      `json:"firstname"`
+	Lastname  string      `json:"lastname"`
+	Email     string      `json:"email"`
+	Role      Role        `json:"role"`
+	Crypt     interface{} `json:"crypt"`
 }
 
-const deleteRefreshToken = `-- name: DeleteRefreshToken :exec
-UPDATE refresh_token
-SET deleted_at = NOW()
-WHERE id = $1
-`
-
-func (q *Queries) DeleteRefreshToken(ctx context.Context, id uuid.UUID) error {
-	_, err := q.exec(ctx, q.deleteRefreshTokenStmt, deleteRefreshToken, id)
-	return err
-}
-
-const getRefreshToken = `-- name: GetRefreshToken :one
-SELECT refresh_token.id, refresh_token.created_at, refresh_token.updated_at, refresh_token.deleted_at, ip, user_agent, token, expir_on, user_id, u.id, u.created_at, u.updated_at, u.deleted_at, email, password, lastname, firstname
-FROM refresh_token
-LEFT JOIN users u ON (u.id = refresh_token.user_id)
-WHERE refresh_token.token = $1
-AND refresh_token.deleted_at IS NULL
-`
-
-type GetRefreshTokenRow struct {
-	ID          uuid.UUID    `json:"id"`
-	CreatedAt   time.Time    `json:"created_at"`
-	UpdatedAt   time.Time    `json:"updated_at"`
-	DeletedAt   sql.NullTime `json:"deleted_at"`
-	Ip          string       `json:"ip"`
-	UserAgent   string       `json:"user_agent"`
-	Token       string       `json:"token"`
-	ExpirOn     time.Time    `json:"expir_on"`
-	UserID      uuid.UUID    `json:"user_id"`
-	ID_2        uuid.UUID    `json:"id_2"`
-	CreatedAt_2 time.Time    `json:"created_at_2"`
-	UpdatedAt_2 time.Time    `json:"updated_at_2"`
-	DeletedAt_2 sql.NullTime `json:"deleted_at_2"`
-	Email       string       `json:"email"`
-	Password    string       `json:"password"`
-	Lastname    string       `json:"lastname"`
-	Firstname   string       `json:"firstname"`
-}
-
-func (q *Queries) GetRefreshToken(ctx context.Context, token string) (GetRefreshTokenRow, error) {
-	row := q.queryRow(ctx, q.getRefreshTokenStmt, getRefreshToken, token)
-	var i GetRefreshTokenRow
+func (q *Queries) Signup(ctx context.Context, arg SignupParams) (User, error) {
+	row := q.queryRow(ctx, q.signupStmt, signup,
+		arg.Firstname,
+		arg.Lastname,
+		arg.Email,
+		arg.Role,
+		arg.Crypt,
+	)
+	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Role,
 		&i.DeletedAt,
-		&i.Ip,
-		&i.UserAgent,
-		&i.Token,
-		&i.ExpirOn,
-		&i.UserID,
-		&i.ID_2,
-		&i.CreatedAt_2,
-		&i.UpdatedAt_2,
-		&i.DeletedAt_2,
 		&i.Email,
 		&i.Password,
 		&i.Lastname,
@@ -110,49 +94,18 @@ func (q *Queries) GetRefreshToken(ctx context.Context, token string) (GetRefresh
 	return i, err
 }
 
-const listRefreshTokenByUserID = `-- name: ListRefreshTokenByUserID :many
-SELECT id, created_at, updated_at, deleted_at, ip, user_agent, token, expir_on, user_id FROM refresh_token
-WHERE user_id = $1
-AND deleted_at IS NULL
-ORDER BY created_at
-LIMIT $1
-OFFSET $2
+const updateUserPassword = `-- name: UpdateUserPassword :exec
+UPDATE users
+SET password = crypt($2, gen_salt('bf')), updated_at = NOW()
+WHERE id = $1
 `
 
-type ListRefreshTokenByUserIDParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+type UpdateUserPasswordParams struct {
+	ID    uuid.UUID   `json:"id"`
+	Crypt interface{} `json:"crypt"`
 }
 
-func (q *Queries) ListRefreshTokenByUserID(ctx context.Context, arg ListRefreshTokenByUserIDParams) ([]RefreshToken, error) {
-	rows, err := q.query(ctx, q.listRefreshTokenByUserIDStmt, listRefreshTokenByUserID, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []RefreshToken{}
-	for rows.Next() {
-		var i RefreshToken
-		if err := rows.Scan(
-			&i.ID,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.DeletedAt,
-			&i.Ip,
-			&i.UserAgent,
-			&i.Token,
-			&i.ExpirOn,
-			&i.UserID,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
+	_, err := q.exec(ctx, q.updateUserPasswordStmt, updateUserPassword, arg.ID, arg.Crypt)
+	return err
 }

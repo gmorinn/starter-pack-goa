@@ -37,7 +37,7 @@ func (s *oAuthsrvc) errorResponse(msg string, err error) *oauth.UnknownError {
 
 // oAuth
 func (s *oAuthsrvc) OAuth(ctx context.Context, p *oauth.OauthPayload) (res *oauth.OAuthResponse, err error) {
-	if p.GrantType != "grant_type" {
+	if p.GrantType != "client_credentials" {
 		return nil, ErrUnsupportedGrantType
 	}
 

@@ -37,13 +37,13 @@ func UsageExamples() string {
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
-      "password": "o04"
+      "password": "2bu"
    }'` + "\n" +
-		os.Args[0] + ` book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Nihil ut ipsa est." --jwt-token "Distinctio est vitae."` + "\n" +
+		os.Args[0] + ` book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Rerum ut doloremque sapiente nisi." --jwt-token "Fuga voluptatibus dolor."` + "\n" +
 		os.Args[0] + ` o-auth o-auth --body '{
-      "client_id": "Consequatur vero deserunt.",
-      "client_secret": "Molestias illum rem soluta.",
-      "grant_type": "Qui nam nam."
+      "client_id": "Aliquid non ut corrupti consequatur saepe enim.",
+      "client_secret": "Tempora ipsam ratione maxime.",
+      "grant_type": "Illum vel nesciunt harum sed labore."
    }'` + "\n" +
 		""
 }
@@ -284,7 +284,7 @@ Example:
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
-      "password": "o04"
+      "password": "2bu"
    }'
 `, os.Args[0])
 }
@@ -298,7 +298,7 @@ signin
 Example:
     %[1]s jwt-token signin --body '{
       "email": "guillaume@epitech.eu",
-      "password": "1cs"
+      "password": "mic"
    }'
 `, os.Args[0])
 }
@@ -342,7 +342,7 @@ Get one item
     -jwt-token STRING: 
 
 Example:
-    %[1]s book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Nihil ut ipsa est." --jwt-token "Distinctio est vitae."
+    %[1]s book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Rerum ut doloremque sapiente nisi." --jwt-token "Fuga voluptatibus dolor."
 `, os.Args[0])
 }
 
@@ -359,7 +359,7 @@ Example:
     %[1]s book update-book --body '{
       "name": "Guillaume",
       "price": 69
-   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Dolorem dolorum." --jwt-token "Vel sed aut consequatur recusandae eum deserunt."
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Non consequuntur cum perspiciatis amet." --jwt-token "Et accusamus repellat."
 `, os.Args[0])
 }
 
@@ -382,7 +382,7 @@ Delete one item by ID
     -jwt-token STRING: 
 
 Example:
-    %[1]s book delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Voluptates adipisci inventore rerum." --jwt-token "Aut nam reiciendis est."
+    %[1]s book delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Adipisci ab aut saepe molestias voluptatibus." --jwt-token "Quaerat numquam consequatur placeat possimus id."
 `, os.Args[0])
 }
 
@@ -397,8 +397,8 @@ Create one item
 Example:
     %[1]s book create-book --body '{
       "name": "Guillaume",
-      "price": 0.94558772578298
-   }' --oauth "Minus minus nobis totam est dicta enim." --jwt-token "Deserunt repellat."
+      "price": 0.18040562637737106
+   }' --oauth "Autem laudantium et earum veniam omnis." --jwt-token "Ab est voluptatem incidunt pariatur et."
 `, os.Args[0])
 }
 
@@ -423,9 +423,9 @@ oAuth
 
 Example:
     %[1]s o-auth o-auth --body '{
-      "client_id": "Consequatur vero deserunt.",
-      "client_secret": "Molestias illum rem soluta.",
-      "grant_type": "Qui nam nam."
+      "client_id": "Aliquid non ut corrupti consequatur saepe enim.",
+      "client_secret": "Tempora ipsam ratione maxime.",
+      "grant_type": "Illum vel nesciunt harum sed labore."
    }'
 `, os.Args[0])
 }

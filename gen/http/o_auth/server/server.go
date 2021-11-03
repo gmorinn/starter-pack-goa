@@ -162,16 +162,16 @@ func HandleOAuthOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOrigin(origin, "\"*\"") {
+		if cors.MatchOrigin(origin, "http://localhost:3000") {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Content-Type, Origin")
-			w.Header().Set("Access-Control-Max-Age", "100")
+			w.Header().Set("Access-Control-Max-Age", "600")
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
 				w.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, PATCH")
-				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, jwtToken")
+				w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, jwtToken, Origin")
 			}
 			origHndlr(w, r)
 			return

@@ -9,7 +9,7 @@ import (
 )
 
 // API describes the global properties of the API server.
-var _ = API("Project Name", func() {
+var _ = API("E-Commerce", func() {
 
 	// Get .env
 	cnf := config.New()
@@ -18,11 +18,11 @@ var _ = API("Project Name", func() {
 	Description("Best API REST building with GoaDesign")
 	Version("1.0")
 
-	cors.Origin(cnf.Cors, func() {
-		cors.Headers("Authorization", "Content-Type", "jwtToken")
+	cors.Origin(cnf.FronHost, func() {
+		cors.Headers("Authorization", "Content-Type", "jwtToken", "Origin")
 		cors.Methods("POST", "GET", "PUT", "OPTIONS", "DELETE", "PATCH")
 		cors.Expose("Content-Type", "Origin")
-		cors.MaxAge(100)
+		cors.MaxAge(600)
 		cors.Credentials()
 	})
 

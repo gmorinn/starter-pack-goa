@@ -41,10 +41,9 @@ type GetBookResponseBody struct {
 // UpdateBookResponseBody is the type of the "book" service "updateBook"
 // endpoint HTTP response body.
 type UpdateBookResponseBody struct {
-	ID      *string  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	Name    *string  `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Price   *float64 `form:"price,omitempty" json:"price,omitempty" xml:"price,omitempty"`
-	Success *bool    `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+	// Result is an Object
+	Book    *BookResponseResponseBody `form:"book,omitempty" json:"book,omitempty" xml:"book,omitempty"`
+	Success *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // GetAllBooksResponseBody is the type of the "book" service "getAllBooks"
@@ -193,11 +192,9 @@ func NewGetBookUnauthorized(body GetBookUnauthorizedResponseBody) book.Unauthori
 // from a HTTP "OK" response.
 func NewUpdateBookResultOK(body *UpdateBookResponseBody) *book.UpdateBookResult {
 	v := &book.UpdateBookResult{
-		ID:      *body.ID,
-		Name:    *body.Name,
-		Price:   *body.Price,
 		Success: *body.Success,
 	}
+	v.Book = unmarshalBookResponseResponseBodyToBookBookResponse(body.Book)
 
 	return v
 }
@@ -338,17 +335,16 @@ func ValidateGetBookResponseBody(body *GetBookResponseBody) (err error) {
 // ValidateUpdateBookResponseBody runs the validations defined on
 // UpdateBookResponseBody
 func ValidateUpdateBookResponseBody(body *UpdateBookResponseBody) (err error) {
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
-	}
-	if body.Price == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("price", "body"))
+	if body.Book == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("book", "body"))
 	}
 	if body.Success == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.Book != nil {
+		if err2 := ValidateBookResponseResponseBody(body.Book); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }

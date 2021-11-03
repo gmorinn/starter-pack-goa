@@ -4,10 +4,31 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+type Role string
+
+const (
+	RoleAdmin Role = "admin"
+	RolePro   Role = "pro"
+	RoleUser  Role = "user"
+)
+
+func (e *Role) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Role(s)
+	case string:
+		*e = Role(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Role: %T", src)
+	}
+	return nil
+}
 
 type Book struct {
 	ID        uuid.UUID `json:"id"`
@@ -16,13 +37,22 @@ type Book struct {
 	Name      string    `json:"name"`
 }
 
+type File struct {
+	ID        uuid.UUID      `json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt sql.NullTime   `json:"deleted_at"`
+	Name      sql.NullString `json:"name"`
+	Url       sql.NullString `json:"url"`
+	Mime      sql.NullString `json:"mime"`
+	Size      sql.NullInt64  `json:"size"`
+}
+
 type RefreshToken struct {
 	ID        uuid.UUID    `json:"id"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 	DeletedAt sql.NullTime `json:"deleted_at"`
-	Ip        string       `json:"ip"`
-	UserAgent string       `json:"user_agent"`
 	Token     string       `json:"token"`
 	ExpirOn   time.Time    `json:"expir_on"`
 	UserID    uuid.UUID    `json:"user_id"`
@@ -32,6 +62,7 @@ type User struct {
 	ID        uuid.UUID    `json:"id"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
+	Role      Role         `json:"role"`
 	DeletedAt sql.NullTime `json:"deleted_at"`
 	Email     string       `json:"email"`
 	Password  string       `json:"password"`

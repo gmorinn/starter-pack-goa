@@ -81,10 +81,8 @@ func initCron(server *Server) {
 // storeRefresh store refres_token into database
 func (server *Server) StoreRefresh(ctx context.Context, token string, exp time.Time, userID uuid.UUID) error {
 	return server.Store.CreateRefreshToken(ctx, db.CreateRefreshTokenParams{
-		Ip:        "À COMPLÉTER",
-		UserAgent: "À COMPLÉTER",
-		Token:     token,
-		ExpirOn:   exp,
-		UserID:    userID,
+		Token:   token,
+		ExpirOn: exp,
+		UserID:  userID,
 	})
 }

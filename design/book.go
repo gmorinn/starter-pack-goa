@@ -92,19 +92,11 @@ var _ = Service("book", func() {
 			Response(StatusOK)
 		})
 		Result(func() {
-			Attribute("id", String, func() {
-				Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
-			})
-			Attribute("name", String, func() {
-				Example("Père riche père pauvre")
-			})
-			Attribute("price", Float64, func() {
-				Example(14.5)
-			})
+			Attribute("book", BookResponse, "Result is an Object")
 			Attribute("success", Boolean, func() {
 				Example(true)
 			})
-			Required("id", "name", "price", "success")
+			Required("book", "success")
 		})
 	})
 
