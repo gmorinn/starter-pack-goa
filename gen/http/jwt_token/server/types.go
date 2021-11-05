@@ -43,9 +43,12 @@ type RefreshRequestBody struct {
 // AuthProvidersRequestBody is the type of the "jwtToken" service
 // "auth-providers" endpoint HTTP request body.
 type AuthProvidersRequestBody struct {
-	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	// Minimum 8 charactères / Chiffre Obligatoire
-	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
+	Firstname        *string `form:"firstname,omitempty" json:"firstname,omitempty" xml:"firstname,omitempty"`
+	Lastname         *string `form:"lastname,omitempty" json:"lastname,omitempty" xml:"lastname,omitempty"`
+	Email            *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	FirebaseIDToken  *string `form:"firebase_id_token,omitempty" json:"firebase_id_token,omitempty" xml:"firebase_id_token,omitempty"`
+	FirebaseUID      *string `form:"firebase_uid,omitempty" json:"firebase_uid,omitempty" xml:"firebase_uid,omitempty"`
+	FirebaseProvider *string `form:"firebase_provider,omitempty" json:"firebase_provider,omitempty" xml:"firebase_provider,omitempty"`
 }
 
 // SignupResponseBody is the type of the "jwtToken" service "signup" endpoint
@@ -407,8 +410,12 @@ func NewRefreshPayload(body *RefreshRequestBody, oauth *string) *jwttoken.Refres
 // payload.
 func NewAuthProvidersPayload(body *AuthProvidersRequestBody, oauth *string) *jwttoken.AuthProvidersPayload {
 	v := &jwttoken.AuthProvidersPayload{
-		Email:    *body.Email,
-		Password: *body.Password,
+		Firstname:        *body.Firstname,
+		Lastname:         *body.Lastname,
+		Email:            *body.Email,
+		FirebaseIDToken:  *body.FirebaseIDToken,
+		FirebaseUID:      *body.FirebaseUID,
+		FirebaseProvider: *body.FirebaseProvider,
 	}
 	v.Oauth = oauth
 
@@ -494,18 +501,47 @@ func ValidateAuthProvidersRequestBody(body *AuthProvidersRequestBody) (err error
 	if body.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
 	}
-	if body.Password == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("password", "body"))
+	if body.Firstname == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("firstname", "body"))
+	}
+	if body.Lastname == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("lastname", "body"))
+	}
+	if body.FirebaseIDToken == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("firebase_id_token", "body"))
+	}
+	if body.FirebaseUID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("firebase_uid", "body"))
+	}
+	if body.FirebaseProvider == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("firebase_provider", "body"))
+	}
+	if body.Firstname != nil {
+		if utf8.RuneCountInString(*body.Firstname) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", *body.Firstname, utf8.RuneCountInString(*body.Firstname), 3, true))
+		}
+	}
+	if body.Firstname != nil {
+		if utf8.RuneCountInString(*body.Firstname) > 15 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", *body.Firstname, utf8.RuneCountInString(*body.Firstname), 15, false))
+		}
+	}
+	if body.Lastname != nil {
+		if utf8.RuneCountInString(*body.Lastname) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.lastname", *body.Lastname, utf8.RuneCountInString(*body.Lastname), 3, true))
+		}
 	}
 	if body.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
 	}
-	if body.Password != nil {
-		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", *body.Password, "\\d"))
+	if body.FirebaseIDToken != nil {
+		if utf8.RuneCountInString(*body.FirebaseIDToken) < 5 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_id_token", *body.FirebaseIDToken, utf8.RuneCountInString(*body.FirebaseIDToken), 5, true))
+		}
 	}
-	if body.Password != nil {
-		if utf8.RuneCountInString(*body.Password) < 8 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 8, true))
+	if body.FirebaseUID != nil {
+		if utf8.RuneCountInString(*body.FirebaseUID) < 5 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_uid", *body.FirebaseUID, utf8.RuneCountInString(*body.FirebaseUID), 5, true))
 		}
 	}
 	return

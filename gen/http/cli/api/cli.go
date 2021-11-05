@@ -33,7 +33,7 @@ o-auth o-auth
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Et in odit et ut sed nihil." --jwt-token "Sint perspiciatis possimus id quibusdam quidem eligendi."` + "\n" +
+	return os.Args[0] + ` book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Possimus id." --jwt-token "Quidem eligendi veniam a explicabo."` + "\n" +
 		os.Args[0] + ` jwt-token signup --body '{
       "birthday": "Voluptas libero non.",
       "email": "guillaume@epitech.eu",
@@ -43,9 +43,9 @@ func UsageExamples() string {
       "phone": "+262 692 12 34 56"
    }' --oauth "Aut eum cumque."` + "\n" +
 		os.Args[0] + ` o-auth o-auth --body '{
-      "client_id": "Culpa enim.",
-      "client_secret": "Atque molestias rerum voluptatem et pariatur ratione.",
-      "grant_type": "Voluptatem quam sunt numquam exercitationem."
+      "client_id": "Voluptatem et pariatur.",
+      "client_secret": "Repellendus voluptatem.",
+      "grant_type": "Sunt numquam exercitationem expedita."
    }'` + "\n" +
 		""
 }
@@ -299,7 +299,7 @@ Get one item
     -jwt-token STRING: 
 
 Example:
-    %[1]s book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Et in odit et ut sed nihil." --jwt-token "Sint perspiciatis possimus id quibusdam quidem eligendi."
+    %[1]s book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Possimus id." --jwt-token "Quidem eligendi veniam a explicabo."
 `, os.Args[0])
 }
 
@@ -316,7 +316,7 @@ Example:
     %[1]s book update-book --body '{
       "name": "Guillaume",
       "price": 69
-   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Qui minus accusantium assumenda." --jwt-token "Porro autem at."
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Porro autem at." --jwt-token "Neque iste excepturi nesciunt voluptas."
 `, os.Args[0])
 }
 
@@ -339,7 +339,7 @@ Delete one item by ID
     -jwt-token STRING: 
 
 Example:
-    %[1]s book delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Qui nihil iure rerum ut doloremque." --jwt-token "Nisi sed fuga voluptatibus."
+    %[1]s book delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Sed fuga voluptatibus." --jwt-token "Omnis quisquam quod illo."
 `, os.Args[0])
 }
 
@@ -354,8 +354,8 @@ Create one item
 Example:
     %[1]s book create-book --body '{
       "name": "Guillaume",
-      "price": 0.45708415863110397
-   }' --oauth "Alias libero dolor eaque fugiat ut minus." --jwt-token "Illum iste aliquam non consequuntur cum."
+      "price": 0.9022704311753039
+   }' --oauth "Ut minus." --jwt-token "Illum iste aliquam non consequuntur cum."
 `, os.Args[0])
 }
 
@@ -434,8 +434,12 @@ Register or login by Google, Facebook
 Example:
     %[1]s jwt-token auth-providers --body '{
       "email": "guillaume@epitech.eu",
-      "password": "JeSuisUnTest974"
-   }' --oauth "Maxime voluptatem dolores modi deserunt."
+      "firebase_id_token": "eov",
+      "firebase_provider": "Facebook",
+      "firebase_uid": "8l5",
+      "firstname": "Guillaume",
+      "lastname": "Morin"
+   }' --oauth "Iusto ipsa sint libero."
 `, os.Args[0])
 }
 
@@ -460,9 +464,9 @@ oAuth
 
 Example:
     %[1]s o-auth o-auth --body '{
-      "client_id": "Culpa enim.",
-      "client_secret": "Atque molestias rerum voluptatem et pariatur ratione.",
-      "grant_type": "Voluptatem quam sunt numquam exercitationem."
+      "client_id": "Voluptatem et pariatur.",
+      "client_secret": "Repellendus voluptatem.",
+      "grant_type": "Sunt numquam exercitationem expedita."
    }'
 `, os.Args[0])
 }

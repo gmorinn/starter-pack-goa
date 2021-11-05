@@ -80,9 +80,12 @@ type RefreshPayload struct {
 // AuthProvidersPayload is the payload type of the jwtToken service
 // auth-providers method.
 type AuthProvidersPayload struct {
-	Email string
-	// Minimum 8 charactères / Chiffre Obligatoire
-	Password string
+	Firstname        string
+	Lastname         string
+	Email            string
+	FirebaseIDToken  string
+	FirebaseUID      string
+	FirebaseProvider string
 	// Use to generate Oauth with /authorization
 	Oauth *string
 }

@@ -179,5 +179,91 @@ func (s *jwtTokensrvc) generateJwtToken(ID uuid.UUID) (string, string, time.Time
 }
 
 func (s *jwtTokensrvc) AuthProviders(ctx context.Context, p *jwttoken.AuthProvidersPayload) (res *jwttoken.Sign, err error) {
-	return nil, nil
+	var t, r string
+	var user db.User
+
+	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		app, err := firebaseClient(ctx)
+		if err != nil {
+			return fmt.Errorf("FIREBASE_CLIENT %v", err.Error())
+		}
+
+		client, err := app.Auth(ctx)
+		if err != nil {
+			return fmt.Errorf("FIREBASE_AUTH %v", err.Error())
+		}
+
+		_, err = client.VerifyIDTokenAndCheckRevoked(ctx, p.FirebaseIDToken)
+		if err != nil {
+			return fmt.Errorf("VERIFYING_ID_TOKEN: %v", err.Error())
+		}
+		// CHECK IF USER BY FIREBASE EXIST
+		existFBUid, err := q.ExistGetUserByFireBaseUid(ctx, utils.NullS(p.FirebaseUID))
+		if err != nil {
+			return fmt.Errorf("EXIST_GET_USER_BY_FIRE_BASE_UID %v", err.Error())
+		}
+		// IF USER WAS EVER CONNECTED WITH FIREBASE
+		if existFBUid {
+			user, err = q.GetUserByFireBaseUid(ctx, utils.NullS(p.FirebaseUID))
+			if err != nil {
+				return fmt.Errorf("GET_USER_BY_FIRE_BASE_UID %v", err.Error())
+			}
+		} else {
+			// CHECK IF USER ALREADY EXIST IN DATABASE
+			existEmail, err := q.ExistUserByEmail(ctx, p.Email)
+			if err != nil {
+				return fmt.Errorf("EXIST_EMAIL: %v", err.Error())
+			}
+			// IF ALREADY EXIST
+			if existEmail {
+				user, err = q.FindUserByEmail(ctx, p.Email)
+				if err != nil {
+					return fmt.Errorf("FIND_USER_BY_EMAIL: %v", err.Error())
+				}
+				// UPDATE FIREBASE FIELDS IN DB
+				if err := q.UpdateUserProvider(ctx, db.UpdateUserProviderParams{
+					ID:               user.ID,
+					FirebaseIDToken:  utils.NullS(p.FirebaseIDToken),
+					FirebaseUid:      utils.NullS(p.FirebaseUID),
+					FirebaseProvider: utils.NullS(p.FirebaseProvider)}); err != nil {
+					return fmt.Errorf("UPDATE_USER_PROVIDER: %v", err.Error())
+				}
+			} else {
+				arg := db.SignProviderParams{
+					Firstname:        p.Firstname,
+					Lastname:         p.Lastname,
+					Email:            p.Email,
+					Crypt:            utils.RandStringRunes(60),
+					FirebaseIDToken:  utils.NullS(p.FirebaseIDToken),
+					FirebaseUid:      utils.NullS(p.FirebaseUID),
+					FirebaseProvider: utils.NullS(p.FirebaseProvider),
+				}
+				user, err = q.SignProvider(ctx, arg)
+				if err != nil {
+					return fmt.Errorf("SIGNUP_PROVIDER %v", err.Error())
+				}
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, s.errorResponse("TX_AUTH_PROVIDER", err)
+	}
+
+	t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID))
+	if err != nil {
+		return nil, s.errorResponse("ERROR_TOKEN", err)
+	}
+
+	if err := s.server.StoreRefresh(ctx, r, expt, user.ID); err != nil {
+		return nil, s.errorResponse("ERROR_REFRESH_TOKEN", err)
+	}
+
+	res = &jwttoken.Sign{
+		AccessToken:  t,
+		RefreshToken: r,
+		Success:      true,
+	}
+	return res, nil
 }

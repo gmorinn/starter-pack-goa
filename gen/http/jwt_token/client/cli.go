@@ -144,13 +144,24 @@ func BuildAuthProvidersPayload(jwtTokenAuthProvidersBody string, jwtTokenAuthPro
 	{
 		err = json.Unmarshal([]byte(jwtTokenAuthProvidersBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"password\": \"JeSuisUnTest974\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firebase_id_token\": \"eov\",\n      \"firebase_provider\": \"Facebook\",\n      \"firebase_uid\": \"8l5\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\"\n   }'")
+		}
+		if utf8.RuneCountInString(body.Firstname) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
+		}
+		if utf8.RuneCountInString(body.Firstname) > 15 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 15, false))
+		}
+		if utf8.RuneCountInString(body.Lastname) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.lastname", body.Lastname, utf8.RuneCountInString(body.Lastname), 3, true))
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
-		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", body.Password, "\\d"))
-		if utf8.RuneCountInString(body.Password) < 8 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 8, true))
+		if utf8.RuneCountInString(body.FirebaseIDToken) < 5 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_id_token", body.FirebaseIDToken, utf8.RuneCountInString(body.FirebaseIDToken), 5, true))
+		}
+		if utf8.RuneCountInString(body.FirebaseUID) < 5 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_uid", body.FirebaseUID, utf8.RuneCountInString(body.FirebaseUID), 5, true))
 		}
 		if err != nil {
 			return nil, err
@@ -163,8 +174,12 @@ func BuildAuthProvidersPayload(jwtTokenAuthProvidersBody string, jwtTokenAuthPro
 		}
 	}
 	v := &jwttoken.AuthProvidersPayload{
-		Email:    body.Email,
-		Password: body.Password,
+		Firstname:        body.Firstname,
+		Lastname:         body.Lastname,
+		Email:            body.Email,
+		FirebaseIDToken:  body.FirebaseIDToken,
+		FirebaseUID:      body.FirebaseUID,
+		FirebaseProvider: body.FirebaseProvider,
 	}
 	v.Oauth = oauth
 

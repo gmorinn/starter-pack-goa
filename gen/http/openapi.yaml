@@ -169,7 +169,11 @@ paths:
           $ref: '#/definitions/JWTTokenAuthProvidersRequestBody'
           required:
           - email
-          - password
+          - firstname
+          - lastname
+          - firebase_id_token
+          - firebase_uid
+          - firebase_provider
       responses:
         "200":
           description: OK response.
@@ -911,18 +915,40 @@ definitions:
         type: string
         example: guillaume@epitech.eu
         format: email
-      password:
+      firebase_id_token:
         type: string
-        description: Minimum 8 charactères / Chiffre Obligatoire
-        example: JeSuisUnTest974
-        pattern: \d
-        minLength: 8
+        example: ehz
+        minLength: 5
+      firebase_provider:
+        type: string
+        example: Facebook
+      firebase_uid:
+        type: string
+        example: bho
+        minLength: 5
+      firstname:
+        type: string
+        example: Guillaume
+        minLength: 3
+        maxLength: 15
+      lastname:
+        type: string
+        example: Morin
+        minLength: 3
     example:
       email: guillaume@epitech.eu
-      password: JeSuisUnTest974
+      firebase_id_token: vox
+      firebase_provider: Facebook
+      firebase_uid: e5g
+      firstname: Guillaume
+      lastname: Morin
     required:
     - email
-    - password
+    - firstname
+    - lastname
+    - firebase_id_token
+    - firebase_uid
+    - firebase_provider
   JWTTokenAuthProvidersResponseBody:
     title: JWTTokenAuthProvidersResponseBody
     type: object
@@ -1269,22 +1295,22 @@ definitions:
     properties:
       access_token:
         type: string
-        example: Ab ex.
+        example: Dicta accusamus.
       expires_in:
         type: integer
-        example: 5980968658470230820
+        example: 3579840831287574682
         format: int64
       success:
         type: boolean
         example: true
       token_type:
         type: string
-        example: Ut nulla corporis in dolor velit.
+        example: Aut quisquam porro quis.
     example:
-      access_token: Dicta accusamus.
-      expires_in: 3579840831287574682
+      access_token: Enim et quia natus est incidunt.
+      expires_in: 2975016019760660156
       success: true
-      token_type: Aut quisquam porro quis.
+      token_type: Voluptatum earum aperiam molestiae accusamus blanditiis id.
     required:
     - access_token
     - token_type
@@ -1296,22 +1322,22 @@ definitions:
     properties:
       access_token:
         type: string
-        example: Adipisci omnis quo consequatur soluta voluptates.
+        example: Labore sint occaecati nihil quis labore et.
       expires_in:
         type: integer
-        example: 6545666370168979061
+        example: 6818664630872691210
         format: int64
       success:
         type: boolean
         example: true
       token_type:
         type: string
-        example: Nihil corporis eos ut illo quia.
+        example: Occaecati voluptas et sit maxime.
     example:
-      access_token: Labore sint occaecati nihil quis labore et.
-      expires_in: 6818664630872691210
+      access_token: Ab ex.
+      expires_in: 5980968658470230820
       success: true
-      token_type: Occaecati voluptas et sit maxime.
+      token_type: Ut nulla corporis in dolor velit.
     required:
     - access_token
     - token_type
@@ -1321,24 +1347,24 @@ definitions:
     title: OAuthOAuthInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Quia natus est.
+    example: Voluptas vitae.
   OAuthOAuthRequestBody:
     title: OAuthOAuthRequestBody
     type: object
     properties:
       client_id:
         type: string
-        example: Blanditiis id rerum provident consequuntur.
+        example: Veniam inventore perspiciatis magnam quam in et.
       client_secret:
         type: string
-        example: Adipisci voluptas vitae quam.
+        example: Perspiciatis maiores amet.
       grant_type:
         type: string
-        example: Id voluptate est labore expedita.
+        example: Soluta labore quo nobis voluptatem et.
     example:
-      client_id: Autem veniam inventore perspiciatis.
-      client_secret: Quam in et voluptatem perspiciatis maiores amet.
-      grant_type: Soluta labore quo nobis voluptatem et.
+      client_id: Beatae occaecati quidem quaerat voluptates.
+      client_secret: Nihil qui enim atque quisquam modi.
+      grant_type: Blanditiis officia enim magni.
     required:
     - client_id
     - client_secret
@@ -1347,7 +1373,7 @@ definitions:
     title: OAuthOAuthUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Impedit voluptatum earum aperiam molestiae.
+    example: Adipisci id voluptate est labore expedita repudiandae.
   OAuthOAuthUnknownErrorResponseBody:
     title: OAuthOAuthUnknownErrorResponseBody
     type: object
@@ -1366,7 +1392,7 @@ definitions:
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: true
+      success: false
     required:
     - err
     - success

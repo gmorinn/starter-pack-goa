@@ -42,9 +42,12 @@ type RefreshRequestBody struct {
 // AuthProvidersRequestBody is the type of the "jwtToken" service
 // "auth-providers" endpoint HTTP request body.
 type AuthProvidersRequestBody struct {
-	Email string `form:"email" json:"email" xml:"email"`
-	// Minimum 8 charactères / Chiffre Obligatoire
-	Password string `form:"password" json:"password" xml:"password"`
+	Firstname        string `form:"firstname" json:"firstname" xml:"firstname"`
+	Lastname         string `form:"lastname" json:"lastname" xml:"lastname"`
+	Email            string `form:"email" json:"email" xml:"email"`
+	FirebaseIDToken  string `form:"firebase_id_token" json:"firebase_id_token" xml:"firebase_id_token"`
+	FirebaseUID      string `form:"firebase_uid" json:"firebase_uid" xml:"firebase_uid"`
+	FirebaseProvider string `form:"firebase_provider" json:"firebase_provider" xml:"firebase_provider"`
 }
 
 // SignupResponseBody is the type of the "jwtToken" service "signup" endpoint
@@ -221,8 +224,12 @@ func NewRefreshRequestBody(p *jwttoken.RefreshPayload) *RefreshRequestBody {
 // the "auth-providers" endpoint of the "jwtToken" service.
 func NewAuthProvidersRequestBody(p *jwttoken.AuthProvidersPayload) *AuthProvidersRequestBody {
 	body := &AuthProvidersRequestBody{
-		Email:    p.Email,
-		Password: p.Password,
+		Firstname:        p.Firstname,
+		Lastname:         p.Lastname,
+		Email:            p.Email,
+		FirebaseIDToken:  p.FirebaseIDToken,
+		FirebaseUID:      p.FirebaseUID,
+		FirebaseProvider: p.FirebaseProvider,
 	}
 	return body
 }

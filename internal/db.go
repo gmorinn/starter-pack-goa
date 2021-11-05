@@ -43,8 +43,14 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteRefreshTokenStmt, err = db.PrepareContext(ctx, deleteRefreshToken); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteRefreshToken: %w", err)
 	}
+	if q.existGetUserByFireBaseUidStmt, err = db.PrepareContext(ctx, existGetUserByFireBaseUid); err != nil {
+		return nil, fmt.Errorf("error preparing query ExistGetUserByFireBaseUid: %w", err)
+	}
 	if q.existUserByEmailStmt, err = db.PrepareContext(ctx, existUserByEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query ExistUserByEmail: %w", err)
+	}
+	if q.findUserByEmailStmt, err = db.PrepareContext(ctx, findUserByEmail); err != nil {
+		return nil, fmt.Errorf("error preparing query FindUserByEmail: %w", err)
 	}
 	if q.getBookStmt, err = db.PrepareContext(ctx, getBook); err != nil {
 		return nil, fmt.Errorf("error preparing query GetBook: %w", err)
@@ -58,6 +64,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getRefreshTokenStmt, err = db.PrepareContext(ctx, getRefreshToken); err != nil {
 		return nil, fmt.Errorf("error preparing query GetRefreshToken: %w", err)
 	}
+	if q.getUserByFireBaseUidStmt, err = db.PrepareContext(ctx, getUserByFireBaseUid); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserByFireBaseUid: %w", err)
+	}
 	if q.getUserByIDStmt, err = db.PrepareContext(ctx, getUserByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByID: %w", err)
 	}
@@ -67,6 +76,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.loginUserStmt, err = db.PrepareContext(ctx, loginUser); err != nil {
 		return nil, fmt.Errorf("error preparing query LoginUser: %w", err)
 	}
+	if q.signProviderStmt, err = db.PrepareContext(ctx, signProvider); err != nil {
+		return nil, fmt.Errorf("error preparing query SignProvider: %w", err)
+	}
 	if q.signupStmt, err = db.PrepareContext(ctx, signup); err != nil {
 		return nil, fmt.Errorf("error preparing query Signup: %w", err)
 	}
@@ -75,6 +87,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.updateUserPasswordStmt, err = db.PrepareContext(ctx, updateUserPassword); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUserPassword: %w", err)
+	}
+	if q.updateUserProviderStmt, err = db.PrepareContext(ctx, updateUserProvider); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserProvider: %w", err)
 	}
 	return &q, nil
 }
@@ -116,9 +131,19 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteRefreshTokenStmt: %w", cerr)
 		}
 	}
+	if q.existGetUserByFireBaseUidStmt != nil {
+		if cerr := q.existGetUserByFireBaseUidStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing existGetUserByFireBaseUidStmt: %w", cerr)
+		}
+	}
 	if q.existUserByEmailStmt != nil {
 		if cerr := q.existUserByEmailStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing existUserByEmailStmt: %w", cerr)
+		}
+	}
+	if q.findUserByEmailStmt != nil {
+		if cerr := q.findUserByEmailStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing findUserByEmailStmt: %w", cerr)
 		}
 	}
 	if q.getBookStmt != nil {
@@ -141,6 +166,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getRefreshTokenStmt: %w", cerr)
 		}
 	}
+	if q.getUserByFireBaseUidStmt != nil {
+		if cerr := q.getUserByFireBaseUidStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserByFireBaseUidStmt: %w", cerr)
+		}
+	}
 	if q.getUserByIDStmt != nil {
 		if cerr := q.getUserByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserByIDStmt: %w", cerr)
@@ -156,6 +186,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing loginUserStmt: %w", cerr)
 		}
 	}
+	if q.signProviderStmt != nil {
+		if cerr := q.signProviderStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing signProviderStmt: %w", cerr)
+		}
+	}
 	if q.signupStmt != nil {
 		if cerr := q.signupStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing signupStmt: %w", cerr)
@@ -169,6 +204,11 @@ func (q *Queries) Close() error {
 	if q.updateUserPasswordStmt != nil {
 		if cerr := q.updateUserPasswordStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateUserPasswordStmt: %w", cerr)
+		}
+	}
+	if q.updateUserProviderStmt != nil {
+		if cerr := q.updateUserProviderStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserProviderStmt: %w", cerr)
 		}
 	}
 	return err
@@ -208,49 +248,59 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                           DBTX
-	tx                           *sql.Tx
-	createBookStmt               *sql.Stmt
-	createFileStmt               *sql.Stmt
-	createRefreshTokenStmt       *sql.Stmt
-	deleteBookStmt               *sql.Stmt
-	deleteFileStmt               *sql.Stmt
-	deleteOldRefreshTokenStmt    *sql.Stmt
-	deleteRefreshTokenStmt       *sql.Stmt
-	existUserByEmailStmt         *sql.Stmt
-	getBookStmt                  *sql.Stmt
-	getBooksStmt                 *sql.Stmt
-	getFileByURLStmt             *sql.Stmt
-	getRefreshTokenStmt          *sql.Stmt
-	getUserByIDStmt              *sql.Stmt
-	listRefreshTokenByUserIDStmt *sql.Stmt
-	loginUserStmt                *sql.Stmt
-	signupStmt                   *sql.Stmt
-	updateBookStmt               *sql.Stmt
-	updateUserPasswordStmt       *sql.Stmt
+	db                            DBTX
+	tx                            *sql.Tx
+	createBookStmt                *sql.Stmt
+	createFileStmt                *sql.Stmt
+	createRefreshTokenStmt        *sql.Stmt
+	deleteBookStmt                *sql.Stmt
+	deleteFileStmt                *sql.Stmt
+	deleteOldRefreshTokenStmt     *sql.Stmt
+	deleteRefreshTokenStmt        *sql.Stmt
+	existGetUserByFireBaseUidStmt *sql.Stmt
+	existUserByEmailStmt          *sql.Stmt
+	findUserByEmailStmt           *sql.Stmt
+	getBookStmt                   *sql.Stmt
+	getBooksStmt                  *sql.Stmt
+	getFileByURLStmt              *sql.Stmt
+	getRefreshTokenStmt           *sql.Stmt
+	getUserByFireBaseUidStmt      *sql.Stmt
+	getUserByIDStmt               *sql.Stmt
+	listRefreshTokenByUserIDStmt  *sql.Stmt
+	loginUserStmt                 *sql.Stmt
+	signProviderStmt              *sql.Stmt
+	signupStmt                    *sql.Stmt
+	updateBookStmt                *sql.Stmt
+	updateUserPasswordStmt        *sql.Stmt
+	updateUserProviderStmt        *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                           tx,
-		tx:                           tx,
-		createBookStmt:               q.createBookStmt,
-		createFileStmt:               q.createFileStmt,
-		createRefreshTokenStmt:       q.createRefreshTokenStmt,
-		deleteBookStmt:               q.deleteBookStmt,
-		deleteFileStmt:               q.deleteFileStmt,
-		deleteOldRefreshTokenStmt:    q.deleteOldRefreshTokenStmt,
-		deleteRefreshTokenStmt:       q.deleteRefreshTokenStmt,
-		existUserByEmailStmt:         q.existUserByEmailStmt,
-		getBookStmt:                  q.getBookStmt,
-		getBooksStmt:                 q.getBooksStmt,
-		getFileByURLStmt:             q.getFileByURLStmt,
-		getRefreshTokenStmt:          q.getRefreshTokenStmt,
-		getUserByIDStmt:              q.getUserByIDStmt,
-		listRefreshTokenByUserIDStmt: q.listRefreshTokenByUserIDStmt,
-		loginUserStmt:                q.loginUserStmt,
-		signupStmt:                   q.signupStmt,
-		updateBookStmt:               q.updateBookStmt,
-		updateUserPasswordStmt:       q.updateUserPasswordStmt,
+		db:                            tx,
+		tx:                            tx,
+		createBookStmt:                q.createBookStmt,
+		createFileStmt:                q.createFileStmt,
+		createRefreshTokenStmt:        q.createRefreshTokenStmt,
+		deleteBookStmt:                q.deleteBookStmt,
+		deleteFileStmt:                q.deleteFileStmt,
+		deleteOldRefreshTokenStmt:     q.deleteOldRefreshTokenStmt,
+		deleteRefreshTokenStmt:        q.deleteRefreshTokenStmt,
+		existGetUserByFireBaseUidStmt: q.existGetUserByFireBaseUidStmt,
+		existUserByEmailStmt:          q.existUserByEmailStmt,
+		findUserByEmailStmt:           q.findUserByEmailStmt,
+		getBookStmt:                   q.getBookStmt,
+		getBooksStmt:                  q.getBooksStmt,
+		getFileByURLStmt:              q.getFileByURLStmt,
+		getRefreshTokenStmt:           q.getRefreshTokenStmt,
+		getUserByFireBaseUidStmt:      q.getUserByFireBaseUidStmt,
+		getUserByIDStmt:               q.getUserByIDStmt,
+		listRefreshTokenByUserIDStmt:  q.listRefreshTokenByUserIDStmt,
+		loginUserStmt:                 q.loginUserStmt,
+		signProviderStmt:              q.signProviderStmt,
+		signupStmt:                    q.signupStmt,
+		updateBookStmt:                q.updateBookStmt,
+		updateUserPasswordStmt:        q.updateUserPasswordStmt,
+		updateUserProviderStmt:        q.updateUserProviderStmt,
 	}
 }

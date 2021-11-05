@@ -127,20 +127,32 @@ var _ = Service("jwtToken", func() {
 		Description("Register or login by Google, Facebook")
 
 		Payload(func() {
+			Attribute("firstname", String, func() {
+				MinLength(3)
+				MaxLength(15)
+				Example("Guillaume")
+			})
+			Attribute("lastname", String, func() {
+				MinLength(3)
+				Example("Morin")
+			})
 			Attribute("email", String, func() {
 				Format(FormatEmail)
 				Example("guillaume@epitech.eu")
 			})
-			Attribute("password", String, func() {
-				Description("Minimum 8 charactères / Chiffre Obligatoire")
-				Pattern("\\d")
-				MinLength(8)
-				Example("JeSuisUnTest974")
+			Attribute("firebase_id_token", String, func() {
+				MinLength(5)
+			})
+			Attribute("firebase_uid", String, func() {
+				MinLength(5)
+			})
+			Attribute("firebase_provider", String, func() {
+				Example("Facebook")
 			})
 			AccessTokenField(1, "oauth", String, func() {
 				Description("Use to generate Oauth with /authorization")
 			})
-			Required("email", "password")
+			Required("email", "firstname", "lastname", "firebase_id_token", "firebase_uid", "firebase_provider")
 		})
 
 		Result(Sign)

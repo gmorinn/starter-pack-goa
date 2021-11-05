@@ -133,7 +133,7 @@ func BuildCreateBookPayload(bookCreateBookBody string, bookCreateBookOauth strin
 	{
 		err = json.Unmarshal([]byte(bookCreateBookBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.45708415863110397\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"name\": \"Guillaume\",\n      \"price\": 0.9022704311753039\n   }'")
 		}
 		if utf8.RuneCountInString(body.Name) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))
