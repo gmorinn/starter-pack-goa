@@ -43,9 +43,9 @@ func UsageExamples() string {
       "phone": "+262 692 12 34 56"
    }' --oauth "Aut eum cumque."` + "\n" +
 		os.Args[0] + ` o-auth o-auth --body '{
-      "client_id": "Voluptatem et pariatur.",
-      "client_secret": "Repellendus voluptatem.",
-      "grant_type": "Sunt numquam exercitationem expedita."
+      "client_id": "Voluptatibus distinctio.",
+      "client_secret": "Rem nulla culpa enim dolor atque molestias.",
+      "grant_type": "Voluptatem et pariatur."
    }'` + "\n" +
 		""
 }
@@ -435,11 +435,11 @@ Example:
     %[1]s jwt-token auth-providers --body '{
       "email": "guillaume@epitech.eu",
       "firebase_id_token": "eov",
-      "firebase_provider": "Facebook",
-      "firebase_uid": "8l5",
+      "firebase_provider": "facebook.com",
+      "firebase_uid": "zgmURRUlcJfgDMRyjJ20xs7Rxxw2",
       "firstname": "Guillaume",
       "lastname": "Morin"
-   }' --oauth "Iusto ipsa sint libero."
+   }' --oauth "Deserunt cum debitis."
 `, os.Args[0])
 }
 
@@ -464,9 +464,9 @@ oAuth
 
 Example:
     %[1]s o-auth o-auth --body '{
-      "client_id": "Voluptatem et pariatur.",
-      "client_secret": "Repellendus voluptatem.",
-      "grant_type": "Sunt numquam exercitationem expedita."
+      "client_id": "Voluptatibus distinctio.",
+      "client_secret": "Rem nulla culpa enim dolor atque molestias.",
+      "grant_type": "Voluptatem et pariatur."
    }'
 `, os.Args[0])
 }

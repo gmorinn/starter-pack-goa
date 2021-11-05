@@ -27,9 +27,9 @@ paths:
             schema:
               $ref: '#/components/schemas/OAuthRequestBody'
             example:
-              client_id: Voluptatem et pariatur.
-              client_secret: Repellendus voluptatem.
-              grant_type: Sunt numquam exercitationem expedita.
+              client_id: Voluptatibus distinctio.
+              client_secret: Rem nulla culpa enim dolor atque molestias.
+              grant_type: Voluptatem et pariatur.
       responses:
         "201":
           description: Created response.
@@ -38,10 +38,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/OAuthResponse'
               example:
-                access_token: Occaecati qui.
-                expires_in: 3536654110888358914
+                access_token: Repellendus voluptatem.
+                expires_in: 2942928061529037883
                 success: true
-                token_type: Quibusdam nemo.
+                token_type: Sunt numquam exercitationem expedita.
         "400":
           description: Bad Request response.
           content:
@@ -49,24 +49,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/OAuthResponse'
               example:
-                access_token: Ipsam repudiandae expedita animi.
-                expires_in: 6829346379698261650
+                access_token: Est cupiditate dicta tempore omnis in vel.
+                expires_in: 7377072863177023727
                 success: true
-                token_type: Expedita nihil omnis assumenda qui qui.
+                token_type: Officia ipsam repudiandae expedita.
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Tempore omnis in vel ullam.
+              example: Iure sequi doloremque.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Sequi est cupiditate.
+              example: Quibusdam nemo.
         "500":
           description: Internal Server Error response.
           content:
@@ -168,8 +168,8 @@ paths:
             example:
               email: guillaume@epitech.eu
               firebase_id_token: eov
-              firebase_provider: Facebook
-              firebase_uid: 8l5
+              firebase_provider: facebook.com
+              firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
               firstname: Guillaume
               lastname: Morin
       responses:
@@ -190,7 +190,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Doloremque et dolor.
+                message: Ipsa sint.
                 success: true
         "401":
           description: Unauthorized response.
@@ -198,14 +198,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Dolor atque molestias.
+              example: Quaerat repellat.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-              example: Nihil voluptatibus distinctio quae rem nulla culpa.
+              example: Doloremque et dolor.
         "500":
           description: Internal Server Error response.
           content:
@@ -658,15 +658,15 @@ components:
           format: email
         firebase_id_token:
           type: string
-          example: 65l
-          minLength: 5
+          example: nha
+          minLength: 400
         firebase_provider:
           type: string
-          example: Facebook
+          example: facebook.com
         firebase_uid:
           type: string
-          example: lwe
-          minLength: 5
+          example: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
+          minLength: 15
         firstname:
           type: string
           example: Guillaume
@@ -678,9 +678,9 @@ components:
           minLength: 3
       example:
         email: guillaume@epitech.eu
-        firebase_id_token: 2uc
-        firebase_provider: Facebook
-        firebase_uid: ndn
+        firebase_id_token: ypk
+        firebase_provider: facebook.com
+        firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
         firstname: Guillaume
         lastname: Morin
       required:
@@ -717,9 +717,9 @@ components:
       properties:
         success:
           type: boolean
-          example: false
+          example: true
       example:
-        success: false
+        success: true
       required:
       - success
     EmailAlreadyExist:
@@ -727,14 +727,14 @@ components:
       properties:
         message:
           type: string
-          example: Similique molestias enim.
+          example: Assumenda eum.
         success:
           type: boolean
           default: false
-          example: true
+          example: false
       description: When email already exist
       example:
-        message: Voluptatum minima adipisci.
+        message: Fuga ratione ut error voluptas ut.
         success: false
       required:
       - message
@@ -754,14 +754,17 @@ components:
           - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
             name: Guillaume
             price: 69
+          - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
         success:
           type: boolean
           example: false
       example:
         books:
-        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          name: Guillaume
-          price: 69
         - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
           price: 69
@@ -777,21 +780,21 @@ components:
       properties:
         id:
           type: string
-          example: Esse eos et reiciendis enim.
+          example: Non ut.
         name:
           type: string
-          example: Velit ea voluptatem.
+          example: Dolorem a cumque.
         price:
           type: number
-          example: 0.6347471387800683
+          example: 0.49944255169767265
           format: double
         success:
           type: boolean
           example: true
       example:
-        id: Perferendis tenetur.
-        name: Ut modi.
-        price: 0.9470005515621835
+        id: Ut molestiae molestias iusto quo.
+        name: Veritatis unde rerum consequatur.
+        price: 0.2797482118444458
         success: false
       required:
       - id
@@ -803,17 +806,17 @@ components:
       properties:
         client_id:
           type: string
-          example: Reiciendis itaque quos illum similique aut sequi.
+          example: Sequi voluptatem a maiores maxime et.
         client_secret:
           type: string
-          example: A maiores maxime.
+          example: Accusamus quos.
         grant_type:
           type: string
-          example: Aspernatur accusamus.
+          example: Debitis incidunt at et.
       example:
-        client_id: Maiores debitis incidunt at.
-        client_secret: Corporis laborum commodi enim quia.
-        grant_type: Est laudantium.
+        client_id: Laborum commodi enim quia earum.
+        client_secret: Laudantium saepe culpa.
+        grant_type: Quod saepe eos commodi perspiciatis.
       required:
       - client_id
       - client_secret
@@ -823,22 +826,22 @@ components:
       properties:
         access_token:
           type: string
-          example: Culpa doloribus.
+          example: Est odio mollitia voluptatem.
         expires_in:
           type: integer
-          example: 8821600341866436857
+          example: 805247224837809882
           format: int64
         success:
           type: boolean
           example: false
         token_type:
           type: string
-          example: Saepe eos commodi.
+          example: Voluptatem quisquam et dolore.
       example:
-        access_token: Odio mollitia.
-        expires_in: 5598219820078611128
+        access_token: Et qui ut recusandae.
+        expires_in: 8164530338756842719
         success: true
-        token_type: Officia voluptatem quisquam et.
+        token_type: Repellat cupiditate non ut quo.
       required:
       - access_token
       - token_type
@@ -865,7 +868,7 @@ components:
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         success:
           type: boolean
-          example: true
+          example: false
       example:
         access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
@@ -899,7 +902,7 @@ components:
         birthday:
           type: string
           default: ""
-          example: Laborum numquam.
+          example: Molestias enim adipisci et voluptatum.
         email:
           type: string
           example: guillaume@epitech.eu
@@ -925,7 +928,7 @@ components:
           example: +262 692 12 34 56
       description: Use client ID and client secret to oAuth
       example:
-        birthday: Dolorum neque repellat velit cupiditate quis delectus.
+        birthday: Adipisci minus.
         email: guillaume@epitech.eu
         firstname: Guillaume
         lastname: Morin
@@ -939,7 +942,7 @@ components:
     Unauthorized:
       type: string
       description: Credentials are invalid
-      example: Id ut molestiae molestias iusto.
+      example: Neque repellat velit.
     UnknownError:
       type: object
       properties:
@@ -957,7 +960,7 @@ components:
       example:
         err: sql no rows affected
         error_code: TX_UPDATE_ITEM
-        success: true
+        success: false
       required:
       - err
       - success

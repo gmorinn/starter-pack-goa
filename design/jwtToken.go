@@ -141,13 +141,14 @@ var _ = Service("jwtToken", func() {
 				Example("guillaume@epitech.eu")
 			})
 			Attribute("firebase_id_token", String, func() {
-				MinLength(5)
+				MinLength(400)
 			})
 			Attribute("firebase_uid", String, func() {
-				MinLength(5)
+				MinLength(15)
+				Example("zgmURRUlcJfgDMRyjJ20xs7Rxxw2")
 			})
 			Attribute("firebase_provider", String, func() {
-				Example("Facebook")
+				Example("facebook.com")
 			})
 			AccessTokenField(1, "oauth", String, func() {
 				Description("Use to generate Oauth with /authorization")

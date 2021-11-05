@@ -535,13 +535,13 @@ func ValidateAuthProvidersRequestBody(body *AuthProvidersRequestBody) (err error
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
 	}
 	if body.FirebaseIDToken != nil {
-		if utf8.RuneCountInString(*body.FirebaseIDToken) < 5 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_id_token", *body.FirebaseIDToken, utf8.RuneCountInString(*body.FirebaseIDToken), 5, true))
+		if utf8.RuneCountInString(*body.FirebaseIDToken) < 400 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_id_token", *body.FirebaseIDToken, utf8.RuneCountInString(*body.FirebaseIDToken), 400, true))
 		}
 	}
 	if body.FirebaseUID != nil {
-		if utf8.RuneCountInString(*body.FirebaseUID) < 5 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_uid", *body.FirebaseUID, utf8.RuneCountInString(*body.FirebaseUID), 5, true))
+		if utf8.RuneCountInString(*body.FirebaseUID) < 15 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_uid", *body.FirebaseUID, utf8.RuneCountInString(*body.FirebaseUID), 15, true))
 		}
 	}
 	return

@@ -144,7 +144,7 @@ func BuildAuthProvidersPayload(jwtTokenAuthProvidersBody string, jwtTokenAuthPro
 	{
 		err = json.Unmarshal([]byte(jwtTokenAuthProvidersBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firebase_id_token\": \"eov\",\n      \"firebase_provider\": \"Facebook\",\n      \"firebase_uid\": \"8l5\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firebase_id_token\": \"eov\",\n      \"firebase_provider\": \"facebook.com\",\n      \"firebase_uid\": \"zgmURRUlcJfgDMRyjJ20xs7Rxxw2\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
@@ -157,11 +157,11 @@ func BuildAuthProvidersPayload(jwtTokenAuthProvidersBody string, jwtTokenAuthPro
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
-		if utf8.RuneCountInString(body.FirebaseIDToken) < 5 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_id_token", body.FirebaseIDToken, utf8.RuneCountInString(body.FirebaseIDToken), 5, true))
+		if utf8.RuneCountInString(body.FirebaseIDToken) < 400 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_id_token", body.FirebaseIDToken, utf8.RuneCountInString(body.FirebaseIDToken), 400, true))
 		}
-		if utf8.RuneCountInString(body.FirebaseUID) < 5 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_uid", body.FirebaseUID, utf8.RuneCountInString(body.FirebaseUID), 5, true))
+		if utf8.RuneCountInString(body.FirebaseUID) < 15 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firebase_uid", body.FirebaseUID, utf8.RuneCountInString(body.FirebaseUID), 15, true))
 		}
 		if err != nil {
 			return nil, err
