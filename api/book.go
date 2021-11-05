@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/google/uuid"
+	"goa.design/goa/v3/security"
 )
 
 // book service example implementation.
@@ -27,6 +28,14 @@ func (s *booksrvc) ErrorResponse(msg string, err error) *book.UnknownError {
 // NewBook returns the book service implementation.
 func NewBook(logger *log.Logger, server *Server) book.Service {
 	return &booksrvc{logger, server}
+}
+
+func (s *booksrvc) OAuth2Auth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
+	return s.server.CheckAuth(ctx, token, scheme)
+}
+
+func (s *booksrvc) JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error) {
+	return s.server.CheckJWT(ctx, token, schema)
 }
 
 // Get one item

@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	goahttp "goa.design/goa/v3/http"
 )
@@ -40,6 +41,14 @@ func EncodeSignupRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 		p, ok := v.(*jwttoken.SignupPayload)
 		if !ok {
 			return goahttp.ErrInvalidType("jwtToken", "signup", "*jwttoken.SignupPayload", v)
+		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
 		}
 		body := NewSignupRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
@@ -166,6 +175,14 @@ func EncodeSigninRequest(encoder func(*http.Request) goahttp.Encoder) func(*http
 		if !ok {
 			return goahttp.ErrInvalidType("jwtToken", "signin", "*jwttoken.SigninPayload", v)
 		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
 		body := NewSigninRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
 			return goahttp.ErrEncodingError("jwtToken", "signin", err)
@@ -291,6 +308,14 @@ func EncodeRefreshRequest(encoder func(*http.Request) goahttp.Encoder) func(*htt
 		if !ok {
 			return goahttp.ErrInvalidType("jwtToken", "refresh", "*jwttoken.RefreshPayload", v)
 		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
 		body := NewRefreshRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
 			return goahttp.ErrEncodingError("jwtToken", "refresh", err)
@@ -389,6 +414,139 @@ func DecodeRefreshResponse(decoder func(*http.Response) goahttp.Decoder, restore
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("jwtToken", "refresh", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildAuthProvidersRequest instantiates a HTTP request object with method and
+// path set to call the "jwtToken" service "auth-providers" endpoint
+func (c *Client) BuildAuthProvidersRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AuthProvidersJWTTokenPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("jwtToken", "auth-providers", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAuthProvidersRequest returns an encoder for requests sent to the
+// jwtToken auth-providers server.
+func EncodeAuthProvidersRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*jwttoken.AuthProvidersPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("jwtToken", "auth-providers", "*jwttoken.AuthProvidersPayload", v)
+		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		body := NewAuthProvidersRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("jwtToken", "auth-providers", err)
+		}
+		return nil
+	}
+}
+
+// DecodeAuthProvidersResponse returns a decoder for responses returned by the
+// jwtToken auth-providers endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeAuthProvidersResponse may return the following errors:
+//	- "email_already_exist" (type *jwttoken.EmailAlreadyExist): http.StatusBadRequest
+//	- "unknown_error" (type *jwttoken.UnknownError): http.StatusInternalServerError
+//	- "invalid_scopes" (type jwttoken.InvalidScopes): http.StatusForbidden
+//	- "unauthorized" (type jwttoken.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeAuthProvidersResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body AuthProvidersResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "auth-providers", err)
+			}
+			err = ValidateAuthProvidersResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("jwtToken", "auth-providers", err)
+			}
+			res := NewAuthProvidersSignOK(&body)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body AuthProvidersEmailAlreadyExistResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "auth-providers", err)
+			}
+			err = ValidateAuthProvidersEmailAlreadyExistResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("jwtToken", "auth-providers", err)
+			}
+			return nil, NewAuthProvidersEmailAlreadyExist(&body)
+		case http.StatusInternalServerError:
+			var (
+				body AuthProvidersUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "auth-providers", err)
+			}
+			err = ValidateAuthProvidersUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("jwtToken", "auth-providers", err)
+			}
+			return nil, NewAuthProvidersUnknownError(&body)
+		case http.StatusForbidden:
+			var (
+				body AuthProvidersInvalidScopesResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "auth-providers", err)
+			}
+			return nil, NewAuthProvidersInvalidScopes(body)
+		case http.StatusUnauthorized:
+			var (
+				body AuthProvidersUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "auth-providers", err)
+			}
+			return nil, NewAuthProvidersUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("jwtToken", "auth-providers", resp.StatusCode, string(body))
 		}
 	}
 }

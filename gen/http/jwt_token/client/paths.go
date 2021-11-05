@@ -21,3 +21,8 @@ func SigninJWTTokenPath() string {
 func RefreshJWTTokenPath() string {
 	return "/resfresh"
 }
+
+// AuthProvidersJWTTokenPath returns the URL path to the jwtToken service auth-providers HTTP endpoint.
+func AuthProvidersJWTTokenPath() string {
+	return "/sign-providers"
+}

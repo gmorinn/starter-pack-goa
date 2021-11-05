@@ -15,17 +15,19 @@ import (
 
 // Client is the "jwtToken" service client.
 type Client struct {
-	SignupEndpoint  goa.Endpoint
-	SigninEndpoint  goa.Endpoint
-	RefreshEndpoint goa.Endpoint
+	SignupEndpoint        goa.Endpoint
+	SigninEndpoint        goa.Endpoint
+	RefreshEndpoint       goa.Endpoint
+	AuthProvidersEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "jwtToken" service client given the endpoints.
-func NewClient(signup, signin, refresh goa.Endpoint) *Client {
+func NewClient(signup, signin, refresh, authProviders goa.Endpoint) *Client {
 	return &Client{
-		SignupEndpoint:  signup,
-		SigninEndpoint:  signin,
-		RefreshEndpoint: refresh,
+		SignupEndpoint:        signup,
+		SigninEndpoint:        signin,
+		RefreshEndpoint:       refresh,
+		AuthProvidersEndpoint: authProviders,
 	}
 }
 
@@ -53,6 +55,16 @@ func (c *Client) Signin(ctx context.Context, p *SigninPayload) (res *Sign, err e
 func (c *Client) Refresh(ctx context.Context, p *RefreshPayload) (res *Sign, err error) {
 	var ires interface{}
 	ires, err = c.RefreshEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Sign), nil
+}
+
+// AuthProviders calls the "auth-providers" endpoint of the "jwtToken" service.
+func (c *Client) AuthProviders(ctx context.Context, p *AuthProvidersPayload) (res *Sign, err error) {
+	var ires interface{}
+	ires, err = c.AuthProvidersEndpoint(ctx, p)
 	if err != nil {
 		return
 	}

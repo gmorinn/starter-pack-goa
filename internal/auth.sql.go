@@ -5,13 +5,14 @@ package db
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
 
 const existUserByEmail = `-- name: ExistUserByEmail :one
 SELECT EXISTS(
-    SELECT id, created_at, updated_at, role, deleted_at, email, password, lastname, firstname FROM users
+    SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
     WHERE email = $1
     AND deleted_at IS NULL
 )
@@ -58,17 +59,18 @@ func (q *Queries) LoginUser(ctx context.Context, arg LoginUserParams) (LoginUser
 }
 
 const signup = `-- name: Signup :one
-INSERT INTO users (firstname, lastname, email, role, password) 
-VALUES ($1, $2, $3, $4, crypt($5, gen_salt('bf')))
-RETURNING id, created_at, updated_at, role, deleted_at, email, password, lastname, firstname
+INSERT INTO users (firstname, lastname, email, password, phone, birthday) 
+VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5, $6)
+RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
 `
 
 type SignupParams struct {
-	Firstname string      `json:"firstname"`
-	Lastname  string      `json:"lastname"`
-	Email     string      `json:"email"`
-	Role      Role        `json:"role"`
-	Crypt     interface{} `json:"crypt"`
+	Firstname string         `json:"firstname"`
+	Lastname  string         `json:"lastname"`
+	Email     string         `json:"email"`
+	Crypt     interface{}    `json:"crypt"`
+	Phone     sql.NullString `json:"phone"`
+	Birthday  sql.NullString `json:"birthday"`
 }
 
 func (q *Queries) Signup(ctx context.Context, arg SignupParams) (User, error) {
@@ -76,20 +78,26 @@ func (q *Queries) Signup(ctx context.Context, arg SignupParams) (User, error) {
 		arg.Firstname,
 		arg.Lastname,
 		arg.Email,
-		arg.Role,
 		arg.Crypt,
+		arg.Phone,
+		arg.Birthday,
 	)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Role,
 		&i.DeletedAt,
-		&i.Email,
-		&i.Password,
 		&i.Lastname,
 		&i.Firstname,
+		&i.Email,
+		&i.Password,
+		&i.Role,
+		&i.Birthday,
+		&i.Phone,
+		&i.FirebaseIDToken,
+		&i.FirebaseUid,
+		&i.FirebaseProvider,
 	)
 	return i, err
 }

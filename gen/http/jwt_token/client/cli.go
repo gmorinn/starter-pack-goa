@@ -18,13 +18,13 @@ import (
 
 // BuildSignupPayload builds the payload for the jwtToken signup endpoint from
 // CLI flags.
-func BuildSignupPayload(jwtTokenSignupBody string) (*jwttoken.SignupPayload, error) {
+func BuildSignupPayload(jwtTokenSignupBody string, jwtTokenSignupOauth string) (*jwttoken.SignupPayload, error) {
 	var err error
 	var body SignupRequestBody
 	{
 		err = json.Unmarshal([]byte(jwtTokenSignupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"2bu\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"birthday\": \"Voluptas libero non.\",\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"JeSuisUnTest974\",\n      \"phone\": \"+262 692 12 34 56\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
@@ -35,6 +35,7 @@ func BuildSignupPayload(jwtTokenSignupBody string) (*jwttoken.SignupPayload, err
 		if utf8.RuneCountInString(body.Lastname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.lastname", body.Lastname, utf8.RuneCountInString(body.Lastname), 3, true))
 		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", body.Password, "\\d"))
 		if utf8.RuneCountInString(body.Password) < 8 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 8, true))
 		}
@@ -42,6 +43,12 @@ func BuildSignupPayload(jwtTokenSignupBody string) (*jwttoken.SignupPayload, err
 
 		if err != nil {
 			return nil, err
+		}
+	}
+	var oauth *string
+	{
+		if jwtTokenSignupOauth != "" {
+			oauth = &jwtTokenSignupOauth
 		}
 	}
 	v := &jwttoken.SignupPayload{
@@ -49,23 +56,39 @@ func BuildSignupPayload(jwtTokenSignupBody string) (*jwttoken.SignupPayload, err
 		Lastname:  body.Lastname,
 		Password:  body.Password,
 		Email:     body.Email,
+		Birthday:  body.Birthday,
+		Phone:     body.Phone,
 	}
+	{
+		var zero string
+		if v.Birthday == zero {
+			v.Birthday = ""
+		}
+	}
+	{
+		var zero string
+		if v.Phone == zero {
+			v.Phone = ""
+		}
+	}
+	v.Oauth = oauth
 
 	return v, nil
 }
 
 // BuildSigninPayload builds the payload for the jwtToken signin endpoint from
 // CLI flags.
-func BuildSigninPayload(jwtTokenSigninBody string) (*jwttoken.SigninPayload, error) {
+func BuildSigninPayload(jwtTokenSigninBody string, jwtTokenSigninOauth string) (*jwttoken.SigninPayload, error) {
 	var err error
 	var body SigninRequestBody
 	{
 		err = json.Unmarshal([]byte(jwtTokenSigninBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"password\": \"mic\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"password\": \"JeSuisUnTest974\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", body.Password, "\\d"))
 		if utf8.RuneCountInString(body.Password) < 8 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 8, true))
 		}
@@ -73,17 +96,24 @@ func BuildSigninPayload(jwtTokenSigninBody string) (*jwttoken.SigninPayload, err
 			return nil, err
 		}
 	}
+	var oauth *string
+	{
+		if jwtTokenSigninOauth != "" {
+			oauth = &jwtTokenSigninOauth
+		}
+	}
 	v := &jwttoken.SigninPayload{
 		Email:    body.Email,
 		Password: body.Password,
 	}
+	v.Oauth = oauth
 
 	return v, nil
 }
 
 // BuildRefreshPayload builds the payload for the jwtToken refresh endpoint
 // from CLI flags.
-func BuildRefreshPayload(jwtTokenRefreshBody string) (*jwttoken.RefreshPayload, error) {
+func BuildRefreshPayload(jwtTokenRefreshBody string, jwtTokenRefreshOauth string) (*jwttoken.RefreshPayload, error) {
 	var err error
 	var body RefreshRequestBody
 	{
@@ -92,9 +122,51 @@ func BuildRefreshPayload(jwtTokenRefreshBody string) (*jwttoken.RefreshPayload, 
 			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"refresh_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ\"\n   }'")
 		}
 	}
+	var oauth *string
+	{
+		if jwtTokenRefreshOauth != "" {
+			oauth = &jwtTokenRefreshOauth
+		}
+	}
 	v := &jwttoken.RefreshPayload{
 		RefreshToken: body.RefreshToken,
 	}
+	v.Oauth = oauth
+
+	return v, nil
+}
+
+// BuildAuthProvidersPayload builds the payload for the jwtToken auth-providers
+// endpoint from CLI flags.
+func BuildAuthProvidersPayload(jwtTokenAuthProvidersBody string, jwtTokenAuthProvidersOauth string) (*jwttoken.AuthProvidersPayload, error) {
+	var err error
+	var body AuthProvidersRequestBody
+	{
+		err = json.Unmarshal([]byte(jwtTokenAuthProvidersBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"password\": \"JeSuisUnTest974\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
+
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", body.Password, "\\d"))
+		if utf8.RuneCountInString(body.Password) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 8, true))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var oauth *string
+	{
+		if jwtTokenAuthProvidersOauth != "" {
+			oauth = &jwtTokenAuthProvidersOauth
+		}
+	}
+	v := &jwttoken.AuthProvidersPayload{
+		Email:    body.Email,
+		Password: body.Password,
+	}
+	v.Oauth = oauth
 
 	return v, nil
 }

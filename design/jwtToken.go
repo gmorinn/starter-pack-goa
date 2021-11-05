@@ -12,12 +12,17 @@ var JWTAuth = JWTSecurity("jwt", func() {
 var _ = Service("jwtToken", func() {
 	Description("Use Token to authenticate. Signin and Signup")
 
+	Security(OAuth2)
+
 	Error("email_already_exist", emailAlreadyExist, "When email already exist")
 	Error("unknown_error", unknownError, "Error not identified (500)")
 	Error("invalid_scopes", String, "Token scopes are invalid")
 	Error("unauthorized", String, "Identifiers are invalid")
 
 	HTTP(func() {
+		Header("oauth:Authorization", String, "OAuth token", func() {
+			Pattern("^Bearer [^ ]+$")
+		})
 		Response("email_already_exist", StatusBadRequest)
 		Response("unknown_error", StatusInternalServerError)
 		Response("invalid_scopes", StatusForbidden)
@@ -39,11 +44,24 @@ var _ = Service("jwtToken", func() {
 				Example("Morin")
 			})
 			Attribute("password", String, func() {
+				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Pattern("\\d")
 				MinLength(8)
+				Example("JeSuisUnTest974")
 			})
 			Attribute("email", String, func() {
 				Format(FormatEmail)
 				Example("guillaume@epitech.eu")
+			})
+			Attribute("birthday", String, func() {
+				Default("")
+			})
+			Attribute("phone", String, func() {
+				Default("")
+				Example("+262 692 12 34 56")
+			})
+			AccessTokenField(1, "oauth", String, func() {
+				Description("Use to generate Oauth with /authorization")
 			})
 			Required("firstname", "lastname", "password", "email")
 		})
@@ -65,7 +83,13 @@ var _ = Service("jwtToken", func() {
 				Example("guillaume@epitech.eu")
 			})
 			Attribute("password", String, func() {
+				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Pattern("\\d")
 				MinLength(8)
+				Example("JeSuisUnTest974")
+			})
+			AccessTokenField(1, "oauth", String, func() {
+				Description("Use to generate Oauth with /authorization")
 			})
 			Required("password", "email")
 		})
@@ -85,6 +109,9 @@ var _ = Service("jwtToken", func() {
 			Attribute("refresh_token", String, func() {
 				Example("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ")
 			})
+			AccessTokenField(1, "oauth", String, func() {
+				Description("Use to generate Oauth with /authorization")
+			})
 			Required("refresh_token")
 		})
 
@@ -92,6 +119,34 @@ var _ = Service("jwtToken", func() {
 
 		HTTP(func() {
 			POST("/resfresh")
+			Response(StatusOK)
+		})
+	})
+
+	Method("auth-providers", func() {
+		Description("Register or login by Google, Facebook")
+
+		Payload(func() {
+			Attribute("email", String, func() {
+				Format(FormatEmail)
+				Example("guillaume@epitech.eu")
+			})
+			Attribute("password", String, func() {
+				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Pattern("\\d")
+				MinLength(8)
+				Example("JeSuisUnTest974")
+			})
+			AccessTokenField(1, "oauth", String, func() {
+				Description("Use to generate Oauth with /authorization")
+			})
+			Required("email", "password")
+		})
+
+		Result(Sign)
+
+		HTTP(func() {
+			POST("/sign-providers")
 			Response(StatusOK)
 		})
 	})

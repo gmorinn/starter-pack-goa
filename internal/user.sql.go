@@ -10,7 +10,7 @@ import (
 )
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, created_at, updated_at, role, deleted_at, email, password, lastname, firstname FROM users
+SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
 WHERE id = $1
 AND deleted_at IS NULL
 LIMIT 1
@@ -23,12 +23,17 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.ID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.Role,
 		&i.DeletedAt,
-		&i.Email,
-		&i.Password,
 		&i.Lastname,
 		&i.Firstname,
+		&i.Email,
+		&i.Password,
+		&i.Role,
+		&i.Birthday,
+		&i.Phone,
+		&i.FirebaseIDToken,
+		&i.FirebaseUid,
+		&i.FirebaseProvider,
 	)
 	return i, err
 }

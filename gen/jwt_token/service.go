@@ -9,6 +9,8 @@ package jwttoken
 
 import (
 	"context"
+
+	"goa.design/goa/v3/security"
 )
 
 // Use Token to authenticate. Signin and Signup
@@ -19,6 +21,14 @@ type Service interface {
 	Signin(context.Context, *SigninPayload) (res *Sign, err error)
 	// Refresh Token
 	Refresh(context.Context, *RefreshPayload) (res *Sign, err error)
+	// Register or login by Google, Facebook
+	AuthProviders(context.Context, *AuthProvidersPayload) (res *Sign, err error)
+}
+
+// Auther defines the authorization functions to be implemented by the service.
+type Auther interface {
+	// OAuth2Auth implements the authorization logic for the OAuth2 security scheme.
+	OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -29,14 +39,19 @@ const ServiceName = "jwtToken"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [3]string{"signup", "signin", "refresh"}
+var MethodNames = [4]string{"signup", "signin", "refresh", "auth-providers"}
 
 // Use client ID and client secret to oAuth
 type SignupPayload struct {
 	Firstname string
 	Lastname  string
-	Password  string
-	Email     string
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Password string
+	Email    string
+	Birthday string
+	Phone    string
+	// Use to generate Oauth with /authorization
+	Oauth *string
 }
 
 // Sign is the result type of the jwtToken service signup method.
@@ -48,13 +63,28 @@ type Sign struct {
 
 // SigninPayload is the payload type of the jwtToken service signin method.
 type SigninPayload struct {
-	Email    string
+	Email string
+	// Minimum 8 charactères / Chiffre Obligatoire
 	Password string
+	// Use to generate Oauth with /authorization
+	Oauth *string
 }
 
 // RefreshPayload is the payload type of the jwtToken service refresh method.
 type RefreshPayload struct {
 	RefreshToken string
+	// Use to generate Oauth with /authorization
+	Oauth *string
+}
+
+// AuthProvidersPayload is the payload type of the jwtToken service
+// auth-providers method.
+type AuthProvidersPayload struct {
+	Email string
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Password string
+	// Use to generate Oauth with /authorization
+	Oauth *string
 }
 
 type EmailAlreadyExist struct {

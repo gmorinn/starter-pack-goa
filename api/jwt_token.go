@@ -1,9 +1,9 @@
 package api
 
 import (
-	"api_crud/gen/book"
 	jwttoken "api_crud/gen/jwt_token"
 	db "api_crud/internal"
+	"api_crud/utils"
 	"context"
 	"fmt"
 	"log"
@@ -37,51 +37,12 @@ func (s *jwtTokensrvc) errorResponse(msg string, err error) *jwttoken.UnknownErr
 }
 
 var (
-	ErrInvalidToken       error = book.Unauthorized("invalid token")
+	ErrInvalidToken       error = jwttoken.Unauthorized("invalid token")
 	ErrInvalidTokenScopes error = jwttoken.InvalidScopes("invalid scopes in token")
 )
 
-func (s *booksrvc) JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error) {
-
-	claims := make(jwt.MapClaims)
-
-	// authorize request
-	// 1. parse JWT token, token key is hardcoded to "secret" in this example
-	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		b := ([]byte(s.server.Config.Security.Secret))
-		return b, nil
-	})
-	if err != nil {
-		return ctx, ErrInvalidToken
-	}
-
-	// 2. validate provided "scopes" claim
-	if claims["scopes"] == nil {
-		return ctx, ErrInvalidTokenScopes
-	}
-	if claims["id"] == nil {
-		return ctx, ErrInvalidTokenScopes
-	}
-	if claims["exp"] == nil {
-		return ctx, ErrInvalidTokenScopes
-	}
-	scopes, ok := claims["scopes"].([]interface{})
-	if !ok {
-		return ctx, ErrInvalidTokenScopes
-	}
-	scopesInToken := make([]string, len(scopes))
-	for _, scp := range scopes {
-		scopesInToken = append(scopesInToken, scp.(string))
-	}
-	if err := schema.Validate(scopesInToken); err != nil {
-		return ctx, jwttoken.InvalidScopes(err.Error())
-	}
-
-	// 3. add authInfo to context
-	ctx = contextWithAuthInfo(ctx, authInfo{
-		jwtToken: claims,
-	})
-	return ctx, nil
+func (s *jwtTokensrvc) OAuth2Auth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
+	return s.server.CheckAuth(ctx, token, scheme)
 }
 
 func (s *jwtTokensrvc) Signup(ctx context.Context, p *jwttoken.SignupPayload) (res *jwttoken.Sign, err error) {
@@ -99,6 +60,8 @@ func (s *jwtTokensrvc) Signup(ctx context.Context, p *jwttoken.SignupPayload) (r
 		Lastname:  p.Lastname,
 		Email:     p.Email,
 		Crypt:     p.Password,
+		Phone:     utils.NullS(p.Phone),
+		Birthday:  utils.NullS(p.Birthday),
 	}
 	user, err := s.server.Store.Signup(ctx, arg)
 	if err != nil {
@@ -213,4 +176,8 @@ func (s *jwtTokensrvc) generateJwtToken(ID uuid.UUID) (string, string, time.Time
 	}
 
 	return t, r, expt, nil
+}
+
+func (s *jwtTokensrvc) AuthProviders(ctx context.Context, p *jwttoken.AuthProvidersPayload) (res *jwttoken.Sign, err error) {
+	return nil, nil
 }

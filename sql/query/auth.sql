@@ -5,8 +5,8 @@ AND password = crypt($2, password)
 AND deleted_at IS NULL;
 
 -- name: Signup :one
-INSERT INTO users (firstname, lastname, email, role, password) 
-VALUES ($1, $2, $3, $4, crypt($5, gen_salt('bf')))
+INSERT INTO users (firstname, lastname, email, password, phone, birthday) 
+VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5, $6)
 RETURNING *;
 
 -- name: ExistUserByEmail :one

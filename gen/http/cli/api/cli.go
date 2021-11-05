@@ -25,25 +25,27 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `jwt-token (signup|signin|refresh)
-book (get-book|update-book|get-all-books|delete-book|create-book)
+	return `book (get-book|update-book|get-all-books|delete-book|create-book)
+jwt-token (signup|signin|refresh|auth-providers)
 o-auth o-auth
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` jwt-token signup --body '{
+	return os.Args[0] + ` book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Et in odit et ut sed nihil." --jwt-token "Sint perspiciatis possimus id quibusdam quidem eligendi."` + "\n" +
+		os.Args[0] + ` jwt-token signup --body '{
+      "birthday": "Voluptas libero non.",
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
-      "password": "2bu"
-   }'` + "\n" +
-		os.Args[0] + ` book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Rerum ut doloremque sapiente nisi." --jwt-token "Fuga voluptatibus dolor."` + "\n" +
+      "password": "JeSuisUnTest974",
+      "phone": "+262 692 12 34 56"
+   }' --oauth "Aut eum cumque."` + "\n" +
 		os.Args[0] + ` o-auth o-auth --body '{
-      "client_id": "Aliquid non ut corrupti consequatur saepe enim.",
-      "client_secret": "Tempora ipsam ratione maxime.",
-      "grant_type": "Illum vel nesciunt harum sed labore."
+      "client_id": "Culpa enim.",
+      "client_secret": "Atque molestias rerum voluptatem et pariatur ratione.",
+      "grant_type": "Voluptatem quam sunt numquam exercitationem."
    }'` + "\n" +
 		""
 }
@@ -58,17 +60,6 @@ func ParseEndpoint(
 	restore bool,
 ) (goa.Endpoint, interface{}, error) {
 	var (
-		jwtTokenFlags = flag.NewFlagSet("jwt-token", flag.ContinueOnError)
-
-		jwtTokenSignupFlags    = flag.NewFlagSet("signup", flag.ExitOnError)
-		jwtTokenSignupBodyFlag = jwtTokenSignupFlags.String("body", "REQUIRED", "")
-
-		jwtTokenSigninFlags    = flag.NewFlagSet("signin", flag.ExitOnError)
-		jwtTokenSigninBodyFlag = jwtTokenSigninFlags.String("body", "REQUIRED", "")
-
-		jwtTokenRefreshFlags    = flag.NewFlagSet("refresh", flag.ExitOnError)
-		jwtTokenRefreshBodyFlag = jwtTokenRefreshFlags.String("body", "REQUIRED", "")
-
 		bookFlags = flag.NewFlagSet("book", flag.ContinueOnError)
 
 		bookGetBookFlags        = flag.NewFlagSet("get-book", flag.ExitOnError)
@@ -94,22 +85,41 @@ func ParseEndpoint(
 		bookCreateBookOauthFlag    = bookCreateBookFlags.String("oauth", "REQUIRED", "")
 		bookCreateBookJWTTokenFlag = bookCreateBookFlags.String("jwt-token", "REQUIRED", "")
 
+		jwtTokenFlags = flag.NewFlagSet("jwt-token", flag.ContinueOnError)
+
+		jwtTokenSignupFlags     = flag.NewFlagSet("signup", flag.ExitOnError)
+		jwtTokenSignupBodyFlag  = jwtTokenSignupFlags.String("body", "REQUIRED", "")
+		jwtTokenSignupOauthFlag = jwtTokenSignupFlags.String("oauth", "", "")
+
+		jwtTokenSigninFlags     = flag.NewFlagSet("signin", flag.ExitOnError)
+		jwtTokenSigninBodyFlag  = jwtTokenSigninFlags.String("body", "REQUIRED", "")
+		jwtTokenSigninOauthFlag = jwtTokenSigninFlags.String("oauth", "", "")
+
+		jwtTokenRefreshFlags     = flag.NewFlagSet("refresh", flag.ExitOnError)
+		jwtTokenRefreshBodyFlag  = jwtTokenRefreshFlags.String("body", "REQUIRED", "")
+		jwtTokenRefreshOauthFlag = jwtTokenRefreshFlags.String("oauth", "", "")
+
+		jwtTokenAuthProvidersFlags     = flag.NewFlagSet("auth-providers", flag.ExitOnError)
+		jwtTokenAuthProvidersBodyFlag  = jwtTokenAuthProvidersFlags.String("body", "REQUIRED", "")
+		jwtTokenAuthProvidersOauthFlag = jwtTokenAuthProvidersFlags.String("oauth", "", "")
+
 		oAuthFlags = flag.NewFlagSet("o-auth", flag.ContinueOnError)
 
 		oAuthOAuthFlags    = flag.NewFlagSet("o-auth", flag.ExitOnError)
 		oAuthOAuthBodyFlag = oAuthOAuthFlags.String("body", "REQUIRED", "")
 	)
-	jwtTokenFlags.Usage = jwtTokenUsage
-	jwtTokenSignupFlags.Usage = jwtTokenSignupUsage
-	jwtTokenSigninFlags.Usage = jwtTokenSigninUsage
-	jwtTokenRefreshFlags.Usage = jwtTokenRefreshUsage
-
 	bookFlags.Usage = bookUsage
 	bookGetBookFlags.Usage = bookGetBookUsage
 	bookUpdateBookFlags.Usage = bookUpdateBookUsage
 	bookGetAllBooksFlags.Usage = bookGetAllBooksUsage
 	bookDeleteBookFlags.Usage = bookDeleteBookUsage
 	bookCreateBookFlags.Usage = bookCreateBookUsage
+
+	jwtTokenFlags.Usage = jwtTokenUsage
+	jwtTokenSignupFlags.Usage = jwtTokenSignupUsage
+	jwtTokenSigninFlags.Usage = jwtTokenSigninUsage
+	jwtTokenRefreshFlags.Usage = jwtTokenRefreshUsage
+	jwtTokenAuthProvidersFlags.Usage = jwtTokenAuthProvidersUsage
 
 	oAuthFlags.Usage = oAuthUsage
 	oAuthOAuthFlags.Usage = oAuthOAuthUsage
@@ -129,10 +139,10 @@ func ParseEndpoint(
 	{
 		svcn = flag.Arg(0)
 		switch svcn {
-		case "jwt-token":
-			svcf = jwtTokenFlags
 		case "book":
 			svcf = bookFlags
+		case "jwt-token":
+			svcf = jwtTokenFlags
 		case "o-auth":
 			svcf = oAuthFlags
 		default:
@@ -150,19 +160,6 @@ func ParseEndpoint(
 	{
 		epn = svcf.Arg(0)
 		switch svcn {
-		case "jwt-token":
-			switch epn {
-			case "signup":
-				epf = jwtTokenSignupFlags
-
-			case "signin":
-				epf = jwtTokenSigninFlags
-
-			case "refresh":
-				epf = jwtTokenRefreshFlags
-
-			}
-
 		case "book":
 			switch epn {
 			case "get-book":
@@ -179,6 +176,22 @@ func ParseEndpoint(
 
 			case "create-book":
 				epf = bookCreateBookFlags
+
+			}
+
+		case "jwt-token":
+			switch epn {
+			case "signup":
+				epf = jwtTokenSignupFlags
+
+			case "signin":
+				epf = jwtTokenSigninFlags
+
+			case "refresh":
+				epf = jwtTokenRefreshFlags
+
+			case "auth-providers":
+				epf = jwtTokenAuthProvidersFlags
 
 			}
 
@@ -209,19 +222,6 @@ func ParseEndpoint(
 	)
 	{
 		switch svcn {
-		case "jwt-token":
-			c := jwttokenc.NewClient(scheme, host, doer, enc, dec, restore)
-			switch epn {
-			case "signup":
-				endpoint = c.Signup()
-				data, err = jwttokenc.BuildSignupPayload(*jwtTokenSignupBodyFlag)
-			case "signin":
-				endpoint = c.Signin()
-				data, err = jwttokenc.BuildSigninPayload(*jwtTokenSigninBodyFlag)
-			case "refresh":
-				endpoint = c.Refresh()
-				data, err = jwttokenc.BuildRefreshPayload(*jwtTokenRefreshBodyFlag)
-			}
 		case "book":
 			c := bookc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -241,6 +241,22 @@ func ParseEndpoint(
 				endpoint = c.CreateBook()
 				data, err = bookc.BuildCreateBookPayload(*bookCreateBookBodyFlag, *bookCreateBookOauthFlag, *bookCreateBookJWTTokenFlag)
 			}
+		case "jwt-token":
+			c := jwttokenc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "signup":
+				endpoint = c.Signup()
+				data, err = jwttokenc.BuildSignupPayload(*jwtTokenSignupBodyFlag, *jwtTokenSignupOauthFlag)
+			case "signin":
+				endpoint = c.Signin()
+				data, err = jwttokenc.BuildSigninPayload(*jwtTokenSigninBodyFlag, *jwtTokenSigninOauthFlag)
+			case "refresh":
+				endpoint = c.Refresh()
+				data, err = jwttokenc.BuildRefreshPayload(*jwtTokenRefreshBodyFlag, *jwtTokenRefreshOauthFlag)
+			case "auth-providers":
+				endpoint = c.AuthProviders()
+				data, err = jwttokenc.BuildAuthProvidersPayload(*jwtTokenAuthProvidersBodyFlag, *jwtTokenAuthProvidersOauthFlag)
+			}
 		case "o-auth":
 			c := oauthc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -255,65 +271,6 @@ func ParseEndpoint(
 	}
 
 	return endpoint, data, nil
-}
-
-// jwt-tokenUsage displays the usage of the jwt-token command and its
-// subcommands.
-func jwtTokenUsage() {
-	fmt.Fprintf(os.Stderr, `Use Token to authenticate. Signin and Signup
-Usage:
-    %[1]s [globalflags] jwt-token COMMAND [flags]
-
-COMMAND:
-    signup: signup to generate jwt token
-    signin: signin
-    refresh: Refresh Token
-
-Additional help:
-    %[1]s jwt-token COMMAND --help
-`, os.Args[0])
-}
-func jwtTokenSignupUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token signup -body JSON
-
-signup to generate jwt token
-    -body JSON: 
-
-Example:
-    %[1]s jwt-token signup --body '{
-      "email": "guillaume@epitech.eu",
-      "firstname": "Guillaume",
-      "lastname": "Morin",
-      "password": "2bu"
-   }'
-`, os.Args[0])
-}
-
-func jwtTokenSigninUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token signin -body JSON
-
-signin
-    -body JSON: 
-
-Example:
-    %[1]s jwt-token signin --body '{
-      "email": "guillaume@epitech.eu",
-      "password": "mic"
-   }'
-`, os.Args[0])
-}
-
-func jwtTokenRefreshUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token refresh -body JSON
-
-Refresh Token
-    -body JSON: 
-
-Example:
-    %[1]s jwt-token refresh --body '{
-      "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
-   }'
-`, os.Args[0])
 }
 
 // bookUsage displays the usage of the book command and its subcommands.
@@ -342,7 +299,7 @@ Get one item
     -jwt-token STRING: 
 
 Example:
-    %[1]s book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Rerum ut doloremque sapiente nisi." --jwt-token "Fuga voluptatibus dolor."
+    %[1]s book get-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Et in odit et ut sed nihil." --jwt-token "Sint perspiciatis possimus id quibusdam quidem eligendi."
 `, os.Args[0])
 }
 
@@ -359,7 +316,7 @@ Example:
     %[1]s book update-book --body '{
       "name": "Guillaume",
       "price": 69
-   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Non consequuntur cum perspiciatis amet." --jwt-token "Et accusamus repellat."
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Qui minus accusantium assumenda." --jwt-token "Porro autem at."
 `, os.Args[0])
 }
 
@@ -382,7 +339,7 @@ Delete one item by ID
     -jwt-token STRING: 
 
 Example:
-    %[1]s book delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Adipisci ab aut saepe molestias voluptatibus." --jwt-token "Quaerat numquam consequatur placeat possimus id."
+    %[1]s book delete-book --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Qui nihil iure rerum ut doloremque." --jwt-token "Nisi sed fuga voluptatibus."
 `, os.Args[0])
 }
 
@@ -397,8 +354,88 @@ Create one item
 Example:
     %[1]s book create-book --body '{
       "name": "Guillaume",
-      "price": 0.18040562637737106
-   }' --oauth "Autem laudantium et earum veniam omnis." --jwt-token "Ab est voluptatem incidunt pariatur et."
+      "price": 0.45708415863110397
+   }' --oauth "Alias libero dolor eaque fugiat ut minus." --jwt-token "Illum iste aliquam non consequuntur cum."
+`, os.Args[0])
+}
+
+// jwt-tokenUsage displays the usage of the jwt-token command and its
+// subcommands.
+func jwtTokenUsage() {
+	fmt.Fprintf(os.Stderr, `Use Token to authenticate. Signin and Signup
+Usage:
+    %[1]s [globalflags] jwt-token COMMAND [flags]
+
+COMMAND:
+    signup: signup to generate jwt token
+    signin: signin
+    refresh: Refresh Token
+    auth-providers: Register or login by Google, Facebook
+
+Additional help:
+    %[1]s jwt-token COMMAND --help
+`, os.Args[0])
+}
+func jwtTokenSignupUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token signup -body JSON -oauth STRING
+
+signup to generate jwt token
+    -body JSON: 
+    -oauth STRING: 
+
+Example:
+    %[1]s jwt-token signup --body '{
+      "birthday": "Voluptas libero non.",
+      "email": "guillaume@epitech.eu",
+      "firstname": "Guillaume",
+      "lastname": "Morin",
+      "password": "JeSuisUnTest974",
+      "phone": "+262 692 12 34 56"
+   }' --oauth "Aut eum cumque."
+`, os.Args[0])
+}
+
+func jwtTokenSigninUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token signin -body JSON -oauth STRING
+
+signin
+    -body JSON: 
+    -oauth STRING: 
+
+Example:
+    %[1]s jwt-token signin --body '{
+      "email": "guillaume@epitech.eu",
+      "password": "JeSuisUnTest974"
+   }' --oauth "Omnis vel ab."
+`, os.Args[0])
+}
+
+func jwtTokenRefreshUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token refresh -body JSON -oauth STRING
+
+Refresh Token
+    -body JSON: 
+    -oauth STRING: 
+
+Example:
+    %[1]s jwt-token refresh --body '{
+      "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
+   }' --oauth "Vel nesciunt harum sed."
+`, os.Args[0])
+}
+
+func jwtTokenAuthProvidersUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] jwt-token auth-providers -body JSON -oauth STRING
+
+Register or login by Google, Facebook
+    -body JSON: 
+    -oauth STRING: 
+
+Example:
+    %[1]s jwt-token auth-providers --body '{
+      "email": "guillaume@epitech.eu",
+      "password": "JeSuisUnTest974"
+   }' --oauth "Maxime voluptatem dolores modi deserunt."
 `, os.Args[0])
 }
 
@@ -423,9 +460,9 @@ oAuth
 
 Example:
     %[1]s o-auth o-auth --body '{
-      "client_id": "Aliquid non ut corrupti consequatur saepe enim.",
-      "client_secret": "Tempora ipsam ratione maxime.",
-      "grant_type": "Illum vel nesciunt harum sed labore."
+      "client_id": "Culpa enim.",
+      "client_secret": "Atque molestias rerum voluptatem et pariatur ratione.",
+      "grant_type": "Voluptatem quam sunt numquam exercitationem."
    }'
 `, os.Args[0])
 }

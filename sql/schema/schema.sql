@@ -26,12 +26,17 @@ CREATE TABLE "users" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "created_at" timestamp NOT NULL DEFAULT (now()),
   "updated_at" timestamp NOT NULL DEFAULT (now()),
-  "role" role NOT NULL DEFAULT 'user',
   "deleted_at" timestamp,
+  "lastname" text NOT NULL,
+  "firstname" text NOT NULL,
   "email" text NOT NULL,
   "password" text NOT NULL,
-  "lastname" text NOT NULL,
-  "firstname" text NOT NULL
+  "role" role NOT NULL DEFAULT 'user',
+  "birthday" text,
+  "phone" text,
+  "firebase_id_token" text DEFAULT NULL,
+  "firebase_uid" text DEFAULT NULL,
+  "firebase_provider" text DEFAULT NULL
 );
 
 CREATE TABLE "refresh_token" (

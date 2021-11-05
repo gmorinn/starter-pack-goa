@@ -27,6 +27,10 @@ type Client struct {
 	// endpoint.
 	RefreshDoer goahttp.Doer
 
+	// AuthProviders Doer is the HTTP client used to make requests to the
+	// auth-providers endpoint.
+	AuthProvidersDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -53,6 +57,7 @@ func NewClient(
 		SignupDoer:          doer,
 		SigninDoer:          doer,
 		RefreshDoer:         doer,
+		AuthProvidersDoer:   doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -129,6 +134,30 @@ func (c *Client) Refresh() goa.Endpoint {
 		resp, err := c.RefreshDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("jwtToken", "refresh", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// AuthProviders returns an endpoint that makes HTTP requests to the jwtToken
+// service auth-providers server.
+func (c *Client) AuthProviders() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAuthProvidersRequest(c.encoder)
+		decodeResponse = DecodeAuthProvidersResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAuthProvidersRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AuthProvidersDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("jwtToken", "auth-providers", err)
 		}
 		return decodeResponse(resp)
 	}

@@ -19,14 +19,18 @@ import (
 type SignupRequestBody struct {
 	Firstname *string `form:"firstname,omitempty" json:"firstname,omitempty" xml:"firstname,omitempty"`
 	Lastname  *string `form:"lastname,omitempty" json:"lastname,omitempty" xml:"lastname,omitempty"`
-	Password  *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
-	Email     *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
+	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Birthday *string `form:"birthday,omitempty" json:"birthday,omitempty" xml:"birthday,omitempty"`
+	Phone    *string `form:"phone,omitempty" json:"phone,omitempty" xml:"phone,omitempty"`
 }
 
 // SigninRequestBody is the type of the "jwtToken" service "signin" endpoint
 // HTTP request body.
 type SigninRequestBody struct {
-	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	// Minimum 8 charactères / Chiffre Obligatoire
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
@@ -34,6 +38,14 @@ type SigninRequestBody struct {
 // HTTP request body.
 type RefreshRequestBody struct {
 	RefreshToken *string `form:"refresh_token,omitempty" json:"refresh_token,omitempty" xml:"refresh_token,omitempty"`
+}
+
+// AuthProvidersRequestBody is the type of the "jwtToken" service
+// "auth-providers" endpoint HTTP request body.
+type AuthProvidersRequestBody struct {
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 }
 
 // SignupResponseBody is the type of the "jwtToken" service "signup" endpoint
@@ -55,6 +67,14 @@ type SigninResponseBody struct {
 // RefreshResponseBody is the type of the "jwtToken" service "refresh" endpoint
 // HTTP response body.
 type RefreshResponseBody struct {
+	AccessToken  string `form:"access_token" json:"access_token" xml:"access_token"`
+	RefreshToken string `form:"refresh_token" json:"refresh_token" xml:"refresh_token"`
+	Success      bool   `form:"success" json:"success" xml:"success"`
+}
+
+// AuthProvidersResponseBody is the type of the "jwtToken" service
+// "auth-providers" endpoint HTTP response body.
+type AuthProvidersResponseBody struct {
 	AccessToken  string `form:"access_token" json:"access_token" xml:"access_token"`
 	RefreshToken string `form:"refresh_token" json:"refresh_token" xml:"refresh_token"`
 	Success      bool   `form:"success" json:"success" xml:"success"`
@@ -129,6 +149,30 @@ type RefreshInvalidScopesResponseBody string
 // "refresh" endpoint HTTP response body for the "unauthorized" error.
 type RefreshUnauthorizedResponseBody string
 
+// AuthProvidersEmailAlreadyExistResponseBody is the type of the "jwtToken"
+// service "auth-providers" endpoint HTTP response body for the
+// "email_already_exist" error.
+type AuthProvidersEmailAlreadyExistResponseBody struct {
+	Message string `form:"message" json:"message" xml:"message"`
+	Success bool   `form:"success" json:"success" xml:"success"`
+}
+
+// AuthProvidersUnknownErrorResponseBody is the type of the "jwtToken" service
+// "auth-providers" endpoint HTTP response body for the "unknown_error" error.
+type AuthProvidersUnknownErrorResponseBody struct {
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
+}
+
+// AuthProvidersInvalidScopesResponseBody is the type of the "jwtToken" service
+// "auth-providers" endpoint HTTP response body for the "invalid_scopes" error.
+type AuthProvidersInvalidScopesResponseBody string
+
+// AuthProvidersUnauthorizedResponseBody is the type of the "jwtToken" service
+// "auth-providers" endpoint HTTP response body for the "unauthorized" error.
+type AuthProvidersUnauthorizedResponseBody string
+
 // NewSignupResponseBody builds the HTTP response body from the result of the
 // "signup" endpoint of the "jwtToken" service.
 func NewSignupResponseBody(res *jwttoken.Sign) *SignupResponseBody {
@@ -155,6 +199,17 @@ func NewSigninResponseBody(res *jwttoken.Sign) *SigninResponseBody {
 // "refresh" endpoint of the "jwtToken" service.
 func NewRefreshResponseBody(res *jwttoken.Sign) *RefreshResponseBody {
 	body := &RefreshResponseBody{
+		AccessToken:  res.AccessToken,
+		RefreshToken: res.RefreshToken,
+		Success:      res.Success,
+	}
+	return body
+}
+
+// NewAuthProvidersResponseBody builds the HTTP response body from the result
+// of the "auth-providers" endpoint of the "jwtToken" service.
+func NewAuthProvidersResponseBody(res *jwttoken.Sign) *AuthProvidersResponseBody {
+	body := &AuthProvidersResponseBody{
 		AccessToken:  res.AccessToken,
 		RefreshToken: res.RefreshToken,
 		Success:      res.Success,
@@ -267,33 +322,95 @@ func NewRefreshUnauthorizedResponseBody(res jwttoken.Unauthorized) RefreshUnauth
 	return body
 }
 
+// NewAuthProvidersEmailAlreadyExistResponseBody builds the HTTP response body
+// from the result of the "auth-providers" endpoint of the "jwtToken" service.
+func NewAuthProvidersEmailAlreadyExistResponseBody(res *jwttoken.EmailAlreadyExist) *AuthProvidersEmailAlreadyExistResponseBody {
+	body := &AuthProvidersEmailAlreadyExistResponseBody{
+		Message: res.Message,
+		Success: res.Success,
+	}
+	return body
+}
+
+// NewAuthProvidersUnknownErrorResponseBody builds the HTTP response body from
+// the result of the "auth-providers" endpoint of the "jwtToken" service.
+func NewAuthProvidersUnknownErrorResponseBody(res *jwttoken.UnknownError) *AuthProvidersUnknownErrorResponseBody {
+	body := &AuthProvidersUnknownErrorResponseBody{
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
+	}
+	return body
+}
+
+// NewAuthProvidersInvalidScopesResponseBody builds the HTTP response body from
+// the result of the "auth-providers" endpoint of the "jwtToken" service.
+func NewAuthProvidersInvalidScopesResponseBody(res jwttoken.InvalidScopes) AuthProvidersInvalidScopesResponseBody {
+	body := AuthProvidersInvalidScopesResponseBody(res)
+	return body
+}
+
+// NewAuthProvidersUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "auth-providers" endpoint of the "jwtToken" service.
+func NewAuthProvidersUnauthorizedResponseBody(res jwttoken.Unauthorized) AuthProvidersUnauthorizedResponseBody {
+	body := AuthProvidersUnauthorizedResponseBody(res)
+	return body
+}
+
 // NewSignupPayload builds a jwtToken service signup endpoint payload.
-func NewSignupPayload(body *SignupRequestBody) *jwttoken.SignupPayload {
+func NewSignupPayload(body *SignupRequestBody, oauth *string) *jwttoken.SignupPayload {
 	v := &jwttoken.SignupPayload{
 		Firstname: *body.Firstname,
 		Lastname:  *body.Lastname,
 		Password:  *body.Password,
 		Email:     *body.Email,
 	}
+	if body.Birthday != nil {
+		v.Birthday = *body.Birthday
+	}
+	if body.Phone != nil {
+		v.Phone = *body.Phone
+	}
+	if body.Birthday == nil {
+		v.Birthday = ""
+	}
+	if body.Phone == nil {
+		v.Phone = ""
+	}
+	v.Oauth = oauth
 
 	return v
 }
 
 // NewSigninPayload builds a jwtToken service signin endpoint payload.
-func NewSigninPayload(body *SigninRequestBody) *jwttoken.SigninPayload {
+func NewSigninPayload(body *SigninRequestBody, oauth *string) *jwttoken.SigninPayload {
 	v := &jwttoken.SigninPayload{
 		Email:    *body.Email,
 		Password: *body.Password,
 	}
+	v.Oauth = oauth
 
 	return v
 }
 
 // NewRefreshPayload builds a jwtToken service refresh endpoint payload.
-func NewRefreshPayload(body *RefreshRequestBody) *jwttoken.RefreshPayload {
+func NewRefreshPayload(body *RefreshRequestBody, oauth *string) *jwttoken.RefreshPayload {
 	v := &jwttoken.RefreshPayload{
 		RefreshToken: *body.RefreshToken,
 	}
+	v.Oauth = oauth
+
+	return v
+}
+
+// NewAuthProvidersPayload builds a jwtToken service auth-providers endpoint
+// payload.
+func NewAuthProvidersPayload(body *AuthProvidersRequestBody, oauth *string) *jwttoken.AuthProvidersPayload {
+	v := &jwttoken.AuthProvidersPayload{
+		Email:    *body.Email,
+		Password: *body.Password,
+	}
+	v.Oauth = oauth
 
 	return v
 }
@@ -328,6 +445,9 @@ func ValidateSignupRequestBody(body *SignupRequestBody) (err error) {
 		}
 	}
 	if body.Password != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", *body.Password, "\\d"))
+	}
+	if body.Password != nil {
 		if utf8.RuneCountInString(*body.Password) < 8 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 8, true))
 		}
@@ -350,6 +470,9 @@ func ValidateSigninRequestBody(body *SigninRequestBody) (err error) {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
 	}
 	if body.Password != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", *body.Password, "\\d"))
+	}
+	if body.Password != nil {
 		if utf8.RuneCountInString(*body.Password) < 8 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 8, true))
 		}
@@ -361,6 +484,29 @@ func ValidateSigninRequestBody(body *SigninRequestBody) (err error) {
 func ValidateRefreshRequestBody(body *RefreshRequestBody) (err error) {
 	if body.RefreshToken == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("refresh_token", "body"))
+	}
+	return
+}
+
+// ValidateAuthProvidersRequestBody runs the validations defined on
+// Auth-ProvidersRequestBody
+func ValidateAuthProvidersRequestBody(body *AuthProvidersRequestBody) (err error) {
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Password == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("password", "body"))
+	}
+	if body.Email != nil {
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
+	}
+	if body.Password != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", *body.Password, "\\d"))
+	}
+	if body.Password != nil {
+		if utf8.RuneCountInString(*body.Password) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 8, true))
+		}
 	}
 	return
 }
