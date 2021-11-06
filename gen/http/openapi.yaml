@@ -569,6 +569,239 @@ paths:
             - error_code
       schemes:
       - http
+  /web/product/{id}:
+    get:
+      tags:
+      - products
+      summary: getProduct products
+      description: Get one product
+      operationId: products#getProduct
+      parameters:
+      - name: id
+        in: path
+        description: Unique ID of the product
+        required: true
+        type: string
+        format: uuid
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/ProductsGetProductResponseBody'
+            required:
+            - product
+            - success
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/ProductsGetProductUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - http
+      security:
+      - OAuth2_header_Authorization: []
+        jwt_header_jwtToken: []
+    put:
+      tags:
+      - products
+      summary: updateProduct products
+      description: Update one product
+      operationId: products#updateProduct
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        format: uuid
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: UpdateProductRequestBody
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ProductsUpdateProductRequestBody'
+          required:
+          - product
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/ProductsUpdateProductResponseBody'
+            required:
+            - product
+            - success
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/ProductsUpdateProductUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - http
+      security:
+      - OAuth2_header_Authorization: []
+        jwt_header_jwtToken: []
+  /web/product/add:
+    post:
+      tags:
+      - products
+      summary: createProduct products
+      description: Create one product
+      operationId: products#createProduct
+      parameters:
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: CreateProductRequestBody
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ProductsCreateProductRequestBody'
+          required:
+          - product
+      responses:
+        "201":
+          description: Created response.
+          schema:
+            $ref: '#/definitions/ProductsCreateProductResponseBody'
+            required:
+            - product
+            - success
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/ProductsCreateProductUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - http
+      security:
+      - OAuth2_header_Authorization: []
+        jwt_header_jwtToken: []
+  /web/product/remove/{id}:
+    delete:
+      tags:
+      - products
+      summary: deleteProduct products
+      description: Delete one product by ID
+      operationId: products#deleteProduct
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+        format: uuid
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/ProductsDeleteProductResponseBody'
+            required:
+            - success
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/ProductsDeleteProductUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - http
+      security:
+      - OAuth2_header_Authorization: []
+        jwt_header_jwtToken: []
+  /web/products:
+    get:
+      tags:
+      - products
+      summary: getAllProductsByCategory products
+      description: Get All products by category
+      operationId: products#getAllProductsByCategory
+      parameters:
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/ProductsGetAllProductsByCategoryResponseBody'
+            required:
+            - products
+            - success
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/ProductsGetAllProductsByCategoryUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - http
+      security:
+      - OAuth2_header_Authorization: []
+        jwt_header_jwtToken: []
 definitions:
   BookCreateBookRequestBody:
     title: BookCreateBookRequestBody
@@ -583,11 +816,11 @@ definitions:
       price:
         type: number
         description: Price of the book
-        example: 0.23933263907974725
+        example: 0.6812804402754251
         minimum: 0.1
     example:
       name: Guillaume
-      price: 0.23791665008385104
+      price: 0.28228381354369586
     required:
     - name
     - price
@@ -613,7 +846,7 @@ definitions:
     title: BookCreateBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Quibusdam ea hic explicabo autem.
+    example: Iste atque eius sed dolores.
   BookCreateBookUnknownErrorResponseBody:
     title: BookCreateBookUnknownErrorResponseBody
     type: object
@@ -632,7 +865,7 @@ definitions:
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: true
+      success: false
     required:
     - err
     - success
@@ -643,16 +876,16 @@ definitions:
     properties:
       success:
         type: boolean
-        example: false
+        example: true
     example:
-      success: false
+      success: true
     required:
     - success
   BookDeleteBookUnauthorizedResponseBody:
     title: BookDeleteBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Dolore ex adipisci.
+    example: Nobis porro ullam aliquam provident.
   BookDeleteBookUnknownErrorResponseBody:
     title: BookDeleteBookUnknownErrorResponseBody
     type: object
@@ -666,7 +899,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -697,9 +930,12 @@ definitions:
           price: 69
       success:
         type: boolean
-        example: true
+        example: false
     example:
       books:
+      - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
       - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
         price: 69
@@ -717,7 +953,7 @@ definitions:
     title: BookGetAllBooksUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Quo cupiditate tempore earum.
+    example: Et quasi unde et eos.
   BookGetAllBooksUnknownErrorResponseBody:
     title: BookGetAllBooksUnknownErrorResponseBody
     type: object
@@ -731,12 +967,12 @@ definitions:
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: true
+      success: false
     required:
     - err
     - success
@@ -747,22 +983,22 @@ definitions:
     properties:
       id:
         type: string
-        example: Est cumque at eum commodi.
+        example: Corporis minus omnis.
       name:
         type: string
-        example: Rem molestias.
+        example: Et tempora.
       price:
         type: number
-        example: 0.7930856996207152
+        example: 0.4168441290043081
         format: double
       success:
         type: boolean
         example: true
     example:
-      id: Impedit ab rerum qui.
-      name: Dignissimos provident.
-      price: 0.9996729332273168
-      success: true
+      id: Laudantium omnis harum temporibus et pariatur laudantium.
+      name: In et quisquam ut qui.
+      price: 0.6522032326895971
+      success: false
     required:
     - id
     - name
@@ -772,7 +1008,7 @@ definitions:
     title: BookGetBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Autem labore architecto.
+    example: Dolore nobis voluptas.
   BookGetBookUnknownErrorResponseBody:
     title: BookGetBookUnknownErrorResponseBody
     type: object
@@ -791,7 +1027,7 @@ definitions:
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: true
+      success: false
     required:
     - err
     - success
@@ -860,7 +1096,7 @@ definitions:
     title: BookUpdateBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Labore rerum repudiandae aperiam eos ad.
+    example: Temporibus non ut mollitia.
   BookUpdateBookUnknownErrorResponseBody:
     title: BookUpdateBookUnknownErrorResponseBody
     type: object
@@ -879,7 +1115,7 @@ definitions:
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: false
+      success: true
     required:
     - err
     - success
@@ -896,11 +1132,11 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: true
+        example: false
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: false
+      success: true
     required:
     - access_token
     - refresh_token
@@ -917,11 +1153,11 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: true
+        example: false
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: true
+      success: false
     required:
     - access_token
     - refresh_token
@@ -932,15 +1168,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Nobis porro ullam aliquam provident.
+        example: Soluta labore quo nobis voluptatem et.
       success:
         type: boolean
         default: false
         example: false
     description: When email already exist
     example:
-      message: Recusandae quia eius.
-      success: true
+      message: Occaecati quidem quaerat voluptates qui nihil.
+      success: false
     required:
     - message
     - success
@@ -948,7 +1184,7 @@ definitions:
     title: JWTTokenAuthProvidersInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Dolores illum velit dicta facilis necessitatibus accusamus.
+    example: Modi fuga blanditiis officia enim magni sint.
   JWTTokenAuthProvidersRequestBody:
     title: JWTTokenAuthProvidersRequestBody
     type: object
@@ -959,7 +1195,7 @@ definitions:
         format: email
       firebase_id_token:
         type: string
-        example: hvo
+        example: g0v
         minLength: 400
       firebase_provider:
         type: string
@@ -979,7 +1215,7 @@ definitions:
         minLength: 3
     example:
       email: guillaume@epitech.eu
-      firebase_id_token: ie5
+      firebase_id_token: mu6
       firebase_provider: facebook.com
       firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
       firstname: Guillaume
@@ -995,7 +1231,7 @@ definitions:
     title: JWTTokenAuthProvidersUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Adipisci omnis quo consequatur soluta voluptates.
+    example: Eos et reiciendis.
   JWTTokenAuthProvidersUnknownErrorResponseBody:
     title: JWTTokenAuthProvidersUnknownErrorResponseBody
     type: object
@@ -1025,14 +1261,14 @@ definitions:
     properties:
       message:
         type: string
-        example: Dolore nobis voluptas.
+        example: Accusamus blanditiis id.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: When email already exist
     example:
-      message: Officia temporibus non ut.
+      message: Consequuntur labore.
       success: false
     required:
     - message
@@ -1041,7 +1277,7 @@ definitions:
     title: JWTTokenRefreshInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Quia facilis excepturi.
+    example: Adipisci id voluptate est labore expedita repudiandae.
   JWTTokenRefreshRequestBody:
     title: JWTTokenRefreshRequestBody
     type: object
@@ -1069,7 +1305,7 @@ definitions:
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: false
+      success: true
     required:
     - access_token
     - refresh_token
@@ -1078,7 +1314,7 @@ definitions:
     title: JWTTokenRefreshUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Et quasi unde et eos.
+    example: Veniam inventore perspiciatis magnam quam in et.
   JWTTokenRefreshUnknownErrorResponseBody:
     title: JWTTokenRefreshUnknownErrorResponseBody
     type: object
@@ -1092,7 +1328,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -1108,14 +1344,14 @@ definitions:
     properties:
       message:
         type: string
-        example: Corporis minus omnis.
+        example: Corporis in dolor velit blanditiis.
       success:
         type: boolean
         default: false
         example: true
     description: When email already exist
     example:
-      message: Tempora reiciendis commodi inventore laudantium omnis.
+      message: Dicta accusamus.
       success: false
     required:
     - message
@@ -1124,7 +1360,7 @@ definitions:
     title: JWTTokenSigninInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Laudantium ab in.
+    example: Quis vitae dolorum dolorem enim et.
   JWTTokenSigninRequestBody:
     title: JWTTokenSigninRequestBody
     type: object
@@ -1157,11 +1393,11 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: true
+        example: false
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: true
+      success: false
     required:
     - access_token
     - refresh_token
@@ -1170,7 +1406,7 @@ definitions:
     title: JWTTokenSigninUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Quisquam ut qui rerum rerum.
+    example: Natus est incidunt impedit voluptatum.
   JWTTokenSigninUnknownErrorResponseBody:
     title: JWTTokenSigninUnknownErrorResponseBody
     type: object
@@ -1184,12 +1420,12 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: true
+      success: false
     required:
     - err
     - success
@@ -1200,15 +1436,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Quia et est vitae distinctio.
+        example: Accusamus est adipisci omnis.
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: When email already exist
     example:
-      message: Maiores nostrum doloremque id distinctio inventore odit.
-      success: true
+      message: Soluta voluptates vel.
+      success: false
     required:
     - message
     - success
@@ -1216,7 +1452,7 @@ definitions:
     title: JWTTokenSignupInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Dolor et earum.
+    example: Illo quia exercitationem culpa minus labore sint.
   JWTTokenSignupRequestBody:
     title: JWTTokenSignupRequestBody
     type: object
@@ -1224,7 +1460,7 @@ definitions:
       birthday:
         type: string
         default: ""
-        example: Dolores aut.
+        example: Et est occaecati voluptas et sit maxime.
       email:
         type: string
         example: guillaume@epitech.eu
@@ -1250,7 +1486,7 @@ definitions:
         example: +262 692 12 34 56
     description: Use client ID and client secret to oAuth
     example:
-      birthday: Ratione ipsum.
+      birthday: Est voluptas ab ex.
       email: guillaume@epitech.eu
       firstname: Guillaume
       lastname: Morin
@@ -1273,7 +1509,7 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: true
+        example: false
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
@@ -1286,117 +1522,9 @@ definitions:
     title: JWTTokenSignupUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Voluptate nostrum enim qui recusandae assumenda eum.
+    example: Nihil quis.
   JWTTokenSignupUnknownErrorResponseBody:
     title: JWTTokenSignupUnknownErrorResponseBody
-    type: object
-    properties:
-      err:
-        type: string
-        example: sql no rows affected
-      error_code:
-        type: string
-        example: TX_UPDATE_ITEM
-      success:
-        type: boolean
-        default: false
-        example: true
-    description: Error not identified (500)
-    example:
-      err: sql no rows affected
-      error_code: TX_UPDATE_ITEM
-      success: false
-    required:
-    - err
-    - success
-    - error_code
-  OAuthOAuthBadRequestResponseBody:
-    title: OAuthOAuthBadRequestResponseBody
-    type: object
-    properties:
-      access_token:
-        type: string
-        example: Corporis in dolor velit blanditiis.
-      expires_in:
-        type: integer
-        example: 721116556768293679
-        format: int64
-      success:
-        type: boolean
-        example: true
-      token_type:
-        type: string
-        example: Aliquam dicta accusamus quis aut quisquam porro.
-    example:
-      access_token: Dolorem enim et quia natus est.
-      expires_in: 7156477281981818310
-      success: true
-      token_type: Impedit voluptatum earum aperiam molestiae.
-    required:
-    - access_token
-    - token_type
-    - expires_in
-    - success
-  OAuthOAuthCreatedResponseBody:
-    title: OAuthOAuthCreatedResponseBody
-    type: object
-    properties:
-      access_token:
-        type: string
-        example: Minus labore.
-      expires_in:
-        type: integer
-        example: 3038936878837500686
-        format: int64
-      success:
-        type: boolean
-        example: true
-      token_type:
-        type: string
-        example: Occaecati nihil quis labore.
-    example:
-      access_token: Voluptas et.
-      expires_in: 2255671971108150923
-      success: false
-      token_type: Maxime illum est voluptas ab ex.
-    required:
-    - access_token
-    - token_type
-    - expires_in
-    - success
-  OAuthOAuthInvalidScopesResponseBody:
-    title: OAuthOAuthInvalidScopesResponseBody
-    type: string
-    description: Token scopes are invalid
-    example: Consequuntur labore.
-  OAuthOAuthRequestBody:
-    title: OAuthOAuthRequestBody
-    type: object
-    properties:
-      client_id:
-        type: string
-        example: Adipisci id voluptate est labore expedita repudiandae.
-      client_secret:
-        type: string
-        example: Veniam inventore perspiciatis magnam quam in et.
-      grant_type:
-        type: string
-        example: Perspiciatis maiores amet.
-    example:
-      client_id: Soluta labore quo nobis voluptatem et.
-      client_secret: Beatae occaecati quidem quaerat voluptates.
-      grant_type: Nihil qui enim atque quisquam modi.
-    required:
-    - client_id
-    - client_secret
-    - grant_type
-  OAuthOAuthUnauthorizedResponseBody:
-    title: OAuthOAuthUnauthorizedResponseBody
-    type: string
-    description: Identifiers are invalid
-    example: Voluptas vitae.
-  OAuthOAuthUnknownErrorResponseBody:
-    title: OAuthOAuthUnknownErrorResponseBody
     type: object
     properties:
       err:
@@ -1418,6 +1546,459 @@ definitions:
     - err
     - success
     - error_code
+  OAuthOAuthBadRequestResponseBody:
+    title: OAuthOAuthBadRequestResponseBody
+    type: object
+    properties:
+      access_token:
+        type: string
+        example: Explicabo dolorum neque repellat velit cupiditate quis.
+      expires_in:
+        type: integer
+        example: 8405595502826510052
+        format: int64
+      success:
+        type: boolean
+        example: false
+      token_type:
+        type: string
+        example: Aut maxime.
+    example:
+      access_token: Enim adipisci.
+      expires_in: 7216135156343218663
+      success: false
+      token_type: Voluptatum minima adipisci.
+    required:
+    - access_token
+    - token_type
+    - expires_in
+    - success
+  OAuthOAuthCreatedResponseBody:
+    title: OAuthOAuthCreatedResponseBody
+    type: object
+    properties:
+      access_token:
+        type: string
+        example: Tenetur non.
+      expires_in:
+        type: integer
+        example: 4606544465343709488
+        format: int64
+      success:
+        type: boolean
+        example: true
+      token_type:
+        type: string
+        example: Modi dolorem a cumque.
+    example:
+      access_token: Ut molestiae molestias iusto quo.
+      expires_in: 2580221834486187725
+      success: false
+      token_type: Veritatis unde rerum consequatur.
+    required:
+    - access_token
+    - token_type
+    - expires_in
+    - success
+  OAuthOAuthInvalidScopesResponseBody:
+    title: OAuthOAuthInvalidScopesResponseBody
+    type: string
+    description: Token scopes are invalid
+    example: Eum nam corrupti fuga ratione ut error.
+  OAuthOAuthRequestBody:
+    title: OAuthOAuthRequestBody
+    type: object
+    properties:
+      client_id:
+        type: string
+        example: Quos illum similique aut.
+      client_secret:
+        type: string
+        example: Voluptatem a maiores maxime et aspernatur accusamus.
+      grant_type:
+        type: string
+        example: Maiores debitis incidunt at.
+    example:
+      client_id: Corporis laborum commodi enim quia.
+      client_secret: Est laudantium.
+      grant_type: Culpa doloribus.
+    required:
+    - client_id
+    - client_secret
+    - grant_type
+  OAuthOAuthUnauthorizedResponseBody:
+    title: OAuthOAuthUnauthorizedResponseBody
+    type: string
+    description: Identifiers are invalid
+    example: Ut architecto veniam sed voluptatem reiciendis.
+  OAuthOAuthUnknownErrorResponseBody:
+    title: OAuthOAuthUnknownErrorResponseBody
+    type: object
+    properties:
+      err:
+        type: string
+        example: sql no rows affected
+      error_code:
+        type: string
+        example: TX_UPDATE_ITEM
+      success:
+        type: boolean
+        default: false
+        example: true
+    description: Error not identified (500)
+    example:
+      err: sql no rows affected
+      error_code: TX_UPDATE_ITEM
+      success: false
+    required:
+    - err
+    - success
+    - error_code
+  ProductsCreateProductRequestBody:
+    title: ProductsCreateProductRequestBody
+    type: object
+    properties:
+      product:
+        $ref: '#/definitions/payloadProductRequestBody'
+    example:
+      product:
+        category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        name: Guillaume
+        price: 69
+    required:
+    - product
+  ProductsCreateProductResponseBody:
+    title: ProductsCreateProductResponseBody
+    type: object
+    properties:
+      product:
+        $ref: '#/definitions/resProductResponseBody'
+      success:
+        type: boolean
+        example: false
+    example:
+      product:
+        category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
+      success: false
+    required:
+    - product
+    - success
+  ProductsCreateProductUnknownErrorResponseBody:
+    title: ProductsCreateProductUnknownErrorResponseBody
+    type: object
+    properties:
+      err:
+        type: string
+        example: sql no rows affected
+      error_code:
+        type: string
+        example: TX_UPDATE_ITEM
+      success:
+        type: boolean
+        default: false
+        example: false
+    description: Error not identified (500)
+    example:
+      err: sql no rows affected
+      error_code: TX_UPDATE_ITEM
+      success: false
+    required:
+    - err
+    - success
+    - error_code
+  ProductsDeleteProductResponseBody:
+    title: ProductsDeleteProductResponseBody
+    type: object
+    properties:
+      success:
+        type: boolean
+        example: false
+    example:
+      success: false
+    required:
+    - success
+  ProductsDeleteProductUnknownErrorResponseBody:
+    title: ProductsDeleteProductUnknownErrorResponseBody
+    type: object
+    properties:
+      err:
+        type: string
+        example: sql no rows affected
+      error_code:
+        type: string
+        example: TX_UPDATE_ITEM
+      success:
+        type: boolean
+        default: false
+        example: false
+    description: Error not identified (500)
+    example:
+      err: sql no rows affected
+      error_code: TX_UPDATE_ITEM
+      success: true
+    required:
+    - err
+    - success
+    - error_code
+  ProductsGetAllProductsByCategoryResponseBody:
+    title: ProductsGetAllProductsByCategoryResponseBody
+    type: object
+    properties:
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/resProductResponseBody'
+        description: Result is an array of object
+        example:
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+      success:
+        type: boolean
+        example: false
+    example:
+      products:
+      - category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
+      - category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
+      - category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
+      - category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
+      success: true
+    required:
+    - products
+    - success
+  ProductsGetAllProductsByCategoryUnknownErrorResponseBody:
+    title: ProductsGetAllProductsByCategoryUnknownErrorResponseBody
+    type: object
+    properties:
+      err:
+        type: string
+        example: sql no rows affected
+      error_code:
+        type: string
+        example: TX_UPDATE_ITEM
+      success:
+        type: boolean
+        default: false
+        example: false
+    description: Error not identified (500)
+    example:
+      err: sql no rows affected
+      error_code: TX_UPDATE_ITEM
+      success: false
+    required:
+    - err
+    - success
+    - error_code
+  ProductsGetProductResponseBody:
+    title: ProductsGetProductResponseBody
+    type: object
+    properties:
+      product:
+        $ref: '#/definitions/resProductResponseBody'
+      success:
+        type: boolean
+        example: false
+    example:
+      product:
+        category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
+      success: true
+    required:
+    - product
+    - success
+  ProductsGetProductUnknownErrorResponseBody:
+    title: ProductsGetProductUnknownErrorResponseBody
+    type: object
+    properties:
+      err:
+        type: string
+        example: sql no rows affected
+      error_code:
+        type: string
+        example: TX_UPDATE_ITEM
+      success:
+        type: boolean
+        default: false
+        example: true
+    description: Error not identified (500)
+    example:
+      err: sql no rows affected
+      error_code: TX_UPDATE_ITEM
+      success: true
+    required:
+    - err
+    - success
+    - error_code
+  ProductsUpdateProductRequestBody:
+    title: ProductsUpdateProductRequestBody
+    type: object
+    properties:
+      product:
+        $ref: '#/definitions/payloadProductRequestBody'
+    example:
+      product:
+        category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        name: Guillaume
+        price: 69
+    required:
+    - product
+  ProductsUpdateProductResponseBody:
+    title: ProductsUpdateProductResponseBody
+    type: object
+    properties:
+      product:
+        $ref: '#/definitions/resProductResponseBody'
+      success:
+        type: boolean
+        example: true
+    example:
+      product:
+        category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
+      success: true
+    required:
+    - product
+    - success
+  ProductsUpdateProductUnknownErrorResponseBody:
+    title: ProductsUpdateProductUnknownErrorResponseBody
+    type: object
+    properties:
+      err:
+        type: string
+        example: sql no rows affected
+      error_code:
+        type: string
+        example: TX_UPDATE_ITEM
+      success:
+        type: boolean
+        default: false
+        example: false
+    description: Error not identified (500)
+    example:
+      err: sql no rows affected
+      error_code: TX_UPDATE_ITEM
+      success: true
+    required:
+    - err
+    - success
+    - error_code
+  payloadProductRequestBody:
+    title: payloadProductRequestBody
+    type: object
+    properties:
+      category:
+        type: string
+        example: men
+        enum:
+        - men
+        - women
+        - hats
+        - jackets
+        - sneakers
+      cover:
+        type: string
+        example: https://i.ibb.co/ypkgK0X/blue-beanie.png
+      name:
+        type: string
+        example: Guillaume
+      price:
+        type: number
+        example: 69
+        format: double
+    example:
+      category: men
+      cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+      name: Guillaume
+      price: 69
+    required:
+    - name
+    - price
+    - cover
+    - category
+  resProductResponseBody:
+    title: resProductResponseBody
+    type: object
+    properties:
+      category:
+        type: string
+        example: men
+        enum:
+        - men
+        - women
+        - hats
+        - jackets
+        - sneakers
+      cover:
+        type: string
+        example: https://i.ibb.co/ypkgK0X/blue-beanie.png
+      id:
+        type: string
+        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        format: uuid
+      name:
+        type: string
+        example: Guillaume
+      price:
+        type: number
+        example: 69
+        format: double
+    example:
+      category: men
+      cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+      id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+      name: Guillaume
+      price: 69
+    required:
+    - id
+    - name
+    - price
+    - cover
+    - category
 securityDefinitions:
   OAuth2_header_Authorization:
     type: oauth2

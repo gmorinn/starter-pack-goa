@@ -23,6 +23,13 @@ type Store struct {
 	db *sql.DB
 }
 
+type Server struct {
+	Store    *Store
+	Config   *config.API
+	Oauth    *oserver.Server
+	cronTask *cron.Cron
+}
+
 // NewStore create new Store
 func NewStore(db *sql.DB) *Store {
 	// db.SetMaxOpenConns(140)
@@ -47,13 +54,6 @@ func (store *Store) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) er
 		return err
 	}
 	return tx.Commit()
-}
-
-type Server struct {
-	Store    *Store
-	Config   *config.API
-	Oauth    *oserver.Server
-	cronTask *cron.Cron
 }
 
 func NewServer() *Server {
