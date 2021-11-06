@@ -10,6 +10,29 @@ import (
 	"github.com/google/uuid"
 )
 
+type Categories string
+
+const (
+	CategoriesMen     Categories = "men"
+	CategoriesWomen   Categories = "women"
+	CategoriesSneaker Categories = "sneaker"
+	CategoriesHat     Categories = "hat"
+	CategoriesJacket  Categories = "jacket"
+	CategoriesNothing Categories = "nothing"
+)
+
+func (e *Categories) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Categories(s)
+	case string:
+		*e = Categories(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Categories: %T", src)
+	}
+	return nil
+}
+
 type Role string
 
 const (
@@ -30,22 +53,15 @@ func (e *Role) Scan(src interface{}) error {
 	return nil
 }
 
-type Book struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	Price     float64   `json:"price"`
-	Name      string    `json:"name"`
-}
-
-type File struct {
-	ID        uuid.UUID      `json:"id"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt sql.NullTime   `json:"deleted_at"`
-	Name      sql.NullString `json:"name"`
-	Url       sql.NullString `json:"url"`
-	Mime      sql.NullString `json:"mime"`
-	Size      sql.NullInt64  `json:"size"`
+type Product struct {
+	ID        uuid.UUID    `json:"id"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	DeletedAt sql.NullTime `json:"deleted_at"`
+	Name      string       `json:"name"`
+	Category  Categories   `json:"category"`
+	Cover     string       `json:"cover"`
+	Price     float64      `json:"price"`
 }
 
 type RefreshToken struct {

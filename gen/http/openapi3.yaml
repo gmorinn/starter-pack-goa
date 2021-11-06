@@ -27,9 +27,9 @@ paths:
             schema:
               $ref: '#/components/schemas/OAuthRequestBody'
             example:
-              client_id: Sequi doloremque sequi est cupiditate.
-              client_secret: Tempore omnis in vel ullam.
-              grant_type: Ipsam repudiandae expedita animi.
+              client_id: Aut veniam autem.
+              client_secret: Et earum veniam omnis vel ab.
+              grant_type: Voluptatem incidunt pariatur et nulla.
       responses:
         "201":
           description: Created response.
@@ -38,10 +38,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/OAuthResponse'
               example:
-                access_token: Expedita nihil omnis assumenda qui qui.
-                expires_in: 4480510178043397355
+                access_token: Ad quis quaerat.
+                expires_in: 7790529887225078354
                 success: true
-                token_type: Est earum est cumque at eum commodi.
+                token_type: Magni animi aliquid non ut corrupti consequatur.
         "400":
           description: Bad Request response.
           content:
@@ -49,24 +49,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/OAuthResponse'
               example:
-                access_token: Ipsum aut mollitia.
-                expires_in: 1044628457192554585
-                success: true
-                token_type: Labore architecto non dolor temporibus.
+                access_token: Nihil et accusantium quam.
+                expires_in: 7656406774412358812
+                success: false
+                token_type: Expedita quibusdam at iste quia neque voluptates.
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Placeat dignissimos provident iste.
+                $ref: '#/components/schemas/InvalidScopes'
+              example: Vel nesciunt harum sed.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Consequuntur ut impedit ab rerum.
+                $ref: '#/components/schemas/InvalidScopes'
+              example: Ipsam ratione maxime molestiae.
         "500":
           description: Internal Server Error response.
           content:
@@ -76,7 +76,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: false
+                success: true
   /openapi.json:
     get:
       tags:
@@ -115,7 +115,7 @@ paths:
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-                success: true
+                success: false
         "400":
           description: Bad Request response.
           content:
@@ -123,22 +123,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Voluptates doloremque.
-                success: false
+                message: Iste aliquam non consequuntur.
+                success: true
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Voluptatibus distinctio.
+                $ref: '#/components/schemas/InvalidScopes'
+              example: Non nisi aut.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Quaerat repellat.
+                $ref: '#/components/schemas/InvalidScopes'
+              example: Voluptas et accusamus repellat excepturi voluptas.
         "500":
           description: Internal Server Error response.
           content:
@@ -148,7 +148,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: false
+                success: true
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -167,7 +167,7 @@ paths:
               $ref: '#/components/schemas/AuthProvidersRequestBody'
             example:
               email: guillaume@epitech.eu
-              firebase_id_token: wme
+              firebase_id_token: gkx
               firebase_provider: facebook.com
               firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
               firstname: Guillaume
@@ -190,22 +190,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/Sign'
               example:
-                message: Et pariatur ratione repellendus voluptatem quam sunt.
-                success: true
+                message: Ab aut saepe molestias voluptatibus.
+                success: false
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Quibusdam nemo.
+                $ref: '#/components/schemas/InvalidScopes'
+              example: Est odit velit voluptas.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Et occaecati qui.
+                $ref: '#/components/schemas/InvalidScopes'
+              example: Consequatur placeat possimus id.
         "500":
           description: Internal Server Error response.
           content:
@@ -245,7 +245,7 @@ paths:
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-                success: false
+                success: true
         "400":
           description: Bad Request response.
           content:
@@ -253,22 +253,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Quibusdam at iste.
-                success: false
+                message: Nihil iure rerum ut doloremque sapiente.
+                success: true
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Modi deserunt cum debitis odit.
+                $ref: '#/components/schemas/InvalidScopes'
+              example: Maiores a aut nesciunt.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Ex qui non sint maxime voluptatem.
+                $ref: '#/components/schemas/InvalidScopes'
+              example: Voluptatibus dolor omnis quisquam quod illo similique.
         "500":
           description: Internal Server Error response.
           content:
@@ -278,7 +278,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: false
+                success: true
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -296,7 +296,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SignupRequestBody'
             example:
-              birthday: Et earum veniam omnis vel ab.
+              birthday: Explicabo quidem odio.
               email: guillaume@epitech.eu
               firstname: Guillaume
               lastname: Morin
@@ -320,83 +320,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Non ut.
-                success: true
+                message: Eum voluptas facilis.
+                success: false
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Vel nesciunt harum sed.
+                $ref: '#/components/schemas/InvalidScopes'
+              example: Explicabo occaecati.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Ipsam ratione maxime molestiae.
-        "500":
-          description: Internal Server Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnknownError'
-              example:
-                err: sql no rows affected
-                error_code: TX_UPDATE_ITEM
-                success: false
-      security:
-      - OAuth2_header_Authorization:
-        - api:read
-  /web/book/{id}:
-    get:
-      tags:
-      - book
-      summary: getBook book
-      description: Get one item
-      operationId: book#getBook
-      parameters:
-      - name: id
-        in: path
-        description: Unique ID of the book
-        required: true
-        schema:
-          type: string
-          description: Unique ID of the book
-          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          format: uuid
-        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-      - name: jwtToken
-        in: header
-        description: Jwt token
-        allowEmptyValue: true
-        required: true
-        schema:
-          type: string
-          description: Jwt token
-          example: "Bearer \U000DF0C7\U00050969\U0005BB0F\U00040D2F"
-          pattern: ^Bearer [^ ]+$
-        example: "Bearer \U00094B2E\U000AC949\U0004CDE6\U00028764\U000B7D56"
-      responses:
-        "200":
-          description: OK response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetBookResponseBody'
-              example:
-                id: Rerum ut doloremque sapiente nisi.
-                name: Fuga voluptatibus dolor.
-                price: 0.5779882770080401
-                success: false
-        "401":
-          description: Unauthorized response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Alias libero dolor eaque fugiat ut minus.
+                $ref: '#/components/schemas/InvalidScopes'
+              example: Accusantium assumenda aut porro autem at est.
         "500":
           description: Internal Server Error response.
           content:
@@ -410,249 +349,6 @@ paths:
       security:
       - OAuth2_header_Authorization:
         - api:read
-        jwt_header_jwtToken:
-        - api:read
-        - api:write
-    put:
-      tags:
-      - book
-      summary: updateBook book
-      description: Update one item
-      operationId: book#updateBook
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          format: uuid
-        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-      - name: jwtToken
-        in: header
-        description: Jwt token
-        allowEmptyValue: true
-        required: true
-        schema:
-          type: string
-          description: Jwt token
-          example: "Bearer \U000EA3C4\U000CC528\U0002A1AB\U00073DFA\U000F48C0\U000911AF"
-          pattern: ^Bearer [^ ]+$
-        example: "Bearer \U0003705F\U0001D315\U0010C64D\U000D64C8\U00080588\U0006424B"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateBookRequestBody'
-            example:
-              name: Guillaume
-              price: 69
-      responses:
-        "200":
-          description: OK response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdateBookResponseBody'
-              example:
-                book:
-                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 69
-                success: true
-        "401":
-          description: Unauthorized response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Repellat excepturi.
-        "500":
-          description: Internal Server Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnknownError'
-              example:
-                err: sql no rows affected
-                error_code: TX_UPDATE_ITEM
-                success: true
-      security:
-      - OAuth2_header_Authorization:
-        - api:read
-        jwt_header_jwtToken:
-        - api:read
-        - api:write
-  /web/book/add:
-    post:
-      tags:
-      - book
-      summary: createBook book
-      description: Create one item
-      operationId: book#createBook
-      parameters:
-      - name: jwtToken
-        in: header
-        description: Jwt token
-        allowEmptyValue: true
-        required: true
-        schema:
-          type: string
-          description: Jwt token
-          example: "Bearer \U0002CFAC\U000E8A7A\U000D114D\U00100513\U0002BF78"
-          pattern: ^Bearer [^ ]+$
-        example: "Bearer \U0001EFE7\U00064D0B\U0006EC04\U0009B0FE\U000E3B6C"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateBookRequestBody'
-            example:
-              name: Guillaume
-              price: 0.23261748302976784
-      responses:
-        "201":
-          description: Created response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdateBookResponseBody'
-              example:
-                book:
-                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 69
-                success: true
-        "401":
-          description: Unauthorized response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Quas qui aut veniam autem.
-        "500":
-          description: Internal Server Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnknownError'
-              example:
-                err: sql no rows affected
-                error_code: TX_UPDATE_ITEM
-                success: true
-      security:
-      - OAuth2_header_Authorization:
-        - api:read
-        jwt_header_jwtToken:
-        - api:read
-        - api:write
-  /web/book/remove/{id}:
-    delete:
-      tags:
-      - book
-      summary: deleteBook book
-      description: Delete one item by ID
-      operationId: book#deleteBook
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          format: uuid
-        example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-      - name: jwtToken
-        in: header
-        description: Jwt token
-        allowEmptyValue: true
-        required: true
-        schema:
-          type: string
-          description: Jwt token
-          example: "Bearer \U000708E7\U000BB83D\U00029014"
-          pattern: ^Bearer [^ ]+$
-        example: "Bearer \U000C518F\U00107C83\U0008CE64"
-      responses:
-        "200":
-          description: OK response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DeleteBookResponseBody'
-              example:
-                success: false
-        "401":
-          description: Unauthorized response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Aut saepe.
-        "500":
-          description: Internal Server Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnknownError'
-              example:
-                err: sql no rows affected
-                error_code: TX_UPDATE_ITEM
-                success: false
-      security:
-      - OAuth2_header_Authorization:
-        - api:read
-        jwt_header_jwtToken:
-        - api:read
-        - api:write
-  /web/books:
-    get:
-      tags:
-      - book
-      summary: getAllBooks book
-      description: Get All items
-      operationId: book#getAllBooks
-      responses:
-        "200":
-          description: OK response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetAllBooksResponseBody'
-              example:
-                books:
-                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 69
-                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 69
-                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 69
-                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 69
-                success: false
-        "401":
-          description: Unauthorized response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-              example: Aut eum cumque.
-        "500":
-          description: Internal Server Error response.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnknownError'
-              example:
-                err: sql no rows affected
-                error_code: TX_UPDATE_ITEM
-                success: true
   /web/product/{id}:
     get:
       tags:
@@ -678,9 +374,9 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U0008E261\U000B01FC\U00026B1C\U00091858\U0001980E"
+          example: "Bearer \U0010D749\U000DDB74웠\U0010545D"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U000E4423"
+        example: "Bearer \U000F46B1\U00098CAB\U0002A625\U00040A1F"
       responses:
         "200":
           description: OK response.
@@ -705,7 +401,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -734,9 +430,9 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U000C1595\U000E383B\U00017267"
+          example: "Bearer \U0002CFAC\U000E8A7A\U000D114D\U00100513\U0002BF78"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U00103049\U0003E8E7눻\U000E37F0\U0006CF89\U00044382"
+        example: "Bearer \U0001EFE7\U00064D0B\U0006EC04\U0009B0FE\U000E3B6C"
       requestBody:
         required: true
         content:
@@ -773,7 +469,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -795,9 +491,9 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U0010846B\U000BC184\U000ACF17"
+          example: "Bearer \U000708E7\U000BB83D\U00029014"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U0001DAC9\U0002B68D\U00058EF7\U0004EB2F\U00065C70\U00021439"
+        example: "Bearer \U000C518F\U00107C83\U0008CE64"
       requestBody:
         required: true
         content:
@@ -824,7 +520,7 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   name: Guillaume
                   price: 69
-                success: false
+                success: true
         "500":
           description: Internal Server Error response.
           content:
@@ -834,7 +530,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: false
+                success: true
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -864,18 +560,18 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U000A4AAA\U00094DB1\U0009DE6D\U0006E1D8"
+          example: "Bearer \U000EA3C4\U000CC528\U0002A1AB\U00073DFA\U000F48C0\U000911AF"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U00073A8F\U0004093F\U0005301D뭘"
+        example: "Bearer \U0003705F\U0001D315\U0010C64D\U000D64C8\U00080588\U0006424B"
       responses:
         "200":
           description: OK response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeleteBookResponseBody'
+                $ref: '#/components/schemas/DeleteProductResponseBody'
               example:
-                success: false
+                success: true
         "500":
           description: Internal Server Error response.
           content:
@@ -885,14 +581,14 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
         jwt_header_jwtToken:
         - api:read
         - api:write
-  /web/products:
+  /web/products/{category}:
     get:
       tags:
       - products
@@ -900,6 +596,21 @@ paths:
       description: Get All products by category
       operationId: products#getAllProductsByCategory
       parameters:
+      - name: category
+        in: path
+        required: true
+        schema:
+          type: string
+          default: nothing
+          example: men
+          enum:
+          - men
+          - women
+          - hat
+          - jacket
+          - sneaker
+          - nothing
+        example: men
       - name: jwtToken
         in: header
         description: Jwt token
@@ -907,9 +618,9 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U0010D749\U000DDB74웠\U0010545D"
+          example: "Bearer \U000DF0C7\U00050969\U0005BB0F\U00040D2F"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U000F46B1\U00098CAB\U0002A625\U00040A1F"
+        example: "Bearer \U00094B2E\U000AC949\U0004CDE6\U00028764\U000B7D56"
       responses:
         "200":
           description: OK response.
@@ -919,6 +630,11 @@ paths:
                 $ref: '#/components/schemas/GetAllProductsByCategoryResponseBody'
               example:
                 products:
+                - category: men
+                  cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 69
                 - category: men
                   cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
@@ -962,7 +678,7 @@ components:
           format: email
         firebase_id_token:
           type: string
-          example: 32q
+          example: pxf
           minLength: 400
         firebase_provider:
           type: string
@@ -982,7 +698,7 @@ components:
           minLength: 3
       example:
         email: guillaume@epitech.eu
-        firebase_id_token: lbx
+        firebase_id_token: 3sl
         firebase_provider: facebook.com
         firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
         firstname: Guillaume
@@ -994,28 +710,6 @@ components:
       - firebase_id_token
       - firebase_uid
       - firebase_provider
-    BookResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          format: uuid
-        name:
-          type: string
-          example: Guillaume
-        price:
-          type: number
-          example: 69
-          format: double
-      example:
-        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-        name: Guillaume
-        price: 69
-      required:
-      - id
-      - name
-      - price
     CreateProductRequestBody:
       type: object
       properties:
@@ -1036,7 +730,7 @@ components:
           $ref: '#/components/schemas/ResProduct'
         success:
           type: boolean
-          example: true
+          example: false
       example:
         product:
           category: men
@@ -1048,12 +742,12 @@ components:
       required:
       - product
       - success
-    DeleteBookResponseBody:
+    DeleteProductResponseBody:
       type: object
       properties:
         success:
           type: boolean
-          example: false
+          example: true
       example:
         success: true
       required:
@@ -1063,53 +757,17 @@ components:
       properties:
         message:
           type: string
-          example: Enim et.
+          example: Est labore expedita repudiandae.
         success:
           type: boolean
           default: false
-          example: true
+          example: false
       description: When email already exist
       example:
-        message: Pariatur explicabo et exercitationem quia sint iusto.
-        success: true
+        message: Inventore perspiciatis magnam quam in et.
+        success: false
       required:
       - message
-      - success
-    GetAllBooksResponseBody:
-      type: object
-      properties:
-        books:
-          type: array
-          items:
-            $ref: '#/components/schemas/BookResponse'
-          description: Result is an array of object
-          example:
-          - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-            name: Guillaume
-            price: 69
-          - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-            name: Guillaume
-            price: 69
-          - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-            name: Guillaume
-            price: 69
-          - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-            name: Guillaume
-            price: 69
-        success:
-          type: boolean
-          example: true
-      example:
-        books:
-        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          name: Guillaume
-          price: 69
-        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          name: Guillaume
-          price: 69
-        success: true
-      required:
-      - books
       - success
     GetAllProductsByCategoryResponseBody:
       type: object
@@ -1130,6 +788,16 @@ components:
             id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
             name: Guillaume
             price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
         success:
           type: boolean
           example: false
@@ -1145,57 +813,30 @@ components:
           id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
           price: 69
-        - category: men
-          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
-          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          name: Guillaume
-          price: 69
-        success: false
+        success: true
       required:
       - products
       - success
-    GetBookResponseBody:
-      type: object
-      properties:
-        id:
-          type: string
-          example: Repellat cupiditate non ut quo.
-        name:
-          type: string
-          example: Voluptatem sed repellat et ipsa.
-        price:
-          type: number
-          example: 0.20715292547893852
-          format: double
-        success:
-          type: boolean
-          example: false
-      example:
-        id: Autem ducimus.
-        name: Ipsa voluptatibus asperiores illum quo dolorum molestiae.
-        price: 0.5909250966997965
-        success: false
-      required:
-      - id
-      - name
-      - price
-      - success
+    InvalidScopes:
+      type: string
+      description: Token scopes are invalid
+      example: Soluta soluta labore quo nobis voluptatem.
     OAuthRequestBody:
       type: object
       properties:
         client_id:
           type: string
-          example: Eaque ut aperiam excepturi.
+          example: Qui enim atque quisquam modi fuga.
         client_secret:
           type: string
-          example: Sed et.
+          example: Officia enim magni sint esse eos et.
         grant_type:
           type: string
-          example: Maxime et aut voluptatum esse.
+          example: Enim aut velit ea voluptatem.
       example:
-        client_id: Quidem est ut ea eligendi ea.
-        client_secret: Quia nesciunt.
-        grant_type: Consequuntur odio molestias sed consequatur.
+        client_id: In corporis perferendis.
+        client_secret: Non ut.
+        grant_type: Dolorem a cumque.
       required:
       - client_id
       - client_secret
@@ -1205,22 +846,22 @@ components:
       properties:
         access_token:
           type: string
-          example: Alias beatae quibusdam voluptas.
+          example: Est id.
         expires_in:
           type: integer
-          example: 5233857070461923496
+          example: 604685638570393078
           format: int64
         success:
           type: boolean
           example: true
         token_type:
           type: string
-          example: Quo deleniti ea.
+          example: Molestiae molestias iusto quo ut.
       example:
-        access_token: Eligendi necessitatibus.
-        expires_in: 7060609363550530949
+        access_token: Consequatur occaecati.
+        expires_in: 8682579153969542440
         success: false
-        token_type: Et voluptatibus laborum distinctio.
+        token_type: Numquam explicabo dolorum neque.
       required:
       - access_token
       - token_type
@@ -1231,23 +872,26 @@ components:
       properties:
         category:
           type: string
+          default: nothing
           example: men
           enum:
           - men
           - women
-          - hats
-          - jackets
-          - sneakers
+          - hat
+          - jacket
+          - sneaker
+          - nothing
         cover:
           type: string
           example: https://i.ibb.co/ypkgK0X/blue-beanie.png
         name:
           type: string
           example: Guillaume
+          minLength: 3
         price:
           type: number
           example: 69
-          format: double
+          minimum: 0
       example:
         category: men
         cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
@@ -1321,7 +965,7 @@ components:
       example:
         access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-        success: true
+        success: false
       required:
       - access_token
       - refresh_token
@@ -1351,7 +995,7 @@ components:
         birthday:
           type: string
           default: ""
-          example: Quia et.
+          example: Molestiae accusamus blanditiis id rerum provident consequuntur.
         email:
           type: string
           example: guillaume@epitech.eu
@@ -1377,7 +1021,7 @@ components:
           example: +262 692 12 34 56
       description: Use client ID and client secret to oAuth
       example:
-        birthday: Rerum non dolor et omnis.
+        birthday: Adipisci voluptas vitae quam.
         email: guillaume@epitech.eu
         firstname: Guillaume
         lastname: Morin
@@ -1388,10 +1032,6 @@ components:
       - lastname
       - password
       - email
-    Unauthorized:
-      type: string
-      description: Credentials are invalid
-      example: Eveniet ad aut dolor et.
     UnknownError:
       type: object
       properties:
@@ -1409,46 +1049,11 @@ components:
       example:
         err: sql no rows affected
         error_code: TX_UPDATE_ITEM
-        success: true
+        success: false
       required:
       - err
       - success
       - error_code
-    UpdateBookRequestBody:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Guillaume
-          minLength: 3
-          maxLength: 10
-        price:
-          type: number
-          example: 69
-          minimum: 0.1
-      example:
-        name: Guillaume
-        price: 69
-      required:
-      - name
-      - price
-    UpdateBookResponseBody:
-      type: object
-      properties:
-        book:
-          $ref: '#/components/schemas/BookResponse'
-        success:
-          type: boolean
-          example: true
-      example:
-        book:
-          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          name: Guillaume
-          price: 69
-        success: true
-      required:
-      - book
-      - success
   securitySchemes:
     OAuth2_header_Authorization:
       type: oauth2
@@ -1466,8 +1071,6 @@ components:
       scheme: bearer
 tags:
 - name: openapi
-- name: book
-  description: The principe of CRUD API with GET, PUT, POST, DELETE with Table Book
 - name: jwtToken
   description: Use Token to authenticate. Signin and Signup
 - name: oAuth

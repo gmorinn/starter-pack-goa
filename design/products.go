@@ -28,15 +28,21 @@ var _ = Service("products", func() {
 	Method("getAllProductsByCategory", func() {
 		Description("Get All products by category")
 		Payload(func() {
+			Attribute("category", String, func() {
+				Enum("men", "women", "hat", "jacket", "sneaker", "nothing")
+				Example("men")
+				Default("nothing")
+			})
 			TokenField(1, "jwtToken", String, func() {
 				Description("JWT used for authentication after Signin/Signup")
 			})
 			AccessTokenField(2, "oauth", String, func() {
 				Description("Use to generate Oauth with /authorization")
 			})
+			Required("category")
 		})
 		HTTP(func() {
-			GET("/products")
+			GET("/products/{category}")
 			Response(StatusOK)
 		})
 		Result(func() {
@@ -174,16 +180,19 @@ var resProduct = Type("resProduct", func() {
 var payloadProduct = Type("payloadProduct", func() {
 	Attribute("name", String, func() {
 		Example("Guillaume")
+		MinLength(3)
 	})
 	Attribute("price", Float64, func() {
 		Example(69.0)
+		Minimum(0)
 	})
 	Attribute("cover", String, func() {
 		Example("https://i.ibb.co/ypkgK0X/blue-beanie.png")
 	})
 	Attribute("category", String, func() {
-		Enum("men", "women", "hats", "jackets", "sneakers")
+		Enum("men", "women", "hat", "jacket", "sneaker", "nothing")
 		Example("men")
+		Default("nothing")
 	})
 	Required("name", "price", "cover", "category")
 })

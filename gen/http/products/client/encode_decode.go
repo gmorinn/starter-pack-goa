@@ -23,7 +23,17 @@ import (
 // method and path set to call the "products" service
 // "getAllProductsByCategory" endpoint
 func (c *Client) BuildGetAllProductsByCategoryRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetAllProductsByCategoryProductsPath()}
+	var (
+		category string
+	)
+	{
+		p, ok := v.(*products.GetAllProductsByCategoryPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("products", "getAllProductsByCategory", "*products.GetAllProductsByCategoryPayload", v)
+		}
+		category = p.Category
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetAllProductsByCategoryProductsPath(category)}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("products", "getAllProductsByCategory", u.String(), err)

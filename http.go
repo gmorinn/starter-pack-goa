@@ -1,13 +1,13 @@
 package main
 
 import (
-	book "api_crud/gen/book"
-	booksvr "api_crud/gen/http/book/server"
 	jwttokensvr "api_crud/gen/http/jwt_token/server"
 	oauthsvr "api_crud/gen/http/o_auth/server"
 	openapisvr "api_crud/gen/http/openapi/server"
+	productssvr "api_crud/gen/http/products/server"
 	jwttoken "api_crud/gen/jwt_token"
 	oauth "api_crud/gen/o_auth"
+	products "api_crud/gen/products"
 	"context"
 	"log"
 	"net/http"
@@ -23,7 +23,7 @@ import (
 
 // handleHTTPServer starts configures and starts a HTTP server on the given
 // URL. It shuts down the server if any error is received in the error channel.
-func handleHTTPServer(ctx context.Context, u *url.URL, jwtTokenEndpoints *jwttoken.Endpoints, bookEndpoints *book.Endpoints, oAuthEndpoints *oauth.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
+func handleHTTPServer(ctx context.Context, u *url.URL, jwtTokenEndpoints *jwttoken.Endpoints, oAuthEndpoints *oauth.Endpoints, productsEndpoints *products.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
 
 	// Setup goa log adapter.
 	var (
@@ -56,21 +56,21 @@ func handleHTTPServer(ctx context.Context, u *url.URL, jwtTokenEndpoints *jwttok
 	var (
 		openapiServer  *openapisvr.Server
 		jwtTokenServer *jwttokensvr.Server
-		bookServer     *booksvr.Server
 		oAuthServer    *oauthsvr.Server
+		productsServer *productssvr.Server
 	)
 	{
 		eh := errorHandler(logger)
 		openapiServer = openapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("../../gen/http"))
 		jwtTokenServer = jwttokensvr.New(jwtTokenEndpoints, mux, dec, enc, eh, nil)
-		bookServer = booksvr.New(bookEndpoints, mux, dec, enc, eh, nil)
 		oAuthServer = oauthsvr.New(oAuthEndpoints, mux, dec, enc, eh, nil)
+		productsServer = productssvr.New(productsEndpoints, mux, dec, enc, eh, nil)
 		if debug {
 			servers := goahttp.Servers{
 				openapiServer,
 				jwtTokenServer,
-				bookServer,
 				oAuthServer,
+				productsServer,
 			}
 			servers.Use(httpmdlwr.Debug(mux, os.Stdout))
 		}
@@ -78,8 +78,8 @@ func handleHTTPServer(ctx context.Context, u *url.URL, jwtTokenEndpoints *jwttok
 	// Configure the mux.
 	openapisvr.Mount(mux, openapiServer)
 	jwttokensvr.Mount(mux, jwtTokenServer)
-	booksvr.Mount(mux, bookServer)
 	oauthsvr.Mount(mux, oAuthServer)
+	productssvr.Mount(mux, productsServer)
 
 	// Wrap the multiplexer with additional middlewares. Middlewares mounted
 	// here apply to all the service endpoints.

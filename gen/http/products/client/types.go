@@ -9,6 +9,7 @@ package client
 
 import (
 	products "api_crud/gen/products"
+	"unicode/utf8"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -444,8 +445,14 @@ func ValidateResProductResponseBody(body *ResProductResponseBody) (err error) {
 // ValidatePayloadProductRequestBody runs the validations defined on
 // payloadProductRequestBody
 func ValidatePayloadProductRequestBody(body *PayloadProductRequestBody) (err error) {
-	if !(body.Category == "men" || body.Category == "women" || body.Category == "hats" || body.Category == "jackets" || body.Category == "sneakers") {
-		err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.category", body.Category, []interface{}{"men", "women", "hats", "jackets", "sneakers"}))
+	if utf8.RuneCountInString(body.Name) < 3 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))
+	}
+	if body.Price < 0 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError("body.price", body.Price, 0, true))
+	}
+	if !(body.Category == "men" || body.Category == "women" || body.Category == "hat" || body.Category == "jacket" || body.Category == "sneaker" || body.Category == "nothing") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.category", body.Category, []interface{}{"men", "women", "hat", "jacket", "sneaker", "nothing"}))
 	}
 	return
 }

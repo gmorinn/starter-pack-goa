@@ -61,12 +61,12 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"GetAllProductsByCategory", "GET", "/web/products"},
+			{"GetAllProductsByCategory", "GET", "/web/products/{category}"},
 			{"DeleteProduct", "DELETE", "/web/product/remove/{id}"},
 			{"CreateProduct", "POST", "/web/product/add"},
 			{"UpdateProduct", "PUT", "/web/product/{id}"},
 			{"GetProduct", "GET", "/web/product/{id}"},
-			{"CORS", "OPTIONS", "/web/products"},
+			{"CORS", "OPTIONS", "/web/products/{category}"},
 			{"CORS", "OPTIONS", "/web/product/remove/{id}"},
 			{"CORS", "OPTIONS", "/web/product/add"},
 			{"CORS", "OPTIONS", "/web/product/{id}"},
@@ -112,7 +112,7 @@ func MountGetAllProductsByCategoryHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/web/products", f)
+	mux.Handle("GET", "/web/products/{category}", f)
 }
 
 // NewGetAllProductsByCategoryHandler creates a HTTP handler which loads the
@@ -369,7 +369,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/web/products", f)
+	mux.Handle("OPTIONS", "/web/products/{category}", f)
 	mux.Handle("OPTIONS", "/web/product/remove/{id}", f)
 	mux.Handle("OPTIONS", "/web/product/add", f)
 	mux.Handle("OPTIONS", "/web/product/{id}", f)

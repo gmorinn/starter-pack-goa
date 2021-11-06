@@ -49,6 +49,7 @@ var MethodNames = [5]string{"getAllProductsByCategory", "deleteProduct", "create
 // GetAllProductsByCategoryPayload is the payload type of the products service
 // getAllProductsByCategory method.
 type GetAllProductsByCategoryPayload struct {
+	Category string
 	// JWT used for authentication after Signin/Signup
 	JWTToken *string
 	// Use to generate Oauth with /authorization

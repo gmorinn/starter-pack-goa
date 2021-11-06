@@ -55,3 +55,16 @@ var _ = Service("openapi", func() {
 		})
 	})
 })
+
+var unknownError = Type("unknownError", func() {
+	Field(1, "err", String, func() {
+		Example("sql no rows affected")
+	})
+	Field(2, "error_code", String, func() {
+		Example("TX_UPDATE_ITEM")
+	})
+	Field(3, "success", Boolean, func() {
+		Default(false)
+	})
+	Required("err", "success", "error_code")
+})

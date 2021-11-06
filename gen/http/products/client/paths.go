@@ -12,8 +12,8 @@ import (
 )
 
 // GetAllProductsByCategoryProductsPath returns the URL path to the products service getAllProductsByCategory HTTP endpoint.
-func GetAllProductsByCategoryProductsPath() string {
-	return "/web/products"
+func GetAllProductsByCategoryProductsPath(category string) string {
+	return fmt.Sprintf("/web/products/%v", category)
 }
 
 // DeleteProductProductsPath returns the URL path to the products service deleteProduct HTTP endpoint.

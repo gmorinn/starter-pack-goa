@@ -2,9 +2,9 @@ package main
 
 import (
 	"api_crud/api"
-	book "api_crud/gen/book"
 	jwttoken "api_crud/gen/jwt_token"
 	oauth "api_crud/gen/o_auth"
+	products "api_crud/gen/products"
 	"context"
 	"flag"
 	"fmt"
@@ -34,34 +34,34 @@ func main() {
 		logger *log.Logger
 	)
 	{
-		logger = log.New(os.Stderr, "[PROJECT NAME] ", log.Ltime)
+		logger = log.New(os.Stderr, "[ecommerce] ", log.Ltime)
 	}
 
 	// Initialize the services.
 	var (
-		bookSvc     book.Service
 		jwtTokenSvc jwttoken.Service
 		oAuthSvc    oauth.Service
+		productsSvc products.Service
 		server      *api.Server
 	)
 	{
 		server = api.NewServer()
-		bookSvc = api.NewBook(logger, server)
-		oAuthSvc = api.NewOAuth(logger, server)
 		jwtTokenSvc = api.NewJWTToken(logger, server)
+		oAuthSvc = api.NewOAuth(logger, server)
+		productsSvc = api.NewProducts(logger, server)
 	}
 
 	// Wrap the services in endpoints that can be invoked from other services
 	// potentially running in different processes.
 	var (
-		bookEndpoints     *book.Endpoints
 		jwtTokenEndpoints *jwttoken.Endpoints
 		oAuthEndpoints    *oauth.Endpoints
+		productsEndpoints *products.Endpoints
 	)
 	{
-		bookEndpoints = book.NewEndpoints(bookSvc)
 		jwtTokenEndpoints = jwttoken.NewEndpoints(jwtTokenSvc)
 		oAuthEndpoints = oauth.NewEndpoints(oAuthSvc)
+		productsEndpoints = products.NewEndpoints(productsSvc)
 	}
 
 	// Create channel used by both the signal handler and server goroutines
@@ -83,7 +83,7 @@ func main() {
 	switch *hostF {
 	case "localhost":
 		{
-			addr := "https://localhost:8088"
+			addr := "http://localhost:8088"
 			u, err := url.Parse(addr)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "invalid URL %#v: %s\n", addr, err)
@@ -103,9 +103,9 @@ func main() {
 				}
 				u.Host = net.JoinHostPort(h, *httpPortF)
 			} else if u.Port() == "" {
-				u.Host = net.JoinHostPort(u.Host, "443")
+				u.Host = net.JoinHostPort(u.Host, "80")
 			}
-			handleHTTPServer(ctx, u, jwtTokenEndpoints, bookEndpoints, oAuthEndpoints, &wg, errc, logger, *dbgF)
+			handleHTTPServer(ctx, u, jwtTokenEndpoints, oAuthEndpoints, productsEndpoints, &wg, errc, logger, *dbgF)
 		}
 
 	default:

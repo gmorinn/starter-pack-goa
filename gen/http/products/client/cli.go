@@ -17,7 +17,18 @@ import (
 
 // BuildGetAllProductsByCategoryPayload builds the payload for the products
 // getAllProductsByCategory endpoint from CLI flags.
-func BuildGetAllProductsByCategoryPayload(productsGetAllProductsByCategoryOauth string, productsGetAllProductsByCategoryJWTToken string) (*products.GetAllProductsByCategoryPayload, error) {
+func BuildGetAllProductsByCategoryPayload(productsGetAllProductsByCategoryCategory string, productsGetAllProductsByCategoryOauth string, productsGetAllProductsByCategoryJWTToken string) (*products.GetAllProductsByCategoryPayload, error) {
+	var err error
+	var category string
+	{
+		category = productsGetAllProductsByCategoryCategory
+		if !(category == "men" || category == "women" || category == "hat" || category == "jacket" || category == "sneaker" || category == "nothing") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("category", category, []interface{}{"men", "women", "hat", "jacket", "sneaker", "nothing"}))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
 	var oauth *string
 	{
 		if productsGetAllProductsByCategoryOauth != "" {
@@ -31,6 +42,7 @@ func BuildGetAllProductsByCategoryPayload(productsGetAllProductsByCategoryOauth 
 		}
 	}
 	v := &products.GetAllProductsByCategoryPayload{}
+	v.Category = category
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
 

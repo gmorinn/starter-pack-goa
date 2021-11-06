@@ -35,9 +35,17 @@ func EncodeGetAllProductsByCategoryResponse(encoder func(context.Context, http.R
 func DecodeGetAllProductsByCategoryRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
+			category string
 			oauth    *string
 			jwtToken *string
+			err      error
+
+			params = mux.Vars(r)
 		)
+		category = params["category"]
+		if !(category == "men" || category == "women" || category == "hat" || category == "jacket" || category == "sneaker" || category == "nothing") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("category", category, []interface{}{"men", "women", "hat", "jacket", "sneaker", "nothing"}))
+		}
 		oauthRaw := r.Header.Get("Authorization")
 		if oauthRaw != "" {
 			oauth = &oauthRaw
@@ -46,7 +54,10 @@ func DecodeGetAllProductsByCategoryRequest(mux goahttp.Muxer, decoder func(*http
 		if jwtTokenRaw != "" {
 			jwtToken = &jwtTokenRaw
 		}
-		payload := NewGetAllProductsByCategoryPayload(oauth, jwtToken)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewGetAllProductsByCategoryPayload(category, oauth, jwtToken)
 		if payload.Oauth != nil {
 			if strings.Contains(*payload.Oauth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")

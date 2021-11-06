@@ -9,6 +9,7 @@ package server
 
 import (
 	products "api_crud/gen/products"
+	"unicode/utf8"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -240,8 +241,9 @@ func NewGetProductUnknownErrorResponseBody(res *products.UnknownError) *GetProdu
 
 // NewGetAllProductsByCategoryPayload builds a products service
 // getAllProductsByCategory endpoint payload.
-func NewGetAllProductsByCategoryPayload(oauth *string, jwtToken *string) *products.GetAllProductsByCategoryPayload {
+func NewGetAllProductsByCategoryPayload(category string, oauth *string, jwtToken *string) *products.GetAllProductsByCategoryPayload {
 	v := &products.GetAllProductsByCategoryPayload{}
+	v.Category = category
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
 
@@ -335,9 +337,19 @@ func ValidatePayloadProductRequestBody(body *PayloadProductRequestBody) (err err
 	if body.Category == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("category", "body"))
 	}
+	if body.Name != nil {
+		if utf8.RuneCountInString(*body.Name) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", *body.Name, utf8.RuneCountInString(*body.Name), 3, true))
+		}
+	}
+	if body.Price != nil {
+		if *body.Price < 0 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError("body.price", *body.Price, 0, true))
+		}
+	}
 	if body.Category != nil {
-		if !(*body.Category == "men" || *body.Category == "women" || *body.Category == "hats" || *body.Category == "jackets" || *body.Category == "sneakers") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.category", *body.Category, []interface{}{"men", "women", "hats", "jackets", "sneakers"}))
+		if !(*body.Category == "men" || *body.Category == "women" || *body.Category == "hat" || *body.Category == "jacket" || *body.Category == "sneaker" || *body.Category == "nothing") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.category", *body.Category, []interface{}{"men", "women", "hat", "jacket", "sneaker", "nothing"}))
 		}
 	}
 	return

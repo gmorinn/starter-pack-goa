@@ -4,22 +4,24 @@ CREATE TYPE "role" AS ENUM (
   'user'
 );
 
-CREATE TABLE "files" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
-  "deleted_at" timestamp,
-  "name" text,
-  "url" text,
-  "mime" text,
-  "size" bigint
+CREATE TYPE "categories" AS ENUM (
+  'men',
+  'women',
+  'sneaker',
+  'hat',
+  'jacket',
+  'nothing'
 );
 
-CREATE TABLE "books" (
+CREATE TABLE "products" (
   "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid()),
   "created_at" timestamptz NOT NULL DEFAULT (NOW()),
-  "price" float8 NOT NULL,
-  "name" varchar(255) NOT NULL
+  "updated_at" timestamptz NOT NULL DEFAULT (NOW()),
+  "deleted_at" timestamptz,
+  "name" text NOT NULL,
+  "category" categories NOT NULL DEFAULT 'nothing',
+  "cover" text NOT NULL,
+  "price" float8 NOT NULL DEFAULT 0
 );
 
 CREATE TABLE "users" (
