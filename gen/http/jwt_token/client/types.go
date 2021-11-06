@@ -74,9 +74,9 @@ type RefreshResponseBody struct {
 	Success      *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
-// AuthProvidersResponseBody is the type of the "jwtToken" service
+// AuthProvidersCreatedResponseBody is the type of the "jwtToken" service
 // "auth-providers" endpoint HTTP response body.
-type AuthProvidersResponseBody struct {
+type AuthProvidersCreatedResponseBody struct {
 	AccessToken  *string `form:"access_token,omitempty" json:"access_token,omitempty" xml:"access_token,omitempty"`
 	RefreshToken *string `form:"refresh_token,omitempty" json:"refresh_token,omitempty" xml:"refresh_token,omitempty"`
 	Success      *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
@@ -174,6 +174,14 @@ type AuthProvidersInvalidScopesResponseBody string
 // AuthProvidersUnauthorizedResponseBody is the type of the "jwtToken" service
 // "auth-providers" endpoint HTTP response body for the "unauthorized" error.
 type AuthProvidersUnauthorizedResponseBody string
+
+// AuthProvidersBadRequestResponseBody is used to define fields on response
+// body types.
+type AuthProvidersBadRequestResponseBody struct {
+	AccessToken  *string `form:"access_token,omitempty" json:"access_token,omitempty" xml:"access_token,omitempty"`
+	RefreshToken *string `form:"refresh_token,omitempty" json:"refresh_token,omitempty" xml:"refresh_token,omitempty"`
+	Success      *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
 
 // NewSignupRequestBody builds the HTTP request body from the payload of the
 // "signup" endpoint of the "jwtToken" service.
@@ -387,9 +395,9 @@ func NewRefreshUnauthorized(body RefreshUnauthorizedResponseBody) jwttoken.Unaut
 	return v
 }
 
-// NewAuthProvidersSignOK builds a "jwtToken" service "auth-providers" endpoint
-// result from a HTTP "OK" response.
-func NewAuthProvidersSignOK(body *AuthProvidersResponseBody) *jwttoken.Sign {
+// NewAuthProvidersSignCreated builds a "jwtToken" service "auth-providers"
+// endpoint result from a HTTP "Created" response.
+func NewAuthProvidersSignCreated(body *AuthProvidersCreatedResponseBody) *jwttoken.Sign {
 	v := &jwttoken.Sign{
 		AccessToken:  *body.AccessToken,
 		RefreshToken: *body.RefreshToken,
@@ -481,9 +489,9 @@ func ValidateRefreshResponseBody(body *RefreshResponseBody) (err error) {
 	return
 }
 
-// ValidateAuthProvidersResponseBody runs the validations defined on
-// Auth-ProvidersResponseBody
-func ValidateAuthProvidersResponseBody(body *AuthProvidersResponseBody) (err error) {
+// ValidateAuthProvidersCreatedResponseBody runs the validations defined on
+// Auth-ProvidersCreatedResponseBody
+func ValidateAuthProvidersCreatedResponseBody(body *AuthProvidersCreatedResponseBody) (err error) {
 	if body.AccessToken == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("access_token", "body"))
 	}
@@ -600,6 +608,21 @@ func ValidateAuthProvidersUnknownErrorResponseBody(body *AuthProvidersUnknownErr
 	}
 	if body.ErrorCode == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
+// ValidateAuthProvidersBadRequestResponseBody runs the validations defined on
+// Auth-ProvidersBad RequestResponseBody
+func ValidateAuthProvidersBadRequestResponseBody(body *AuthProvidersBadRequestResponseBody) (err error) {
+	if body.AccessToken == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("access_token", "body"))
+	}
+	if body.RefreshToken == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("refresh_token", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
 	}
 	return
 }

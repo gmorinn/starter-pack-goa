@@ -481,20 +481,20 @@ func DecodeAuthProvidersResponse(decoder func(*http.Response) goahttp.Decoder, r
 			defer resp.Body.Close()
 		}
 		switch resp.StatusCode {
-		case http.StatusOK:
+		case http.StatusCreated:
 			var (
-				body AuthProvidersResponseBody
+				body AuthProvidersCreatedResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("jwtToken", "auth-providers", err)
 			}
-			err = ValidateAuthProvidersResponseBody(&body)
+			err = ValidateAuthProvidersCreatedResponseBody(&body)
 			if err != nil {
 				return nil, goahttp.ErrValidationError("jwtToken", "auth-providers", err)
 			}
-			res := NewAuthProvidersSignOK(&body)
+			res := NewAuthProvidersSignCreated(&body)
 			return res, nil
 		case http.StatusBadRequest:
 			var (

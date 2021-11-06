@@ -372,8 +372,8 @@ func EncodeAuthProvidersResponse(encoder func(context.Context, http.ResponseWrit
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		res, _ := v.(*jwttoken.Sign)
 		enc := encoder(ctx, w)
-		body := NewAuthProvidersResponseBody(res)
-		w.WriteHeader(http.StatusOK)
+		body := NewAuthProvidersCreatedResponseBody(res)
+		w.WriteHeader(http.StatusCreated)
 		return enc.Encode(body)
 	}
 }

@@ -43,9 +43,9 @@ func UsageExamples() string {
       "phone": "+262 692 12 34 56"
    }' --oauth "Aut eum cumque."` + "\n" +
 		os.Args[0] + ` o-auth o-auth --body '{
-      "client_id": "Voluptatibus distinctio.",
-      "client_secret": "Rem nulla culpa enim dolor atque molestias.",
-      "grant_type": "Voluptatem et pariatur."
+      "client_id": "Distinctio quae rem.",
+      "client_secret": "Culpa enim.",
+      "grant_type": "Atque molestias rerum voluptatem et pariatur ratione."
    }'` + "\n" +
 		""
 }
@@ -464,9 +464,9 @@ oAuth
 
 Example:
     %[1]s o-auth o-auth --body '{
-      "client_id": "Voluptatibus distinctio.",
-      "client_secret": "Rem nulla culpa enim dolor atque molestias.",
-      "grant_type": "Voluptatem et pariatur."
+      "client_id": "Distinctio quae rem.",
+      "client_secret": "Culpa enim.",
+      "grant_type": "Atque molestias rerum voluptatem et pariatur ratione."
    }'
 `, os.Args[0])
 }

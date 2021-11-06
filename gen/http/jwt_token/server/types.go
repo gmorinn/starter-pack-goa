@@ -75,9 +75,9 @@ type RefreshResponseBody struct {
 	Success      bool   `form:"success" json:"success" xml:"success"`
 }
 
-// AuthProvidersResponseBody is the type of the "jwtToken" service
+// AuthProvidersCreatedResponseBody is the type of the "jwtToken" service
 // "auth-providers" endpoint HTTP response body.
-type AuthProvidersResponseBody struct {
+type AuthProvidersCreatedResponseBody struct {
 	AccessToken  string `form:"access_token" json:"access_token" xml:"access_token"`
 	RefreshToken string `form:"refresh_token" json:"refresh_token" xml:"refresh_token"`
 	Success      bool   `form:"success" json:"success" xml:"success"`
@@ -209,10 +209,10 @@ func NewRefreshResponseBody(res *jwttoken.Sign) *RefreshResponseBody {
 	return body
 }
 
-// NewAuthProvidersResponseBody builds the HTTP response body from the result
-// of the "auth-providers" endpoint of the "jwtToken" service.
-func NewAuthProvidersResponseBody(res *jwttoken.Sign) *AuthProvidersResponseBody {
-	body := &AuthProvidersResponseBody{
+// NewAuthProvidersCreatedResponseBody builds the HTTP response body from the
+// result of the "auth-providers" endpoint of the "jwtToken" service.
+func NewAuthProvidersCreatedResponseBody(res *jwttoken.Sign) *AuthProvidersCreatedResponseBody {
+	body := &AuthProvidersCreatedResponseBody{
 		AccessToken:  res.AccessToken,
 		RefreshToken: res.RefreshToken,
 		Success:      res.Success,

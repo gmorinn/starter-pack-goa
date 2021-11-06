@@ -181,7 +181,6 @@ func (s *jwtTokensrvc) generateJwtToken(ID uuid.UUID) (string, string, time.Time
 func (s *jwtTokensrvc) AuthProviders(ctx context.Context, p *jwttoken.AuthProvidersPayload) (res *jwttoken.Sign, err error) {
 	var t, r string
 	var user db.User
-
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		app, err := firebaseClient(ctx)
 		if err != nil {
@@ -238,6 +237,7 @@ func (s *jwtTokensrvc) AuthProviders(ctx context.Context, p *jwttoken.AuthProvid
 					FirebaseUid:      utils.NullS(p.FirebaseUID),
 					FirebaseProvider: utils.NullS(p.FirebaseProvider),
 				}
+				//Sign with Provider
 				user, err = q.SignProvider(ctx, arg)
 				if err != nil {
 					return fmt.Errorf("SIGNUP_PROVIDER %v", err.Error())

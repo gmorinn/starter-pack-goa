@@ -160,7 +160,8 @@ var _ = Service("jwtToken", func() {
 
 		HTTP(func() {
 			POST("/sign-providers")
-			Response(StatusOK)
+			Response(StatusCreated)
+			Response(StatusBadRequest)
 		})
 	})
 

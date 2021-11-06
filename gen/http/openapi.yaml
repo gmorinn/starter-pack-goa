@@ -175,10 +175,10 @@ paths:
           - firebase_uid
           - firebase_provider
       responses:
-        "200":
-          description: OK response.
+        "201":
+          description: Created response.
           schema:
-            $ref: '#/definitions/JWTTokenAuthProvidersResponseBody'
+            $ref: '#/definitions/JWTTokenAuthProvidersCreatedResponseBody'
             required:
             - access_token
             - refresh_token
@@ -583,11 +583,11 @@ definitions:
       price:
         type: number
         description: Price of the book
-        example: 0.39536195663730467
+        example: 0.23933263907974725
         minimum: 0.1
     example:
       name: Guillaume
-      price: 0.20406260616769864
+      price: 0.23791665008385104
     required:
     - name
     - price
@@ -599,7 +599,7 @@ definitions:
         $ref: '#/definitions/BookResponseResponseBody'
       success:
         type: boolean
-        example: true
+        example: false
     example:
       book:
         id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
@@ -613,7 +613,7 @@ definitions:
     title: BookCreateBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Explicabo autem sint vel in ea laboriosam.
+    example: Quibusdam ea hic explicabo autem.
   BookCreateBookUnknownErrorResponseBody:
     title: BookCreateBookUnknownErrorResponseBody
     type: object
@@ -627,7 +627,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -652,7 +652,7 @@ definitions:
     title: BookDeleteBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Quod dolore ex adipisci perferendis eos voluptas.
+    example: Dolore ex adipisci.
   BookDeleteBookUnknownErrorResponseBody:
     title: BookDeleteBookUnknownErrorResponseBody
     type: object
@@ -695,12 +695,9 @@ definitions:
         - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
           price: 69
-        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          name: Guillaume
-          price: 69
       success:
         type: boolean
-        example: false
+        example: true
     example:
       books:
       - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
@@ -712,7 +709,7 @@ definitions:
       - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
         price: 69
-      success: true
+      success: false
     required:
     - books
     - success
@@ -720,7 +717,7 @@ definitions:
     title: BookGetAllBooksUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Cupiditate tempore.
+    example: Quo cupiditate tempore earum.
   BookGetAllBooksUnknownErrorResponseBody:
     title: BookGetAllBooksUnknownErrorResponseBody
     type: object
@@ -750,22 +747,22 @@ definitions:
     properties:
       id:
         type: string
-        example: Nihil omnis assumenda qui qui molestiae.
+        example: Est cumque at eum commodi.
       name:
         type: string
-        example: Earum est.
+        example: Rem molestias.
       price:
         type: number
-        example: 0.8010139615717401
+        example: 0.7930856996207152
         format: double
       success:
         type: boolean
         example: true
     example:
-      id: Commodi molestias rem molestias earum consequuntur ut.
-      name: Ab rerum qui placeat dignissimos provident iste.
-      price: 0.3038175932314245
-      success: false
+      id: Impedit ab rerum qui.
+      name: Dignissimos provident.
+      price: 0.9996729332273168
+      success: true
     required:
     - id
     - name
@@ -775,7 +772,7 @@ definitions:
     title: BookGetBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Labore architecto non dolor temporibus.
+    example: Autem labore architecto.
   BookGetBookUnknownErrorResponseBody:
     title: BookGetBookUnknownErrorResponseBody
     type: object
@@ -789,7 +786,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -863,7 +860,7 @@ definitions:
     title: BookUpdateBookUnauthorizedResponseBody
     type: string
     description: Credentials are invalid
-    example: Aperiam eos ad porro.
+    example: Labore rerum repudiandae aperiam eos ad.
   BookUpdateBookUnknownErrorResponseBody:
     title: BookUpdateBookUnknownErrorResponseBody
     type: object
@@ -882,25 +879,67 @@ definitions:
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: true
+      success: false
     required:
     - err
     - success
     - error_code
+  JWTTokenAuthProvidersBadRequestResponseBody:
+    title: JWTTokenAuthProvidersBadRequestResponseBody
+    type: object
+    properties:
+      access_token:
+        type: string
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      refresh_token:
+        type: string
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      success:
+        type: boolean
+        example: true
+    example:
+      access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      success: false
+    required:
+    - access_token
+    - refresh_token
+    - success
+  JWTTokenAuthProvidersCreatedResponseBody:
+    title: JWTTokenAuthProvidersCreatedResponseBody
+    type: object
+    properties:
+      access_token:
+        type: string
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      refresh_token:
+        type: string
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      success:
+        type: boolean
+        example: true
+    example:
+      access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
+      success: true
+    required:
+    - access_token
+    - refresh_token
+    - success
   JWTTokenAuthProvidersEmailAlreadyExistResponseBody:
     title: JWTTokenAuthProvidersEmailAlreadyExistResponseBody
     type: object
     properties:
       message:
         type: string
-        example: Illum velit dicta facilis necessitatibus.
+        example: Nobis porro ullam aliquam provident.
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: When email already exist
     example:
-      message: Adipisci omnis quo consequatur soluta voluptates.
+      message: Recusandae quia eius.
       success: true
     required:
     - message
@@ -909,7 +948,7 @@ definitions:
     title: JWTTokenAuthProvidersInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Ut illo quia.
+    example: Dolores illum velit dicta facilis necessitatibus accusamus.
   JWTTokenAuthProvidersRequestBody:
     title: JWTTokenAuthProvidersRequestBody
     type: object
@@ -920,7 +959,7 @@ definitions:
         format: email
       firebase_id_token:
         type: string
-        example: sqw
+        example: hvo
         minLength: 400
       firebase_provider:
         type: string
@@ -940,7 +979,7 @@ definitions:
         minLength: 3
     example:
       email: guillaume@epitech.eu
-      firebase_id_token: bca
+      firebase_id_token: ie5
       firebase_provider: facebook.com
       firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
       firstname: Guillaume
@@ -952,32 +991,11 @@ definitions:
     - firebase_id_token
     - firebase_uid
     - firebase_provider
-  JWTTokenAuthProvidersResponseBody:
-    title: JWTTokenAuthProvidersResponseBody
-    type: object
-    properties:
-      access_token:
-        type: string
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      refresh_token:
-        type: string
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success:
-        type: boolean
-        example: false
-    example:
-      access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: false
-    required:
-    - access_token
-    - refresh_token
-    - success
   JWTTokenAuthProvidersUnauthorizedResponseBody:
     title: JWTTokenAuthProvidersUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Culpa minus labore sint occaecati nihil.
+    example: Adipisci omnis quo consequatur soluta voluptates.
   JWTTokenAuthProvidersUnknownErrorResponseBody:
     title: JWTTokenAuthProvidersUnknownErrorResponseBody
     type: object
@@ -991,7 +1009,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -1007,15 +1025,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Eaque et quasi.
+        example: Dolore nobis voluptas.
       success:
         type: boolean
         default: false
         example: false
     description: When email already exist
     example:
-      message: Eos culpa.
-      success: true
+      message: Officia temporibus non ut.
+      success: false
     required:
     - message
     - success
@@ -1023,7 +1041,7 @@ definitions:
     title: JWTTokenRefreshInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Nobis porro ullam aliquam provident.
+    example: Quia facilis excepturi.
   JWTTokenRefreshRequestBody:
     title: JWTTokenRefreshRequestBody
     type: object
@@ -1060,7 +1078,7 @@ definitions:
     title: JWTTokenRefreshUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Harum recusandae quia eius iste atque.
+    example: Et quasi unde et eos.
   JWTTokenRefreshUnknownErrorResponseBody:
     title: JWTTokenRefreshUnknownErrorResponseBody
     type: object
@@ -1074,7 +1092,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -1090,14 +1108,14 @@ definitions:
     properties:
       message:
         type: string
-        example: Pariatur laudantium ab in et.
+        example: Corporis minus omnis.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: When email already exist
     example:
-      message: Qui rerum rerum est odio eos.
+      message: Tempora reiciendis commodi inventore laudantium omnis.
       success: false
     required:
     - message
@@ -1106,7 +1124,7 @@ definitions:
     title: JWTTokenSigninInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Optio officia temporibus non ut.
+    example: Laudantium ab in.
   JWTTokenSigninRequestBody:
     title: JWTTokenSigninRequestBody
     type: object
@@ -1139,11 +1157,11 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: false
+        example: true
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: false
+      success: true
     required:
     - access_token
     - refresh_token
@@ -1152,7 +1170,7 @@ definitions:
     title: JWTTokenSigninUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Aliquid minus unde.
+    example: Quisquam ut qui rerum rerum.
   JWTTokenSigninUnknownErrorResponseBody:
     title: JWTTokenSigninUnknownErrorResponseBody
     type: object
@@ -1182,14 +1200,14 @@ definitions:
     properties:
       message:
         type: string
-        example: Impedit optio maiores nostrum doloremque id distinctio.
+        example: Quia et est vitae distinctio.
       success:
         type: boolean
         default: false
         example: true
     description: When email already exist
     example:
-      message: Sit sit est libero dolor et earum.
+      message: Maiores nostrum doloremque id distinctio inventore odit.
       success: true
     required:
     - message
@@ -1198,7 +1216,7 @@ definitions:
     title: JWTTokenSignupInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Qui recusandae assumenda eum id dolores.
+    example: Dolor et earum.
   JWTTokenSignupRequestBody:
     title: JWTTokenSignupRequestBody
     type: object
@@ -1206,7 +1224,7 @@ definitions:
       birthday:
         type: string
         default: ""
-        example: Recusandae corporis minus omnis veritatis.
+        example: Dolores aut.
       email:
         type: string
         example: guillaume@epitech.eu
@@ -1232,7 +1250,7 @@ definitions:
         example: +262 692 12 34 56
     description: Use client ID and client secret to oAuth
     example:
-      birthday: Tempora reiciendis commodi inventore laudantium omnis.
+      birthday: Ratione ipsum.
       email: guillaume@epitech.eu
       firstname: Guillaume
       lastname: Morin
@@ -1255,11 +1273,11 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: false
+        example: true
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: false
+      success: true
     required:
     - access_token
     - refresh_token
@@ -1268,7 +1286,7 @@ definitions:
     title: JWTTokenSignupUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Similique ratione ipsum aliquam.
+    example: Voluptate nostrum enim qui recusandae assumenda eum.
   JWTTokenSignupUnknownErrorResponseBody:
     title: JWTTokenSignupUnknownErrorResponseBody
     type: object
@@ -1282,7 +1300,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -1298,22 +1316,22 @@ definitions:
     properties:
       access_token:
         type: string
-        example: Est incidunt impedit voluptatum earum aperiam.
+        example: Corporis in dolor velit blanditiis.
       expires_in:
         type: integer
-        example: 2975016019760660156
+        example: 721116556768293679
         format: int64
       success:
         type: boolean
         example: true
       token_type:
         type: string
-        example: Accusamus blanditiis id.
+        example: Aliquam dicta accusamus quis aut quisquam porro.
     example:
-      access_token: Labore adipisci voluptas vitae quam adipisci.
-      expires_in: 1664667603485178265
-      success: false
-      token_type: Voluptate est labore expedita repudiandae.
+      access_token: Dolorem enim et quia natus est.
+      expires_in: 7156477281981818310
+      success: true
+      token_type: Impedit voluptatum earum aperiam molestiae.
     required:
     - access_token
     - token_type
@@ -1325,22 +1343,22 @@ definitions:
     properties:
       access_token:
         type: string
-        example: Illum est voluptas ab ex consequatur ut.
+        example: Minus labore.
       expires_in:
         type: integer
-        example: 1675975443963354888
+        example: 3038936878837500686
         format: int64
       success:
         type: boolean
         example: true
       token_type:
         type: string
-        example: Corporis in dolor velit blanditiis.
+        example: Occaecati nihil quis labore.
     example:
-      access_token: Accusamus quis aut quisquam porro.
-      expires_in: 5543241223372585727
+      access_token: Voluptas et.
+      expires_in: 2255671971108150923
       success: false
-      token_type: Vitae dolorum dolorem enim.
+      token_type: Maxime illum est voluptas ab ex.
     required:
     - access_token
     - token_type
@@ -1350,24 +1368,24 @@ definitions:
     title: OAuthOAuthInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Quam in et voluptatem perspiciatis maiores amet.
+    example: Consequuntur labore.
   OAuthOAuthRequestBody:
     title: OAuthOAuthRequestBody
     type: object
     properties:
       client_id:
         type: string
-        example: Beatae occaecati quidem quaerat voluptates.
+        example: Adipisci id voluptate est labore expedita repudiandae.
       client_secret:
         type: string
-        example: Nihil qui enim atque quisquam modi.
+        example: Veniam inventore perspiciatis magnam quam in et.
       grant_type:
         type: string
-        example: Blanditiis officia enim magni.
+        example: Perspiciatis maiores amet.
     example:
-      client_id: Esse eos et reiciendis enim.
-      client_secret: Velit ea voluptatem.
-      grant_type: In corporis perferendis.
+      client_id: Soluta labore quo nobis voluptatem et.
+      client_secret: Beatae occaecati quidem quaerat voluptates.
+      grant_type: Nihil qui enim atque quisquam modi.
     required:
     - client_id
     - client_secret
@@ -1376,7 +1394,7 @@ definitions:
     title: OAuthOAuthUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Soluta labore quo nobis voluptatem et.
+    example: Voluptas vitae.
   OAuthOAuthUnknownErrorResponseBody:
     title: OAuthOAuthUnknownErrorResponseBody
     type: object
@@ -1390,7 +1408,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
