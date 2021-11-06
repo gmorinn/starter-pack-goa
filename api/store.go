@@ -2,7 +2,6 @@ package api
 
 import (
 	"api_crud/config"
-	jwttoken "api_crud/gen/jwt_token"
 	db "api_crud/internal"
 	sqlc "api_crud/internal"
 
@@ -11,11 +10,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 	"github.com/robfig/cron/v3"
-	"goa.design/goa/v3/security"
 	oserver "gopkg.in/oauth2.v3/server"
 
 	"log"
@@ -88,90 +85,4 @@ func (server *Server) StoreRefresh(ctx context.Context, token string, exp time.T
 		ExpirOn: exp,
 		UserID:  userID,
 	})
-}
-
-func (server *Server) CheckAuth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
-
-	claims := make(jwt.MapClaims)
-
-	// authorize request
-	// 1. parse JWT token, token key is hardcoded to "secret" in this example
-	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		b := ([]byte(server.Config.Security.Secret))
-		return b, nil
-	})
-	if err != nil {
-		return ctx, ErrInvalidToken
-	}
-
-	// 2. validate provided "scopes" claim
-	if claims["scopes"] == nil {
-		return ctx, ErrInvalidTokenScopes
-	}
-	if claims["expires_in"] == nil {
-		return ctx, ErrInvalidTokenScopes
-	}
-	if claims["token_type"] != "Bearer" {
-		return ctx, ErrInvalidToken
-	}
-	scopes, ok := claims["scopes"].([]interface{})
-	if !ok {
-		return ctx, ErrInvalidTokenScopes
-	}
-	scopesInToken := make([]string, len(scopes))
-	for _, scp := range scopes {
-		scopesInToken = append(scopesInToken, scp.(string))
-	}
-	if err := scheme.Validate(scopesInToken); err != nil {
-		return ctx, jwttoken.InvalidScopes(err.Error())
-	}
-
-	// 3. add authInfo to context
-	ctx = contextWithAuthInfo(ctx, authInfo{
-		oAuth: claims,
-	})
-	return ctx, nil
-}
-
-func (server *Server) CheckJWT(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error) {
-
-	claims := make(jwt.MapClaims)
-
-	// authorize request
-	// 1. parse JWT token, token key is hardcoded to "secret" in this example
-	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-		b := ([]byte(server.Config.Security.Secret))
-		return b, nil
-	})
-	if err != nil {
-		return ctx, ErrInvalidToken
-	}
-
-	// 2. validate provided "scopes" claim
-	if claims["scopes"] == nil {
-		return ctx, ErrInvalidTokenScopes
-	}
-	if claims["id"] == nil {
-		return ctx, ErrInvalidTokenScopes
-	}
-	if claims["exp"] == nil {
-		return ctx, ErrInvalidTokenScopes
-	}
-	scopes, ok := claims["scopes"].([]interface{})
-	if !ok {
-		return ctx, ErrInvalidTokenScopes
-	}
-	scopesInToken := make([]string, len(scopes))
-	for _, scp := range scopes {
-		scopesInToken = append(scopesInToken, scp.(string))
-	}
-	if err := schema.Validate(scopesInToken); err != nil {
-		return ctx, jwttoken.InvalidScopes(err.Error())
-	}
-
-	// 3. add authInfo to context
-	ctx = contextWithAuthInfo(ctx, authInfo{
-		jwtToken: claims,
-	})
-	return ctx, nil
 }

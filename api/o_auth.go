@@ -1,12 +1,14 @@
 package api
 
 import (
+	jwttoken "api_crud/gen/jwt_token"
 	oauth "api_crud/gen/o_auth"
 	"context"
 	"log"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"goa.design/goa/v3/security"
 )
 
 // oAuth service example implementation.
@@ -48,7 +50,7 @@ func (s *oAuthsrvc) OAuth(ctx context.Context, p *oauth.OauthPayload) (res *oaut
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"expires_in": time.Now().Add(time.Duration(time.Second * 2)).Unix(),
+		"exp":        time.Now().Add(time.Duration(time.Hour * 2)).Unix(),
 		"scopes":     []string{"api:read", "api:write"},
 		"token_type": "Bearer",
 	})
@@ -60,9 +62,55 @@ func (s *oAuthsrvc) OAuth(ctx context.Context, p *oauth.OauthPayload) (res *oaut
 
 	res = &oauth.OAuthResponse{
 		AccessToken: t,
-		ExpiresIn:   time.Now().Add(time.Duration(time.Second * 2)).Unix(),
+		ExpiresIn:   time.Now().Add(time.Duration(time.Hour * 2)).Unix(),
 		TokenType:   "Bearer",
 		Success:     true,
 	}
 	return res, nil
+}
+
+func (server *Server) CheckAuth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
+
+	claims := make(jwt.MapClaims)
+
+	// authorize request
+	// 1. parse JWT token, token key is hardcoded to "secret" in this example
+	t, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		b := ([]byte(server.Config.Security.Secret))
+		return b, nil
+	})
+	if err != nil {
+		return ctx, ErrInvalidToken
+	}
+	if !t.Valid {
+		return ctx, ErrInvalidToken
+	}
+
+	// 2. validate provided "scopes" claim
+	if claims["scopes"] == nil {
+		return ctx, ErrInvalidTokenScopes
+	}
+	if claims["exp"] == nil {
+		return ctx, ErrInvalidTokenScopes
+	}
+	if claims["token_type"] != "Bearer" {
+		return ctx, ErrInvalidToken
+	}
+	scopes, ok := claims["scopes"].([]interface{})
+	if !ok {
+		return ctx, ErrInvalidTokenScopes
+	}
+	scopesInToken := make([]string, len(scopes))
+	for _, scp := range scopes {
+		scopesInToken = append(scopesInToken, scp.(string))
+	}
+	if err := scheme.Validate(scopesInToken); err != nil {
+		return ctx, jwttoken.InvalidScopes(err.Error())
+	}
+
+	// 3. add authInfo to context
+	ctx = contextWithAuthInfo(ctx, authInfo{
+		oAuth: claims,
+	})
+	return ctx, nil
 }

@@ -39,6 +39,7 @@ func (s *jwtTokensrvc) errorResponse(msg string, err error) *jwttoken.UnknownErr
 var (
 	ErrInvalidToken       error = jwttoken.Unauthorized("invalid token")
 	ErrInvalidTokenScopes error = jwttoken.InvalidScopes("invalid scopes in token")
+	ErrExpiredToken       error = jwttoken.Unauthorized("token has expired")
 )
 
 func (s *jwtTokensrvc) OAuth2Auth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
@@ -266,4 +267,47 @@ func (s *jwtTokensrvc) AuthProviders(ctx context.Context, p *jwttoken.AuthProvid
 		Success:      true,
 	}
 	return res, nil
+}
+
+func (server *Server) CheckJWT(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error) {
+
+	claims := make(jwt.MapClaims)
+
+	// authorize request
+	// 1. parse JWT token, token key is hardcoded to "secret" in this example
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		b := ([]byte(server.Config.Security.Secret))
+		return b, nil
+	})
+	if err != nil {
+		return ctx, ErrInvalidToken
+	}
+
+	// 2. validate provided "scopes" claim
+	if claims["scopes"] == nil {
+		return ctx, ErrInvalidTokenScopes
+	}
+	if claims["id"] == nil {
+		return ctx, ErrInvalidTokenScopes
+	}
+	if claims["exp"] == nil {
+		return ctx, ErrInvalidTokenScopes
+	}
+	scopes, ok := claims["scopes"].([]interface{})
+	if !ok {
+		return ctx, ErrInvalidTokenScopes
+	}
+	scopesInToken := make([]string, len(scopes))
+	for _, scp := range scopes {
+		scopesInToken = append(scopesInToken, scp.(string))
+	}
+	if err := schema.Validate(scopesInToken); err != nil {
+		return ctx, jwttoken.InvalidScopes(err.Error())
+	}
+
+	// 3. add authInfo to context
+	ctx = contextWithAuthInfo(ctx, authInfo{
+		jwtToken: claims,
+	})
+	return ctx, nil
 }
