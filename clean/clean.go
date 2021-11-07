@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func checkNameFile(api []fs.FileInfo, fileName string) bool {
+func CheckNameFile(api []fs.FileInfo, fileName string) bool {
 	for _, v := range api {
 		if v.Name() == fileName {
 			return true
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	for _, f := range currentFolder {
-		if checkNameFile(apiFolder, f.Name()) {
+		if CheckNameFile(apiFolder, f.Name()) {
 			e := os.Remove(f.Name())
 			if e != nil {
 				log.Fatal(e)

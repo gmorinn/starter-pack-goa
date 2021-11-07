@@ -17,7 +17,7 @@ import (
 	"syscall"
 )
 
-func Main() {
+func main() {
 	// Define command line flags, add any other flag required to configure the
 	// service.
 	var (

@@ -17,9 +17,8 @@ api-goa:
 	@echo -e "\nWait...⌛\n\nGOA & GM will generate functions for you❤️\n"
 	@goa example $(DIR)/design
 	@rm -r cmd/api
-	@go build clean.go
-	@./clean
-	@rm clean
+	@go build -o cl clean/clean.go && ./cl
+	@rm cl
 	@echo -e "\nEnjoy🐿️\n=> Documentation make api-doc"
 
 api-doc:
