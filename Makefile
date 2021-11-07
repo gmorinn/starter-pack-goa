@@ -14,6 +14,12 @@ api-goa:
 	@goa gen $(DIR)/design
 	@cp -f gen/http/openapi.json ./documentation
 	@mv gen/http/openapi.json ./
+	@echo -e "\nWait...⌛\n\nGOA & GM will generate functions for you❤️\n"
+	@goa example $(DIR)/design
+	@rm -r cmd/api
+	@go build clean.go
+	@./clean
+	@rm clean
 	@echo -e "\nEnjoy🐿️\n=> Documentation make api-doc"
 
 api-doc:
