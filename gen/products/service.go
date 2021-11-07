@@ -16,6 +16,8 @@ import (
 
 // Products of the E-Commerce
 type Service interface {
+	// Get All products
+	GetAllProducts(context.Context, *GetAllProductsPayload) (res *GetAllProductsResult, err error)
 	// Get All products by category
 	GetAllProductsByCategory(context.Context, *GetAllProductsByCategoryPayload) (res *GetAllProductsByCategoryResult, err error)
 	// Delete one product by ID
@@ -44,7 +46,24 @@ const ServiceName = "products"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [5]string{"getAllProductsByCategory", "deleteProduct", "createProduct", "updateProduct", "getProduct"}
+var MethodNames = [6]string{"getAllProducts", "getAllProductsByCategory", "deleteProduct", "createProduct", "updateProduct", "getProduct"}
+
+// GetAllProductsPayload is the payload type of the products service
+// getAllProducts method.
+type GetAllProductsPayload struct {
+	// JWT used for authentication after Signin/Signup
+	JWTToken *string
+	// Use to generate Oauth with /authorization
+	Oauth *string
+}
+
+// GetAllProductsResult is the result type of the products service
+// getAllProducts method.
+type GetAllProductsResult struct {
+	// All products by category
+	Products []*ResAllProducts
+	Success  bool
+}
 
 // GetAllProductsByCategoryPayload is the payload type of the products service
 // getAllProductsByCategory method.
@@ -134,6 +153,14 @@ type GetProductResult struct {
 	// Result is an object
 	Product *ResProduct
 	Success bool
+}
+
+type ResAllProducts struct {
+	Men     []*ResProduct
+	Women   []*ResProduct
+	Hat     []*ResProduct
+	Jacket  []*ResProduct
+	Sneaker []*ResProduct
 }
 
 type ResProduct struct {

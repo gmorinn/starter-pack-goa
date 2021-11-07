@@ -25,6 +25,27 @@ var _ = Service("products", func() {
 		Response("unknown_error", StatusInternalServerError)
 	})
 
+	Method("getAllProducts", func() {
+		Description("Get All products")
+		Payload(func() {
+			TokenField(1, "jwtToken", String, func() {
+				Description("JWT used for authentication after Signin/Signup")
+			})
+			AccessTokenField(2, "oauth", String, func() {
+				Description("Use to generate Oauth with /authorization")
+			})
+		})
+		HTTP(func() {
+			GET("/products")
+			Response(StatusOK)
+		})
+		Result(func() {
+			Attribute("products", ArrayOf(resAllProducts), "All products by category")
+			Attribute("success", Boolean)
+			Required("products", "success")
+		})
+	})
+
 	Method("getAllProductsByCategory", func() {
 		Description("Get All products by category")
 		Payload(func() {
@@ -42,7 +63,7 @@ var _ = Service("products", func() {
 			Required("category")
 		})
 		HTTP(func() {
-			GET("/products/{category}")
+			GET("/products/category/{category}")
 			Response(StatusOK)
 		})
 		Result(func() {
@@ -171,10 +192,18 @@ var resProduct = Type("resProduct", func() {
 		Example("https://i.ibb.co/ypkgK0X/blue-beanie.png")
 	})
 	Attribute("category", String, func() {
-		Enum("men", "women", "hats", "jackets", "sneakers")
 		Example("men")
 	})
 	Required("id", "name", "price", "cover", "category")
+})
+
+var resAllProducts = Type("resAllProducts", func() {
+	Attribute("men", ArrayOf(resProduct))
+	Attribute("women", ArrayOf(resProduct))
+	Attribute("hat", ArrayOf(resProduct))
+	Attribute("jacket", ArrayOf(resProduct))
+	Attribute("sneaker", ArrayOf(resProduct))
+	Required("men", "women", "hat", "jacket", "sneaker")
 })
 
 var payloadProduct = Type("payloadProduct", func() {

@@ -27,9 +27,9 @@ paths:
             schema:
               $ref: '#/components/schemas/OAuthRequestBody'
             example:
-              client_id: Aut veniam autem.
-              client_secret: Et earum veniam omnis vel ab.
-              grant_type: Voluptatem incidunt pariatur et nulla.
+              client_id: Incidunt pariatur et nulla ipsa ad quis.
+              client_secret: Tempore magni animi.
+              grant_type: Non ut.
       responses:
         "201":
           description: Created response.
@@ -38,10 +38,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/OAuthResponse'
               example:
-                access_token: Ad quis quaerat.
-                expires_in: 7790529887225078354
+                access_token: Consequatur saepe enim aut tempora ipsam.
+                expires_in: 2662836920380232934
                 success: true
-                token_type: Magni animi aliquid non ut corrupti consequatur.
+                token_type: Maxime molestiae.
         "400":
           description: Bad Request response.
           content:
@@ -49,24 +49,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/OAuthResponse'
               example:
-                access_token: Nihil et accusantium quam.
-                expires_in: 7656406774412358812
-                success: false
-                token_type: Expedita quibusdam at iste quia neque voluptates.
+                access_token: Iste quia neque voluptates.
+                expires_in: 9126965065571231162
+                success: true
+                token_type: Qui non sint.
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Vel nesciunt harum sed.
+              example: Accusantium quam optio expedita quibusdam.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Ipsam ratione maxime molestiae.
+              example: Sed labore nihil.
         "500":
           description: Internal Server Error response.
           content:
@@ -76,7 +76,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
   /openapi.json:
     get:
       tags:
@@ -115,7 +115,7 @@ paths:
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-                success: false
+                success: true
         "400":
           description: Bad Request response.
           content:
@@ -123,22 +123,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Iste aliquam non consequuntur.
-                success: true
+                message: Accusamus repellat excepturi voluptas libero non nisi.
+                success: false
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Non nisi aut.
+              example: Ut qui adipisci.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Voluptas et accusamus repellat excepturi voluptas.
+              example: Voluptatum necessitatibus tempora consectetur incidunt.
         "500":
           description: Internal Server Error response.
           content:
@@ -148,7 +148,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -167,7 +167,7 @@ paths:
               $ref: '#/components/schemas/AuthProvidersRequestBody'
             example:
               email: guillaume@epitech.eu
-              firebase_id_token: gkx
+              firebase_id_token: qhn
               firebase_provider: facebook.com
               firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
               firstname: Guillaume
@@ -190,22 +190,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/Sign'
               example:
-                message: Ab aut saepe molestias voluptatibus.
-                success: false
+                message: Est odit velit voluptas.
+                success: true
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Est odit velit voluptas.
+              example: Omnis vel ab.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Consequatur placeat possimus id.
+              example: Veniam autem laudantium et earum.
         "500":
           description: Internal Server Error response.
           content:
@@ -245,7 +245,7 @@ paths:
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-                success: true
+                success: false
         "400":
           description: Bad Request response.
           content:
@@ -253,7 +253,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Nihil iure rerum ut doloremque sapiente.
+                message: Maiores a aut nesciunt.
                 success: true
         "401":
           description: Unauthorized response.
@@ -261,14 +261,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Maiores a aut nesciunt.
+              example: Minus doloremque illum iste aliquam non consequuntur.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Voluptatibus dolor omnis quisquam quod illo similique.
+              example: Dolor eaque fugiat.
         "500":
           description: Internal Server Error response.
           content:
@@ -296,7 +296,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SignupRequestBody'
             example:
-              birthday: Explicabo quidem odio.
+              birthday: Eum voluptas facilis.
               email: guillaume@epitech.eu
               firstname: Guillaume
               lastname: Morin
@@ -320,7 +320,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Eum voluptas facilis.
+                message: Autem at est neque iste excepturi.
                 success: false
         "401":
           description: Unauthorized response.
@@ -328,14 +328,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Explicabo occaecati.
+              example: Fuga voluptatibus dolor.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Accusantium assumenda aut porro autem at est.
+              example: Sit velit qui nihil.
         "500":
           description: Internal Server Error response.
           content:
@@ -345,7 +345,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -374,9 +374,9 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U0010D749\U000DDB74웠\U0010545D"
+          example: "Bearer \U000A4AAA\U00094DB1\U0009DE6D\U0006E1D8"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U000F46B1\U00098CAB\U0002A625\U00040A1F"
+        example: "Bearer \U00073A8F\U0004093F\U0005301D뭘"
       responses:
         "200":
           description: OK response.
@@ -391,7 +391,7 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   name: Guillaume
                   price: 69
-                success: true
+                success: false
         "500":
           description: Internal Server Error response.
           content:
@@ -401,7 +401,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: false
+                success: true
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -430,9 +430,9 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U0002CFAC\U000E8A7A\U000D114D\U00100513\U0002BF78"
+          example: "Bearer \U0010D749\U000DDB74웠\U0010545D"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U0001EFE7\U00064D0B\U0006EC04\U0009B0FE\U000E3B6C"
+        example: "Bearer \U000F46B1\U00098CAB\U0002A625\U00040A1F"
       requestBody:
         required: true
         content:
@@ -491,9 +491,9 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U000708E7\U000BB83D\U00029014"
+          example: "Bearer \U0002CFAC\U000E8A7A\U000D114D\U00100513\U0002BF78"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U000C518F\U00107C83\U0008CE64"
+        example: "Bearer \U0001EFE7\U00064D0B\U0006EC04\U0009B0FE\U000E3B6C"
       requestBody:
         required: true
         content:
@@ -530,7 +530,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -560,9 +560,9 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U000EA3C4\U000CC528\U0002A1AB\U00073DFA\U000F48C0\U000911AF"
+          example: "Bearer \U000708E7\U000BB83D\U00029014"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U0003705F\U0001D315\U0010C64D\U000D64C8\U00080588\U0006424B"
+        example: "Bearer \U000C518F\U00107C83\U0008CE64"
       responses:
         "200":
           description: OK response.
@@ -571,6 +571,330 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeleteProductResponseBody'
               example:
+                success: false
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+              example:
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
+                success: true
+      security:
+      - OAuth2_header_Authorization:
+        - api:read
+        jwt_header_jwtToken:
+        - api:read
+        - api:write
+  /web/products:
+    get:
+      tags:
+      - products
+      summary: getAllProducts products
+      description: Get All products
+      operationId: products#getAllProducts
+      parameters:
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        allowEmptyValue: true
+        schema:
+          type: string
+          description: Jwt token
+          example: "Bearer \U000DF0C7\U00050969\U0005BB0F\U00040D2F"
+          pattern: ^Bearer [^ ]+$
+        example: "Bearer \U00094B2E\U000AC949\U0004CDE6\U00028764\U000B7D56"
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAllProductsResponseBody'
+              example:
+                products:
+                - hat:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  jacket:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  men:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  sneaker:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  women:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                - hat:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  jacket:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  men:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  sneaker:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  women:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                - hat:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  jacket:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  men:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  sneaker:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  women:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                - hat:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  jacket:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  men:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  sneaker:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  women:
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
+                  - category: men
+                    cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                    name: Guillaume
+                    price: 69
                 success: true
         "500":
           description: Internal Server Error response.
@@ -581,14 +905,14 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: false
+                success: true
       security:
       - OAuth2_header_Authorization:
         - api:read
         jwt_header_jwtToken:
         - api:read
         - api:write
-  /web/products/{category}:
+  /web/products/category/{category}:
     get:
       tags:
       - products
@@ -618,9 +942,9 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U000DF0C7\U00050969\U0005BB0F\U00040D2F"
+          example: "Bearer \U000EA3C4\U000CC528\U0002A1AB\U00073DFA\U000F48C0\U000911AF"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U00094B2E\U000AC949\U0004CDE6\U00028764\U000B7D56"
+        example: "Bearer \U0003705F\U0001D315\U0010C64D\U000D64C8\U00080588\U0006424B"
       responses:
         "200":
           description: OK response.
@@ -630,16 +954,6 @@ paths:
                 $ref: '#/components/schemas/GetAllProductsByCategoryResponseBody'
               example:
                 products:
-                - category: men
-                  cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
-                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 69
-                - category: men
-                  cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
-                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                  name: Guillaume
-                  price: 69
                 - category: men
                   cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
@@ -678,7 +992,7 @@ components:
           format: email
         firebase_id_token:
           type: string
-          example: pxf
+          example: g0v
           minLength: 400
         firebase_provider:
           type: string
@@ -698,7 +1012,7 @@ components:
           minLength: 3
       example:
         email: guillaume@epitech.eu
-        firebase_id_token: 3sl
+        firebase_id_token: mu6
         firebase_provider: facebook.com
         firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
         firstname: Guillaume
@@ -730,7 +1044,7 @@ components:
           $ref: '#/components/schemas/ResProduct'
         success:
           type: boolean
-          example: false
+          example: true
       example:
         product:
           category: men
@@ -738,7 +1052,7 @@ components:
           id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
           price: 69
-        success: false
+        success: true
       required:
       - product
       - success
@@ -749,7 +1063,7 @@ components:
           type: boolean
           example: true
       example:
-        success: true
+        success: false
       required:
       - success
     EmailAlreadyExist:
@@ -757,14 +1071,14 @@ components:
       properties:
         message:
           type: string
-          example: Est labore expedita repudiandae.
+          example: Occaecati quidem quaerat voluptates qui nihil.
         success:
           type: boolean
           default: false
           example: false
       description: When email already exist
       example:
-        message: Inventore perspiciatis magnam quam in et.
+        message: Atque quisquam modi fuga blanditiis officia.
         success: false
       required:
       - message
@@ -813,30 +1127,473 @@ components:
           id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
           price: 69
-        success: true
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        success: false
+      required:
+      - products
+      - success
+    GetAllProductsResponseBody:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResAllProducts'
+          description: All products by category
+          example:
+          - hat:
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            jacket:
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            men:
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            sneaker:
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            women:
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+          - hat:
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            jacket:
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            men:
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            sneaker:
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            women:
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+            - category: men
+              cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+              id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+              name: Guillaume
+              price: 69
+        success:
+          type: boolean
+          example: false
+      example:
+        products:
+        - hat:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          jacket:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          men:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          sneaker:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          women:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+        - hat:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          jacket:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          men:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          sneaker:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          women:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+        - hat:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          jacket:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          men:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          sneaker:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          women:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+        - hat:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          jacket:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          men:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          sneaker:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          women:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+        success: false
       required:
       - products
       - success
     InvalidScopes:
       type: string
       description: Token scopes are invalid
-      example: Soluta soluta labore quo nobis voluptatem.
+      example: Eos et reiciendis.
     OAuthRequestBody:
       type: object
       properties:
         client_id:
           type: string
-          example: Qui enim atque quisquam modi fuga.
+          example: Tenetur non.
         client_secret:
           type: string
-          example: Officia enim magni sint esse eos et.
+          example: Modi dolorem a cumque.
         grant_type:
           type: string
-          example: Enim aut velit ea voluptatem.
+          example: Est id.
       example:
-        client_id: In corporis perferendis.
-        client_secret: Non ut.
-        grant_type: Dolorem a cumque.
+        client_id: Molestiae molestias iusto quo ut.
+        client_secret: Unde rerum.
+        grant_type: Occaecati laborum.
       required:
       - client_id
       - client_secret
@@ -846,22 +1603,22 @@ components:
       properties:
         access_token:
           type: string
-          example: Est id.
+          example: Explicabo dolorum neque repellat velit cupiditate quis.
         expires_in:
           type: integer
-          example: 604685638570393078
+          example: 8405595502826510052
           format: int64
         success:
           type: boolean
-          example: true
+          example: false
         token_type:
           type: string
-          example: Molestiae molestias iusto quo ut.
+          example: Aut maxime.
       example:
-        access_token: Consequatur occaecati.
-        expires_in: 8682579153969542440
+        access_token: Enim adipisci.
+        expires_in: 7216135156343218663
         success: false
-        token_type: Numquam explicabo dolorum neque.
+        token_type: Voluptatum minima adipisci.
       required:
       - access_token
       - token_type
@@ -912,18 +1669,207 @@ components:
         refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       required:
       - refresh_token
+    ResAllProducts:
+      type: object
+      properties:
+        hat:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResProduct'
+          example:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+        jacket:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResProduct'
+          example:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+        men:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResProduct'
+          example:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+        sneaker:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResProduct'
+          example:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+        women:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResProduct'
+          example:
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+      example:
+        hat:
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        jacket:
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        men:
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        sneaker:
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        women:
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
+      required:
+      - men
+      - women
+      - hat
+      - jacket
+      - sneaker
     ResProduct:
       type: object
       properties:
         category:
           type: string
           example: men
-          enum:
-          - men
-          - women
-          - hats
-          - jackets
-          - sneakers
         cover:
           type: string
           example: https://i.ibb.co/ypkgK0X/blue-beanie.png
@@ -961,7 +1907,7 @@ components:
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         success:
           type: boolean
-          example: false
+          example: true
       example:
         access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
@@ -995,7 +1941,7 @@ components:
         birthday:
           type: string
           default: ""
-          example: Molestiae accusamus blanditiis id rerum provident consequuntur.
+          example: Amet soluta soluta labore.
         email:
           type: string
           example: guillaume@epitech.eu
@@ -1021,7 +1967,7 @@ components:
           example: +262 692 12 34 56
       description: Use client ID and client secret to oAuth
       example:
-        birthday: Adipisci voluptas vitae quam.
+        birthday: Nobis voluptatem.
         email: guillaume@epitech.eu
         firstname: Guillaume
         lastname: Morin
@@ -1044,7 +1990,7 @@ components:
         success:
           type: boolean
           default: false
-          example: false
+          example: true
       description: Error not identified (500)
       example:
         err: sql no rows affected

@@ -68,7 +68,7 @@ func (s *productssrvc) GetAllProductsByCategory(ctx context.Context, p *products
 		return nil
 	})
 	if err != nil {
-		return nil, s.errorResponse("TX_DELETE_PRODUCT", err)
+		return nil, s.errorResponse("TX_GET_ALL_PRODUCTS", err)
 	}
 	return res, nil
 }
@@ -98,7 +98,7 @@ func (s *productssrvc) CreateProduct(ctx context.Context, p *products.CreateProd
 		}
 		createdProduct, err := q.CreateProduct(ctx, arg)
 		if err != nil {
-			return fmt.Errorf("ERROR_UPDATE_PRODUCT %v", err)
+			return fmt.Errorf("ERROR_CREATE_PRODUCT %v", err)
 		}
 		newProduct, err := q.GetProduct(ctx, createdProduct.ID)
 		if err != nil {
@@ -117,7 +117,7 @@ func (s *productssrvc) CreateProduct(ctx context.Context, p *products.CreateProd
 		return nil
 	})
 	if err != nil {
-		return nil, s.errorResponse("TX_DELETE_PRODUCT", err)
+		return nil, s.errorResponse("TX_CREATE_PRODUCT", err)
 	}
 	return res, nil
 }
@@ -152,7 +152,7 @@ func (s *productssrvc) UpdateProduct(ctx context.Context, p *products.UpdateProd
 		return nil
 	})
 	if err != nil {
-		return nil, s.errorResponse("TX_DELETE_PRODUCT", err)
+		return nil, s.errorResponse("TX_UPDATE_PRODUCT", err)
 	}
 	return res, nil
 }
@@ -177,7 +177,87 @@ func (s *productssrvc) GetProduct(ctx context.Context, p *products.GetProductPay
 		return nil
 	})
 	if err != nil {
-		return nil, s.errorResponse("TX_DELETE_PRODUCT", err)
+		return nil, s.errorResponse("TX_GET_PRODUCT_ID", err)
+	}
+	return res, nil
+}
+
+func (s *productssrvc) GetAllProducts(ctx context.Context, p *products.GetAllProductsPayload) (res *products.GetAllProductsResult, err error) {
+	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		p, err := s.server.Store.GetAllProducts(ctx)
+		if err != nil {
+			return fmt.Errorf("ERROR_GET_ALL_PRODUCTS %v", err)
+		}
+
+		var hat []*products.ResProduct
+		var sneaker []*products.ResProduct
+		var men []*products.ResProduct
+		var women []*products.ResProduct
+		var jacket []*products.ResProduct
+
+		var r []*products.ResAllProducts
+
+		for _, v := range p {
+			id := v.ID.String()
+			if v.Category == "hat" {
+				hat = append(hat, &products.ResProduct{
+					ID:       id,
+					Name:     v.Name,
+					Price:    v.Price,
+					Cover:    v.Cover,
+					Category: string(v.Category),
+				})
+			} else if v.Category == "sneaker" {
+				sneaker = append(sneaker, &products.ResProduct{
+					ID:       id,
+					Name:     v.Name,
+					Price:    v.Price,
+					Cover:    v.Cover,
+					Category: string(v.Category),
+				})
+			} else if v.Category == "men" {
+				men = append(men, &products.ResProduct{
+					ID:       id,
+					Name:     v.Name,
+					Price:    v.Price,
+					Cover:    v.Cover,
+					Category: string(v.Category),
+				})
+			} else if v.Category == "women" {
+				women = append(women, &products.ResProduct{
+					ID:       id,
+					Name:     v.Name,
+					Price:    v.Price,
+					Cover:    v.Cover,
+					Category: string(v.Category),
+				})
+			} else if v.Category == "jacket" {
+				jacket = append(jacket, &products.ResProduct{
+					ID:       id,
+					Name:     v.Name,
+					Price:    v.Price,
+					Cover:    v.Cover,
+					Category: string(v.Category),
+				})
+			}
+		}
+
+		r = append(r, &products.ResAllProducts{
+			Men:     men,
+			Jacket:  jacket,
+			Women:   women,
+			Sneaker: sneaker,
+			Hat:     hat,
+		})
+
+		res = &products.GetAllProductsResult{
+			Products: r,
+			Success:  true,
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, s.errorResponse("TX_GET_PRODUCTS", err)
 	}
 	return res, nil
 }

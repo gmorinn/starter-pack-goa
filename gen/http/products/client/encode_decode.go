@@ -19,6 +19,102 @@ import (
 	goahttp "goa.design/goa/v3/http"
 )
 
+// BuildGetAllProductsRequest instantiates a HTTP request object with method
+// and path set to call the "products" service "getAllProducts" endpoint
+func (c *Client) BuildGetAllProductsRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetAllProductsProductsPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("products", "getAllProducts", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeGetAllProductsRequest returns an encoder for requests sent to the
+// products getAllProducts server.
+func EncodeGetAllProductsRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*products.GetAllProductsPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("products", "getAllProducts", "*products.GetAllProductsPayload", v)
+		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		if p.JWTToken != nil {
+			head := *p.JWTToken
+			req.Header.Set("jwtToken", head)
+		}
+		return nil
+	}
+}
+
+// DecodeGetAllProductsResponse returns a decoder for responses returned by the
+// products getAllProducts endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeGetAllProductsResponse may return the following errors:
+//	- "unknown_error" (type *products.UnknownError): http.StatusInternalServerError
+//	- error: internal error
+func DecodeGetAllProductsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body GetAllProductsResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("products", "getAllProducts", err)
+			}
+			err = ValidateGetAllProductsResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("products", "getAllProducts", err)
+			}
+			res := NewGetAllProductsResultOK(&body)
+			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body GetAllProductsUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("products", "getAllProducts", err)
+			}
+			err = ValidateGetAllProductsUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("products", "getAllProducts", err)
+			}
+			return nil, NewGetAllProductsUnknownError(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("products", "getAllProducts", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildGetAllProductsByCategoryRequest instantiates a HTTP request object with
 // method and path set to call the "products" service
 // "getAllProductsByCategory" endpoint
@@ -546,6 +642,35 @@ func DecodeGetProductResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			return nil, goahttp.ErrInvalidResponse("products", "getProduct", resp.StatusCode, string(body))
 		}
 	}
+}
+
+// unmarshalResAllProductsResponseBodyToProductsResAllProducts builds a value
+// of type *products.ResAllProducts from a value of type
+// *ResAllProductsResponseBody.
+func unmarshalResAllProductsResponseBodyToProductsResAllProducts(v *ResAllProductsResponseBody) *products.ResAllProducts {
+	res := &products.ResAllProducts{}
+	res.Men = make([]*products.ResProduct, len(v.Men))
+	for i, val := range v.Men {
+		res.Men[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
+	}
+	res.Women = make([]*products.ResProduct, len(v.Women))
+	for i, val := range v.Women {
+		res.Women[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
+	}
+	res.Hat = make([]*products.ResProduct, len(v.Hat))
+	for i, val := range v.Hat {
+		res.Hat[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
+	}
+	res.Jacket = make([]*products.ResProduct, len(v.Jacket))
+	for i, val := range v.Jacket {
+		res.Jacket[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
+	}
+	res.Sneaker = make([]*products.ResProduct, len(v.Sneaker))
+	for i, val := range v.Sneaker {
+		res.Sneaker[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
+	}
+
+	return res
 }
 
 // unmarshalResProductResponseBodyToProductsResProduct builds a value of type

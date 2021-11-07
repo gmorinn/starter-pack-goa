@@ -26,6 +26,14 @@ type UpdateProductRequestBody struct {
 	Product *PayloadProductRequestBody `form:"product" json:"product" xml:"product"`
 }
 
+// GetAllProductsResponseBody is the type of the "products" service
+// "getAllProducts" endpoint HTTP response body.
+type GetAllProductsResponseBody struct {
+	// All products by category
+	Products []*ResAllProductsResponseBody `form:"products,omitempty" json:"products,omitempty" xml:"products,omitempty"`
+	Success  *bool                         `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
 // GetAllProductsByCategoryResponseBody is the type of the "products" service
 // "getAllProductsByCategory" endpoint HTTP response body.
 type GetAllProductsByCategoryResponseBody struct {
@@ -62,6 +70,14 @@ type GetProductResponseBody struct {
 	// Result is an object
 	Product *ResProductResponseBody `form:"product,omitempty" json:"product,omitempty" xml:"product,omitempty"`
 	Success *bool                   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// GetAllProductsUnknownErrorResponseBody is the type of the "products" service
+// "getAllProducts" endpoint HTTP response body for the "unknown_error" error.
+type GetAllProductsUnknownErrorResponseBody struct {
+	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
+	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
+	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // GetAllProductsByCategoryUnknownErrorResponseBody is the type of the
@@ -105,6 +121,15 @@ type GetProductUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// ResAllProductsResponseBody is used to define fields on response body types.
+type ResAllProductsResponseBody struct {
+	Men     []*ResProductResponseBody `form:"men,omitempty" json:"men,omitempty" xml:"men,omitempty"`
+	Women   []*ResProductResponseBody `form:"women,omitempty" json:"women,omitempty" xml:"women,omitempty"`
+	Hat     []*ResProductResponseBody `form:"hat,omitempty" json:"hat,omitempty" xml:"hat,omitempty"`
+	Jacket  []*ResProductResponseBody `form:"jacket,omitempty" json:"jacket,omitempty" xml:"jacket,omitempty"`
+	Sneaker []*ResProductResponseBody `form:"sneaker,omitempty" json:"sneaker,omitempty" xml:"sneaker,omitempty"`
+}
+
 // ResProductResponseBody is used to define fields on response body types.
 type ResProductResponseBody struct {
 	ID       *string  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -140,6 +165,32 @@ func NewUpdateProductRequestBody(p *products.UpdateProductPayload) *UpdateProduc
 		body.Product = marshalProductsPayloadProductToPayloadProductRequestBody(p.Product)
 	}
 	return body
+}
+
+// NewGetAllProductsResultOK builds a "products" service "getAllProducts"
+// endpoint result from a HTTP "OK" response.
+func NewGetAllProductsResultOK(body *GetAllProductsResponseBody) *products.GetAllProductsResult {
+	v := &products.GetAllProductsResult{
+		Success: *body.Success,
+	}
+	v.Products = make([]*products.ResAllProducts, len(body.Products))
+	for i, val := range body.Products {
+		v.Products[i] = unmarshalResAllProductsResponseBodyToProductsResAllProducts(val)
+	}
+
+	return v
+}
+
+// NewGetAllProductsUnknownError builds a products service getAllProducts
+// endpoint unknown_error error.
+func NewGetAllProductsUnknownError(body *GetAllProductsUnknownErrorResponseBody) *products.UnknownError {
+	v := &products.UnknownError{
+		Err:       *body.Err,
+		ErrorCode: *body.ErrorCode,
+		Success:   *body.Success,
+	}
+
+	return v
 }
 
 // NewGetAllProductsByCategoryResultOK builds a "products" service
@@ -259,6 +310,25 @@ func NewGetProductUnknownError(body *GetProductUnknownErrorResponseBody) *produc
 	return v
 }
 
+// ValidateGetAllProductsResponseBody runs the validations defined on
+// GetAllProductsResponseBody
+func ValidateGetAllProductsResponseBody(body *GetAllProductsResponseBody) (err error) {
+	if body.Products == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("products", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	for _, e := range body.Products {
+		if e != nil {
+			if err2 := ValidateResAllProductsResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // ValidateGetAllProductsByCategoryResponseBody runs the validations defined on
 // GetAllProductsByCategoryResponseBody
 func ValidateGetAllProductsByCategoryResponseBody(body *GetAllProductsByCategoryResponseBody) (err error) {
@@ -338,6 +408,21 @@ func ValidateGetProductResponseBody(body *GetProductResponseBody) (err error) {
 	return
 }
 
+// ValidateGetAllProductsUnknownErrorResponseBody runs the validations defined
+// on getAllProducts_unknown_error_response_body
+func ValidateGetAllProductsUnknownErrorResponseBody(body *GetAllProductsUnknownErrorResponseBody) (err error) {
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.ErrorCode == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
 // ValidateGetAllProductsByCategoryUnknownErrorResponseBody runs the
 // validations defined on getAllProductsByCategory_unknown_error_response_body
 func ValidateGetAllProductsByCategoryUnknownErrorResponseBody(body *GetAllProductsByCategoryUnknownErrorResponseBody) (err error) {
@@ -413,6 +498,62 @@ func ValidateGetProductUnknownErrorResponseBody(body *GetProductUnknownErrorResp
 	return
 }
 
+// ValidateResAllProductsResponseBody runs the validations defined on
+// resAllProductsResponseBody
+func ValidateResAllProductsResponseBody(body *ResAllProductsResponseBody) (err error) {
+	if body.Men == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("men", "body"))
+	}
+	if body.Women == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("women", "body"))
+	}
+	if body.Hat == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("hat", "body"))
+	}
+	if body.Jacket == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("jacket", "body"))
+	}
+	if body.Sneaker == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("sneaker", "body"))
+	}
+	for _, e := range body.Men {
+		if e != nil {
+			if err2 := ValidateResProductResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.Women {
+		if e != nil {
+			if err2 := ValidateResProductResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.Hat {
+		if e != nil {
+			if err2 := ValidateResProductResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.Jacket {
+		if e != nil {
+			if err2 := ValidateResProductResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	for _, e := range body.Sneaker {
+		if e != nil {
+			if err2 := ValidateResProductResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // ValidateResProductResponseBody runs the validations defined on
 // resProductResponseBody
 func ValidateResProductResponseBody(body *ResProductResponseBody) (err error) {
@@ -433,11 +574,6 @@ func ValidateResProductResponseBody(body *ResProductResponseBody) (err error) {
 	}
 	if body.ID != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.id", *body.ID, goa.FormatUUID))
-	}
-	if body.Category != nil {
-		if !(*body.Category == "men" || *body.Category == "women" || *body.Category == "hats" || *body.Category == "jackets" || *body.Category == "sneakers") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.category", *body.Category, []interface{}{"men", "women", "hats", "jackets", "sneakers"}))
-		}
 	}
 	return
 }

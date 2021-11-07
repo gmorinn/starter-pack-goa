@@ -15,6 +15,28 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// BuildGetAllProductsPayload builds the payload for the products
+// getAllProducts endpoint from CLI flags.
+func BuildGetAllProductsPayload(productsGetAllProductsOauth string, productsGetAllProductsJWTToken string) (*products.GetAllProductsPayload, error) {
+	var oauth *string
+	{
+		if productsGetAllProductsOauth != "" {
+			oauth = &productsGetAllProductsOauth
+		}
+	}
+	var jwtToken *string
+	{
+		if productsGetAllProductsJWTToken != "" {
+			jwtToken = &productsGetAllProductsJWTToken
+		}
+	}
+	v := &products.GetAllProductsPayload{}
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
+
+	return v, nil
+}
+
 // BuildGetAllProductsByCategoryPayload builds the payload for the products
 // getAllProductsByCategory endpoint from CLI flags.
 func BuildGetAllProductsByCategoryPayload(productsGetAllProductsByCategoryCategory string, productsGetAllProductsByCategoryOauth string, productsGetAllProductsByCategoryJWTToken string) (*products.GetAllProductsByCategoryPayload, error) {

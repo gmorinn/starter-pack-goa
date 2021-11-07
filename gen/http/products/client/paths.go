@@ -11,9 +11,14 @@ import (
 	"fmt"
 )
 
+// GetAllProductsProductsPath returns the URL path to the products service getAllProducts HTTP endpoint.
+func GetAllProductsProductsPath() string {
+	return "/web/products"
+}
+
 // GetAllProductsByCategoryProductsPath returns the URL path to the products service getAllProductsByCategory HTTP endpoint.
 func GetAllProductsByCategoryProductsPath(category string) string {
-	return fmt.Sprintf("/web/products/%v", category)
+	return fmt.Sprintf("/web/products/category/%v", category)
 }
 
 // DeleteProductProductsPath returns the URL path to the products service deleteProduct HTTP endpoint.

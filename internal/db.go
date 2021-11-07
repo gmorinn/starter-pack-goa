@@ -46,6 +46,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.findUserByEmailStmt, err = db.PrepareContext(ctx, findUserByEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query FindUserByEmail: %w", err)
 	}
+	if q.getAllProductsStmt, err = db.PrepareContext(ctx, getAllProducts); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllProducts: %w", err)
+	}
 	if q.getProductStmt, err = db.PrepareContext(ctx, getProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProduct: %w", err)
 	}
@@ -125,6 +128,11 @@ func (q *Queries) Close() error {
 	if q.findUserByEmailStmt != nil {
 		if cerr := q.findUserByEmailStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing findUserByEmailStmt: %w", cerr)
+		}
+	}
+	if q.getAllProductsStmt != nil {
+		if cerr := q.getAllProductsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllProductsStmt: %w", cerr)
 		}
 	}
 	if q.getProductStmt != nil {
@@ -234,6 +242,7 @@ type Queries struct {
 	existGetUserByFireBaseUidStmt *sql.Stmt
 	existUserByEmailStmt          *sql.Stmt
 	findUserByEmailStmt           *sql.Stmt
+	getAllProductsStmt            *sql.Stmt
 	getProductStmt                *sql.Stmt
 	getProductsByCategoryStmt     *sql.Stmt
 	getRefreshTokenStmt           *sql.Stmt
@@ -260,6 +269,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		existGetUserByFireBaseUidStmt: q.existGetUserByFireBaseUidStmt,
 		existUserByEmailStmt:          q.existUserByEmailStmt,
 		findUserByEmailStmt:           q.findUserByEmailStmt,
+		getAllProductsStmt:            q.getAllProductsStmt,
 		getProductStmt:                q.getProductStmt,
 		getProductsByCategoryStmt:     q.getProductsByCategoryStmt,
 		getRefreshTokenStmt:           q.getRefreshTokenStmt,

@@ -18,6 +18,82 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
+// EncodeGetAllProductsResponse returns an encoder for responses returned by
+// the products getAllProducts endpoint.
+func EncodeGetAllProductsResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*products.GetAllProductsResult)
+		enc := encoder(ctx, w)
+		body := NewGetAllProductsResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeGetAllProductsRequest returns a decoder for requests sent to the
+// products getAllProducts endpoint.
+func DecodeGetAllProductsRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			oauth    *string
+			jwtToken *string
+		)
+		oauthRaw := r.Header.Get("Authorization")
+		if oauthRaw != "" {
+			oauth = &oauthRaw
+		}
+		jwtTokenRaw := r.Header.Get("jwtToken")
+		if jwtTokenRaw != "" {
+			jwtToken = &jwtTokenRaw
+		}
+		payload := NewGetAllProductsPayload(oauth, jwtToken)
+		if payload.Oauth != nil {
+			if strings.Contains(*payload.Oauth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Oauth, " ", 2)[1]
+				payload.Oauth = &cred
+			}
+		}
+		if payload.JWTToken != nil {
+			if strings.Contains(*payload.JWTToken, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.JWTToken, " ", 2)[1]
+				payload.JWTToken = &cred
+			}
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeGetAllProductsError returns an encoder for errors returned by the
+// getAllProducts products endpoint.
+func EncodeGetAllProductsError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unknown_error":
+			res := v.(*products.UnknownError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewGetAllProductsUnknownErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // EncodeGetAllProductsByCategoryResponse returns an encoder for responses
 // returned by the products getAllProductsByCategory endpoint.
 func EncodeGetAllProductsByCategoryResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
@@ -468,6 +544,45 @@ func EncodeGetProductError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 	}
+}
+
+// marshalProductsResAllProductsToResAllProductsResponseBody builds a value of
+// type *ResAllProductsResponseBody from a value of type
+// *products.ResAllProducts.
+func marshalProductsResAllProductsToResAllProductsResponseBody(v *products.ResAllProducts) *ResAllProductsResponseBody {
+	res := &ResAllProductsResponseBody{}
+	if v.Men != nil {
+		res.Men = make([]*ResProductResponseBody, len(v.Men))
+		for i, val := range v.Men {
+			res.Men[i] = marshalProductsResProductToResProductResponseBody(val)
+		}
+	}
+	if v.Women != nil {
+		res.Women = make([]*ResProductResponseBody, len(v.Women))
+		for i, val := range v.Women {
+			res.Women[i] = marshalProductsResProductToResProductResponseBody(val)
+		}
+	}
+	if v.Hat != nil {
+		res.Hat = make([]*ResProductResponseBody, len(v.Hat))
+		for i, val := range v.Hat {
+			res.Hat[i] = marshalProductsResProductToResProductResponseBody(val)
+		}
+	}
+	if v.Jacket != nil {
+		res.Jacket = make([]*ResProductResponseBody, len(v.Jacket))
+		for i, val := range v.Jacket {
+			res.Jacket[i] = marshalProductsResProductToResProductResponseBody(val)
+		}
+	}
+	if v.Sneaker != nil {
+		res.Sneaker = make([]*ResProductResponseBody, len(v.Sneaker))
+		for i, val := range v.Sneaker {
+			res.Sneaker[i] = marshalProductsResProductToResProductResponseBody(val)
+		}
+	}
+
+	return res
 }
 
 // marshalProductsResProductToResProductResponseBody builds a value of type

@@ -24,7 +24,7 @@ func BuildSignupPayload(jwtTokenSignupBody string, jwtTokenSignupOauth string) (
 	{
 		err = json.Unmarshal([]byte(jwtTokenSignupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"birthday\": \"Explicabo quidem odio.\",\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"JeSuisUnTest974\",\n      \"phone\": \"+262 692 12 34 56\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"birthday\": \"Eum voluptas facilis.\",\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"JeSuisUnTest974\",\n      \"phone\": \"+262 692 12 34 56\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
@@ -144,7 +144,7 @@ func BuildAuthProvidersPayload(jwtTokenAuthProvidersBody string, jwtTokenAuthPro
 	{
 		err = json.Unmarshal([]byte(jwtTokenAuthProvidersBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firebase_id_token\": \"gkx\",\n      \"firebase_provider\": \"facebook.com\",\n      \"firebase_uid\": \"zgmURRUlcJfgDMRyjJ20xs7Rxxw2\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firebase_id_token\": \"qhn\",\n      \"firebase_provider\": \"facebook.com\",\n      \"firebase_uid\": \"zgmURRUlcJfgDMRyjJ20xs7Rxxw2\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))

@@ -52,9 +52,47 @@ func (q *Queries) DeleteProduct(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getAllProducts = `-- name: GetAllProducts :many
+SELECT id, created_at, updated_at, deleted_at, name, category, cover, price FROM products
+WHERE deleted_at IS NULL
+`
+
+func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
+	rows, err := q.query(ctx, q.getAllProductsStmt, getAllProducts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Product{}
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.Name,
+			&i.Category,
+			&i.Cover,
+			&i.Price,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProduct = `-- name: GetProduct :one
 SELECT id, created_at, updated_at, deleted_at, name, category, cover, price FROM products
-WHERE id = $1
+WHERE deleted_at IS NULL
+AND id = $1
 `
 
 func (q *Queries) GetProduct(ctx context.Context, id uuid.UUID) (Product, error) {
@@ -75,7 +113,8 @@ func (q *Queries) GetProduct(ctx context.Context, id uuid.UUID) (Product, error)
 
 const getProductsByCategory = `-- name: GetProductsByCategory :many
 SELECT id, created_at, updated_at, deleted_at, name, category, cover, price FROM products
-WHERE category = $1
+WHERE deleted_at IS NULL
+AND category = $1
 `
 
 func (q *Queries) GetProductsByCategory(ctx context.Context, category Categories) ([]Product, error) {

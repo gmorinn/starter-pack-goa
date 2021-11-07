@@ -16,6 +16,7 @@ import (
 
 // Endpoints wraps the "products" service endpoints.
 type Endpoints struct {
+	GetAllProducts           goa.Endpoint
 	GetAllProductsByCategory goa.Endpoint
 	DeleteProduct            goa.Endpoint
 	CreateProduct            goa.Endpoint
@@ -28,6 +29,7 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
+		GetAllProducts:           NewGetAllProductsEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		GetAllProductsByCategory: NewGetAllProductsByCategoryEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		DeleteProduct:            NewDeleteProductEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		CreateProduct:            NewCreateProductEndpoint(s, a.OAuth2Auth, a.JWTAuth),
@@ -38,11 +40,54 @@ func NewEndpoints(s Service) *Endpoints {
 
 // Use applies the given middleware to all the "products" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
+	e.GetAllProducts = m(e.GetAllProducts)
 	e.GetAllProductsByCategory = m(e.GetAllProductsByCategory)
 	e.DeleteProduct = m(e.DeleteProduct)
 	e.CreateProduct = m(e.CreateProduct)
 	e.UpdateProduct = m(e.UpdateProduct)
 	e.GetProduct = m(e.GetProduct)
+}
+
+// NewGetAllProductsEndpoint returns an endpoint function that calls the method
+// "getAllProducts" of service "products".
+func NewGetAllProductsEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*GetAllProductsPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "OAuth2",
+			Scopes:         []string{"api:read"},
+			RequiredScopes: []string{},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:       "client_credentials",
+					TokenURL:   "/authorization",
+					RefreshURL: "/refresh",
+				},
+			},
+		}
+		var token string
+		if p.Oauth != nil {
+			token = *p.Oauth
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err == nil {
+			sc := security.JWTScheme{
+				Name:           "jwt",
+				Scopes:         []string{"api:read", "api:write"},
+				RequiredScopes: []string{},
+			}
+			var token string
+			if p.JWTToken != nil {
+				token = *p.JWTToken
+			}
+			ctx, err = authJWTFn(ctx, token, &sc)
+		}
+		if err != nil {
+			return nil, err
+		}
+		return s.GetAllProducts(ctx, p)
+	}
 }
 
 // NewGetAllProductsByCategoryEndpoint returns an endpoint function that calls

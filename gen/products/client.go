@@ -15,6 +15,7 @@ import (
 
 // Client is the "products" service client.
 type Client struct {
+	GetAllProductsEndpoint           goa.Endpoint
 	GetAllProductsByCategoryEndpoint goa.Endpoint
 	DeleteProductEndpoint            goa.Endpoint
 	CreateProductEndpoint            goa.Endpoint
@@ -23,14 +24,25 @@ type Client struct {
 }
 
 // NewClient initializes a "products" service client given the endpoints.
-func NewClient(getAllProductsByCategory, deleteProduct, createProduct, updateProduct, getProduct goa.Endpoint) *Client {
+func NewClient(getAllProducts, getAllProductsByCategory, deleteProduct, createProduct, updateProduct, getProduct goa.Endpoint) *Client {
 	return &Client{
+		GetAllProductsEndpoint:           getAllProducts,
 		GetAllProductsByCategoryEndpoint: getAllProductsByCategory,
 		DeleteProductEndpoint:            deleteProduct,
 		CreateProductEndpoint:            createProduct,
 		UpdateProductEndpoint:            updateProduct,
 		GetProductEndpoint:               getProduct,
 	}
+}
+
+// GetAllProducts calls the "getAllProducts" endpoint of the "products" service.
+func (c *Client) GetAllProducts(ctx context.Context, p *GetAllProductsPayload) (res *GetAllProductsResult, err error) {
+	var ires interface{}
+	ires, err = c.GetAllProductsEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*GetAllProductsResult), nil
 }
 
 // GetAllProductsByCategory calls the "getAllProductsByCategory" endpoint of

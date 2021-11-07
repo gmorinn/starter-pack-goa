@@ -26,6 +26,14 @@ type UpdateProductRequestBody struct {
 	Product *PayloadProductRequestBody `form:"product,omitempty" json:"product,omitempty" xml:"product,omitempty"`
 }
 
+// GetAllProductsResponseBody is the type of the "products" service
+// "getAllProducts" endpoint HTTP response body.
+type GetAllProductsResponseBody struct {
+	// All products by category
+	Products []*ResAllProductsResponseBody `form:"products" json:"products" xml:"products"`
+	Success  bool                          `form:"success" json:"success" xml:"success"`
+}
+
 // GetAllProductsByCategoryResponseBody is the type of the "products" service
 // "getAllProductsByCategory" endpoint HTTP response body.
 type GetAllProductsByCategoryResponseBody struct {
@@ -62,6 +70,14 @@ type GetProductResponseBody struct {
 	// Result is an object
 	Product *ResProductResponseBody `form:"product" json:"product" xml:"product"`
 	Success bool                    `form:"success" json:"success" xml:"success"`
+}
+
+// GetAllProductsUnknownErrorResponseBody is the type of the "products" service
+// "getAllProducts" endpoint HTTP response body for the "unknown_error" error.
+type GetAllProductsUnknownErrorResponseBody struct {
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
 // GetAllProductsByCategoryUnknownErrorResponseBody is the type of the
@@ -105,6 +121,15 @@ type GetProductUnknownErrorResponseBody struct {
 	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
+// ResAllProductsResponseBody is used to define fields on response body types.
+type ResAllProductsResponseBody struct {
+	Men     []*ResProductResponseBody `form:"men" json:"men" xml:"men"`
+	Women   []*ResProductResponseBody `form:"women" json:"women" xml:"women"`
+	Hat     []*ResProductResponseBody `form:"hat" json:"hat" xml:"hat"`
+	Jacket  []*ResProductResponseBody `form:"jacket" json:"jacket" xml:"jacket"`
+	Sneaker []*ResProductResponseBody `form:"sneaker" json:"sneaker" xml:"sneaker"`
+}
+
 // ResProductResponseBody is used to define fields on response body types.
 type ResProductResponseBody struct {
 	ID       string  `form:"id" json:"id" xml:"id"`
@@ -120,6 +145,21 @@ type PayloadProductRequestBody struct {
 	Price    *float64 `form:"price,omitempty" json:"price,omitempty" xml:"price,omitempty"`
 	Cover    *string  `form:"cover,omitempty" json:"cover,omitempty" xml:"cover,omitempty"`
 	Category *string  `form:"category,omitempty" json:"category,omitempty" xml:"category,omitempty"`
+}
+
+// NewGetAllProductsResponseBody builds the HTTP response body from the result
+// of the "getAllProducts" endpoint of the "products" service.
+func NewGetAllProductsResponseBody(res *products.GetAllProductsResult) *GetAllProductsResponseBody {
+	body := &GetAllProductsResponseBody{
+		Success: res.Success,
+	}
+	if res.Products != nil {
+		body.Products = make([]*ResAllProductsResponseBody, len(res.Products))
+		for i, val := range res.Products {
+			body.Products[i] = marshalProductsResAllProductsToResAllProductsResponseBody(val)
+		}
+	}
+	return body
 }
 
 // NewGetAllProductsByCategoryResponseBody builds the HTTP response body from
@@ -183,6 +223,17 @@ func NewGetProductResponseBody(res *products.GetProductResult) *GetProductRespon
 	return body
 }
 
+// NewGetAllProductsUnknownErrorResponseBody builds the HTTP response body from
+// the result of the "getAllProducts" endpoint of the "products" service.
+func NewGetAllProductsUnknownErrorResponseBody(res *products.UnknownError) *GetAllProductsUnknownErrorResponseBody {
+	body := &GetAllProductsUnknownErrorResponseBody{
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
+	}
+	return body
+}
+
 // NewGetAllProductsByCategoryUnknownErrorResponseBody builds the HTTP response
 // body from the result of the "getAllProductsByCategory" endpoint of the
 // "products" service.
@@ -237,6 +288,16 @@ func NewGetProductUnknownErrorResponseBody(res *products.UnknownError) *GetProdu
 		Success:   res.Success,
 	}
 	return body
+}
+
+// NewGetAllProductsPayload builds a products service getAllProducts endpoint
+// payload.
+func NewGetAllProductsPayload(oauth *string, jwtToken *string) *products.GetAllProductsPayload {
+	v := &products.GetAllProductsPayload{}
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
+
+	return v
 }
 
 // NewGetAllProductsByCategoryPayload builds a products service

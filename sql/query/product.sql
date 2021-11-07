@@ -1,10 +1,16 @@
 -- name: GetProductsByCategory :many
 SELECT * FROM products
-WHERE category = $1;
+WHERE deleted_at IS NULL
+AND category = $1;
+
+-- name: GetAllProducts :many
+SELECT * FROM products
+WHERE deleted_at IS NULL;
 
 -- name: GetProduct :one
 SELECT * FROM products
-WHERE id = $1;
+WHERE deleted_at IS NULL
+AND id = $1;
 
 -- name: DeleteProduct :exec
 DELETE FROM products
