@@ -43,7 +43,8 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 }
 
 const deleteProduct = `-- name: DeleteProduct :exec
-DELETE FROM products
+UPDATE products
+SET deleted_at = NOW()
 WHERE id = $1
 `
 
@@ -151,7 +152,7 @@ func (q *Queries) GetProductsByCategory(ctx context.Context, category Categories
 
 const updateProduct = `-- name: UpdateProduct :exec
 UPDATE products
-SET name = $1, price = $2, cover = $3, category = $4
+SET name = $1, price = $2, cover = $3, category = $4, updated_at = NOW()
 WHERE id = $5
 `
 

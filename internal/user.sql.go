@@ -5,9 +5,67 @@ package db
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
+
+const deleteUserByID = `-- name: DeleteUserByID :exec
+UPDATE
+    users
+SET
+    deleted_at = NOW()
+WHERE 
+    id = $1
+`
+
+func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
+	_, err := q.exec(ctx, q.deleteUserByIDStmt, deleteUserByID, id)
+	return err
+}
+
+const getAllUsers = `-- name: GetAllUsers :many
+SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
+WHERE deleted_at IS NULL
+`
+
+func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.query(ctx, q.getAllUsersStmt, getAllUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []User{}
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.Lastname,
+			&i.Firstname,
+			&i.Email,
+			&i.Password,
+			&i.Role,
+			&i.Birthday,
+			&i.Phone,
+			&i.FirebaseIDToken,
+			&i.FirebaseUid,
+			&i.FirebaseProvider,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
 
 const getUserByID = `-- name: GetUserByID :one
 SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
@@ -36,4 +94,63 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.FirebaseProvider,
 	)
 	return i, err
+}
+
+const insertUser = `-- name: InsertUser :exec
+INSERT INTO users (firstname, lastname, email, phone, birthday)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
+`
+
+type InsertUserParams struct {
+	Firstname string         `json:"firstname"`
+	Lastname  string         `json:"lastname"`
+	Email     string         `json:"email"`
+	Phone     sql.NullString `json:"phone"`
+	Birthday  sql.NullString `json:"birthday"`
+}
+
+func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
+	_, err := q.exec(ctx, q.insertUserStmt, insertUser,
+		arg.Firstname,
+		arg.Lastname,
+		arg.Email,
+		arg.Phone,
+		arg.Birthday,
+	)
+	return err
+}
+
+const updateUser = `-- name: UpdateUser :exec
+UPDATE 
+    users
+SET
+    firstname = $1,
+    lastname = $2,
+    email = $3,
+    phone = $4,
+    birthday = $5,
+    updated_at = NOW()
+WHERE
+    id = $1
+RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
+`
+
+type UpdateUserParams struct {
+	Firstname string         `json:"firstname"`
+	Lastname  string         `json:"lastname"`
+	Email     string         `json:"email"`
+	Phone     sql.NullString `json:"phone"`
+	Birthday  sql.NullString `json:"birthday"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
+	_, err := q.exec(ctx, q.updateUserStmt, updateUser,
+		arg.Firstname,
+		arg.Lastname,
+		arg.Email,
+		arg.Phone,
+		arg.Birthday,
+	)
+	return err
 }

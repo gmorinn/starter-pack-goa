@@ -2,9 +2,12 @@ package api
 
 import (
 	users "api_crud/gen/users"
+	db "api_crud/internal"
 	"context"
+	"fmt"
 	"log"
 
+	"github.com/google/uuid"
 	"goa.design/goa/v3/security"
 )
 
@@ -31,40 +34,12 @@ func (s *userssrvc) errorResponse(msg string, err error) *users.UnknownError {
 // "OAuth2" security scheme.
 func (s *userssrvc) OAuth2Auth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
 	return s.server.CheckAuth(ctx, token, scheme)
-	// TBD: add authorization logic.
-	//
-	// In case of authorization failure this function should return
-	// one of the generated error structs, e.g.:
-	//
-	//    return ctx, myservice.MakeUnauthorizedError("invalid token")
-	//
-	// Alternatively this function may return an instance of
-	// goa.ServiceError with a Name field value that matches one of
-	// the design error names, e.g:
-	//
-	//    return ctx, goa.PermanentError("unauthorized", "invalid token")
-	//
-
 }
 
 // JWTAuth implements the authorization logic for service "users" for the "jwt"
 // security scheme.
 func (s *userssrvc) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
 	return s.server.CheckJWT(ctx, token, scheme)
-	// TBD: add authorization logic.
-	//
-	// In case of authorization failure this function should return
-	// one of the generated error structs, e.g.:
-	//
-	//    return ctx, myservice.MakeUnauthorizedError("invalid token")
-	//
-	// Alternatively this function may return an instance of
-	// goa.ServiceError with a Name field value that matches one of
-	// the design error names, e.g:
-	//
-	//    return ctx, goa.PermanentError("unauthorized", "invalid token")
-	//
-
 }
 
 // Get All users
@@ -76,9 +51,18 @@ func (s *userssrvc) GetAllusers(ctx context.Context, p *users.GetAllusersPayload
 
 // Delete one User by ID
 func (s *userssrvc) DeleteUser(ctx context.Context, p *users.DeleteUserPayload) (res *users.DeleteUserResult, err error) {
-	res = &users.DeleteUserResult{}
-	s.logger.Print("users.deleteUser")
-	return
+	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		if err := q.DeleteUserByID(ctx, uuid.MustParse(p.ID)); err != nil {
+			return fmt.Errorf("DELETE_USER_BY_ID %v", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, s.errorResponse("TX_DELETE_USER", err)
+	}
+	return &users.DeleteUserResult{
+		Success: true,
+	}, nil
 }
 
 // Create one User
@@ -97,7 +81,26 @@ func (s *userssrvc) UpdateUser(ctx context.Context, p *users.UpdateUserPayload) 
 
 // Get one User
 func (s *userssrvc) GetUser(ctx context.Context, p *users.GetUserPayload) (res *users.GetUserResult, err error) {
-	res = &users.GetUserResult{}
-	s.logger.Print("users.getUser")
-	return
+	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		u, err := q.GetUserByID(ctx, uuid.MustParse(p.ID))
+		if err != nil {
+			return fmt.Errorf("GET_USER_BY_ID %v", err)
+		}
+		res = &users.GetUserResult{
+			User: &users.ResUser{
+				ID:        u.ID.String(),
+				Firstname: &u.Firstname,
+				Lastname:  &u.Lastname,
+				Email:     u.Email,
+				Phone:     u.Phone.String,
+				Birthday:  u.Birthday.String,
+			},
+			Success: true,
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, s.errorResponse("TX_GET_USER_BY_ID", err)
+	}
+	return res, nil
 }
