@@ -30,8 +30,8 @@ type UpdateProductRequestBody struct {
 // "getAllProducts" endpoint HTTP response body.
 type GetAllProductsResponseBody struct {
 	// All products by category
-	Products []*ResAllProductsResponseBody `form:"products,omitempty" json:"products,omitempty" xml:"products,omitempty"`
-	Success  *bool                         `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+	Products []*ResProductResponseBody `form:"products,omitempty" json:"products,omitempty" xml:"products,omitempty"`
+	Success  *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // GetAllProductsByCategoryResponseBody is the type of the "products" service
@@ -121,15 +121,6 @@ type GetProductUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
-// ResAllProductsResponseBody is used to define fields on response body types.
-type ResAllProductsResponseBody struct {
-	Men     []*ResProductResponseBody `form:"men,omitempty" json:"men,omitempty" xml:"men,omitempty"`
-	Women   []*ResProductResponseBody `form:"women,omitempty" json:"women,omitempty" xml:"women,omitempty"`
-	Hat     []*ResProductResponseBody `form:"hat,omitempty" json:"hat,omitempty" xml:"hat,omitempty"`
-	Jacket  []*ResProductResponseBody `form:"jacket,omitempty" json:"jacket,omitempty" xml:"jacket,omitempty"`
-	Sneaker []*ResProductResponseBody `form:"sneaker,omitempty" json:"sneaker,omitempty" xml:"sneaker,omitempty"`
-}
-
 // ResProductResponseBody is used to define fields on response body types.
 type ResProductResponseBody struct {
 	ID       *string  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -173,9 +164,9 @@ func NewGetAllProductsResultOK(body *GetAllProductsResponseBody) *products.GetAl
 	v := &products.GetAllProductsResult{
 		Success: *body.Success,
 	}
-	v.Products = make([]*products.ResAllProducts, len(body.Products))
+	v.Products = make([]*products.ResProduct, len(body.Products))
 	for i, val := range body.Products {
-		v.Products[i] = unmarshalResAllProductsResponseBodyToProductsResAllProducts(val)
+		v.Products[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
 	}
 
 	return v
@@ -321,7 +312,7 @@ func ValidateGetAllProductsResponseBody(body *GetAllProductsResponseBody) (err e
 	}
 	for _, e := range body.Products {
 		if e != nil {
-			if err2 := ValidateResAllProductsResponseBody(e); err2 != nil {
+			if err2 := ValidateResProductResponseBody(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
@@ -494,62 +485,6 @@ func ValidateGetProductUnknownErrorResponseBody(body *GetProductUnknownErrorResp
 	}
 	if body.ErrorCode == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
-	}
-	return
-}
-
-// ValidateResAllProductsResponseBody runs the validations defined on
-// resAllProductsResponseBody
-func ValidateResAllProductsResponseBody(body *ResAllProductsResponseBody) (err error) {
-	if body.Men == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("men", "body"))
-	}
-	if body.Women == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("women", "body"))
-	}
-	if body.Hat == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("hat", "body"))
-	}
-	if body.Jacket == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("jacket", "body"))
-	}
-	if body.Sneaker == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("sneaker", "body"))
-	}
-	for _, e := range body.Men {
-		if e != nil {
-			if err2 := ValidateResProductResponseBody(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	for _, e := range body.Women {
-		if e != nil {
-			if err2 := ValidateResProductResponseBody(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	for _, e := range body.Hat {
-		if e != nil {
-			if err2 := ValidateResProductResponseBody(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	for _, e := range body.Jacket {
-		if e != nil {
-			if err2 := ValidateResProductResponseBody(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	for _, e := range body.Sneaker {
-		if e != nil {
-			if err2 := ValidateResProductResponseBody(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
 	}
 	return
 }

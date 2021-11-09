@@ -30,8 +30,8 @@ type UpdateProductRequestBody struct {
 // "getAllProducts" endpoint HTTP response body.
 type GetAllProductsResponseBody struct {
 	// All products by category
-	Products []*ResAllProductsResponseBody `form:"products" json:"products" xml:"products"`
-	Success  bool                          `form:"success" json:"success" xml:"success"`
+	Products []*ResProductResponseBody `form:"products" json:"products" xml:"products"`
+	Success  bool                      `form:"success" json:"success" xml:"success"`
 }
 
 // GetAllProductsByCategoryResponseBody is the type of the "products" service
@@ -121,15 +121,6 @@ type GetProductUnknownErrorResponseBody struct {
 	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
-// ResAllProductsResponseBody is used to define fields on response body types.
-type ResAllProductsResponseBody struct {
-	Men     []*ResProductResponseBody `form:"men" json:"men" xml:"men"`
-	Women   []*ResProductResponseBody `form:"women" json:"women" xml:"women"`
-	Hat     []*ResProductResponseBody `form:"hat" json:"hat" xml:"hat"`
-	Jacket  []*ResProductResponseBody `form:"jacket" json:"jacket" xml:"jacket"`
-	Sneaker []*ResProductResponseBody `form:"sneaker" json:"sneaker" xml:"sneaker"`
-}
-
 // ResProductResponseBody is used to define fields on response body types.
 type ResProductResponseBody struct {
 	ID       string  `form:"id" json:"id" xml:"id"`
@@ -154,9 +145,9 @@ func NewGetAllProductsResponseBody(res *products.GetAllProductsResult) *GetAllPr
 		Success: res.Success,
 	}
 	if res.Products != nil {
-		body.Products = make([]*ResAllProductsResponseBody, len(res.Products))
+		body.Products = make([]*ResProductResponseBody, len(res.Products))
 		for i, val := range res.Products {
-			body.Products[i] = marshalProductsResAllProductsToResAllProductsResponseBody(val)
+			body.Products[i] = marshalProductsResProductToResProductResponseBody(val)
 		}
 	}
 	return body

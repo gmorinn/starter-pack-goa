@@ -61,7 +61,7 @@ type GetAllProductsPayload struct {
 // getAllProducts method.
 type GetAllProductsResult struct {
 	// All products by category
-	Products []*ResAllProducts
+	Products []*ResProduct
 	Success  bool
 }
 
@@ -153,14 +153,6 @@ type GetProductResult struct {
 	// Result is an object
 	Product *ResProduct
 	Success bool
-}
-
-type ResAllProducts struct {
-	Men     []*ResProduct
-	Women   []*ResProduct
-	Hat     []*ResProduct
-	Jacket  []*ResProduct
-	Sneaker []*ResProduct
 }
 
 type ResProduct struct {

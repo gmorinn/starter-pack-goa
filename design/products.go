@@ -40,7 +40,7 @@ var _ = Service("products", func() {
 			Response(StatusOK)
 		})
 		Result(func() {
-			Attribute("products", ArrayOf(resAllProducts), "All products by category")
+			Attribute("products", ArrayOf(resProduct), "All products by category")
 			Attribute("success", Boolean)
 			Required("products", "success")
 		})
@@ -195,15 +195,6 @@ var resProduct = Type("resProduct", func() {
 		Example("men")
 	})
 	Required("id", "name", "price", "cover", "category")
-})
-
-var resAllProducts = Type("resAllProducts", func() {
-	Attribute("men", ArrayOf(resProduct))
-	Attribute("women", ArrayOf(resProduct))
-	Attribute("hat", ArrayOf(resProduct))
-	Attribute("jacket", ArrayOf(resProduct))
-	Attribute("sneaker", ArrayOf(resProduct))
-	Required("men", "women", "hat", "jacket", "sneaker")
 })
 
 var payloadProduct = Type("payloadProduct", func() {

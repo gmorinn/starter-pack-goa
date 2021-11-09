@@ -644,35 +644,6 @@ func DecodeGetProductResponse(decoder func(*http.Response) goahttp.Decoder, rest
 	}
 }
 
-// unmarshalResAllProductsResponseBodyToProductsResAllProducts builds a value
-// of type *products.ResAllProducts from a value of type
-// *ResAllProductsResponseBody.
-func unmarshalResAllProductsResponseBodyToProductsResAllProducts(v *ResAllProductsResponseBody) *products.ResAllProducts {
-	res := &products.ResAllProducts{}
-	res.Men = make([]*products.ResProduct, len(v.Men))
-	for i, val := range v.Men {
-		res.Men[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
-	}
-	res.Women = make([]*products.ResProduct, len(v.Women))
-	for i, val := range v.Women {
-		res.Women[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
-	}
-	res.Hat = make([]*products.ResProduct, len(v.Hat))
-	for i, val := range v.Hat {
-		res.Hat[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
-	}
-	res.Jacket = make([]*products.ResProduct, len(v.Jacket))
-	for i, val := range v.Jacket {
-		res.Jacket[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
-	}
-	res.Sneaker = make([]*products.ResProduct, len(v.Sneaker))
-	for i, val := range v.Sneaker {
-		res.Sneaker[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
-	}
-
-	return res
-}
-
 // unmarshalResProductResponseBodyToProductsResProduct builds a value of type
 // *products.ResProduct from a value of type *ResProductResponseBody.
 func unmarshalResProductResponseBodyToProductsResProduct(v *ResProductResponseBody) *products.ResProduct {

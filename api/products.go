@@ -34,7 +34,6 @@ func (s *productssrvc) errorResponse(msg string, err error) *products.UnknownErr
 // "OAuth2" security scheme.
 func (s *productssrvc) OAuth2Auth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
 	return s.server.CheckAuth(ctx, token, scheme)
-
 }
 
 // JWTAuth implements the authorization logic for service "products" for the
@@ -188,71 +187,21 @@ func (s *productssrvc) GetAllProducts(ctx context.Context, p *products.GetAllPro
 		if err != nil {
 			return fmt.Errorf("ERROR_GET_ALL_PRODUCTS %v", err)
 		}
-
-		var hat []*products.ResProduct
-		var sneaker []*products.ResProduct
-		var men []*products.ResProduct
-		var women []*products.ResProduct
-		var jacket []*products.ResProduct
-
-		var r []*products.ResAllProducts
-
+		var ProductsResponse []*products.ResProduct
 		for _, v := range p {
 			id := v.ID.String()
-			if v.Category == "hat" {
-				hat = append(hat, &products.ResProduct{
-					ID:       id,
-					Name:     v.Name,
-					Price:    v.Price,
-					Cover:    v.Cover,
-					Category: string(v.Category),
-				})
-			} else if v.Category == "sneaker" {
-				sneaker = append(sneaker, &products.ResProduct{
-					ID:       id,
-					Name:     v.Name,
-					Price:    v.Price,
-					Cover:    v.Cover,
-					Category: string(v.Category),
-				})
-			} else if v.Category == "men" {
-				men = append(men, &products.ResProduct{
-					ID:       id,
-					Name:     v.Name,
-					Price:    v.Price,
-					Cover:    v.Cover,
-					Category: string(v.Category),
-				})
-			} else if v.Category == "women" {
-				women = append(women, &products.ResProduct{
-					ID:       id,
-					Name:     v.Name,
-					Price:    v.Price,
-					Cover:    v.Cover,
-					Category: string(v.Category),
-				})
-			} else if v.Category == "jacket" {
-				jacket = append(jacket, &products.ResProduct{
-					ID:       id,
-					Name:     v.Name,
-					Price:    v.Price,
-					Cover:    v.Cover,
-					Category: string(v.Category),
-				})
+			ProductsResponse = append(ProductsResponse, &products.ResProduct{
+				ID:       id,
+				Name:     v.Name,
+				Price:    v.Price,
+				Cover:    v.Cover,
+				Category: string(v.Category),
+			})
+
+			res = &products.GetAllProductsResult{
+				Products: ProductsResponse,
+				Success:  true,
 			}
-		}
-
-		r = append(r, &products.ResAllProducts{
-			Men:     men,
-			Jacket:  jacket,
-			Women:   women,
-			Sneaker: sneaker,
-			Hat:     hat,
-		})
-
-		res = &products.GetAllProductsResult{
-			Products: r,
-			Success:  true,
 		}
 		return nil
 	})

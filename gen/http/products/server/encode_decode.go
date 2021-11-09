@@ -546,45 +546,6 @@ func EncodeGetProductError(encoder func(context.Context, http.ResponseWriter) go
 	}
 }
 
-// marshalProductsResAllProductsToResAllProductsResponseBody builds a value of
-// type *ResAllProductsResponseBody from a value of type
-// *products.ResAllProducts.
-func marshalProductsResAllProductsToResAllProductsResponseBody(v *products.ResAllProducts) *ResAllProductsResponseBody {
-	res := &ResAllProductsResponseBody{}
-	if v.Men != nil {
-		res.Men = make([]*ResProductResponseBody, len(v.Men))
-		for i, val := range v.Men {
-			res.Men[i] = marshalProductsResProductToResProductResponseBody(val)
-		}
-	}
-	if v.Women != nil {
-		res.Women = make([]*ResProductResponseBody, len(v.Women))
-		for i, val := range v.Women {
-			res.Women[i] = marshalProductsResProductToResProductResponseBody(val)
-		}
-	}
-	if v.Hat != nil {
-		res.Hat = make([]*ResProductResponseBody, len(v.Hat))
-		for i, val := range v.Hat {
-			res.Hat[i] = marshalProductsResProductToResProductResponseBody(val)
-		}
-	}
-	if v.Jacket != nil {
-		res.Jacket = make([]*ResProductResponseBody, len(v.Jacket))
-		for i, val := range v.Jacket {
-			res.Jacket[i] = marshalProductsResProductToResProductResponseBody(val)
-		}
-	}
-	if v.Sneaker != nil {
-		res.Sneaker = make([]*ResProductResponseBody, len(v.Sneaker))
-		for i, val := range v.Sneaker {
-			res.Sneaker[i] = marshalProductsResProductToResProductResponseBody(val)
-		}
-	}
-
-	return res
-}
-
 // marshalProductsResProductToResProductResponseBody builds a value of type
 // *ResProductResponseBody from a value of type *products.ResProduct.
 func marshalProductsResProductToResProductResponseBody(v *products.ResProduct) *ResProductResponseBody {
