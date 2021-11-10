@@ -10,11 +10,11 @@ DIR=$(notdir $(shell pwd))
 export DIR
 
 api-goa:
-	@echo -e "\n\t🔥GOA X GM\n\n\tLoading...⌛\n"
+	@echo -e "\n\t🔥GOA GM\n\n\tLoading...⌛\n"
 	@goa gen $(DIR)/design
 	@cp -f gen/http/openapi.json ./documentation
-	@mv gen/http/openapi.json ./
-	@echo -e "\nWait...⌛\n\nGOA & GM will generate functions for you❤️\n"
+	@mv gen/http/openapi3.json ./
+	@echo -e "\nWait...⌛\n\nGOA GM will generate functions for you❤️\n"
 	@goa example $(DIR)/design
 	@rm -r cmd/api
 	@go build -o cl clean/clean.go && ./cl

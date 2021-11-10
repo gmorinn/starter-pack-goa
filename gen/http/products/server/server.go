@@ -62,17 +62,17 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"GetAllProducts", "GET", "/web/products"},
-			{"GetAllProductsByCategory", "GET", "/web/products/category/{category}"},
-			{"DeleteProduct", "DELETE", "/web/product/remove/{id}"},
-			{"CreateProduct", "POST", "/web/product/add"},
-			{"UpdateProduct", "PUT", "/web/product/{id}"},
-			{"GetProduct", "GET", "/web/product/{id}"},
-			{"CORS", "OPTIONS", "/web/products"},
-			{"CORS", "OPTIONS", "/web/products/category/{category}"},
-			{"CORS", "OPTIONS", "/web/product/remove/{id}"},
-			{"CORS", "OPTIONS", "/web/product/add"},
-			{"CORS", "OPTIONS", "/web/product/{id}"},
+			{"GetAllProducts", "GET", "/v1/web/products"},
+			{"GetAllProductsByCategory", "GET", "/v1/web/products/category/{category}"},
+			{"DeleteProduct", "DELETE", "/v1/web/product/remove/{id}"},
+			{"CreateProduct", "POST", "/v1/web/product/add"},
+			{"UpdateProduct", "PUT", "/v1/web/product/{id}"},
+			{"GetProduct", "GET", "/v1/web/product/{id}"},
+			{"CORS", "OPTIONS", "/v1/web/products"},
+			{"CORS", "OPTIONS", "/v1/web/products/category/{category}"},
+			{"CORS", "OPTIONS", "/v1/web/product/remove/{id}"},
+			{"CORS", "OPTIONS", "/v1/web/product/add"},
+			{"CORS", "OPTIONS", "/v1/web/product/{id}"},
 		},
 		GetAllProducts:           NewGetAllProductsHandler(e.GetAllProducts, mux, decoder, encoder, errhandler, formatter),
 		GetAllProductsByCategory: NewGetAllProductsByCategoryHandler(e.GetAllProductsByCategory, mux, decoder, encoder, errhandler, formatter),
@@ -118,7 +118,7 @@ func MountGetAllProductsHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/web/products", f)
+	mux.Handle("GET", "/v1/web/products", f)
 }
 
 // NewGetAllProductsHandler creates a HTTP handler which loads the HTTP request
@@ -169,7 +169,7 @@ func MountGetAllProductsByCategoryHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/web/products/category/{category}", f)
+	mux.Handle("GET", "/v1/web/products/category/{category}", f)
 }
 
 // NewGetAllProductsByCategoryHandler creates a HTTP handler which loads the
@@ -221,7 +221,7 @@ func MountDeleteProductHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("DELETE", "/web/product/remove/{id}", f)
+	mux.Handle("DELETE", "/v1/web/product/remove/{id}", f)
 }
 
 // NewDeleteProductHandler creates a HTTP handler which loads the HTTP request
@@ -272,7 +272,7 @@ func MountCreateProductHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/web/product/add", f)
+	mux.Handle("POST", "/v1/web/product/add", f)
 }
 
 // NewCreateProductHandler creates a HTTP handler which loads the HTTP request
@@ -323,7 +323,7 @@ func MountUpdateProductHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("PUT", "/web/product/{id}", f)
+	mux.Handle("PUT", "/v1/web/product/{id}", f)
 }
 
 // NewUpdateProductHandler creates a HTTP handler which loads the HTTP request
@@ -374,7 +374,7 @@ func MountGetProductHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/web/product/{id}", f)
+	mux.Handle("GET", "/v1/web/product/{id}", f)
 }
 
 // NewGetProductHandler creates a HTTP handler which loads the HTTP request and
@@ -426,11 +426,11 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/web/products", f)
-	mux.Handle("OPTIONS", "/web/products/category/{category}", f)
-	mux.Handle("OPTIONS", "/web/product/remove/{id}", f)
-	mux.Handle("OPTIONS", "/web/product/add", f)
-	mux.Handle("OPTIONS", "/web/product/{id}", f)
+	mux.Handle("OPTIONS", "/v1/web/products", f)
+	mux.Handle("OPTIONS", "/v1/web/products/category/{category}", f)
+	mux.Handle("OPTIONS", "/v1/web/product/remove/{id}", f)
+	mux.Handle("OPTIONS", "/v1/web/product/add", f)
+	mux.Handle("OPTIONS", "/v1/web/product/{id}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

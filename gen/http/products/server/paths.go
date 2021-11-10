@@ -13,30 +13,30 @@ import (
 
 // GetAllProductsProductsPath returns the URL path to the products service getAllProducts HTTP endpoint.
 func GetAllProductsProductsPath() string {
-	return "/web/products"
+	return "/v1/web/products"
 }
 
 // GetAllProductsByCategoryProductsPath returns the URL path to the products service getAllProductsByCategory HTTP endpoint.
 func GetAllProductsByCategoryProductsPath(category string) string {
-	return fmt.Sprintf("/web/products/category/%v", category)
+	return fmt.Sprintf("/v1/web/products/category/%v", category)
 }
 
 // DeleteProductProductsPath returns the URL path to the products service deleteProduct HTTP endpoint.
 func DeleteProductProductsPath(id string) string {
-	return fmt.Sprintf("/web/product/remove/%v", id)
+	return fmt.Sprintf("/v1/web/product/remove/%v", id)
 }
 
 // CreateProductProductsPath returns the URL path to the products service createProduct HTTP endpoint.
 func CreateProductProductsPath() string {
-	return "/web/product/add"
+	return "/v1/web/product/add"
 }
 
 // UpdateProductProductsPath returns the URL path to the products service updateProduct HTTP endpoint.
 func UpdateProductProductsPath(id string) string {
-	return fmt.Sprintf("/web/product/%v", id)
+	return fmt.Sprintf("/v1/web/product/%v", id)
 }
 
 // GetProductProductsPath returns the URL path to the products service getProduct HTTP endpoint.
 func GetProductProductsPath(id string) string {
-	return fmt.Sprintf("/web/product/%v", id)
+	return fmt.Sprintf("/v1/web/product/%v", id)
 }

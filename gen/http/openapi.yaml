@@ -328,7 +328,7 @@ paths:
       - http
       security:
       - OAuth2_header_Authorization: []
-  /web/product/{id}:
+  /v1/web/product/{id}:
     get:
       tags:
       - products
@@ -427,7 +427,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /web/product/add:
+  /v1/web/product/add:
     post:
       tags:
       - products
@@ -475,7 +475,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /web/product/remove/{id}:
+  /v1/web/product/remove/{id}:
     delete:
       tags:
       - products
@@ -520,7 +520,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /web/products:
+  /v1/web/products:
     get:
       tags:
       - products
@@ -561,7 +561,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /web/products/category/{category}:
+  /v1/web/products/category/{category}:
     get:
       tags:
       - products
@@ -614,7 +614,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /web/user/{id}:
+  /v1/web/user/{id}:
     get:
       tags:
       - users
@@ -713,7 +713,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /web/user/add:
+  /v1/web/user/add:
     post:
       tags:
       - users
@@ -761,7 +761,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /web/user/remove/{id}:
+  /v1/web/user/remove/{id}:
     delete:
       tags:
       - users
@@ -806,7 +806,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /web/users:
+  /v1/web/users:
     get:
       tags:
       - users

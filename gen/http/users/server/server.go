@@ -61,15 +61,15 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"GetAllusers", "GET", "/web/users"},
-			{"DeleteUser", "DELETE", "/web/user/remove/{id}"},
-			{"CreateUser", "POST", "/web/user/add"},
-			{"UpdateUser", "PUT", "/web/user/{id}"},
-			{"GetUser", "GET", "/web/user/{id}"},
-			{"CORS", "OPTIONS", "/web/users"},
-			{"CORS", "OPTIONS", "/web/user/remove/{id}"},
-			{"CORS", "OPTIONS", "/web/user/add"},
-			{"CORS", "OPTIONS", "/web/user/{id}"},
+			{"GetAllusers", "GET", "/v1/web/users"},
+			{"DeleteUser", "DELETE", "/v1/web/user/remove/{id}"},
+			{"CreateUser", "POST", "/v1/web/user/add"},
+			{"UpdateUser", "PUT", "/v1/web/user/{id}"},
+			{"GetUser", "GET", "/v1/web/user/{id}"},
+			{"CORS", "OPTIONS", "/v1/web/users"},
+			{"CORS", "OPTIONS", "/v1/web/user/remove/{id}"},
+			{"CORS", "OPTIONS", "/v1/web/user/add"},
+			{"CORS", "OPTIONS", "/v1/web/user/{id}"},
 		},
 		GetAllusers: NewGetAllusersHandler(e.GetAllusers, mux, decoder, encoder, errhandler, formatter),
 		DeleteUser:  NewDeleteUserHandler(e.DeleteUser, mux, decoder, encoder, errhandler, formatter),
@@ -112,7 +112,7 @@ func MountGetAllusersHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/web/users", f)
+	mux.Handle("GET", "/v1/web/users", f)
 }
 
 // NewGetAllusersHandler creates a HTTP handler which loads the HTTP request
@@ -163,7 +163,7 @@ func MountDeleteUserHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("DELETE", "/web/user/remove/{id}", f)
+	mux.Handle("DELETE", "/v1/web/user/remove/{id}", f)
 }
 
 // NewDeleteUserHandler creates a HTTP handler which loads the HTTP request and
@@ -214,7 +214,7 @@ func MountCreateUserHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/web/user/add", f)
+	mux.Handle("POST", "/v1/web/user/add", f)
 }
 
 // NewCreateUserHandler creates a HTTP handler which loads the HTTP request and
@@ -265,7 +265,7 @@ func MountUpdateUserHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("PUT", "/web/user/{id}", f)
+	mux.Handle("PUT", "/v1/web/user/{id}", f)
 }
 
 // NewUpdateUserHandler creates a HTTP handler which loads the HTTP request and
@@ -316,7 +316,7 @@ func MountGetUserHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/web/user/{id}", f)
+	mux.Handle("GET", "/v1/web/user/{id}", f)
 }
 
 // NewGetUserHandler creates a HTTP handler which loads the HTTP request and
@@ -368,10 +368,10 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/web/users", f)
-	mux.Handle("OPTIONS", "/web/user/remove/{id}", f)
-	mux.Handle("OPTIONS", "/web/user/add", f)
-	mux.Handle("OPTIONS", "/web/user/{id}", f)
+	mux.Handle("OPTIONS", "/v1/web/users", f)
+	mux.Handle("OPTIONS", "/v1/web/user/remove/{id}", f)
+	mux.Handle("OPTIONS", "/v1/web/user/add", f)
+	mux.Handle("OPTIONS", "/v1/web/user/{id}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

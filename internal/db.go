@@ -28,6 +28,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createRefreshTokenStmt, err = db.PrepareContext(ctx, createRefreshToken); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateRefreshToken: %w", err)
 	}
+	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
+	}
 	if q.deleteOldRefreshTokenStmt, err = db.PrepareContext(ctx, deleteOldRefreshToken); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteOldRefreshToken: %w", err)
 	}
@@ -70,9 +73,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserByIDStmt, err = db.PrepareContext(ctx, getUserByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByID: %w", err)
 	}
-	if q.insertUserStmt, err = db.PrepareContext(ctx, insertUser); err != nil {
-		return nil, fmt.Errorf("error preparing query InsertUser: %w", err)
-	}
 	if q.listRefreshTokenByUserIDStmt, err = db.PrepareContext(ctx, listRefreshTokenByUserID); err != nil {
 		return nil, fmt.Errorf("error preparing query ListRefreshTokenByUserID: %w", err)
 	}
@@ -110,6 +110,11 @@ func (q *Queries) Close() error {
 	if q.createRefreshTokenStmt != nil {
 		if cerr := q.createRefreshTokenStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createRefreshTokenStmt: %w", cerr)
+		}
+	}
+	if q.createUserStmt != nil {
+		if cerr := q.createUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
 		}
 	}
 	if q.deleteOldRefreshTokenStmt != nil {
@@ -180,11 +185,6 @@ func (q *Queries) Close() error {
 	if q.getUserByIDStmt != nil {
 		if cerr := q.getUserByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getUserByIDStmt: %w", cerr)
-		}
-	}
-	if q.insertUserStmt != nil {
-		if cerr := q.insertUserStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing insertUserStmt: %w", cerr)
 		}
 	}
 	if q.listRefreshTokenByUserIDStmt != nil {
@@ -268,6 +268,7 @@ type Queries struct {
 	tx                            *sql.Tx
 	createProductStmt             *sql.Stmt
 	createRefreshTokenStmt        *sql.Stmt
+	createUserStmt                *sql.Stmt
 	deleteOldRefreshTokenStmt     *sql.Stmt
 	deleteProductStmt             *sql.Stmt
 	deleteRefreshTokenStmt        *sql.Stmt
@@ -282,7 +283,6 @@ type Queries struct {
 	getRefreshTokenStmt           *sql.Stmt
 	getUserByFireBaseUidStmt      *sql.Stmt
 	getUserByIDStmt               *sql.Stmt
-	insertUserStmt                *sql.Stmt
 	listRefreshTokenByUserIDStmt  *sql.Stmt
 	loginUserStmt                 *sql.Stmt
 	signProviderStmt              *sql.Stmt
@@ -299,6 +299,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		tx:                            tx,
 		createProductStmt:             q.createProductStmt,
 		createRefreshTokenStmt:        q.createRefreshTokenStmt,
+		createUserStmt:                q.createUserStmt,
 		deleteOldRefreshTokenStmt:     q.deleteOldRefreshTokenStmt,
 		deleteProductStmt:             q.deleteProductStmt,
 		deleteRefreshTokenStmt:        q.deleteRefreshTokenStmt,
@@ -313,7 +314,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getRefreshTokenStmt:           q.getRefreshTokenStmt,
 		getUserByFireBaseUidStmt:      q.getUserByFireBaseUidStmt,
 		getUserByIDStmt:               q.getUserByIDStmt,
-		insertUserStmt:                q.insertUserStmt,
 		listRefreshTokenByUserIDStmt:  q.listRefreshTokenByUserIDStmt,
 		loginUserStmt:                 q.loginUserStmt,
 		signProviderStmt:              q.signProviderStmt,

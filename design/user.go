@@ -15,7 +15,7 @@ var _ = Service("users", func() {
 	Error("unknown_error", unknownError, "Error not identified (500)")
 
 	HTTP(func() {
-		Path("/web")
+		Path("/v1/web")
 		Header("oauth:Authorization", String, "OAuth token", func() {
 			Pattern("^Bearer [^ ]+$")
 		})

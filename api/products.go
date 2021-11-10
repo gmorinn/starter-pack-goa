@@ -44,13 +44,13 @@ func (s *productssrvc) JWTAuth(ctx context.Context, token string, scheme *securi
 
 // Get All products by category
 func (s *productssrvc) GetAllProductsByCategory(ctx context.Context, p *products.GetAllProductsByCategoryPayload) (res *products.GetAllProductsByCategoryResult, err error) {
+	var ProductsResponse []*products.ResProduct
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		p, err := s.server.Store.GetProductsByCategory(ctx, db.Categories(p.Category))
+		pS, err := s.server.Store.GetProductsByCategory(ctx, db.Categories(p.Category))
 		if err != nil {
 			return fmt.Errorf("ERROR_GET_ALL_PRODUCTS %v", err)
 		}
-		var ProductsResponse []*products.ResProduct
-		for _, v := range p {
+		for _, v := range pS {
 			id := v.ID.String()
 			ProductsResponse = append(ProductsResponse, &products.ResProduct{
 				ID:       id,
@@ -60,14 +60,14 @@ func (s *productssrvc) GetAllProductsByCategory(ctx context.Context, p *products
 				Category: string(v.Category),
 			})
 		}
-		res = &products.GetAllProductsByCategoryResult{
-			Products: ProductsResponse,
-			Success:  true,
-		}
 		return nil
 	})
 	if err != nil {
 		return nil, s.errorResponse("TX_GET_ALL_PRODUCTS", err)
+	}
+	res = &products.GetAllProductsByCategoryResult{
+		Products: ProductsResponse,
+		Success:  true,
 	}
 	return res, nil
 }
@@ -76,7 +76,7 @@ func (s *productssrvc) GetAllProductsByCategory(ctx context.Context, p *products
 func (s *productssrvc) DeleteProduct(ctx context.Context, p *products.DeleteProductPayload) (res *products.DeleteProductResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		if err := q.DeleteProduct(ctx, uuid.MustParse(p.ID)); err != nil {
-			return fmt.Errorf("ERROR_DELETE_PRODUCT %v", err)
+			return fmt.Errorf("ERROR_DELETE_PRODUCT_BY_ID %v", err)
 		}
 		return nil
 	})

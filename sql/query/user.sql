@@ -27,10 +27,10 @@ SET
     birthday = $5,
     updated_at = NOW()
 WHERE
-    id = $1
+    id = $6
 RETURNING *;
 
--- name: InsertUser :exec
+-- name: CreateUser :one
 INSERT INTO users (firstname, lastname, email, phone, birthday)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING *;

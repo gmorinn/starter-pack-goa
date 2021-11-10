@@ -10,6 +10,48 @@ import (
 	"github.com/google/uuid"
 )
 
+const createUser = `-- name: CreateUser :one
+INSERT INTO users (firstname, lastname, email, phone, birthday)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
+`
+
+type CreateUserParams struct {
+	Firstname string         `json:"firstname"`
+	Lastname  string         `json:"lastname"`
+	Email     string         `json:"email"`
+	Phone     sql.NullString `json:"phone"`
+	Birthday  sql.NullString `json:"birthday"`
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.queryRow(ctx, q.createUserStmt, createUser,
+		arg.Firstname,
+		arg.Lastname,
+		arg.Email,
+		arg.Phone,
+		arg.Birthday,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.Lastname,
+		&i.Firstname,
+		&i.Email,
+		&i.Password,
+		&i.Role,
+		&i.Birthday,
+		&i.Phone,
+		&i.FirebaseIDToken,
+		&i.FirebaseUid,
+		&i.FirebaseProvider,
+	)
+	return i, err
+}
+
 const deleteUserByID = `-- name: DeleteUserByID :exec
 UPDATE
     users
@@ -96,31 +138,6 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 	return i, err
 }
 
-const insertUser = `-- name: InsertUser :exec
-INSERT INTO users (firstname, lastname, email, phone, birthday)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
-`
-
-type InsertUserParams struct {
-	Firstname string         `json:"firstname"`
-	Lastname  string         `json:"lastname"`
-	Email     string         `json:"email"`
-	Phone     sql.NullString `json:"phone"`
-	Birthday  sql.NullString `json:"birthday"`
-}
-
-func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) error {
-	_, err := q.exec(ctx, q.insertUserStmt, insertUser,
-		arg.Firstname,
-		arg.Lastname,
-		arg.Email,
-		arg.Phone,
-		arg.Birthday,
-	)
-	return err
-}
-
 const updateUser = `-- name: UpdateUser :exec
 UPDATE 
     users
@@ -132,7 +149,7 @@ SET
     birthday = $5,
     updated_at = NOW()
 WHERE
-    id = $1
+    id = $6
 RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
 `
 
@@ -142,6 +159,7 @@ type UpdateUserParams struct {
 	Email     string         `json:"email"`
 	Phone     sql.NullString `json:"phone"`
 	Birthday  sql.NullString `json:"birthday"`
+	ID        uuid.UUID      `json:"id"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
@@ -151,6 +169,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 		arg.Email,
 		arg.Phone,
 		arg.Birthday,
+		arg.ID,
 	)
 	return err
 }

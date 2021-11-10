@@ -29,7 +29,7 @@
             "\tid = 1",
             "RETURNING *;",
             "",
-            "-- name: Insert${2:name} :exec",
+            "-- name: Create${2:name} :exec",
             "INSERT INTO ${1:table} () ",
             "VALUES ()",
             "RETURNING *;"
