@@ -17,6 +17,12 @@ import (
 	"syscall"
 )
 
+type ApiEndpoints struct {
+	jwtTokenEndpoints *jwttoken.Endpoints
+	oAuthEndpoints    *oauth.Endpoints
+	productsEndpoints *products.Endpoints
+}
+
 func main() {
 	// Define command line flags, add any other flag required to configure the
 	// service.
@@ -39,30 +45,21 @@ func main() {
 
 	// Initialize the services.
 	var (
-		jwtTokenSvc jwttoken.Service
-		oAuthSvc    oauth.Service
-		productsSvc products.Service
-		server      *api.Server
+		server      *api.Server      = api.NewServer()
+		jwtTokenSvc jwttoken.Service = api.NewJWTToken(logger, server)
+		oAuthSvc    oauth.Service    = api.NewOAuth(logger, server)
+		productsSvc products.Service = api.NewProducts(logger, server)
 	)
-	{
-		server = api.NewServer()
-		jwtTokenSvc = api.NewJWTToken(logger, server)
-		oAuthSvc = api.NewOAuth(logger, server)
-		productsSvc = api.NewProducts(logger, server)
-	}
 
 	// Wrap the services in endpoints that can be invoked from other services
 	// potentially running in different processes.
 	var (
-		jwtTokenEndpoints *jwttoken.Endpoints
-		oAuthEndpoints    *oauth.Endpoints
-		productsEndpoints *products.Endpoints
+		apiEndpoints ApiEndpoints = ApiEndpoints{
+			jwtTokenEndpoints: jwttoken.NewEndpoints(jwtTokenSvc),
+			oAuthEndpoints:    oauth.NewEndpoints(oAuthSvc),
+			productsEndpoints: products.NewEndpoints(productsSvc),
+		}
 	)
-	{
-		jwtTokenEndpoints = jwttoken.NewEndpoints(jwtTokenSvc)
-		oAuthEndpoints = oauth.NewEndpoints(oAuthSvc)
-		productsEndpoints = products.NewEndpoints(productsSvc)
-	}
 
 	// Create channel used by both the signal handler and server goroutines
 	// to notify the main goroutine when to stop the server.
@@ -105,7 +102,7 @@ func main() {
 			} else if u.Port() == "" {
 				u.Host = net.JoinHostPort(u.Host, "80")
 			}
-			handleHTTPServer(ctx, u, jwtTokenEndpoints, oAuthEndpoints, productsEndpoints, &wg, errc, logger, *dbgF)
+			handleHTTPServer(ctx, u, &apiEndpoints, &wg, errc, logger, *dbgF)
 		}
 
 	default:

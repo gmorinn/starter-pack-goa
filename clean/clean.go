@@ -31,16 +31,17 @@ func checkNameFile(api []fs.FileInfo, fileName string) bool {
 }
 
 func main() {
+	//OPEN CURRENT FOLDER
 	currentFolder, err := ioutil.ReadDir("./")
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// OPEN API FOLDER
 	apiFolder, err := ioutil.ReadDir("./api")
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	// CHECK IF NEW FILE ALREADY EXIST IN API FOLDER AND IF TRUE REMOVE IN THE CURRENT FOLDER
 	for _, f := range currentFolder {
 		if checkNameFile(apiFolder, f.Name()) {
 			e := os.Remove(f.Name())
@@ -49,7 +50,7 @@ func main() {
 			}
 		}
 	}
-
+	// CHECK IF NEW FILES AND REPLACE LIKE ALL OTHERS FILES IN API FOLDER
 	for _, v := range currentFolder {
 		if v.Name() == "http.go" || v.Name() == "main.go" || len(v.Name()) < 3 {
 			continue
@@ -94,6 +95,17 @@ func main() {
 				err = ioutil.WriteFile("./api/"+v.Name(), []byte(output), 0644)
 				if err != nil {
 					log.Fatal(err)
+				}
+				// ONCE FILE IS CHANGED, ADD THE NEW METHOD IN main.go
+				input, err = ioutil.ReadFile("./main.go")
+				if err != nil {
+					log.Fatal(err)
+				}
+				lines = strings.Split(string(input), "\n")
+				for i, line := range lines {
+					if strings.Contains(line, "type ApiEndpoints struct") {
+						lines[i+1] = fmt.Sprintf("%vEndpoints *%v.Endpoints\n%v", v.Name(), v.Name(), line[i+1])
+					}
 				}
 			}
 		}

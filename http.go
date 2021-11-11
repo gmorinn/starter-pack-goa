@@ -5,9 +5,6 @@ import (
 	oauthsvr "api_crud/gen/http/o_auth/server"
 	openapisvr "api_crud/gen/http/openapi/server"
 	productssvr "api_crud/gen/http/products/server"
-	jwttoken "api_crud/gen/jwt_token"
-	oauth "api_crud/gen/o_auth"
-	products "api_crud/gen/products"
 	"context"
 	"log"
 	"net/http"
@@ -23,7 +20,7 @@ import (
 
 // handleHTTPServer starts configures and starts a HTTP server on the given
 // URL. It shuts down the server if any error is received in the error channel.
-func handleHTTPServer(ctx context.Context, u *url.URL, jwtTokenEndpoints *jwttoken.Endpoints, oAuthEndpoints *oauth.Endpoints, productsEndpoints *products.Endpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
+func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
 
 	// Setup goa log adapter.
 	var (
@@ -62,9 +59,9 @@ func handleHTTPServer(ctx context.Context, u *url.URL, jwtTokenEndpoints *jwttok
 	{
 		eh := errorHandler(logger)
 		openapiServer = openapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("../../gen/http"))
-		jwtTokenServer = jwttokensvr.New(jwtTokenEndpoints, mux, dec, enc, eh, nil)
-		oAuthServer = oauthsvr.New(oAuthEndpoints, mux, dec, enc, eh, nil)
-		productsServer = productssvr.New(productsEndpoints, mux, dec, enc, eh, nil)
+		jwtTokenServer = jwttokensvr.New(api.jwtTokenEndpoints, mux, dec, enc, eh, nil)
+		oAuthServer = oauthsvr.New(api.oAuthEndpoints, mux, dec, enc, eh, nil)
+		productsServer = productssvr.New(api.productsEndpoints, mux, dec, enc, eh, nil)
 		if debug {
 			servers := goahttp.Servers{
 				openapiServer,
