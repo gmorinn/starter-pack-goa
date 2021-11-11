@@ -5,6 +5,7 @@ import (
 	jwttoken "api_crud/gen/jwt_token"
 	oauth "api_crud/gen/o_auth"
 	products "api_crud/gen/products"
+	"api_crud/gen/users"
 	"context"
 	"flag"
 	"fmt"
@@ -18,6 +19,7 @@ import (
 )
 
 type ApiEndpoints struct {
+	usersEndpoints    *users.Endpoints
 	jwtTokenEndpoints *jwttoken.Endpoints
 	oAuthEndpoints    *oauth.Endpoints
 	productsEndpoints *products.Endpoints
@@ -46,6 +48,7 @@ func main() {
 	// Initialize the services.
 	var (
 		server      *api.Server      = api.NewServer()
+		usersSvc    users.Service    = api.NewUsers(logger, server)
 		jwtTokenSvc jwttoken.Service = api.NewJWTToken(logger, server)
 		oAuthSvc    oauth.Service    = api.NewOAuth(logger, server)
 		productsSvc products.Service = api.NewProducts(logger, server)
@@ -55,6 +58,7 @@ func main() {
 	// potentially running in different processes.
 	var (
 		apiEndpoints ApiEndpoints = ApiEndpoints{
+			usersEndpoints:    users.NewEndpoints(usersSvc),
 			jwtTokenEndpoints: jwttoken.NewEndpoints(jwtTokenSvc),
 			oAuthEndpoints:    oauth.NewEndpoints(oAuthSvc),
 			productsEndpoints: products.NewEndpoints(productsSvc),

@@ -5,6 +5,7 @@ import (
 	oauthsvr "api_crud/gen/http/o_auth/server"
 	openapisvr "api_crud/gen/http/openapi/server"
 	productssvr "api_crud/gen/http/products/server"
+	userssvr "api_crud/gen/http/users/server"
 	"context"
 	"log"
 	"net/http"
@@ -51,19 +52,17 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 	// the service input and output data structures to HTTP requests and
 	// responses.
 	var (
-		openapiServer  *openapisvr.Server
-		jwtTokenServer *jwttokensvr.Server
-		oAuthServer    *oauthsvr.Server
-		productsServer *productssvr.Server
+		eh                                 = errorHandler(logger)
+		openapiServer  *openapisvr.Server  = openapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("../../gen/http"))
+		usersServer    *userssvr.Server    = userssvr.New(api.usersEndpoints, mux, dec, enc, eh, nil)
+		jwtTokenServer *jwttokensvr.Server = jwttokensvr.New(api.jwtTokenEndpoints, mux, dec, enc, eh, nil)
+		oAuthServer    *oauthsvr.Server    = oauthsvr.New(api.oAuthEndpoints, mux, dec, enc, eh, nil)
+		productsServer *productssvr.Server = productssvr.New(api.productsEndpoints, mux, dec, enc, eh, nil)
 	)
 	{
-		eh := errorHandler(logger)
-		openapiServer = openapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("../../gen/http"))
-		jwtTokenServer = jwttokensvr.New(api.jwtTokenEndpoints, mux, dec, enc, eh, nil)
-		oAuthServer = oauthsvr.New(api.oAuthEndpoints, mux, dec, enc, eh, nil)
-		productsServer = productssvr.New(api.productsEndpoints, mux, dec, enc, eh, nil)
 		if debug {
 			servers := goahttp.Servers{
+				usersServer,
 				openapiServer,
 				jwtTokenServer,
 				oAuthServer,
@@ -74,6 +73,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 	}
 	// Configure the mux.
 	openapisvr.Mount(mux, openapiServer)
+	userssvr.Mount(mux, usersServer)
 	jwttokensvr.Mount(mux, jwtTokenServer)
 	oauthsvr.Mount(mux, oAuthServer)
 	productssvr.Mount(mux, productsServer)

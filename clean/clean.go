@@ -102,10 +102,53 @@ func main() {
 					log.Fatal(err)
 				}
 				lines = strings.Split(string(input), "\n")
+				method := strings.ReplaceAll(v.Name(), ".go", "")
 				for i, line := range lines {
+					//ADD NEW METHOD IN STRUCT
 					if strings.Contains(line, "type ApiEndpoints struct") {
-						lines[i+1] = fmt.Sprintf("%vEndpoints *%v.Endpoints\n%v", v.Name(), v.Name(), line[i+1])
+						lines[i+1] = fmt.Sprintf("\t%vEndpoints *%v.Endpoints\n", method, method) + lines[i+1]
 					}
+					// INITIALIZE IT
+					if strings.Contains(line, "api.NewServer()") {
+						lines[i+1] = fmt.Sprintf("\t\t%vSvc %v.Service = api.New%v(logger, server)\n", method, method, strings.Title(method)) + lines[i+1]
+					}
+					// Wrap the services
+					if strings.Contains(line, "apiEndpoints ApiEndpoints = ApiEndpoints{") {
+						lines[i+1] = fmt.Sprintf("\t\t\t%vEndpoints: %v.NewEndpoints(%vSvc),\n", method, method, method) + lines[i+1]
+					}
+				}
+				output = strings.Join(lines, "\n")
+				err = ioutil.WriteFile("./main.go", []byte(output), 0644)
+				if err != nil {
+					log.Fatal(err)
+				}
+				// WE ALSO NEED TO ADD THE METHOD IN THE HTTP.GO
+				input, err = ioutil.ReadFile("./http.go")
+				if err != nil {
+					log.Fatal(err)
+				}
+				lines = strings.Split(string(input), "\n")
+				for i, line := range lines {
+					// Add to the import
+					if strings.Contains(line, `jwttokensvr "`) {
+						lines[i+1] = fmt.Sprintf(`\t%vsvr "/gen/http/%v/server"\n`, method, method) + lines[i+1]
+					}
+					// Build the service HTTP request
+					if strings.Contains(line, "openapiServer  *openapisvr.Server") {
+						lines[i+1] = fmt.Sprintf("\t\t\t%vServer *%vsvr.Server = %vsvr.New(api.%vEndpoints, mux, dec, enc, eh, nil)\n", method, method, method, method) + lines[i+1]
+					}
+					if strings.Contains(line, "servers := goahttp.Servers{") {
+						lines[i+1] = fmt.Sprintf("\t\t\t\t%vServer,\n", method) + lines[i+1]
+					}
+					// Configure the mux.
+					if strings.Contains(line, "openapisvr.Mount(mux, openapiServer)") {
+						lines[i+1] = fmt.Sprintf("\t%vsvr.Mount(mux, %vServer)\n", method, method) + lines[i+1]
+					}
+				}
+				output = strings.Join(lines, "\n")
+				err = ioutil.WriteFile("./http.go", []byte(output), 0644)
+				if err != nil {
+					log.Fatal(err)
 				}
 			}
 		}
