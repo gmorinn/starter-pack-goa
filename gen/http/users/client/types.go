@@ -9,6 +9,7 @@ package client
 
 import (
 	users "api_crud/gen/users"
+	"unicode/utf8"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -115,11 +116,11 @@ type ResUserResponseBody struct {
 
 // PayloadUserRequestBody is used to define fields on request body types.
 type PayloadUserRequestBody struct {
-	Firstname *string `form:"firstname,omitempty" json:"firstname,omitempty" xml:"firstname,omitempty"`
-	Lastname  *string `form:"lastname,omitempty" json:"lastname,omitempty" xml:"lastname,omitempty"`
-	Email     *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Birthday  string  `form:"birthday" json:"birthday" xml:"birthday"`
-	Phone     string  `form:"phone" json:"phone" xml:"phone"`
+	Firstname string `form:"firstname" json:"firstname" xml:"firstname"`
+	Lastname  string `form:"lastname" json:"lastname" xml:"lastname"`
+	Email     string `form:"email" json:"email" xml:"email"`
+	Birthday  string `form:"birthday" json:"birthday" xml:"birthday"`
+	Phone     string `form:"phone" json:"phone" xml:"phone"`
 }
 
 // NewCreateUserRequestBody builds the HTTP request body from the payload of
@@ -434,8 +435,13 @@ func ValidateResUserResponseBody(body *ResUserResponseBody) (err error) {
 // ValidatePayloadUserRequestBody runs the validations defined on
 // payloadUserRequestBody
 func ValidatePayloadUserRequestBody(body *PayloadUserRequestBody) (err error) {
-	if body.Email != nil {
-		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
+	if utf8.RuneCountInString(body.Firstname) < 3 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
 	}
+	if utf8.RuneCountInString(body.Lastname) < 3 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError("body.lastname", body.Lastname, utf8.RuneCountInString(body.Lastname), 3, true))
+	}
+	err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
+
 	return
 }

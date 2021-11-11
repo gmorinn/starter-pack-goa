@@ -2030,9 +2030,11 @@ definitions:
       firstname:
         type: string
         example: Guillaume
+        minLength: 3
       lastname:
         type: string
         example: Morin
+        minLength: 3
       phone:
         type: string
         default: ""
@@ -2043,6 +2045,10 @@ definitions:
       firstname: Guillaume
       lastname: Morin
       phone: +262 692 12 34 56
+    required:
+    - email
+    - firstname
+    - lastname
   resProductResponseBody:
     title: resProductResponseBody
     type: object

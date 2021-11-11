@@ -179,9 +179,11 @@ var resUser = Type("resUser", func() {
 var payloadUser = Type("payloadUser", func() {
 	Attribute("firstname", String, func() {
 		Example("Guillaume")
+		MinLength(3)
 	})
 	Attribute("lastname", String, func() {
 		Example("Morin")
+		MinLength(3)
 	})
 	Attribute("email", String, func() {
 		Format(FormatEmail)
@@ -195,4 +197,5 @@ var payloadUser = Type("payloadUser", func() {
 		Default("")
 		Example("+262 692 12 34 56")
 	})
+	Required("email", "firstname", "lastname")
 })

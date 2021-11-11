@@ -490,9 +490,9 @@ func marshalUsersResUserToResUserResponseBody(v *users.ResUser) *ResUserResponse
 // *users.PayloadUser from a value of type *PayloadUserRequestBody.
 func unmarshalPayloadUserRequestBodyToUsersPayloadUser(v *PayloadUserRequestBody) *users.PayloadUser {
 	res := &users.PayloadUser{
-		Firstname: v.Firstname,
-		Lastname:  v.Lastname,
-		Email:     v.Email,
+		Firstname: *v.Firstname,
+		Lastname:  *v.Lastname,
+		Email:     *v.Email,
 	}
 	if v.Birthday != nil {
 		res.Birthday = *v.Birthday

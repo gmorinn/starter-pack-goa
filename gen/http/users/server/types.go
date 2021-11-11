@@ -9,6 +9,7 @@ package server
 
 import (
 	users "api_crud/gen/users"
+	"unicode/utf8"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -318,6 +319,25 @@ func ValidateUpdateUserRequestBody(body *UpdateUserRequestBody) (err error) {
 // ValidatePayloadUserRequestBody runs the validations defined on
 // payloadUserRequestBody
 func ValidatePayloadUserRequestBody(body *PayloadUserRequestBody) (err error) {
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
+	}
+	if body.Firstname == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("firstname", "body"))
+	}
+	if body.Lastname == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("lastname", "body"))
+	}
+	if body.Firstname != nil {
+		if utf8.RuneCountInString(*body.Firstname) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", *body.Firstname, utf8.RuneCountInString(*body.Firstname), 3, true))
+		}
+	}
+	if body.Lastname != nil {
+		if utf8.RuneCountInString(*body.Lastname) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.lastname", *body.Lastname, utf8.RuneCountInString(*body.Lastname), 3, true))
+		}
+	}
 	if body.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
 	}

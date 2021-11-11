@@ -136,9 +136,9 @@ type ResUser struct {
 }
 
 type PayloadUser struct {
-	Firstname *string
-	Lastname  *string
-	Email     *string
+	Firstname string
+	Lastname  string
+	Email     string
 	Birthday  string
 	Phone     string
 }

@@ -91,9 +91,9 @@ func (s *userssrvc) DeleteUser(ctx context.Context, p *users.DeleteUserPayload) 
 func (s *userssrvc) CreateUser(ctx context.Context, p *users.CreateUserPayload) (res *users.CreateUserResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		arg := db.CreateUserParams{
-			Firstname: *p.User.Firstname,
-			Lastname:  *p.User.Lastname,
-			Email:     *p.User.Email,
+			Firstname: p.User.Firstname,
+			Lastname:  p.User.Lastname,
+			Email:     p.User.Email,
 			Phone:     utils.NullS(p.User.Phone),
 			Birthday:  utils.NullS(p.User.Birthday),
 		}
@@ -128,9 +128,9 @@ func (s *userssrvc) UpdateUser(ctx context.Context, p *users.UpdateUserPayload) 
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		arg := db.UpdateUserParams{
 			ID:        uuid.MustParse(p.ID),
-			Firstname: *p.User.Firstname,
-			Lastname:  *p.User.Lastname,
-			Email:     *p.User.Email,
+			Firstname: p.User.Firstname,
+			Lastname:  p.User.Lastname,
+			Email:     p.User.Email,
 			Phone:     utils.NullS(p.User.Phone),
 			Birthday:  utils.NullS(p.User.Birthday),
 		}
