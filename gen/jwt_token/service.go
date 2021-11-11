@@ -47,9 +47,11 @@ type SignupPayload struct {
 	Lastname  string
 	// Minimum 8 charactères / Chiffre Obligatoire
 	Password string
-	Email    string
-	Birthday string
-	Phone    string
+	// Minimum 8 charactères / Chiffre Obligatoire
+	ConfirmPassword string
+	Email           string
+	Birthday        string
+	Phone           string
 	// Use to generate Oauth with /authorization
 	Oauth *string
 }

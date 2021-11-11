@@ -38,6 +38,7 @@ func (s *jwtTokensrvc) errorResponse(msg string, err error) *jwttoken.UnknownErr
 
 var (
 	ErrInvalidToken       error = jwttoken.Unauthorized("invalid token")
+	ErrInvalidPassword    error = jwttoken.Unauthorized("invalid password")
 	ErrInvalidTokenScopes error = jwttoken.InvalidScopes("invalid scopes in token")
 	ErrExpiredToken       error = jwttoken.Unauthorized("token has expired")
 )
@@ -47,6 +48,10 @@ func (s *jwtTokensrvc) OAuth2Auth(ctx context.Context, token string, scheme *sec
 }
 
 func (s *jwtTokensrvc) Signup(ctx context.Context, p *jwttoken.SignupPayload) (res *jwttoken.Sign, err error) {
+
+	if p.Password != p.ConfirmPassword {
+		return nil, ErrInvalidPassword
+	}
 
 	isExist, err := s.server.Store.ExistUserByEmail(ctx, p.Email)
 	if err != nil {

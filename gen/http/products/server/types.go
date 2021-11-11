@@ -283,21 +283,19 @@ func NewGetProductUnknownErrorResponseBody(res *products.UnknownError) *GetProdu
 
 // NewGetAllProductsPayload builds a products service getAllProducts endpoint
 // payload.
-func NewGetAllProductsPayload(oauth *string, jwtToken *string) *products.GetAllProductsPayload {
+func NewGetAllProductsPayload(oauth *string) *products.GetAllProductsPayload {
 	v := &products.GetAllProductsPayload{}
 	v.Oauth = oauth
-	v.JWTToken = jwtToken
 
 	return v
 }
 
 // NewGetAllProductsByCategoryPayload builds a products service
 // getAllProductsByCategory endpoint payload.
-func NewGetAllProductsByCategoryPayload(category string, oauth *string, jwtToken *string) *products.GetAllProductsByCategoryPayload {
+func NewGetAllProductsByCategoryPayload(category string, oauth *string) *products.GetAllProductsByCategoryPayload {
 	v := &products.GetAllProductsByCategoryPayload{}
 	v.Category = category
 	v.Oauth = oauth
-	v.JWTToken = jwtToken
 
 	return v
 }
@@ -337,11 +335,10 @@ func NewUpdateProductPayload(body *UpdateProductRequestBody, id string, oauth *s
 }
 
 // NewGetProductPayload builds a products service getProduct endpoint payload.
-func NewGetProductPayload(id string, oauth *string, jwtToken *string) *products.GetProductPayload {
+func NewGetProductPayload(id string, oauth *string) *products.GetProductPayload {
 	v := &products.GetProductPayload{}
 	v.ID = id
 	v.Oauth = oauth
-	v.JWTToken = jwtToken
 
 	return v
 }

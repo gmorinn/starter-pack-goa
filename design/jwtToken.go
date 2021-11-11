@@ -49,6 +49,12 @@ var _ = Service("jwtToken", func() {
 				MinLength(8)
 				Example("JeSuisUnTest974")
 			})
+			Attribute("confirm_password", String, func() {
+				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Pattern("\\d")
+				MinLength(8)
+				Example("JeSuisUnTest974")
+			})
 			Attribute("email", String, func() {
 				Format(FormatEmail)
 				Example("guillaume@epitech.eu")
@@ -63,7 +69,7 @@ var _ = Service("jwtToken", func() {
 			AccessTokenField(1, "oauth", String, func() {
 				Description("Use to generate Oauth with /authorization")
 			})
-			Required("firstname", "lastname", "password", "email")
+			Required("firstname", "lastname", "password", "email", "confirm_password")
 		})
 
 		Result(Sign)

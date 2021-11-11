@@ -51,8 +51,6 @@ var MethodNames = [6]string{"getAllProducts", "getAllProductsByCategory", "delet
 // GetAllProductsPayload is the payload type of the products service
 // getAllProducts method.
 type GetAllProductsPayload struct {
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
 	// Use to generate Oauth with /authorization
 	Oauth *string
 }
@@ -69,8 +67,6 @@ type GetAllProductsResult struct {
 // getAllProductsByCategory method.
 type GetAllProductsByCategoryPayload struct {
 	Category string
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
 	// Use to generate Oauth with /authorization
 	Oauth *string
 }
@@ -141,8 +137,6 @@ type UpdateProductResult struct {
 type GetProductPayload struct {
 	// Unique ID of the product
 	ID string
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
 	// Use to generate Oauth with /authorization
 	Oauth *string
 }

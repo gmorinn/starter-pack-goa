@@ -29,12 +29,12 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		GetAllProducts:           NewGetAllProductsEndpoint(s, a.OAuth2Auth, a.JWTAuth),
-		GetAllProductsByCategory: NewGetAllProductsByCategoryEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		GetAllProducts:           NewGetAllProductsEndpoint(s, a.OAuth2Auth),
+		GetAllProductsByCategory: NewGetAllProductsByCategoryEndpoint(s, a.OAuth2Auth),
 		DeleteProduct:            NewDeleteProductEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		CreateProduct:            NewCreateProductEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		UpdateProduct:            NewUpdateProductEndpoint(s, a.OAuth2Auth, a.JWTAuth),
-		GetProduct:               NewGetProductEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		GetProduct:               NewGetProductEndpoint(s, a.OAuth2Auth),
 	}
 }
 
@@ -50,7 +50,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 
 // NewGetAllProductsEndpoint returns an endpoint function that calls the method
 // "getAllProducts" of service "products".
-func NewGetAllProductsEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+func NewGetAllProductsEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*GetAllProductsPayload)
 		var err error
@@ -71,18 +71,6 @@ func NewGetAllProductsEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, 
 			token = *p.Oauth
 		}
 		ctx, err = authOAuth2Fn(ctx, token, &sc)
-		if err == nil {
-			sc := security.JWTScheme{
-				Name:           "jwt",
-				Scopes:         []string{"api:read", "api:write"},
-				RequiredScopes: []string{},
-			}
-			var token string
-			if p.JWTToken != nil {
-				token = *p.JWTToken
-			}
-			ctx, err = authJWTFn(ctx, token, &sc)
-		}
 		if err != nil {
 			return nil, err
 		}
@@ -92,7 +80,7 @@ func NewGetAllProductsEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, 
 
 // NewGetAllProductsByCategoryEndpoint returns an endpoint function that calls
 // the method "getAllProductsByCategory" of service "products".
-func NewGetAllProductsByCategoryEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+func NewGetAllProductsByCategoryEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*GetAllProductsByCategoryPayload)
 		var err error
@@ -113,18 +101,6 @@ func NewGetAllProductsByCategoryEndpoint(s Service, authOAuth2Fn security.AuthOA
 			token = *p.Oauth
 		}
 		ctx, err = authOAuth2Fn(ctx, token, &sc)
-		if err == nil {
-			sc := security.JWTScheme{
-				Name:           "jwt",
-				Scopes:         []string{"api:read", "api:write"},
-				RequiredScopes: []string{},
-			}
-			var token string
-			if p.JWTToken != nil {
-				token = *p.JWTToken
-			}
-			ctx, err = authJWTFn(ctx, token, &sc)
-		}
 		if err != nil {
 			return nil, err
 		}
@@ -260,7 +236,7 @@ func NewUpdateProductEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, a
 
 // NewGetProductEndpoint returns an endpoint function that calls the method
 // "getProduct" of service "products".
-func NewGetProductEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+func NewGetProductEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*GetProductPayload)
 		var err error
@@ -281,18 +257,6 @@ func NewGetProductEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, auth
 			token = *p.Oauth
 		}
 		ctx, err = authOAuth2Fn(ctx, token, &sc)
-		if err == nil {
-			sc := security.JWTScheme{
-				Name:           "jwt",
-				Scopes:         []string{"api:read", "api:write"},
-				RequiredScopes: []string{},
-			}
-			var token string
-			if p.JWTToken != nil {
-				token = *p.JWTToken
-			}
-			ctx, err = authJWTFn(ctx, token, &sc)
-		}
 		if err != nil {
 			return nil, err
 		}

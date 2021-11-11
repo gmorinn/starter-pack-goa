@@ -20,9 +20,11 @@ type SignupRequestBody struct {
 	Lastname  string `form:"lastname" json:"lastname" xml:"lastname"`
 	// Minimum 8 charactères / Chiffre Obligatoire
 	Password string `form:"password" json:"password" xml:"password"`
-	Email    string `form:"email" json:"email" xml:"email"`
-	Birthday string `form:"birthday" json:"birthday" xml:"birthday"`
-	Phone    string `form:"phone" json:"phone" xml:"phone"`
+	// Minimum 8 charactères / Chiffre Obligatoire
+	ConfirmPassword string `form:"confirm_password" json:"confirm_password" xml:"confirm_password"`
+	Email           string `form:"email" json:"email" xml:"email"`
+	Birthday        string `form:"birthday" json:"birthday" xml:"birthday"`
+	Phone           string `form:"phone" json:"phone" xml:"phone"`
 }
 
 // SigninRequestBody is the type of the "jwtToken" service "signin" endpoint
@@ -187,12 +189,13 @@ type AuthProvidersBadRequestResponseBody struct {
 // "signup" endpoint of the "jwtToken" service.
 func NewSignupRequestBody(p *jwttoken.SignupPayload) *SignupRequestBody {
 	body := &SignupRequestBody{
-		Firstname: p.Firstname,
-		Lastname:  p.Lastname,
-		Password:  p.Password,
-		Email:     p.Email,
-		Birthday:  p.Birthday,
-		Phone:     p.Phone,
+		Firstname:       p.Firstname,
+		Lastname:        p.Lastname,
+		Password:        p.Password,
+		ConfirmPassword: p.ConfirmPassword,
+		Email:           p.Email,
+		Birthday:        p.Birthday,
+		Phone:           p.Phone,
 	}
 	{
 		var zero string

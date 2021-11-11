@@ -17,29 +17,22 @@ import (
 
 // BuildGetAllProductsPayload builds the payload for the products
 // getAllProducts endpoint from CLI flags.
-func BuildGetAllProductsPayload(productsGetAllProductsOauth string, productsGetAllProductsJWTToken string) (*products.GetAllProductsPayload, error) {
+func BuildGetAllProductsPayload(productsGetAllProductsOauth string) (*products.GetAllProductsPayload, error) {
 	var oauth *string
 	{
 		if productsGetAllProductsOauth != "" {
 			oauth = &productsGetAllProductsOauth
 		}
 	}
-	var jwtToken *string
-	{
-		if productsGetAllProductsJWTToken != "" {
-			jwtToken = &productsGetAllProductsJWTToken
-		}
-	}
 	v := &products.GetAllProductsPayload{}
 	v.Oauth = oauth
-	v.JWTToken = jwtToken
 
 	return v, nil
 }
 
 // BuildGetAllProductsByCategoryPayload builds the payload for the products
 // getAllProductsByCategory endpoint from CLI flags.
-func BuildGetAllProductsByCategoryPayload(productsGetAllProductsByCategoryCategory string, productsGetAllProductsByCategoryOauth string, productsGetAllProductsByCategoryJWTToken string) (*products.GetAllProductsByCategoryPayload, error) {
+func BuildGetAllProductsByCategoryPayload(productsGetAllProductsByCategoryCategory string, productsGetAllProductsByCategoryOauth string) (*products.GetAllProductsByCategoryPayload, error) {
 	var err error
 	var category string
 	{
@@ -57,16 +50,9 @@ func BuildGetAllProductsByCategoryPayload(productsGetAllProductsByCategoryCatego
 			oauth = &productsGetAllProductsByCategoryOauth
 		}
 	}
-	var jwtToken *string
-	{
-		if productsGetAllProductsByCategoryJWTToken != "" {
-			jwtToken = &productsGetAllProductsByCategoryJWTToken
-		}
-	}
 	v := &products.GetAllProductsByCategoryPayload{}
 	v.Category = category
 	v.Oauth = oauth
-	v.JWTToken = jwtToken
 
 	return v, nil
 }
@@ -204,7 +190,7 @@ func BuildUpdateProductPayload(productsUpdateProductBody string, productsUpdateP
 
 // BuildGetProductPayload builds the payload for the products getProduct
 // endpoint from CLI flags.
-func BuildGetProductPayload(productsGetProductID string, productsGetProductOauth string, productsGetProductJWTToken string) (*products.GetProductPayload, error) {
+func BuildGetProductPayload(productsGetProductID string, productsGetProductOauth string) (*products.GetProductPayload, error) {
 	var err error
 	var id string
 	{
@@ -221,16 +207,9 @@ func BuildGetProductPayload(productsGetProductID string, productsGetProductOauth
 			oauth = &productsGetProductOauth
 		}
 	}
-	var jwtToken *string
-	{
-		if productsGetProductJWTToken != "" {
-			jwtToken = &productsGetProductJWTToken
-		}
-	}
 	v := &products.GetProductPayload{}
 	v.ID = id
 	v.Oauth = oauth
-	v.JWTToken = jwtToken
 
 	return v, nil
 }

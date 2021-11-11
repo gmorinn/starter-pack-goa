@@ -50,10 +50,6 @@ func EncodeGetAllProductsRequest(encoder func(*http.Request) goahttp.Encoder) fu
 				req.Header.Set("Authorization", head)
 			}
 		}
-		if p.JWTToken != nil {
-			head := *p.JWTToken
-			req.Header.Set("jwtToken", head)
-		}
 		return nil
 	}
 }
@@ -156,10 +152,6 @@ func EncodeGetAllProductsByCategoryRequest(encoder func(*http.Request) goahttp.E
 			} else {
 				req.Header.Set("Authorization", head)
 			}
-		}
-		if p.JWTToken != nil {
-			head := *p.JWTToken
-			req.Header.Set("jwtToken", head)
 		}
 		return nil
 	}
@@ -578,10 +570,6 @@ func EncodeGetProductRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 			} else {
 				req.Header.Set("Authorization", head)
 			}
-		}
-		if p.JWTToken != nil {
-			head := *p.JWTToken
-			req.Header.Set("jwtToken", head)
 		}
 		return nil
 	}

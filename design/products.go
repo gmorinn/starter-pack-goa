@@ -10,7 +10,7 @@ var _ = Service("products", func() {
 		Timeout()
 	})
 
-	Security(OAuth2, JWTAuth)
+	Security(OAuth2)
 
 	Error("unknown_error", unknownError, "Error not identified (500)")
 
@@ -19,18 +19,12 @@ var _ = Service("products", func() {
 		Header("oauth:Authorization", String, "OAuth token", func() {
 			Pattern("^Bearer [^ ]+$")
 		})
-		Header("jwtToken:jwtToken", String, "Jwt token", func() {
-			Pattern("^Bearer [^ ]+$")
-		})
 		Response("unknown_error", StatusInternalServerError)
 	})
 
 	Method("getAllProducts", func() {
 		Description("Get All products")
 		Payload(func() {
-			TokenField(1, "jwtToken", String, func() {
-				Description("JWT used for authentication after Signin/Signup")
-			})
 			AccessTokenField(2, "oauth", String, func() {
 				Description("Use to generate Oauth with /authorization")
 			})
@@ -54,9 +48,6 @@ var _ = Service("products", func() {
 				Example("men")
 				Default("nothing")
 			})
-			TokenField(1, "jwtToken", String, func() {
-				Description("JWT used for authentication after Signin/Signup")
-			})
 			AccessTokenField(2, "oauth", String, func() {
 				Description("Use to generate Oauth with /authorization")
 			})
@@ -75,6 +66,7 @@ var _ = Service("products", func() {
 
 	Method("deleteProduct", func() {
 		Description("Delete one product by ID")
+		Security(OAuth2, JWTAuth)
 		Payload(func() {
 			Attribute("id", String, func() {
 				Format(FormatUUID)
@@ -90,6 +82,9 @@ var _ = Service("products", func() {
 		})
 		HTTP(func() {
 			DELETE("/product/remove/{id}")
+			Header("jwtToken:jwtToken", String, "Jwt token", func() {
+				Pattern("^Bearer [^ ]+$")
+			})
 			Response(StatusOK)
 		})
 		Result(func() {
@@ -100,6 +95,7 @@ var _ = Service("products", func() {
 
 	Method("createProduct", func() {
 		Description("Create one product")
+		Security(OAuth2, JWTAuth)
 		Payload(func() {
 			Attribute("product", payloadProduct)
 			TokenField(1, "jwtToken", String, func() {
@@ -112,6 +108,9 @@ var _ = Service("products", func() {
 		})
 		HTTP(func() {
 			POST("/product/add")
+			Header("jwtToken:jwtToken", String, "Jwt token", func() {
+				Pattern("^Bearer [^ ]+$")
+			})
 			Response(StatusCreated)
 		})
 		Result(func() {
@@ -123,6 +122,7 @@ var _ = Service("products", func() {
 
 	Method("updateProduct", func() {
 		Description("Update one product")
+		Security(OAuth2, JWTAuth)
 		Payload(func() {
 			Attribute("id", String, func() {
 				Format(FormatUUID)
@@ -139,6 +139,9 @@ var _ = Service("products", func() {
 		})
 		HTTP(func() {
 			PUT("/product/{id}")
+			Header("jwtToken:jwtToken", String, "Jwt token", func() {
+				Pattern("^Bearer [^ ]+$")
+			})
 			Response(StatusOK)
 		})
 		Result(func() {
@@ -155,9 +158,6 @@ var _ = Service("products", func() {
 				Format(FormatUUID)
 				Description("Unique ID of the product")
 				Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
-			})
-			TokenField(1, "jwtToken", String, func() {
-				Description("JWT used for authentication after Signin/Signup")
 			})
 			AccessTokenField(2, "oauth", String, func() {
 				Description("Use to generate Oauth with /authorization")

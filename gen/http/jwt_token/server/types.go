@@ -21,9 +21,11 @@ type SignupRequestBody struct {
 	Lastname  *string `form:"lastname,omitempty" json:"lastname,omitempty" xml:"lastname,omitempty"`
 	// Minimum 8 charactères / Chiffre Obligatoire
 	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
-	Email    *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Birthday *string `form:"birthday,omitempty" json:"birthday,omitempty" xml:"birthday,omitempty"`
-	Phone    *string `form:"phone,omitempty" json:"phone,omitempty" xml:"phone,omitempty"`
+	// Minimum 8 charactères / Chiffre Obligatoire
+	ConfirmPassword *string `form:"confirm_password,omitempty" json:"confirm_password,omitempty" xml:"confirm_password,omitempty"`
+	Email           *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Birthday        *string `form:"birthday,omitempty" json:"birthday,omitempty" xml:"birthday,omitempty"`
+	Phone           *string `form:"phone,omitempty" json:"phone,omitempty" xml:"phone,omitempty"`
 }
 
 // SigninRequestBody is the type of the "jwtToken" service "signin" endpoint
@@ -363,10 +365,11 @@ func NewAuthProvidersUnauthorizedResponseBody(res jwttoken.Unauthorized) AuthPro
 // NewSignupPayload builds a jwtToken service signup endpoint payload.
 func NewSignupPayload(body *SignupRequestBody, oauth *string) *jwttoken.SignupPayload {
 	v := &jwttoken.SignupPayload{
-		Firstname: *body.Firstname,
-		Lastname:  *body.Lastname,
-		Password:  *body.Password,
-		Email:     *body.Email,
+		Firstname:       *body.Firstname,
+		Lastname:        *body.Lastname,
+		Password:        *body.Password,
+		ConfirmPassword: *body.ConfirmPassword,
+		Email:           *body.Email,
 	}
 	if body.Birthday != nil {
 		v.Birthday = *body.Birthday
@@ -436,6 +439,9 @@ func ValidateSignupRequestBody(body *SignupRequestBody) (err error) {
 	if body.Email == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
 	}
+	if body.ConfirmPassword == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("confirm_password", "body"))
+	}
 	if body.Firstname != nil {
 		if utf8.RuneCountInString(*body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", *body.Firstname, utf8.RuneCountInString(*body.Firstname), 3, true))
@@ -457,6 +463,14 @@ func ValidateSignupRequestBody(body *SignupRequestBody) (err error) {
 	if body.Password != nil {
 		if utf8.RuneCountInString(*body.Password) < 8 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", *body.Password, utf8.RuneCountInString(*body.Password), 8, true))
+		}
+	}
+	if body.ConfirmPassword != nil {
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.confirm_password", *body.ConfirmPassword, "\\d"))
+	}
+	if body.ConfirmPassword != nil {
+		if utf8.RuneCountInString(*body.ConfirmPassword) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.confirm_password", *body.ConfirmPassword, utf8.RuneCountInString(*body.ConfirmPassword), 8, true))
 		}
 	}
 	if body.Email != nil {

@@ -35,30 +35,18 @@ func EncodeGetAllProductsResponse(encoder func(context.Context, http.ResponseWri
 func DecodeGetAllProductsRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			oauth    *string
-			jwtToken *string
+			oauth *string
 		)
 		oauthRaw := r.Header.Get("Authorization")
 		if oauthRaw != "" {
 			oauth = &oauthRaw
 		}
-		jwtTokenRaw := r.Header.Get("jwtToken")
-		if jwtTokenRaw != "" {
-			jwtToken = &jwtTokenRaw
-		}
-		payload := NewGetAllProductsPayload(oauth, jwtToken)
+		payload := NewGetAllProductsPayload(oauth)
 		if payload.Oauth != nil {
 			if strings.Contains(*payload.Oauth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")
 				cred := strings.SplitN(*payload.Oauth, " ", 2)[1]
 				payload.Oauth = &cred
-			}
-		}
-		if payload.JWTToken != nil {
-			if strings.Contains(*payload.JWTToken, " ") {
-				// Remove authorization scheme prefix (e.g. "Bearer")
-				cred := strings.SplitN(*payload.JWTToken, " ", 2)[1]
-				payload.JWTToken = &cred
 			}
 		}
 
@@ -113,7 +101,6 @@ func DecodeGetAllProductsByCategoryRequest(mux goahttp.Muxer, decoder func(*http
 		var (
 			category string
 			oauth    *string
-			jwtToken *string
 			err      error
 
 			params = mux.Vars(r)
@@ -126,26 +113,15 @@ func DecodeGetAllProductsByCategoryRequest(mux goahttp.Muxer, decoder func(*http
 		if oauthRaw != "" {
 			oauth = &oauthRaw
 		}
-		jwtTokenRaw := r.Header.Get("jwtToken")
-		if jwtTokenRaw != "" {
-			jwtToken = &jwtTokenRaw
-		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetAllProductsByCategoryPayload(category, oauth, jwtToken)
+		payload := NewGetAllProductsByCategoryPayload(category, oauth)
 		if payload.Oauth != nil {
 			if strings.Contains(*payload.Oauth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")
 				cred := strings.SplitN(*payload.Oauth, " ", 2)[1]
 				payload.Oauth = &cred
-			}
-		}
-		if payload.JWTToken != nil {
-			if strings.Contains(*payload.JWTToken, " ") {
-				// Remove authorization scheme prefix (e.g. "Bearer")
-				cred := strings.SplitN(*payload.JWTToken, " ", 2)[1]
-				payload.JWTToken = &cred
 			}
 		}
 
@@ -477,10 +453,9 @@ func EncodeGetProductResponse(encoder func(context.Context, http.ResponseWriter)
 func DecodeGetProductRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			id       string
-			oauth    *string
-			jwtToken *string
-			err      error
+			id    string
+			oauth *string
+			err   error
 
 			params = mux.Vars(r)
 		)
@@ -491,26 +466,15 @@ func DecodeGetProductRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 		if oauthRaw != "" {
 			oauth = &oauthRaw
 		}
-		jwtTokenRaw := r.Header.Get("jwtToken")
-		if jwtTokenRaw != "" {
-			jwtToken = &jwtTokenRaw
-		}
 		if err != nil {
 			return nil, err
 		}
-		payload := NewGetProductPayload(id, oauth, jwtToken)
+		payload := NewGetProductPayload(id, oauth)
 		if payload.Oauth != nil {
 			if strings.Contains(*payload.Oauth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")
 				cred := strings.SplitN(*payload.Oauth, " ", 2)[1]
 				payload.Oauth = &cred
-			}
-		}
-		if payload.JWTToken != nil {
-			if strings.Contains(*payload.JWTToken, " ") {
-				// Remove authorization scheme prefix (e.g. "Bearer")
-				cred := strings.SplitN(*payload.JWTToken, " ", 2)[1]
-				payload.JWTToken = &cred
 			}
 		}
 
