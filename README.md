@@ -8,6 +8,7 @@ We'll use Goa, it's a framework for building micro-services and APIs in Go using
 ### Why I use GOA DESIGN ?
 
 **Reason n°1: Postman updated every time the design file is modified**
+
 Just do:
 ```sh
 make api-goa
@@ -17,6 +18,7 @@ File: openapi.json
 You will have a new postman with all the expected requests, payloads and authentication system
 
 **Reason n°2: Documentation automatically updated without writing a single line of HTML, CSS, and JavaScript**
+
 Documentation is based on generated postman file
 
 Just do:
@@ -48,6 +50,7 @@ In this documentation you will have:
 ![](documentation/struct.png)
 
 **Reason n°3: 70% of your code is generated**
+
 As the Goa design language is Go DSL, it is easy to customize and understandable by anyone.
 It is from this GOA DSL that all the code will be generated.
 
