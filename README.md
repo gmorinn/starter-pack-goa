@@ -140,7 +140,7 @@ cd cmd/api-cli && go build -o cmd
 
 --------------------------
 
-### Why I use GOA GM
+### Why I use GOA GM ?
 
 **Your CRUD application in 5 minutes thanks to snippets**
 
