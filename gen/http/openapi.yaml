@@ -1198,7 +1198,6 @@ definitions:
         type: string
         default: ""
         example: +262 692 12 34 56
-    description: Use client ID and client secret to oAuth
     example:
       birthday: Omnis harum temporibus.
       confirm_password: JeSuisUnTest974

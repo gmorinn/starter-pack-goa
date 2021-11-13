@@ -33,7 +33,6 @@ var _ = Service("jwtToken", func() {
 		Description("signup to generate jwt token")
 
 		Payload(func() {
-			Description("Use client ID and client secret to oAuth")
 			Attribute("firstname", String, func() {
 				MinLength(3)
 				MaxLength(15)

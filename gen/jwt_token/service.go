@@ -41,7 +41,7 @@ const ServiceName = "jwtToken"
 // MethodKey key.
 var MethodNames = [4]string{"signup", "signin", "refresh", "auth-providers"}
 
-// Use client ID and client secret to oAuth
+// SignupPayload is the payload type of the jwtToken service signup method.
 type SignupPayload struct {
 	Firstname string
 	Lastname  string

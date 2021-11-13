@@ -1497,7 +1497,6 @@ components:
           type: string
           default: ""
           example: +262 692 12 34 56
-      description: Use client ID and client secret to oAuth
       example:
         birthday: Et aspernatur accusamus quos maiores debitis incidunt.
         confirm_password: JeSuisUnTest974
