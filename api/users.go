@@ -168,12 +168,7 @@ func (s *userssrvc) GetUser(ctx context.Context, p *users.GetUserPayload) (res *
 		}
 		res = &users.GetUserResult{
 			User: &users.ResUser{
-				ID:        u.ID.String(),
-				Firstname: &u.Firstname,
-				Lastname:  &u.Lastname,
-				Email:     u.Email,
-				Phone:     u.Phone.String,
-				Birthday:  u.Birthday.String,
+				ID: u.ID.String(),
 			},
 			Success: true,
 		}

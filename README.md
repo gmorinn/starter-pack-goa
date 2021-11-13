@@ -5,7 +5,7 @@
 A starter-pack to make its APIs in golang.
 We'll use Goa, it's a framework for building micro-services and APIs in Go using a unique design-first approach.
 
-We'll use also ***sqlc*** generates type-safe code from SQL.
+We also use ***sqlc*** that generates type-safe code from SQL.
 
 ### Why I use GOA DESIGN ?
 
@@ -126,6 +126,7 @@ We understand very clearly that this request:
 => The response will return id, name, price and a success
 
 **Reason n°4: You can run your requests from the command line**
+
 <a href="https://postman.com" target="_blank"> <img src="https://www.vectorlogo.zone/logos/getpostman/getpostman-icon.svg" alt="postman" width="40" height="40"/> </a>
 If you don't like Postman, no problem⛔
 Goa automatically generates the code to be able to test all your requests on your terminal
@@ -138,6 +139,34 @@ cd cmd/api-cli && go build -o cmd
 ![](documentation/cli.png)
 
 --------------------------
+
+### Why I use GOA GM
+
+**Your CRUD application in 5 minutes thanks to snippets**
+
+GOA GM offers you many snippets. You will just have to choose the name and to insert for the "Create" and "Update" method the parameters you want. No more no less.
+
+Some examples of snippets used:
+
+In go:
+
+=> Get an item (goa-get)
+
+=> Get all the items (goa-gets)
+
+=> Delete an item (goa-delete)
+
+=> Create an item (goa-create)
+
+=> Update an item (goa-update)
+
+SQL:
+
+=> Create all sql commands for a basic crud (goa-sql)
+
+***Example to create an item***
+
+![Alt Text](documentation/snippet.gif)
 
 **To start the server, do:**
 
