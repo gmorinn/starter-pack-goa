@@ -1,23 +1,22 @@
-# 🔥 GOA GM 🔥
+# 🔥 GOA GM
 
 ### What is that ?
 <a href="https://golang.org" target="_blank"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/go/go-original.svg" alt="go" width="40" height="40"/> </a>
 A starter-pack to make its APIs in golang.
 We'll use Goa, it's a framework for building micro-services and APIs in Go using a unique design-first approach.
 
-## Why I use GOA DESIGN ?
+### Why I use GOA DESIGN ?
 
-### Reason n°1: Postman updated every time the design file is modified
+**Reason n°1: Postman updated every time the design file is modified**
 Just do:
 ```sh
 make api-goa
 ```
 File: openapi.json
 
----------------------
 You will have a new postman with all the expected requests, payloads and authentication system
 
-### Reason n°2: Documentation automatically updated without writing a single line of HTML, CSS, and JavaScript
+**Reason n°2: Documentation automatically updated without writing a single line of HTML, CSS, and JavaScript**
 Documentation is based on generated postman file
 
 Just do:
@@ -48,7 +47,7 @@ In this documentation you will have:
 
 ![](documentation/struct.png)
 
-### Reason n°3: 70% of your code is generated
+**Reason n°3: 70% of your code is generated**
 As the Goa design language is Go DSL, it is easy to customize and understandable by anyone.
 It is from this GOA DSL that all the code will be generated.
 
@@ -121,7 +120,7 @@ We understand very clearly that this request:
 
 => The response will return id, name, price and a success
 
-### Reason n°4: You can run your requests from the command line
+**Reason n°4: You can run your requests from the command line**
 <a href="https://postman.com" target="_blank"> <img src="https://www.vectorlogo.zone/logos/getpostman/getpostman-icon.svg" alt="postman" width="40" height="40"/> </a>
 If you don't like Postman, no problem⛔
 Goa automatically generates the code to be able to test all your requests on your terminal
