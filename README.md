@@ -5,6 +5,8 @@
 A starter-pack to make its APIs in golang.
 We'll use Goa, it's a framework for building micro-services and APIs in Go using a unique design-first approach.
 
+We'll use also ***sqlc*** generates type-safe code from SQL.
+
 ### Why I use GOA DESIGN ?
 
 **Reason n°1: Postman updated every time the design file is modified**
