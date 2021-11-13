@@ -32,7 +32,7 @@ func main() {
 		hostF     = flag.String("host", "localhost", "Server host (valid values: localhost)")
 		domainF   = flag.String("domain", "", "Host domain name (overrides host domain specified in service design)")
 		httpPortF = flag.String("http-port", "", "HTTP port (overrides host HTTP port specified in service design)")
-		secureF   = flag.Bool("secure", false, "Use secure scheme (https or grpcs)")
+		secureF   = flag.Bool("secure", true, "Use secure scheme (https or grpcs)")
 		dbgF      = flag.Bool("debug", false, "Log request and response bodies")
 	)
 	flag.Parse()
@@ -80,11 +80,12 @@ func main() {
 	var wg sync.WaitGroup
 	ctx, cancel := context.WithCancel(context.Background())
 
+	fmt.Println("==> " + server.Config.Host)
 	// Start the servers and send errors (if any) to the error channel.
 	switch *hostF {
 	case "localhost":
 		{
-			addr := "http://localhost:8088"
+			addr := server.Config.Host
 			u, err := url.Parse(addr)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "invalid URL %#v: %s\n", addr, err)
@@ -103,8 +104,6 @@ func main() {
 					os.Exit(1)
 				}
 				u.Host = net.JoinHostPort(h, *httpPortF)
-			} else if u.Port() == "" {
-				u.Host = net.JoinHostPort(u.Host, "80")
 			}
 			handleHTTPServer(ctx, u, &apiEndpoints, &wg, errc, logger, *dbgF)
 		}

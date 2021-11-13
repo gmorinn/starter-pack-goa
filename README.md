@@ -168,10 +168,8 @@ SQL:
 
 ![Alt Text](documentation/snippet.gif)
 
-**To start the server, do:**
+**To start with docker, do:**
 
 ```sh
-go build -o api-gm && ./api-gm
+make api-init && make api-dev
 ```
-
-For the moment you must connect your own database, a version with docker will be released soon.

@@ -1,12 +1,14 @@
 package main
 
 import (
+	"api_crud/config"
 	jwttokensvr "api_crud/gen/http/jwt_token/server"
 	oauthsvr "api_crud/gen/http/o_auth/server"
 	openapisvr "api_crud/gen/http/openapi/server"
 	productssvr "api_crud/gen/http/products/server"
 	userssvr "api_crud/gen/http/users/server"
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -22,6 +24,9 @@ import (
 // handleHTTPServer starts configures and starts a HTTP server on the given
 // URL. It shuts down the server if any error is received in the error channel.
 func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sync.WaitGroup, errc chan error, logger *log.Logger, debug bool) {
+
+	// Get .env
+	cnf := config.New()
 
 	// Setup goa log adapter.
 	var (
@@ -106,8 +111,11 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 
 		// Start HTTP server in a separate goroutine.
 		go func() {
+			port := fmt.Sprint(cnf.Port)
+			if err := http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", srv.Handler); err != nil {
+				log.Fatal("ListenAndServe: ", err)
+			}
 			logger.Printf("HTTP server listening on %q", u.Host)
-			errc <- srv.ListenAndServe()
 		}()
 
 		<-ctx.Done()
