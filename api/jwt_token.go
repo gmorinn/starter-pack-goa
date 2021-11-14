@@ -74,7 +74,7 @@ func (s *jwtTokensrvc) Signup(ctx context.Context, p *jwttoken.SignupPayload) (r
 		return nil, s.errorResponse("ERROR_CREATE_USER", err)
 	}
 
-	t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID))
+	t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID), string(user.Role))
 	if err != nil {
 		return nil, s.errorResponse("ERROR_TOKEN", err)
 	}
@@ -102,7 +102,7 @@ func (s *jwtTokensrvc) Signin(ctx context.Context, p *jwttoken.SigninPayload) (r
 		return nil, s.errorResponse("ERROR_LOGIN_USER", err)
 	}
 
-	t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID))
+	t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID), string(user.Role))
 	if err != nil {
 		return nil, s.errorResponse("ERROR_TOKEN", err)
 	}
@@ -138,7 +138,7 @@ func (s *jwtTokensrvc) Refresh(ctx context.Context, p *jwttoken.RefreshPayload) 
 		return nil, s.errorResponse("FIND_REFRESH_TOKEN", err)
 	}
 
-	t, r, expt, err := s.generateJwtToken(uuid.UUID(refresh.UserID))
+	t, r, expt, err := s.generateJwtToken(uuid.UUID(refresh.UserID), string(refresh.UserRole))
 	if err != nil {
 		return nil, s.errorResponse("ERROR_TOKEN", err)
 	}
@@ -155,10 +155,11 @@ func (s *jwtTokensrvc) Refresh(ctx context.Context, p *jwttoken.RefreshPayload) 
 	return &response, nil
 }
 
-func (s *jwtTokensrvc) generateJwtToken(ID uuid.UUID) (string, string, time.Time, error) {
+func (s *jwtTokensrvc) generateJwtToken(ID uuid.UUID, role string) (string, string, time.Time, error) {
 	// Generate access token
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":     ID.String(),
+		"role":   role,
 		"exp":    time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.server.Config.Security.AccessTokenDuration))).Unix(),
 		"scopes": []string{"api:read", "api:write"},
 	})
@@ -173,6 +174,7 @@ func (s *jwtTokensrvc) generateJwtToken(ID uuid.UUID) (string, string, time.Time
 	// Generate refresh token
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":     ID.String(),
+		"role":   role,
 		"exp":    exp,
 		"scopes": []string{"api:read", "api:write"},
 	})
@@ -257,7 +259,7 @@ func (s *jwtTokensrvc) AuthProviders(ctx context.Context, p *jwttoken.AuthProvid
 		return nil, s.errorResponse("TX_AUTH_PROVIDER", err)
 	}
 
-	t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID))
+	t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID), string(user.Role))
 	if err != nil {
 		return nil, s.errorResponse("ERROR_TOKEN", err)
 	}

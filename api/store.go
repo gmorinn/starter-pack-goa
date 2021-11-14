@@ -13,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 	"github.com/robfig/cron/v3"
-	oserver "gopkg.in/oauth2.v3/server"
 
 	"log"
 )
@@ -26,7 +25,6 @@ type Store struct {
 type Server struct {
 	Store    *Store
 	Config   *config.API
-	Oauth    *oserver.Server
 	cronTask *cron.Cron
 }
 

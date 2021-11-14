@@ -8,6 +8,7 @@
 package cli
 
 import (
+	bousersc "api_crud/gen/http/bo_users/client"
 	jwttokenc "api_crud/gen/http/jwt_token/client"
 	oauthc "api_crud/gen/http/o_auth/client"
 	productsc "api_crud/gen/http/products/client"
@@ -26,31 +27,33 @@ import (
 //    command (subcommand1|subcommand2|...)
 //
 func UsageCommands() string {
-	return `jwt-token (signup|signin|refresh|auth-providers)
+	return `bo-users (get-allusers|delete-user|create-user|update-user|get-user)
+jwt-token (signup|signin|refresh|auth-providers)
 o-auth o-auth
 products (get-all-products|get-all-products-by-category|delete-product|create-product|update-product|get-product)
-users (get-allusers|delete-user|create-user|update-user|get-user)
+users get-user
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` jwt-token signup --body '{
-      "birthday": "Ut doloremque sapiente.",
+	return os.Args[0] + ` bo-users get-allusers --oauth "Illum iste aliquam non consequuntur cum." --jwt-token "Amet voluptas."` + "\n" +
+		os.Args[0] + ` jwt-token signup --body '{
+      "birthday": "Magni animi aliquid non ut corrupti consequatur.",
       "confirm_password": "JeSuisUnTest974",
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
       "password": "JeSuisUnTest974",
       "phone": "+262 692 12 34 56"
-   }' --oauth "Sed fuga voluptatibus."` + "\n" +
+   }' --oauth "Enim aut."` + "\n" +
 		os.Args[0] + ` o-auth o-auth --body '{
-      "client_id": "Et accusantium.",
-      "client_secret": "Optio expedita quibusdam at iste quia neque.",
-      "grant_type": "Ex qui non sint maxime voluptatem."
+      "client_id": "Molestiae est earum est.",
+      "client_secret": "At eum.",
+      "grant_type": "Molestias rem molestias earum consequuntur."
    }'` + "\n" +
-		os.Args[0] + ` products get-all-products --oauth "Sunt numquam exercitationem expedita."` + "\n" +
-		os.Args[0] + ` users get-allusers --oauth "Labore architecto non dolor temporibus." --jwt-token "Rerum repudiandae aperiam eos."` + "\n" +
+		os.Args[0] + ` products get-all-products --oauth "Eum quod dolore."` + "\n" +
+		os.Args[0] + ` users get-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Omnis veritatis et tempora reiciendis commodi inventore." --jwt-token "Omnis harum temporibus."` + "\n" +
 		""
 }
 
@@ -64,6 +67,33 @@ func ParseEndpoint(
 	restore bool,
 ) (goa.Endpoint, interface{}, error) {
 	var (
+		boUsersFlags = flag.NewFlagSet("bo-users", flag.ContinueOnError)
+
+		boUsersGetAllusersFlags        = flag.NewFlagSet("get-allusers", flag.ExitOnError)
+		boUsersGetAllusersOauthFlag    = boUsersGetAllusersFlags.String("oauth", "", "")
+		boUsersGetAllusersJWTTokenFlag = boUsersGetAllusersFlags.String("jwt-token", "", "")
+
+		boUsersDeleteUserFlags        = flag.NewFlagSet("delete-user", flag.ExitOnError)
+		boUsersDeleteUserIDFlag       = boUsersDeleteUserFlags.String("id", "REQUIRED", "")
+		boUsersDeleteUserOauthFlag    = boUsersDeleteUserFlags.String("oauth", "", "")
+		boUsersDeleteUserJWTTokenFlag = boUsersDeleteUserFlags.String("jwt-token", "", "")
+
+		boUsersCreateUserFlags        = flag.NewFlagSet("create-user", flag.ExitOnError)
+		boUsersCreateUserBodyFlag     = boUsersCreateUserFlags.String("body", "REQUIRED", "")
+		boUsersCreateUserOauthFlag    = boUsersCreateUserFlags.String("oauth", "", "")
+		boUsersCreateUserJWTTokenFlag = boUsersCreateUserFlags.String("jwt-token", "", "")
+
+		boUsersUpdateUserFlags        = flag.NewFlagSet("update-user", flag.ExitOnError)
+		boUsersUpdateUserBodyFlag     = boUsersUpdateUserFlags.String("body", "REQUIRED", "")
+		boUsersUpdateUserIDFlag       = boUsersUpdateUserFlags.String("id", "REQUIRED", "")
+		boUsersUpdateUserOauthFlag    = boUsersUpdateUserFlags.String("oauth", "", "")
+		boUsersUpdateUserJWTTokenFlag = boUsersUpdateUserFlags.String("jwt-token", "", "")
+
+		boUsersGetUserFlags        = flag.NewFlagSet("get-user", flag.ExitOnError)
+		boUsersGetUserIDFlag       = boUsersGetUserFlags.String("id", "REQUIRED", "Unique ID of the User")
+		boUsersGetUserOauthFlag    = boUsersGetUserFlags.String("oauth", "", "")
+		boUsersGetUserJWTTokenFlag = boUsersGetUserFlags.String("jwt-token", "", "")
+
 		jwtTokenFlags = flag.NewFlagSet("jwt-token", flag.ContinueOnError)
 
 		jwtTokenSignupFlags     = flag.NewFlagSet("signup", flag.ExitOnError)
@@ -118,31 +148,18 @@ func ParseEndpoint(
 
 		usersFlags = flag.NewFlagSet("users", flag.ContinueOnError)
 
-		usersGetAllusersFlags        = flag.NewFlagSet("get-allusers", flag.ExitOnError)
-		usersGetAllusersOauthFlag    = usersGetAllusersFlags.String("oauth", "", "")
-		usersGetAllusersJWTTokenFlag = usersGetAllusersFlags.String("jwt-token", "", "")
-
-		usersDeleteUserFlags        = flag.NewFlagSet("delete-user", flag.ExitOnError)
-		usersDeleteUserIDFlag       = usersDeleteUserFlags.String("id", "REQUIRED", "")
-		usersDeleteUserOauthFlag    = usersDeleteUserFlags.String("oauth", "", "")
-		usersDeleteUserJWTTokenFlag = usersDeleteUserFlags.String("jwt-token", "", "")
-
-		usersCreateUserFlags        = flag.NewFlagSet("create-user", flag.ExitOnError)
-		usersCreateUserBodyFlag     = usersCreateUserFlags.String("body", "REQUIRED", "")
-		usersCreateUserOauthFlag    = usersCreateUserFlags.String("oauth", "", "")
-		usersCreateUserJWTTokenFlag = usersCreateUserFlags.String("jwt-token", "", "")
-
-		usersUpdateUserFlags        = flag.NewFlagSet("update-user", flag.ExitOnError)
-		usersUpdateUserBodyFlag     = usersUpdateUserFlags.String("body", "REQUIRED", "")
-		usersUpdateUserIDFlag       = usersUpdateUserFlags.String("id", "REQUIRED", "")
-		usersUpdateUserOauthFlag    = usersUpdateUserFlags.String("oauth", "", "")
-		usersUpdateUserJWTTokenFlag = usersUpdateUserFlags.String("jwt-token", "", "")
-
 		usersGetUserFlags        = flag.NewFlagSet("get-user", flag.ExitOnError)
 		usersGetUserIDFlag       = usersGetUserFlags.String("id", "REQUIRED", "Unique ID of the User")
 		usersGetUserOauthFlag    = usersGetUserFlags.String("oauth", "", "")
 		usersGetUserJWTTokenFlag = usersGetUserFlags.String("jwt-token", "", "")
 	)
+	boUsersFlags.Usage = boUsersUsage
+	boUsersGetAllusersFlags.Usage = boUsersGetAllusersUsage
+	boUsersDeleteUserFlags.Usage = boUsersDeleteUserUsage
+	boUsersCreateUserFlags.Usage = boUsersCreateUserUsage
+	boUsersUpdateUserFlags.Usage = boUsersUpdateUserUsage
+	boUsersGetUserFlags.Usage = boUsersGetUserUsage
+
 	jwtTokenFlags.Usage = jwtTokenUsage
 	jwtTokenSignupFlags.Usage = jwtTokenSignupUsage
 	jwtTokenSigninFlags.Usage = jwtTokenSigninUsage
@@ -161,10 +178,6 @@ func ParseEndpoint(
 	productsGetProductFlags.Usage = productsGetProductUsage
 
 	usersFlags.Usage = usersUsage
-	usersGetAllusersFlags.Usage = usersGetAllusersUsage
-	usersDeleteUserFlags.Usage = usersDeleteUserUsage
-	usersCreateUserFlags.Usage = usersCreateUserUsage
-	usersUpdateUserFlags.Usage = usersUpdateUserUsage
 	usersGetUserFlags.Usage = usersGetUserUsage
 
 	if err := flag.CommandLine.Parse(os.Args[1:]); err != nil {
@@ -182,6 +195,8 @@ func ParseEndpoint(
 	{
 		svcn = flag.Arg(0)
 		switch svcn {
+		case "bo-users":
+			svcf = boUsersFlags
 		case "jwt-token":
 			svcf = jwtTokenFlags
 		case "o-auth":
@@ -205,6 +220,25 @@ func ParseEndpoint(
 	{
 		epn = svcf.Arg(0)
 		switch svcn {
+		case "bo-users":
+			switch epn {
+			case "get-allusers":
+				epf = boUsersGetAllusersFlags
+
+			case "delete-user":
+				epf = boUsersDeleteUserFlags
+
+			case "create-user":
+				epf = boUsersCreateUserFlags
+
+			case "update-user":
+				epf = boUsersUpdateUserFlags
+
+			case "get-user":
+				epf = boUsersGetUserFlags
+
+			}
+
 		case "jwt-token":
 			switch epn {
 			case "signup":
@@ -252,18 +286,6 @@ func ParseEndpoint(
 
 		case "users":
 			switch epn {
-			case "get-allusers":
-				epf = usersGetAllusersFlags
-
-			case "delete-user":
-				epf = usersDeleteUserFlags
-
-			case "create-user":
-				epf = usersCreateUserFlags
-
-			case "update-user":
-				epf = usersUpdateUserFlags
-
 			case "get-user":
 				epf = usersGetUserFlags
 
@@ -289,6 +311,25 @@ func ParseEndpoint(
 	)
 	{
 		switch svcn {
+		case "bo-users":
+			c := bousersc.NewClient(scheme, host, doer, enc, dec, restore)
+			switch epn {
+			case "get-allusers":
+				endpoint = c.GetAllusers()
+				data, err = bousersc.BuildGetAllusersPayload(*boUsersGetAllusersOauthFlag, *boUsersGetAllusersJWTTokenFlag)
+			case "delete-user":
+				endpoint = c.DeleteUser()
+				data, err = bousersc.BuildDeleteUserPayload(*boUsersDeleteUserIDFlag, *boUsersDeleteUserOauthFlag, *boUsersDeleteUserJWTTokenFlag)
+			case "create-user":
+				endpoint = c.CreateUser()
+				data, err = bousersc.BuildCreateUserPayload(*boUsersCreateUserBodyFlag, *boUsersCreateUserOauthFlag, *boUsersCreateUserJWTTokenFlag)
+			case "update-user":
+				endpoint = c.UpdateUser()
+				data, err = bousersc.BuildUpdateUserPayload(*boUsersUpdateUserBodyFlag, *boUsersUpdateUserIDFlag, *boUsersUpdateUserOauthFlag, *boUsersUpdateUserJWTTokenFlag)
+			case "get-user":
+				endpoint = c.GetUser()
+				data, err = bousersc.BuildGetUserPayload(*boUsersGetUserIDFlag, *boUsersGetUserOauthFlag, *boUsersGetUserJWTTokenFlag)
+			}
 		case "jwt-token":
 			c := jwttokenc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
@@ -337,18 +378,6 @@ func ParseEndpoint(
 		case "users":
 			c := usersc.NewClient(scheme, host, doer, enc, dec, restore)
 			switch epn {
-			case "get-allusers":
-				endpoint = c.GetAllusers()
-				data, err = usersc.BuildGetAllusersPayload(*usersGetAllusersOauthFlag, *usersGetAllusersJWTTokenFlag)
-			case "delete-user":
-				endpoint = c.DeleteUser()
-				data, err = usersc.BuildDeleteUserPayload(*usersDeleteUserIDFlag, *usersDeleteUserOauthFlag, *usersDeleteUserJWTTokenFlag)
-			case "create-user":
-				endpoint = c.CreateUser()
-				data, err = usersc.BuildCreateUserPayload(*usersCreateUserBodyFlag, *usersCreateUserOauthFlag, *usersCreateUserJWTTokenFlag)
-			case "update-user":
-				endpoint = c.UpdateUser()
-				data, err = usersc.BuildUpdateUserPayload(*usersUpdateUserBodyFlag, *usersUpdateUserIDFlag, *usersUpdateUserOauthFlag, *usersUpdateUserJWTTokenFlag)
 			case "get-user":
 				endpoint = c.GetUser()
 				data, err = usersc.BuildGetUserPayload(*usersGetUserIDFlag, *usersGetUserOauthFlag, *usersGetUserJWTTokenFlag)
@@ -360,6 +389,104 @@ func ParseEndpoint(
 	}
 
 	return endpoint, data, nil
+}
+
+// bo-usersUsage displays the usage of the bo-users command and its subcommands.
+func boUsersUsage() {
+	fmt.Fprintf(os.Stderr, `users of the api
+Usage:
+    %[1]s [globalflags] bo-users COMMAND [flags]
+
+COMMAND:
+    get-allusers: Get All users
+    delete-user: Delete one User by ID
+    create-user: Create one User
+    update-user: Update one User
+    get-user: Get one User
+
+Additional help:
+    %[1]s bo-users COMMAND --help
+`, os.Args[0])
+}
+func boUsersGetAllusersUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] bo-users get-allusers -oauth STRING -jwt-token STRING
+
+Get All users
+    -oauth STRING: 
+    -jwt-token STRING: 
+
+Example:
+    %[1]s bo-users get-allusers --oauth "Illum iste aliquam non consequuntur cum." --jwt-token "Amet voluptas."
+`, os.Args[0])
+}
+
+func boUsersDeleteUserUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] bo-users delete-user -id STRING -oauth STRING -jwt-token STRING
+
+Delete one User by ID
+    -id STRING: 
+    -oauth STRING: 
+    -jwt-token STRING: 
+
+Example:
+    %[1]s bo-users delete-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Libero non nisi aut eum." --jwt-token "Voluptatum necessitatibus tempora consectetur incidunt."
+`, os.Args[0])
+}
+
+func boUsersCreateUserUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] bo-users create-user -body JSON -oauth STRING -jwt-token STRING
+
+Create one User
+    -body JSON: 
+    -oauth STRING: 
+    -jwt-token STRING: 
+
+Example:
+    %[1]s bo-users create-user --body '{
+      "user": {
+         "birthday": "01/09/2002",
+         "email": "guillaume.morin@epitech.eu",
+         "firstname": "Guillaume",
+         "lastname": "Morin",
+         "phone": "+262 692 12 34 56"
+      }
+   }' --oauth "Adipisci ab aut saepe molestias voluptatibus." --jwt-token "Quaerat numquam consequatur placeat possimus id."
+`, os.Args[0])
+}
+
+func boUsersUpdateUserUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] bo-users update-user -body JSON -id STRING -oauth STRING -jwt-token STRING
+
+Update one User
+    -body JSON: 
+    -id STRING: 
+    -oauth STRING: 
+    -jwt-token STRING: 
+
+Example:
+    %[1]s bo-users update-user --body '{
+      "User": {
+         "birthday": "01/09/2002",
+         "email": "guillaume.morin@epitech.eu",
+         "firstname": "Guillaume",
+         "lastname": "Morin",
+         "phone": "+262 692 12 34 56"
+      }
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Velit voluptas quas qui." --jwt-token "Veniam autem laudantium et earum."
+`, os.Args[0])
+}
+
+func boUsersGetUserUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] bo-users get-user -id STRING -oauth STRING -jwt-token STRING
+
+Get one User
+    -id STRING: Unique ID of the User
+    -oauth STRING: 
+    -jwt-token STRING: 
+
+Example:
+    %[1]s bo-users get-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Ab est voluptatem incidunt pariatur et." --jwt-token "Ipsa ad."
+`, os.Args[0])
 }
 
 // jwt-tokenUsage displays the usage of the jwt-token command and its
@@ -388,14 +515,14 @@ signup to generate jwt token
 
 Example:
     %[1]s jwt-token signup --body '{
-      "birthday": "Ut doloremque sapiente.",
+      "birthday": "Magni animi aliquid non ut corrupti consequatur.",
       "confirm_password": "JeSuisUnTest974",
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
       "password": "JeSuisUnTest974",
       "phone": "+262 692 12 34 56"
-   }' --oauth "Sed fuga voluptatibus."
+   }' --oauth "Enim aut."
 `, os.Args[0])
 }
 
@@ -410,7 +537,7 @@ Example:
     %[1]s jwt-token signin --body '{
       "email": "guillaume@epitech.eu",
       "password": "JeSuisUnTest974"
-   }' --oauth "Aut eum cumque."
+   }' --oauth "Debitis odit."
 `, os.Args[0])
 }
 
@@ -424,7 +551,7 @@ Refresh Token
 Example:
     %[1]s jwt-token refresh --body '{
       "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
-   }' --oauth "Est odit velit voluptas."
+   }' --oauth "Culpa enim."
 `, os.Args[0])
 }
 
@@ -438,12 +565,12 @@ Register or login by Google, Facebook
 Example:
     %[1]s jwt-token auth-providers --body '{
       "email": "guillaume@epitech.eu",
-      "firebase_id_token": "v9c",
+      "firebase_id_token": "gan",
       "firebase_provider": "facebook.com",
       "firebase_uid": "zgmURRUlcJfgDMRyjJ20xs7Rxxw2",
       "firstname": "Guillaume",
       "lastname": "Morin"
-   }' --oauth "Non ut."
+   }' --oauth "Nemo temporibus."
 `, os.Args[0])
 }
 
@@ -468,9 +595,9 @@ oAuth
 
 Example:
     %[1]s o-auth o-auth --body '{
-      "client_id": "Et accusantium.",
-      "client_secret": "Optio expedita quibusdam at iste quia neque.",
-      "grant_type": "Ex qui non sint maxime voluptatem."
+      "client_id": "Molestiae est earum est.",
+      "client_secret": "At eum.",
+      "grant_type": "Molestias rem molestias earum consequuntur."
    }'
 `, os.Args[0])
 }
@@ -500,7 +627,7 @@ Get All products
     -oauth STRING: 
 
 Example:
-    %[1]s products get-all-products --oauth "Sunt numquam exercitationem expedita."
+    %[1]s products get-all-products --oauth "Eum quod dolore."
 `, os.Args[0])
 }
 
@@ -512,7 +639,7 @@ Get All products by category
     -oauth STRING: 
 
 Example:
-    %[1]s products get-all-products-by-category --category "men" --oauth "Quibusdam nemo."
+    %[1]s products get-all-products-by-category --category "men" --oauth "Voluptas numquam sint quibusdam ea hic."
 `, os.Args[0])
 }
 
@@ -525,7 +652,7 @@ Delete one product by ID
     -jwt-token STRING: 
 
 Example:
-    %[1]s products delete-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Sequi est cupiditate." --jwt-token "Tempore omnis in vel ullam."
+    %[1]s products delete-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "In ea laboriosam quia et est." --jwt-token "Distinctio impedit optio maiores."
 `, os.Args[0])
 }
 
@@ -545,7 +672,7 @@ Example:
          "name": "Guillaume",
          "price": 69
       }
-   }' --oauth "Expedita animi facere expedita nihil omnis assumenda." --jwt-token "Qui molestiae est earum est cumque at."
+   }' --oauth "Distinctio inventore." --jwt-token "Sit sit est libero dolor et earum."
 `, os.Args[0])
 }
 
@@ -566,7 +693,7 @@ Example:
          "name": "Guillaume",
          "price": 69
       }
-   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Rem molestias." --jwt-token "Consequuntur ut impedit ab rerum."
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Enim qui recusandae assumenda eum." --jwt-token "Dolores aut."
 `, os.Args[0])
 }
 
@@ -578,7 +705,7 @@ Get one product
     -oauth STRING: 
 
 Example:
-    %[1]s products get-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Provident iste enim ipsum."
+    %[1]s products get-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Aliquam aspernatur."
 `, os.Args[0])
 }
 
@@ -589,84 +716,12 @@ Usage:
     %[1]s [globalflags] users COMMAND [flags]
 
 COMMAND:
-    get-allusers: Get All users
-    delete-user: Delete one User by ID
-    create-user: Create one User
-    update-user: Update one User
     get-user: Get one User
 
 Additional help:
     %[1]s users COMMAND --help
 `, os.Args[0])
 }
-func usersGetAllusersUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] users get-allusers -oauth STRING -jwt-token STRING
-
-Get All users
-    -oauth STRING: 
-    -jwt-token STRING: 
-
-Example:
-    %[1]s users get-allusers --oauth "Labore architecto non dolor temporibus." --jwt-token "Rerum repudiandae aperiam eos."
-`, os.Args[0])
-}
-
-func usersDeleteUserUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] users delete-user -id STRING -oauth STRING -jwt-token STRING
-
-Delete one User by ID
-    -id STRING: 
-    -oauth STRING: 
-    -jwt-token STRING: 
-
-Example:
-    %[1]s users delete-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Delectus molestias dolores aut quo cupiditate." --jwt-token "Earum natus blanditiis porro eum quod dolore."
-`, os.Args[0])
-}
-
-func usersCreateUserUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] users create-user -body JSON -oauth STRING -jwt-token STRING
-
-Create one User
-    -body JSON: 
-    -oauth STRING: 
-    -jwt-token STRING: 
-
-Example:
-    %[1]s users create-user --body '{
-      "user": {
-         "birthday": "01/09/2002",
-         "email": "guillaume.morin@epitech.eu",
-         "firstname": "Guillaume",
-         "lastname": "Morin",
-         "phone": "+262 692 12 34 56"
-      }
-   }' --oauth "Eos voluptas." --jwt-token "Sint quibusdam ea hic."
-`, os.Args[0])
-}
-
-func usersUpdateUserUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] users update-user -body JSON -id STRING -oauth STRING -jwt-token STRING
-
-Update one User
-    -body JSON: 
-    -id STRING: 
-    -oauth STRING: 
-    -jwt-token STRING: 
-
-Example:
-    %[1]s users update-user --body '{
-      "User": {
-         "birthday": "01/09/2002",
-         "email": "guillaume.morin@epitech.eu",
-         "firstname": "Guillaume",
-         "lastname": "Morin",
-         "phone": "+262 692 12 34 56"
-      }
-   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Vel in." --jwt-token "Laboriosam quia et."
-`, os.Args[0])
-}
-
 func usersGetUserUsage() {
 	fmt.Fprintf(os.Stderr, `%[1]s [flags] users get-user -id STRING -oauth STRING -jwt-token STRING
 
@@ -676,6 +731,6 @@ Get one User
     -jwt-token STRING: 
 
 Example:
-    %[1]s users get-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Impedit optio maiores nostrum doloremque id distinctio." --jwt-token "Odit sit sit est libero dolor et."
+    %[1]s users get-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Omnis veritatis et tempora reiciendis commodi inventore." --jwt-token "Omnis harum temporibus."
 `, os.Args[0])
 }

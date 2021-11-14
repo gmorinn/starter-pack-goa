@@ -15,62 +15,14 @@ import (
 
 // Client is the "users" service client.
 type Client struct {
-	GetAllusersEndpoint goa.Endpoint
-	DeleteUserEndpoint  goa.Endpoint
-	CreateUserEndpoint  goa.Endpoint
-	UpdateUserEndpoint  goa.Endpoint
-	GetUserEndpoint     goa.Endpoint
+	GetUserEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "users" service client given the endpoints.
-func NewClient(getAllusers, deleteUser, createUser, updateUser, getUser goa.Endpoint) *Client {
+func NewClient(getUser goa.Endpoint) *Client {
 	return &Client{
-		GetAllusersEndpoint: getAllusers,
-		DeleteUserEndpoint:  deleteUser,
-		CreateUserEndpoint:  createUser,
-		UpdateUserEndpoint:  updateUser,
-		GetUserEndpoint:     getUser,
+		GetUserEndpoint: getUser,
 	}
-}
-
-// GetAllusers calls the "getAllusers" endpoint of the "users" service.
-func (c *Client) GetAllusers(ctx context.Context, p *GetAllusersPayload) (res *GetAllusersResult, err error) {
-	var ires interface{}
-	ires, err = c.GetAllusersEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*GetAllusersResult), nil
-}
-
-// DeleteUser calls the "deleteUser" endpoint of the "users" service.
-func (c *Client) DeleteUser(ctx context.Context, p *DeleteUserPayload) (res *DeleteUserResult, err error) {
-	var ires interface{}
-	ires, err = c.DeleteUserEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*DeleteUserResult), nil
-}
-
-// CreateUser calls the "createUser" endpoint of the "users" service.
-func (c *Client) CreateUser(ctx context.Context, p *CreateUserPayload) (res *CreateUserResult, err error) {
-	var ires interface{}
-	ires, err = c.CreateUserEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*CreateUserResult), nil
-}
-
-// UpdateUser calls the "updateUser" endpoint of the "users" service.
-func (c *Client) UpdateUser(ctx context.Context, p *UpdateUserPayload) (res *UpdateUserResult, err error) {
-	var ires interface{}
-	ires, err = c.UpdateUserEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*UpdateUserResult), nil
 }
 
 // GetUser calls the "getUser" endpoint of the "users" service.

@@ -19,13 +19,9 @@ import (
 
 // Server lists the users service endpoint HTTP handlers.
 type Server struct {
-	Mounts      []*MountPoint
-	GetAllusers http.Handler
-	DeleteUser  http.Handler
-	CreateUser  http.Handler
-	UpdateUser  http.Handler
-	GetUser     http.Handler
-	CORS        http.Handler
+	Mounts  []*MountPoint
+	GetUser http.Handler
+	CORS    http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -61,22 +57,11 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"GetAllusers", "GET", "/v1/web/users"},
-			{"DeleteUser", "DELETE", "/v1/web/user/remove/{id}"},
-			{"CreateUser", "POST", "/v1/web/user/add"},
-			{"UpdateUser", "PUT", "/v1/web/user/{id}"},
 			{"GetUser", "GET", "/v1/web/user/{id}"},
-			{"CORS", "OPTIONS", "/v1/web/users"},
-			{"CORS", "OPTIONS", "/v1/web/user/remove/{id}"},
-			{"CORS", "OPTIONS", "/v1/web/user/add"},
 			{"CORS", "OPTIONS", "/v1/web/user/{id}"},
 		},
-		GetAllusers: NewGetAllusersHandler(e.GetAllusers, mux, decoder, encoder, errhandler, formatter),
-		DeleteUser:  NewDeleteUserHandler(e.DeleteUser, mux, decoder, encoder, errhandler, formatter),
-		CreateUser:  NewCreateUserHandler(e.CreateUser, mux, decoder, encoder, errhandler, formatter),
-		UpdateUser:  NewUpdateUserHandler(e.UpdateUser, mux, decoder, encoder, errhandler, formatter),
-		GetUser:     NewGetUserHandler(e.GetUser, mux, decoder, encoder, errhandler, formatter),
-		CORS:        NewCORSHandler(),
+		GetUser: NewGetUserHandler(e.GetUser, mux, decoder, encoder, errhandler, formatter),
+		CORS:    NewCORSHandler(),
 	}
 }
 
@@ -85,226 +70,14 @@ func (s *Server) Service() string { return "users" }
 
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
-	s.GetAllusers = m(s.GetAllusers)
-	s.DeleteUser = m(s.DeleteUser)
-	s.CreateUser = m(s.CreateUser)
-	s.UpdateUser = m(s.UpdateUser)
 	s.GetUser = m(s.GetUser)
 	s.CORS = m(s.CORS)
 }
 
 // Mount configures the mux to serve the users endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
-	MountGetAllusersHandler(mux, h.GetAllusers)
-	MountDeleteUserHandler(mux, h.DeleteUser)
-	MountCreateUserHandler(mux, h.CreateUser)
-	MountUpdateUserHandler(mux, h.UpdateUser)
 	MountGetUserHandler(mux, h.GetUser)
 	MountCORSHandler(mux, h.CORS)
-}
-
-// MountGetAllusersHandler configures the mux to serve the "users" service
-// "getAllusers" endpoint.
-func MountGetAllusersHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := HandleUsersOrigin(h).(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("GET", "/v1/web/users", f)
-}
-
-// NewGetAllusersHandler creates a HTTP handler which loads the HTTP request
-// and calls the "users" service "getAllusers" endpoint.
-func NewGetAllusersHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeGetAllusersRequest(mux, decoder)
-		encodeResponse = EncodeGetAllusersResponse(encoder)
-		encodeError    = EncodeGetAllusersError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "getAllusers")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "users")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
-}
-
-// MountDeleteUserHandler configures the mux to serve the "users" service
-// "deleteUser" endpoint.
-func MountDeleteUserHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := HandleUsersOrigin(h).(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("DELETE", "/v1/web/user/remove/{id}", f)
-}
-
-// NewDeleteUserHandler creates a HTTP handler which loads the HTTP request and
-// calls the "users" service "deleteUser" endpoint.
-func NewDeleteUserHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeDeleteUserRequest(mux, decoder)
-		encodeResponse = EncodeDeleteUserResponse(encoder)
-		encodeError    = EncodeDeleteUserError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "deleteUser")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "users")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
-}
-
-// MountCreateUserHandler configures the mux to serve the "users" service
-// "createUser" endpoint.
-func MountCreateUserHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := HandleUsersOrigin(h).(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("POST", "/v1/web/user/add", f)
-}
-
-// NewCreateUserHandler creates a HTTP handler which loads the HTTP request and
-// calls the "users" service "createUser" endpoint.
-func NewCreateUserHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeCreateUserRequest(mux, decoder)
-		encodeResponse = EncodeCreateUserResponse(encoder)
-		encodeError    = EncodeCreateUserError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "createUser")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "users")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
-}
-
-// MountUpdateUserHandler configures the mux to serve the "users" service
-// "updateUser" endpoint.
-func MountUpdateUserHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := HandleUsersOrigin(h).(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("PUT", "/v1/web/user/{id}", f)
-}
-
-// NewUpdateUserHandler creates a HTTP handler which loads the HTTP request and
-// calls the "users" service "updateUser" endpoint.
-func NewUpdateUserHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeUpdateUserRequest(mux, decoder)
-		encodeResponse = EncodeUpdateUserResponse(encoder)
-		encodeError    = EncodeUpdateUserError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "updateUser")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "users")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
 }
 
 // MountGetUserHandler configures the mux to serve the "users" service
@@ -368,9 +141,6 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/v1/web/users", f)
-	mux.Handle("OPTIONS", "/v1/web/user/remove/{id}", f)
-	mux.Handle("OPTIONS", "/v1/web/user/add", f)
 	mux.Handle("OPTIONS", "/v1/web/user/{id}", f)
 }
 

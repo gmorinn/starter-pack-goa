@@ -16,14 +16,6 @@ import (
 
 // users of the api
 type Service interface {
-	// Get All users
-	GetAllusers(context.Context, *GetAllusersPayload) (res *GetAllusersResult, err error)
-	// Delete one User by ID
-	DeleteUser(context.Context, *DeleteUserPayload) (res *DeleteUserResult, err error)
-	// Create one User
-	CreateUser(context.Context, *CreateUserPayload) (res *CreateUserResult, err error)
-	// Update one User
-	UpdateUser(context.Context, *UpdateUserPayload) (res *UpdateUserResult, err error)
 	// Get one User
 	GetUser(context.Context, *GetUserPayload) (res *GetUserResult, err error)
 }
@@ -44,70 +36,7 @@ const ServiceName = "users"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [5]string{"getAllusers", "deleteUser", "createUser", "updateUser", "getUser"}
-
-// GetAllusersPayload is the payload type of the users service getAllusers
-// method.
-type GetAllusersPayload struct {
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
-	// Use to generate Oauth with /authorization
-	Oauth *string
-}
-
-// GetAllusersResult is the result type of the users service getAllusers method.
-type GetAllusersResult struct {
-	// All users by category
-	Users   []*ResUser
-	Success bool
-}
-
-// DeleteUserPayload is the payload type of the users service deleteUser method.
-type DeleteUserPayload struct {
-	ID string
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
-	// Use to generate Oauth with /authorization
-	Oauth *string
-}
-
-// DeleteUserResult is the result type of the users service deleteUser method.
-type DeleteUserResult struct {
-	Success bool
-}
-
-// CreateUserPayload is the payload type of the users service createUser method.
-type CreateUserPayload struct {
-	User *PayloadUser
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
-	// Use to generate Oauth with /authorization
-	Oauth *string
-}
-
-// CreateUserResult is the result type of the users service createUser method.
-type CreateUserResult struct {
-	// Result is an object
-	User    *ResUser
-	Success bool
-}
-
-// UpdateUserPayload is the payload type of the users service updateUser method.
-type UpdateUserPayload struct {
-	ID   string
-	User *PayloadUser
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
-	// Use to generate Oauth with /authorization
-	Oauth *string
-}
-
-// UpdateUserResult is the result type of the users service updateUser method.
-type UpdateUserResult struct {
-	// Result is an Object
-	User    *ResUser
-	Success bool
-}
+var MethodNames = [1]string{"getUser"}
 
 // GetUserPayload is the payload type of the users service getUser method.
 type GetUserPayload struct {
@@ -130,14 +59,6 @@ type ResUser struct {
 	ID        string
 	Firstname *string
 	Lastname  *string
-	Email     string
-	Birthday  string
-	Phone     string
-}
-
-type PayloadUser struct {
-	Firstname string
-	Lastname  string
 	Email     string
 	Birthday  string
 	Phone     string

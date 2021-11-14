@@ -3,7 +3,7 @@ package design
 import . "goa.design/goa/v3/dsl"
 
 // Service describes a service
-var _ = Service("users", func() {
+var _ = Service("boUsers", func() {
 	Description("users of the api")
 
 	Error("timeout", func() { // Use default error type
@@ -15,7 +15,7 @@ var _ = Service("users", func() {
 	Error("unknown_error", unknownError, "Error not identified (500)")
 
 	HTTP(func() {
-		Path("/v1/web")
+		Path("/v1/web/bo")
 		Header("oauth:Authorization", String, "OAuth token", func() {
 			Pattern("^Bearer [^ ]+$")
 		})
@@ -40,7 +40,7 @@ var _ = Service("users", func() {
 			Response(StatusOK)
 		})
 		Result(func() {
-			Attribute("users", ArrayOf(resUser), "All users by category")
+			Attribute("users", ArrayOf(resBoUser), "All users by category")
 			Attribute("success", Boolean)
 			Required("users", "success")
 		})
@@ -88,7 +88,7 @@ var _ = Service("users", func() {
 			Response(StatusCreated)
 		})
 		Result(func() {
-			Attribute("user", resUser, "Result is an object")
+			Attribute("user", resBoUser, "Result is an object")
 			Attribute("success", Boolean)
 			Required("user", "success")
 		})
@@ -115,7 +115,7 @@ var _ = Service("users", func() {
 			Response(StatusOK)
 		})
 		Result(func() {
-			Attribute("user", resUser, "Result is an Object")
+			Attribute("user", resBoUser, "Result is an Object")
 			Attribute("success", Boolean)
 			Required("user", "success")
 		})
@@ -143,14 +143,14 @@ var _ = Service("users", func() {
 			Response(StatusOK)
 		})
 		Result(func() {
-			Attribute("user", resUser, "Result is an object")
+			Attribute("user", resBoUser, "Result is an object")
 			Attribute("success", Boolean)
 			Required("user", "success")
 		})
 	})
 })
 
-var resUser = Type("resUser", func() {
+var resBoUser = Type("resBoUser", func() {
 	Attribute("id", String, func() {
 		Format(FormatUUID)
 		Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
