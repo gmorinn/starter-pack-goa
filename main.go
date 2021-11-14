@@ -26,28 +26,18 @@ type ApiEndpoints struct {
 }
 
 func main() {
-	// Define command line flags, add any other flag required to configure the
-	// service.
-	var (
-		hostF     = flag.String("host", "localhost", "Server host (valid values: localhost)")
-		domainF   = flag.String("domain", "", "Host domain name (overrides host domain specified in service design)")
-		httpPortF = flag.String("http-port", "", "HTTP port (overrides host HTTP port specified in service design)")
-		secureF   = flag.Bool("secure", true, "Use secure scheme (https or grpcs)")
-		dbgF      = flag.Bool("debug", false, "Log request and response bodies")
-	)
-	flag.Parse()
-
 	// Setup logger. Replace logger with your own log package of choice.
 	var (
 		logger *log.Logger
+		server *api.Server
 	)
 	{
 		logger = log.New(os.Stderr, "[ecommerce] ", log.Ltime)
+		server = api.NewServer()
 	}
 
 	// Initialize the services.
 	var (
-		server      *api.Server      = api.NewServer()
 		usersSvc    users.Service    = api.NewUsers(logger, server)
 		jwtTokenSvc jwttoken.Service = api.NewJWTToken(logger, server)
 		oAuthSvc    oauth.Service    = api.NewOAuth(logger, server)
@@ -64,6 +54,16 @@ func main() {
 			productsEndpoints: products.NewEndpoints(productsSvc),
 		}
 	)
+	// Define command line flags, add any other flag required to configure the
+	// service.
+	var (
+		hostF     = flag.String("host", "localhost", "Server host (valid values: localhost)")
+		domainF   = flag.String("domain", "", "Host domain name (overrides host domain specified in service design)")
+		httpPortF = flag.String("http-port", "", "HTTP port (overrides host HTTP port specified in service design)")
+		secureF   = flag.Bool("secure", server.Config.SSL, "Use secure scheme (https or grpcs)")
+		dbgF      = flag.Bool("debug", false, "Log request and response bodies")
+	)
+	flag.Parse()
 
 	// Create channel used by both the signal handler and server goroutines
 	// to notify the main goroutine when to stop the server.
@@ -83,7 +83,7 @@ func main() {
 	fmt.Println("==> " + server.Config.Host)
 	// Start the servers and send errors (if any) to the error channel.
 	switch *hostF {
-	case "localhost":
+	case server.Config.Domain:
 		{
 			addr := server.Config.Host
 			u, err := url.Parse(addr)
@@ -109,7 +109,7 @@ func main() {
 		}
 
 	default:
-		fmt.Fprintf(os.Stderr, "invalid host argument: %q (valid hosts: localhost)\n", *hostF)
+		fmt.Fprintf(os.Stderr, "invalid host argument: %q (valid hosts: %v)\n", *hostF, server.Config.Host)
 	}
 
 	// Wait for signal.

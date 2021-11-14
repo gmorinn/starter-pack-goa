@@ -93,7 +93,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 
 	// Start HTTP server using default configuration, change the code to
 	// configure the server as required by your service.
-	srv := &http.Server{Addr: u.Host, Handler: handler}
+	srv := &http.Server{Addr: fmt.Sprintf(":%v", cnf.Port), Handler: handler}
 	logger.Printf(`
 	
 	 ██████╗  ██████╗  █████╗     ██╗  ██╗     ██████╗ ███╗   ███╗
@@ -111,9 +111,14 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 
 		// Start HTTP server in a separate goroutine.
 		go func() {
-			port := fmt.Sprint(cnf.Port)
-			if err := http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", srv.Handler); err != nil {
-				log.Fatal("ListenAndServe: ", err)
+			if cnf.SSL {
+				if err := srv.ListenAndServeTLS(cnf.Cert, cnf.Key); err != nil {
+					log.Fatal("ListenAndServe: ", err)
+				}
+			} else {
+				if err := srv.ListenAndServe(); err != nil {
+					log.Fatal("ListenAndServe: ", err)
+				}
 			}
 			logger.Printf("HTTP server listening on %q", u.Host)
 		}()

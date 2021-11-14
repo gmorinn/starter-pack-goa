@@ -55,6 +55,8 @@ func New() *API {
 	config.TZ = os.Getenv("TZ")
 	config.Port, _ = getenvInt("API_PORT")
 	config.SSL, _ = getenvBool("API_SSL")
+	config.Cert = os.Getenv("API_CERT")
+	config.Key = os.Getenv("API_KEY")
 	config.Host = os.Getenv("API_HOST")
 
 	config.Cors = os.Getenv("API_CORS")

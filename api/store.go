@@ -58,13 +58,17 @@ func (store *Store) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) er
 
 func NewServer() *Server {
 	cnf := config.New()
-	source := fmt.Sprintf("user=%s password=%s host=%s port=%v dbname=%s sslmode=disable", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database)
+	source := fmt.Sprintf("user=%s password=%s host=%s port=%v dbname=%s sslmode=disable TimeZone=%s", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database, cnf.TZ)
 	pg, err := sql.Open("postgres", source)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Err DB ==> ", err)
 	}
-	store := NewStore(pg)
 
+	if err = pg.Ping(); err != nil {
+		fmt.Printf("Postgres ping error : (%v)", err)
+	}
+
+	store := NewStore(pg)
 	server := &Server{Store: store}
 	server.Config = cnf
 	server.runCron(&server.cronTask, server.Config)
