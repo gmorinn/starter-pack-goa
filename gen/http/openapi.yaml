@@ -329,7 +329,7 @@ paths:
       - https
       security:
       - OAuth2_header_Authorization: []
-  /v1/web/bo/user/{id}:
+  /v1/bo/user/{id}:
     get:
       tags:
       - boUsers
@@ -428,7 +428,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /v1/web/bo/user/add:
+  /v1/bo/user/add:
     post:
       tags:
       - boUsers
@@ -476,7 +476,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /v1/web/bo/user/remove/{id}:
+  /v1/bo/user/remove/{id}:
     delete:
       tags:
       - boUsers
@@ -521,7 +521,7 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /v1/web/bo/users:
+  /v1/bo/users:
     get:
       tags:
       - boUsers

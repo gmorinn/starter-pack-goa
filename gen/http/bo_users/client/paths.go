@@ -13,25 +13,25 @@ import (
 
 // GetAllusersBoUsersPath returns the URL path to the boUsers service getAllusers HTTP endpoint.
 func GetAllusersBoUsersPath() string {
-	return "/v1/web/bo/users"
+	return "/v1/bo/users"
 }
 
 // DeleteUserBoUsersPath returns the URL path to the boUsers service deleteUser HTTP endpoint.
 func DeleteUserBoUsersPath(id string) string {
-	return fmt.Sprintf("/v1/web/bo/user/remove/%v", id)
+	return fmt.Sprintf("/v1/bo/user/remove/%v", id)
 }
 
 // CreateUserBoUsersPath returns the URL path to the boUsers service createUser HTTP endpoint.
 func CreateUserBoUsersPath() string {
-	return "/v1/web/bo/user/add"
+	return "/v1/bo/user/add"
 }
 
 // UpdateUserBoUsersPath returns the URL path to the boUsers service updateUser HTTP endpoint.
 func UpdateUserBoUsersPath(id string) string {
-	return fmt.Sprintf("/v1/web/bo/user/%v", id)
+	return fmt.Sprintf("/v1/bo/user/%v", id)
 }
 
 // GetUserBoUsersPath returns the URL path to the boUsers service getUser HTTP endpoint.
 func GetUserBoUsersPath(id string) string {
-	return fmt.Sprintf("/v1/web/bo/user/%v", id)
+	return fmt.Sprintf("/v1/bo/user/%v", id)
 }

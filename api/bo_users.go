@@ -52,10 +52,12 @@ func (s *boUserssrvc) GetAllusers(ctx context.Context, p *bousers.GetAllusersPay
 		}
 		var allUsers []*bousers.ResBoUser
 		for _, v := range uS {
+			var firstname string = v.Firstname
+			var lastname string = v.Lastname
 			allUsers = append(allUsers, &bousers.ResBoUser{
 				ID:        v.ID.String(),
-				Firstname: &v.Firstname,
-				Lastname:  &v.Lastname,
+				Firstname: &firstname,
+				Lastname:  &lastname,
 				Email:     v.Email,
 				Phone:     v.Phone.String,
 				Birthday:  v.Birthday.String,
