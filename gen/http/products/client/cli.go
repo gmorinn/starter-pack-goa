@@ -9,26 +9,9 @@ package client
 
 import (
 	products "api_crud/gen/products"
-	"encoding/json"
-	"fmt"
 
 	goa "goa.design/goa/v3/pkg"
 )
-
-// BuildGetAllProductsPayload builds the payload for the products
-// getAllProducts endpoint from CLI flags.
-func BuildGetAllProductsPayload(productsGetAllProductsOauth string) (*products.GetAllProductsPayload, error) {
-	var oauth *string
-	{
-		if productsGetAllProductsOauth != "" {
-			oauth = &productsGetAllProductsOauth
-		}
-	}
-	v := &products.GetAllProductsPayload{}
-	v.Oauth = oauth
-
-	return v, nil
-}
 
 // BuildGetAllProductsByCategoryPayload builds the payload for the products
 // getAllProductsByCategory endpoint from CLI flags.
@@ -53,137 +36,6 @@ func BuildGetAllProductsByCategoryPayload(productsGetAllProductsByCategoryCatego
 	v := &products.GetAllProductsByCategoryPayload{}
 	v.Category = category
 	v.Oauth = oauth
-
-	return v, nil
-}
-
-// BuildDeleteProductPayload builds the payload for the products deleteProduct
-// endpoint from CLI flags.
-func BuildDeleteProductPayload(productsDeleteProductID string, productsDeleteProductOauth string, productsDeleteProductJWTToken string) (*products.DeleteProductPayload, error) {
-	var err error
-	var id string
-	{
-		id = productsDeleteProductID
-		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
-
-		if err != nil {
-			return nil, err
-		}
-	}
-	var oauth *string
-	{
-		if productsDeleteProductOauth != "" {
-			oauth = &productsDeleteProductOauth
-		}
-	}
-	var jwtToken *string
-	{
-		if productsDeleteProductJWTToken != "" {
-			jwtToken = &productsDeleteProductJWTToken
-		}
-	}
-	v := &products.DeleteProductPayload{}
-	v.ID = id
-	v.Oauth = oauth
-	v.JWTToken = jwtToken
-
-	return v, nil
-}
-
-// BuildCreateProductPayload builds the payload for the products createProduct
-// endpoint from CLI flags.
-func BuildCreateProductPayload(productsCreateProductBody string, productsCreateProductOauth string, productsCreateProductJWTToken string) (*products.CreateProductPayload, error) {
-	var err error
-	var body CreateProductRequestBody
-	{
-		err = json.Unmarshal([]byte(productsCreateProductBody), &body)
-		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"product\": {\n         \"category\": \"men\",\n         \"cover\": \"https://i.ibb.co/ypkgK0X/blue-beanie.png\",\n         \"name\": \"Guillaume\",\n         \"price\": 69\n      }\n   }'")
-		}
-		if body.Product == nil {
-			err = goa.MergeErrors(err, goa.MissingFieldError("product", "body"))
-		}
-		if body.Product != nil {
-			if err2 := ValidatePayloadProductRequestBody(body.Product); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-		if err != nil {
-			return nil, err
-		}
-	}
-	var oauth *string
-	{
-		if productsCreateProductOauth != "" {
-			oauth = &productsCreateProductOauth
-		}
-	}
-	var jwtToken *string
-	{
-		if productsCreateProductJWTToken != "" {
-			jwtToken = &productsCreateProductJWTToken
-		}
-	}
-	v := &products.CreateProductPayload{}
-	if body.Product != nil {
-		v.Product = marshalPayloadProductRequestBodyToProductsPayloadProduct(body.Product)
-	}
-	v.Oauth = oauth
-	v.JWTToken = jwtToken
-
-	return v, nil
-}
-
-// BuildUpdateProductPayload builds the payload for the products updateProduct
-// endpoint from CLI flags.
-func BuildUpdateProductPayload(productsUpdateProductBody string, productsUpdateProductID string, productsUpdateProductOauth string, productsUpdateProductJWTToken string) (*products.UpdateProductPayload, error) {
-	var err error
-	var body UpdateProductRequestBody
-	{
-		err = json.Unmarshal([]byte(productsUpdateProductBody), &body)
-		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"product\": {\n         \"category\": \"men\",\n         \"cover\": \"https://i.ibb.co/ypkgK0X/blue-beanie.png\",\n         \"name\": \"Guillaume\",\n         \"price\": 69\n      }\n   }'")
-		}
-		if body.Product == nil {
-			err = goa.MergeErrors(err, goa.MissingFieldError("product", "body"))
-		}
-		if body.Product != nil {
-			if err2 := ValidatePayloadProductRequestBody(body.Product); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-		if err != nil {
-			return nil, err
-		}
-	}
-	var id string
-	{
-		id = productsUpdateProductID
-		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
-
-		if err != nil {
-			return nil, err
-		}
-	}
-	var oauth *string
-	{
-		if productsUpdateProductOauth != "" {
-			oauth = &productsUpdateProductOauth
-		}
-	}
-	var jwtToken *string
-	{
-		if productsUpdateProductJWTToken != "" {
-			jwtToken = &productsUpdateProductJWTToken
-		}
-	}
-	v := &products.UpdateProductPayload{}
-	if body.Product != nil {
-		v.Product = marshalPayloadProductRequestBodyToProductsPayloadProduct(body.Product)
-	}
-	v.ID = id
-	v.Oauth = oauth
-	v.JWTToken = jwtToken
 
 	return v, nil
 }

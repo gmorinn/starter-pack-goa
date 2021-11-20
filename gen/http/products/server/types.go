@@ -9,30 +9,7 @@ package server
 
 import (
 	products "api_crud/gen/products"
-	"unicode/utf8"
-
-	goa "goa.design/goa/v3/pkg"
 )
-
-// CreateProductRequestBody is the type of the "products" service
-// "createProduct" endpoint HTTP request body.
-type CreateProductRequestBody struct {
-	Product *PayloadProductRequestBody `form:"product,omitempty" json:"product,omitempty" xml:"product,omitempty"`
-}
-
-// UpdateProductRequestBody is the type of the "products" service
-// "updateProduct" endpoint HTTP request body.
-type UpdateProductRequestBody struct {
-	Product *PayloadProductRequestBody `form:"product,omitempty" json:"product,omitempty" xml:"product,omitempty"`
-}
-
-// GetAllProductsResponseBody is the type of the "products" service
-// "getAllProducts" endpoint HTTP response body.
-type GetAllProductsResponseBody struct {
-	// All products by category
-	Products []*ResProductResponseBody `form:"products" json:"products" xml:"products"`
-	Success  bool                      `form:"success" json:"success" xml:"success"`
-}
 
 // GetAllProductsByCategoryResponseBody is the type of the "products" service
 // "getAllProductsByCategory" endpoint HTTP response body.
@@ -40,28 +17,6 @@ type GetAllProductsByCategoryResponseBody struct {
 	// Result is an array of object
 	Products []*ResProductResponseBody `form:"products" json:"products" xml:"products"`
 	Success  bool                      `form:"success" json:"success" xml:"success"`
-}
-
-// DeleteProductResponseBody is the type of the "products" service
-// "deleteProduct" endpoint HTTP response body.
-type DeleteProductResponseBody struct {
-	Success bool `form:"success" json:"success" xml:"success"`
-}
-
-// CreateProductResponseBody is the type of the "products" service
-// "createProduct" endpoint HTTP response body.
-type CreateProductResponseBody struct {
-	// Result is an object
-	Product *ResProductResponseBody `form:"product" json:"product" xml:"product"`
-	Success bool                    `form:"success" json:"success" xml:"success"`
-}
-
-// UpdateProductResponseBody is the type of the "products" service
-// "updateProduct" endpoint HTTP response body.
-type UpdateProductResponseBody struct {
-	// Result is an Object
-	Product *ResProductResponseBody `form:"product" json:"product" xml:"product"`
-	Success bool                    `form:"success" json:"success" xml:"success"`
 }
 
 // GetProductResponseBody is the type of the "products" service "getProduct"
@@ -72,42 +27,10 @@ type GetProductResponseBody struct {
 	Success bool                    `form:"success" json:"success" xml:"success"`
 }
 
-// GetAllProductsUnknownErrorResponseBody is the type of the "products" service
-// "getAllProducts" endpoint HTTP response body for the "unknown_error" error.
-type GetAllProductsUnknownErrorResponseBody struct {
-	Err       string `form:"err" json:"err" xml:"err"`
-	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
-	Success   bool   `form:"success" json:"success" xml:"success"`
-}
-
 // GetAllProductsByCategoryUnknownErrorResponseBody is the type of the
 // "products" service "getAllProductsByCategory" endpoint HTTP response body
 // for the "unknown_error" error.
 type GetAllProductsByCategoryUnknownErrorResponseBody struct {
-	Err       string `form:"err" json:"err" xml:"err"`
-	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
-	Success   bool   `form:"success" json:"success" xml:"success"`
-}
-
-// DeleteProductUnknownErrorResponseBody is the type of the "products" service
-// "deleteProduct" endpoint HTTP response body for the "unknown_error" error.
-type DeleteProductUnknownErrorResponseBody struct {
-	Err       string `form:"err" json:"err" xml:"err"`
-	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
-	Success   bool   `form:"success" json:"success" xml:"success"`
-}
-
-// CreateProductUnknownErrorResponseBody is the type of the "products" service
-// "createProduct" endpoint HTTP response body for the "unknown_error" error.
-type CreateProductUnknownErrorResponseBody struct {
-	Err       string `form:"err" json:"err" xml:"err"`
-	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
-	Success   bool   `form:"success" json:"success" xml:"success"`
-}
-
-// UpdateProductUnknownErrorResponseBody is the type of the "products" service
-// "updateProduct" endpoint HTTP response body for the "unknown_error" error.
-type UpdateProductUnknownErrorResponseBody struct {
 	Err       string `form:"err" json:"err" xml:"err"`
 	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
 	Success   bool   `form:"success" json:"success" xml:"success"`
@@ -130,29 +53,6 @@ type ResProductResponseBody struct {
 	Category string  `form:"category" json:"category" xml:"category"`
 }
 
-// PayloadProductRequestBody is used to define fields on request body types.
-type PayloadProductRequestBody struct {
-	Name     *string  `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Price    *float64 `form:"price,omitempty" json:"price,omitempty" xml:"price,omitempty"`
-	Cover    *string  `form:"cover,omitempty" json:"cover,omitempty" xml:"cover,omitempty"`
-	Category *string  `form:"category,omitempty" json:"category,omitempty" xml:"category,omitempty"`
-}
-
-// NewGetAllProductsResponseBody builds the HTTP response body from the result
-// of the "getAllProducts" endpoint of the "products" service.
-func NewGetAllProductsResponseBody(res *products.GetAllProductsResult) *GetAllProductsResponseBody {
-	body := &GetAllProductsResponseBody{
-		Success: res.Success,
-	}
-	if res.Products != nil {
-		body.Products = make([]*ResProductResponseBody, len(res.Products))
-		for i, val := range res.Products {
-			body.Products[i] = marshalProductsResProductToResProductResponseBody(val)
-		}
-	}
-	return body
-}
-
 // NewGetAllProductsByCategoryResponseBody builds the HTTP response body from
 // the result of the "getAllProductsByCategory" endpoint of the "products"
 // service.
@@ -169,39 +69,6 @@ func NewGetAllProductsByCategoryResponseBody(res *products.GetAllProductsByCateg
 	return body
 }
 
-// NewDeleteProductResponseBody builds the HTTP response body from the result
-// of the "deleteProduct" endpoint of the "products" service.
-func NewDeleteProductResponseBody(res *products.DeleteProductResult) *DeleteProductResponseBody {
-	body := &DeleteProductResponseBody{
-		Success: res.Success,
-	}
-	return body
-}
-
-// NewCreateProductResponseBody builds the HTTP response body from the result
-// of the "createProduct" endpoint of the "products" service.
-func NewCreateProductResponseBody(res *products.CreateProductResult) *CreateProductResponseBody {
-	body := &CreateProductResponseBody{
-		Success: res.Success,
-	}
-	if res.Product != nil {
-		body.Product = marshalProductsResProductToResProductResponseBody(res.Product)
-	}
-	return body
-}
-
-// NewUpdateProductResponseBody builds the HTTP response body from the result
-// of the "updateProduct" endpoint of the "products" service.
-func NewUpdateProductResponseBody(res *products.UpdateProductResult) *UpdateProductResponseBody {
-	body := &UpdateProductResponseBody{
-		Success: res.Success,
-	}
-	if res.Product != nil {
-		body.Product = marshalProductsResProductToResProductResponseBody(res.Product)
-	}
-	return body
-}
-
 // NewGetProductResponseBody builds the HTTP response body from the result of
 // the "getProduct" endpoint of the "products" service.
 func NewGetProductResponseBody(res *products.GetProductResult) *GetProductResponseBody {
@@ -214,55 +81,11 @@ func NewGetProductResponseBody(res *products.GetProductResult) *GetProductRespon
 	return body
 }
 
-// NewGetAllProductsUnknownErrorResponseBody builds the HTTP response body from
-// the result of the "getAllProducts" endpoint of the "products" service.
-func NewGetAllProductsUnknownErrorResponseBody(res *products.UnknownError) *GetAllProductsUnknownErrorResponseBody {
-	body := &GetAllProductsUnknownErrorResponseBody{
-		Err:       res.Err,
-		ErrorCode: res.ErrorCode,
-		Success:   res.Success,
-	}
-	return body
-}
-
 // NewGetAllProductsByCategoryUnknownErrorResponseBody builds the HTTP response
 // body from the result of the "getAllProductsByCategory" endpoint of the
 // "products" service.
 func NewGetAllProductsByCategoryUnknownErrorResponseBody(res *products.UnknownError) *GetAllProductsByCategoryUnknownErrorResponseBody {
 	body := &GetAllProductsByCategoryUnknownErrorResponseBody{
-		Err:       res.Err,
-		ErrorCode: res.ErrorCode,
-		Success:   res.Success,
-	}
-	return body
-}
-
-// NewDeleteProductUnknownErrorResponseBody builds the HTTP response body from
-// the result of the "deleteProduct" endpoint of the "products" service.
-func NewDeleteProductUnknownErrorResponseBody(res *products.UnknownError) *DeleteProductUnknownErrorResponseBody {
-	body := &DeleteProductUnknownErrorResponseBody{
-		Err:       res.Err,
-		ErrorCode: res.ErrorCode,
-		Success:   res.Success,
-	}
-	return body
-}
-
-// NewCreateProductUnknownErrorResponseBody builds the HTTP response body from
-// the result of the "createProduct" endpoint of the "products" service.
-func NewCreateProductUnknownErrorResponseBody(res *products.UnknownError) *CreateProductUnknownErrorResponseBody {
-	body := &CreateProductUnknownErrorResponseBody{
-		Err:       res.Err,
-		ErrorCode: res.ErrorCode,
-		Success:   res.Success,
-	}
-	return body
-}
-
-// NewUpdateProductUnknownErrorResponseBody builds the HTTP response body from
-// the result of the "updateProduct" endpoint of the "products" service.
-func NewUpdateProductUnknownErrorResponseBody(res *products.UnknownError) *UpdateProductUnknownErrorResponseBody {
-	body := &UpdateProductUnknownErrorResponseBody{
 		Err:       res.Err,
 		ErrorCode: res.ErrorCode,
 		Success:   res.Success,
@@ -281,55 +104,12 @@ func NewGetProductUnknownErrorResponseBody(res *products.UnknownError) *GetProdu
 	return body
 }
 
-// NewGetAllProductsPayload builds a products service getAllProducts endpoint
-// payload.
-func NewGetAllProductsPayload(oauth *string) *products.GetAllProductsPayload {
-	v := &products.GetAllProductsPayload{}
-	v.Oauth = oauth
-
-	return v
-}
-
 // NewGetAllProductsByCategoryPayload builds a products service
 // getAllProductsByCategory endpoint payload.
 func NewGetAllProductsByCategoryPayload(category string, oauth *string) *products.GetAllProductsByCategoryPayload {
 	v := &products.GetAllProductsByCategoryPayload{}
 	v.Category = category
 	v.Oauth = oauth
-
-	return v
-}
-
-// NewDeleteProductPayload builds a products service deleteProduct endpoint
-// payload.
-func NewDeleteProductPayload(id string, oauth *string, jwtToken *string) *products.DeleteProductPayload {
-	v := &products.DeleteProductPayload{}
-	v.ID = id
-	v.Oauth = oauth
-	v.JWTToken = jwtToken
-
-	return v
-}
-
-// NewCreateProductPayload builds a products service createProduct endpoint
-// payload.
-func NewCreateProductPayload(body *CreateProductRequestBody, oauth *string, jwtToken *string) *products.CreateProductPayload {
-	v := &products.CreateProductPayload{}
-	v.Product = unmarshalPayloadProductRequestBodyToProductsPayloadProduct(body.Product)
-	v.Oauth = oauth
-	v.JWTToken = jwtToken
-
-	return v
-}
-
-// NewUpdateProductPayload builds a products service updateProduct endpoint
-// payload.
-func NewUpdateProductPayload(body *UpdateProductRequestBody, id string, oauth *string, jwtToken *string) *products.UpdateProductPayload {
-	v := &products.UpdateProductPayload{}
-	v.Product = unmarshalPayloadProductRequestBodyToProductsPayloadProduct(body.Product)
-	v.ID = id
-	v.Oauth = oauth
-	v.JWTToken = jwtToken
 
 	return v
 }
@@ -341,65 +121,4 @@ func NewGetProductPayload(id string, oauth *string) *products.GetProductPayload 
 	v.Oauth = oauth
 
 	return v
-}
-
-// ValidateCreateProductRequestBody runs the validations defined on
-// CreateProductRequestBody
-func ValidateCreateProductRequestBody(body *CreateProductRequestBody) (err error) {
-	if body.Product == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("product", "body"))
-	}
-	if body.Product != nil {
-		if err2 := ValidatePayloadProductRequestBody(body.Product); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// ValidateUpdateProductRequestBody runs the validations defined on
-// UpdateProductRequestBody
-func ValidateUpdateProductRequestBody(body *UpdateProductRequestBody) (err error) {
-	if body.Product == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("product", "body"))
-	}
-	if body.Product != nil {
-		if err2 := ValidatePayloadProductRequestBody(body.Product); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// ValidatePayloadProductRequestBody runs the validations defined on
-// payloadProductRequestBody
-func ValidatePayloadProductRequestBody(body *PayloadProductRequestBody) (err error) {
-	if body.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
-	}
-	if body.Price == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("price", "body"))
-	}
-	if body.Cover == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("cover", "body"))
-	}
-	if body.Category == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("category", "body"))
-	}
-	if body.Name != nil {
-		if utf8.RuneCountInString(*body.Name) < 3 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", *body.Name, utf8.RuneCountInString(*body.Name), 3, true))
-		}
-	}
-	if body.Price != nil {
-		if *body.Price < 0 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError("body.price", *body.Price, 0, true))
-		}
-	}
-	if body.Category != nil {
-		if !(*body.Category == "men" || *body.Category == "women" || *body.Category == "hat" || *body.Category == "jacket" || *body.Category == "sneaker" || *body.Category == "nothing") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.category", *body.Category, []interface{}{"men", "women", "hat", "jacket", "sneaker", "nothing"}))
-		}
-	}
-	return
 }

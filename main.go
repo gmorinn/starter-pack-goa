@@ -2,6 +2,7 @@ package main
 
 import (
 	"api_crud/api"
+	boproducts "api_crud/gen/bo_products"
 	bousers "api_crud/gen/bo_users"
 	jwttoken "api_crud/gen/jwt_token"
 	oauth "api_crud/gen/o_auth"
@@ -20,11 +21,12 @@ import (
 )
 
 type ApiEndpoints struct {
-	bo_usersEndpoints *bousers.Endpoints
-	usersEndpoints    *users.Endpoints
-	jwtTokenEndpoints *jwttoken.Endpoints
-	oAuthEndpoints    *oauth.Endpoints
-	productsEndpoints *products.Endpoints
+	bo_productsEndpoints *boproducts.Endpoints
+	bo_usersEndpoints    *bousers.Endpoints
+	usersEndpoints       *users.Endpoints
+	jwtTokenEndpoints    *jwttoken.Endpoints
+	oAuthEndpoints       *oauth.Endpoints
+	productsEndpoints    *products.Endpoints
 }
 
 func main() {
@@ -40,22 +42,24 @@ func main() {
 
 	// Initialize the services.
 	var (
-		usersSvc    users.Service    = api.NewUsers(logger, server)
-		bo_usersSvc bousers.Service  = api.NewBoUsers(logger, server)
-		jwtTokenSvc jwttoken.Service = api.NewJWTToken(logger, server)
-		oAuthSvc    oauth.Service    = api.NewOAuth(logger, server)
-		productsSvc products.Service = api.NewProducts(logger, server)
+		usersSvc      users.Service      = api.NewUsers(logger, server)
+		boproductsSvc boproducts.Service = api.NewBoProducts(logger, server)
+		bo_usersSvc   bousers.Service    = api.NewBoUsers(logger, server)
+		jwtTokenSvc   jwttoken.Service   = api.NewJWTToken(logger, server)
+		oAuthSvc      oauth.Service      = api.NewOAuth(logger, server)
+		productsSvc   products.Service   = api.NewProducts(logger, server)
 	)
 
 	// Wrap the services in endpoints that can be invoked from other services
 	// potentially running in different processes.
 	var (
 		apiEndpoints ApiEndpoints = ApiEndpoints{
-			bo_usersEndpoints: bousers.NewEndpoints(bo_usersSvc),
-			usersEndpoints:    users.NewEndpoints(usersSvc),
-			jwtTokenEndpoints: jwttoken.NewEndpoints(jwtTokenSvc),
-			oAuthEndpoints:    oauth.NewEndpoints(oAuthSvc),
-			productsEndpoints: products.NewEndpoints(productsSvc),
+			bo_productsEndpoints: boproducts.NewEndpoints(boproductsSvc),
+			bo_usersEndpoints:    bousers.NewEndpoints(bo_usersSvc),
+			usersEndpoints:       users.NewEndpoints(usersSvc),
+			jwtTokenEndpoints:    jwttoken.NewEndpoints(jwtTokenSvc),
+			oAuthEndpoints:       oauth.NewEndpoints(oAuthSvc),
+			productsEndpoints:    products.NewEndpoints(productsSvc),
 		}
 	)
 	// Define command line flags, add any other flag required to configure the

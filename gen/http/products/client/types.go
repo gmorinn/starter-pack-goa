@@ -9,30 +9,9 @@ package client
 
 import (
 	products "api_crud/gen/products"
-	"unicode/utf8"
 
 	goa "goa.design/goa/v3/pkg"
 )
-
-// CreateProductRequestBody is the type of the "products" service
-// "createProduct" endpoint HTTP request body.
-type CreateProductRequestBody struct {
-	Product *PayloadProductRequestBody `form:"product" json:"product" xml:"product"`
-}
-
-// UpdateProductRequestBody is the type of the "products" service
-// "updateProduct" endpoint HTTP request body.
-type UpdateProductRequestBody struct {
-	Product *PayloadProductRequestBody `form:"product" json:"product" xml:"product"`
-}
-
-// GetAllProductsResponseBody is the type of the "products" service
-// "getAllProducts" endpoint HTTP response body.
-type GetAllProductsResponseBody struct {
-	// All products by category
-	Products []*ResProductResponseBody `form:"products,omitempty" json:"products,omitempty" xml:"products,omitempty"`
-	Success  *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
 
 // GetAllProductsByCategoryResponseBody is the type of the "products" service
 // "getAllProductsByCategory" endpoint HTTP response body.
@@ -40,28 +19,6 @@ type GetAllProductsByCategoryResponseBody struct {
 	// Result is an array of object
 	Products []*ResProductResponseBody `form:"products,omitempty" json:"products,omitempty" xml:"products,omitempty"`
 	Success  *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// DeleteProductResponseBody is the type of the "products" service
-// "deleteProduct" endpoint HTTP response body.
-type DeleteProductResponseBody struct {
-	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// CreateProductResponseBody is the type of the "products" service
-// "createProduct" endpoint HTTP response body.
-type CreateProductResponseBody struct {
-	// Result is an object
-	Product *ResProductResponseBody `form:"product,omitempty" json:"product,omitempty" xml:"product,omitempty"`
-	Success *bool                   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// UpdateProductResponseBody is the type of the "products" service
-// "updateProduct" endpoint HTTP response body.
-type UpdateProductResponseBody struct {
-	// Result is an Object
-	Product *ResProductResponseBody `form:"product,omitempty" json:"product,omitempty" xml:"product,omitempty"`
-	Success *bool                   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // GetProductResponseBody is the type of the "products" service "getProduct"
@@ -72,42 +29,10 @@ type GetProductResponseBody struct {
 	Success *bool                   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
-// GetAllProductsUnknownErrorResponseBody is the type of the "products" service
-// "getAllProducts" endpoint HTTP response body for the "unknown_error" error.
-type GetAllProductsUnknownErrorResponseBody struct {
-	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
-	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
 // GetAllProductsByCategoryUnknownErrorResponseBody is the type of the
 // "products" service "getAllProductsByCategory" endpoint HTTP response body
 // for the "unknown_error" error.
 type GetAllProductsByCategoryUnknownErrorResponseBody struct {
-	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
-	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// DeleteProductUnknownErrorResponseBody is the type of the "products" service
-// "deleteProduct" endpoint HTTP response body for the "unknown_error" error.
-type DeleteProductUnknownErrorResponseBody struct {
-	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
-	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// CreateProductUnknownErrorResponseBody is the type of the "products" service
-// "createProduct" endpoint HTTP response body for the "unknown_error" error.
-type CreateProductUnknownErrorResponseBody struct {
-	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
-	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
-	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
-}
-
-// UpdateProductUnknownErrorResponseBody is the type of the "products" service
-// "updateProduct" endpoint HTTP response body for the "unknown_error" error.
-type UpdateProductUnknownErrorResponseBody struct {
 	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
@@ -130,60 +55,6 @@ type ResProductResponseBody struct {
 	Category *string  `form:"category,omitempty" json:"category,omitempty" xml:"category,omitempty"`
 }
 
-// PayloadProductRequestBody is used to define fields on request body types.
-type PayloadProductRequestBody struct {
-	Name     string  `form:"name" json:"name" xml:"name"`
-	Price    float64 `form:"price" json:"price" xml:"price"`
-	Cover    string  `form:"cover" json:"cover" xml:"cover"`
-	Category string  `form:"category" json:"category" xml:"category"`
-}
-
-// NewCreateProductRequestBody builds the HTTP request body from the payload of
-// the "createProduct" endpoint of the "products" service.
-func NewCreateProductRequestBody(p *products.CreateProductPayload) *CreateProductRequestBody {
-	body := &CreateProductRequestBody{}
-	if p.Product != nil {
-		body.Product = marshalProductsPayloadProductToPayloadProductRequestBody(p.Product)
-	}
-	return body
-}
-
-// NewUpdateProductRequestBody builds the HTTP request body from the payload of
-// the "updateProduct" endpoint of the "products" service.
-func NewUpdateProductRequestBody(p *products.UpdateProductPayload) *UpdateProductRequestBody {
-	body := &UpdateProductRequestBody{}
-	if p.Product != nil {
-		body.Product = marshalProductsPayloadProductToPayloadProductRequestBody(p.Product)
-	}
-	return body
-}
-
-// NewGetAllProductsResultOK builds a "products" service "getAllProducts"
-// endpoint result from a HTTP "OK" response.
-func NewGetAllProductsResultOK(body *GetAllProductsResponseBody) *products.GetAllProductsResult {
-	v := &products.GetAllProductsResult{
-		Success: *body.Success,
-	}
-	v.Products = make([]*products.ResProduct, len(body.Products))
-	for i, val := range body.Products {
-		v.Products[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
-	}
-
-	return v
-}
-
-// NewGetAllProductsUnknownError builds a products service getAllProducts
-// endpoint unknown_error error.
-func NewGetAllProductsUnknownError(body *GetAllProductsUnknownErrorResponseBody) *products.UnknownError {
-	v := &products.UnknownError{
-		Err:       *body.Err,
-		ErrorCode: *body.ErrorCode,
-		Success:   *body.Success,
-	}
-
-	return v
-}
-
 // NewGetAllProductsByCategoryResultOK builds a "products" service
 // "getAllProductsByCategory" endpoint result from a HTTP "OK" response.
 func NewGetAllProductsByCategoryResultOK(body *GetAllProductsByCategoryResponseBody) *products.GetAllProductsByCategoryResult {
@@ -201,74 +72,6 @@ func NewGetAllProductsByCategoryResultOK(body *GetAllProductsByCategoryResponseB
 // NewGetAllProductsByCategoryUnknownError builds a products service
 // getAllProductsByCategory endpoint unknown_error error.
 func NewGetAllProductsByCategoryUnknownError(body *GetAllProductsByCategoryUnknownErrorResponseBody) *products.UnknownError {
-	v := &products.UnknownError{
-		Err:       *body.Err,
-		ErrorCode: *body.ErrorCode,
-		Success:   *body.Success,
-	}
-
-	return v
-}
-
-// NewDeleteProductResultOK builds a "products" service "deleteProduct"
-// endpoint result from a HTTP "OK" response.
-func NewDeleteProductResultOK(body *DeleteProductResponseBody) *products.DeleteProductResult {
-	v := &products.DeleteProductResult{
-		Success: *body.Success,
-	}
-
-	return v
-}
-
-// NewDeleteProductUnknownError builds a products service deleteProduct
-// endpoint unknown_error error.
-func NewDeleteProductUnknownError(body *DeleteProductUnknownErrorResponseBody) *products.UnknownError {
-	v := &products.UnknownError{
-		Err:       *body.Err,
-		ErrorCode: *body.ErrorCode,
-		Success:   *body.Success,
-	}
-
-	return v
-}
-
-// NewCreateProductResultCreated builds a "products" service "createProduct"
-// endpoint result from a HTTP "Created" response.
-func NewCreateProductResultCreated(body *CreateProductResponseBody) *products.CreateProductResult {
-	v := &products.CreateProductResult{
-		Success: *body.Success,
-	}
-	v.Product = unmarshalResProductResponseBodyToProductsResProduct(body.Product)
-
-	return v
-}
-
-// NewCreateProductUnknownError builds a products service createProduct
-// endpoint unknown_error error.
-func NewCreateProductUnknownError(body *CreateProductUnknownErrorResponseBody) *products.UnknownError {
-	v := &products.UnknownError{
-		Err:       *body.Err,
-		ErrorCode: *body.ErrorCode,
-		Success:   *body.Success,
-	}
-
-	return v
-}
-
-// NewUpdateProductResultOK builds a "products" service "updateProduct"
-// endpoint result from a HTTP "OK" response.
-func NewUpdateProductResultOK(body *UpdateProductResponseBody) *products.UpdateProductResult {
-	v := &products.UpdateProductResult{
-		Success: *body.Success,
-	}
-	v.Product = unmarshalResProductResponseBodyToProductsResProduct(body.Product)
-
-	return v
-}
-
-// NewUpdateProductUnknownError builds a products service updateProduct
-// endpoint unknown_error error.
-func NewUpdateProductUnknownError(body *UpdateProductUnknownErrorResponseBody) *products.UnknownError {
 	v := &products.UnknownError{
 		Err:       *body.Err,
 		ErrorCode: *body.ErrorCode,
@@ -301,25 +104,6 @@ func NewGetProductUnknownError(body *GetProductUnknownErrorResponseBody) *produc
 	return v
 }
 
-// ValidateGetAllProductsResponseBody runs the validations defined on
-// GetAllProductsResponseBody
-func ValidateGetAllProductsResponseBody(body *GetAllProductsResponseBody) (err error) {
-	if body.Products == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("products", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	for _, e := range body.Products {
-		if e != nil {
-			if err2 := ValidateResProductResponseBody(e); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
 // ValidateGetAllProductsByCategoryResponseBody runs the validations defined on
 // GetAllProductsByCategoryResponseBody
 func ValidateGetAllProductsByCategoryResponseBody(body *GetAllProductsByCategoryResponseBody) (err error) {
@@ -334,49 +118,6 @@ func ValidateGetAllProductsByCategoryResponseBody(body *GetAllProductsByCategory
 			if err2 := ValidateResProductResponseBody(e); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
-		}
-	}
-	return
-}
-
-// ValidateDeleteProductResponseBody runs the validations defined on
-// DeleteProductResponseBody
-func ValidateDeleteProductResponseBody(body *DeleteProductResponseBody) (err error) {
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	return
-}
-
-// ValidateCreateProductResponseBody runs the validations defined on
-// CreateProductResponseBody
-func ValidateCreateProductResponseBody(body *CreateProductResponseBody) (err error) {
-	if body.Product == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("product", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.Product != nil {
-		if err2 := ValidateResProductResponseBody(body.Product); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// ValidateUpdateProductResponseBody runs the validations defined on
-// UpdateProductResponseBody
-func ValidateUpdateProductResponseBody(body *UpdateProductResponseBody) (err error) {
-	if body.Product == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("product", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.Product != nil {
-		if err2 := ValidateResProductResponseBody(body.Product); err2 != nil {
-			err = goa.MergeErrors(err, err2)
 		}
 	}
 	return
@@ -399,69 +140,9 @@ func ValidateGetProductResponseBody(body *GetProductResponseBody) (err error) {
 	return
 }
 
-// ValidateGetAllProductsUnknownErrorResponseBody runs the validations defined
-// on getAllProducts_unknown_error_response_body
-func ValidateGetAllProductsUnknownErrorResponseBody(body *GetAllProductsUnknownErrorResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ErrorCode == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
-	}
-	return
-}
-
 // ValidateGetAllProductsByCategoryUnknownErrorResponseBody runs the
 // validations defined on getAllProductsByCategory_unknown_error_response_body
 func ValidateGetAllProductsByCategoryUnknownErrorResponseBody(body *GetAllProductsByCategoryUnknownErrorResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ErrorCode == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
-	}
-	return
-}
-
-// ValidateDeleteProductUnknownErrorResponseBody runs the validations defined
-// on deleteProduct_unknown_error_response_body
-func ValidateDeleteProductUnknownErrorResponseBody(body *DeleteProductUnknownErrorResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ErrorCode == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
-	}
-	return
-}
-
-// ValidateCreateProductUnknownErrorResponseBody runs the validations defined
-// on createProduct_unknown_error_response_body
-func ValidateCreateProductUnknownErrorResponseBody(body *CreateProductUnknownErrorResponseBody) (err error) {
-	if body.Err == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
-	}
-	if body.Success == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
-	}
-	if body.ErrorCode == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
-	}
-	return
-}
-
-// ValidateUpdateProductUnknownErrorResponseBody runs the validations defined
-// on updateProduct_unknown_error_response_body
-func ValidateUpdateProductUnknownErrorResponseBody(body *UpdateProductUnknownErrorResponseBody) (err error) {
 	if body.Err == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}
@@ -509,21 +190,6 @@ func ValidateResProductResponseBody(body *ResProductResponseBody) (err error) {
 	}
 	if body.ID != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.id", *body.ID, goa.FormatUUID))
-	}
-	return
-}
-
-// ValidatePayloadProductRequestBody runs the validations defined on
-// payloadProductRequestBody
-func ValidatePayloadProductRequestBody(body *PayloadProductRequestBody) (err error) {
-	if utf8.RuneCountInString(body.Name) < 3 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError("body.name", body.Name, utf8.RuneCountInString(body.Name), 3, true))
-	}
-	if body.Price < 0 {
-		err = goa.MergeErrors(err, goa.InvalidRangeError("body.price", body.Price, 0, true))
-	}
-	if !(body.Category == "men" || body.Category == "women" || body.Category == "hat" || body.Category == "jacket" || body.Category == "sneaker" || body.Category == "nothing") {
-		err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.category", body.Category, []interface{}{"men", "women", "hat", "jacket", "sneaker", "nothing"}))
 	}
 	return
 }

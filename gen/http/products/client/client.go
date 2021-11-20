@@ -17,25 +17,9 @@ import (
 
 // Client lists the products service endpoint HTTP clients.
 type Client struct {
-	// GetAllProducts Doer is the HTTP client used to make requests to the
-	// getAllProducts endpoint.
-	GetAllProductsDoer goahttp.Doer
-
 	// GetAllProductsByCategory Doer is the HTTP client used to make requests to
 	// the getAllProductsByCategory endpoint.
 	GetAllProductsByCategoryDoer goahttp.Doer
-
-	// DeleteProduct Doer is the HTTP client used to make requests to the
-	// deleteProduct endpoint.
-	DeleteProductDoer goahttp.Doer
-
-	// CreateProduct Doer is the HTTP client used to make requests to the
-	// createProduct endpoint.
-	CreateProductDoer goahttp.Doer
-
-	// UpdateProduct Doer is the HTTP client used to make requests to the
-	// updateProduct endpoint.
-	UpdateProductDoer goahttp.Doer
 
 	// GetProduct Doer is the HTTP client used to make requests to the getProduct
 	// endpoint.
@@ -64,11 +48,7 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		GetAllProductsDoer:           doer,
 		GetAllProductsByCategoryDoer: doer,
-		DeleteProductDoer:            doer,
-		CreateProductDoer:            doer,
-		UpdateProductDoer:            doer,
 		GetProductDoer:               doer,
 		CORSDoer:                     doer,
 		RestoreResponseBody:          restoreBody,
@@ -76,30 +56,6 @@ func NewClient(
 		host:                         host,
 		decoder:                      dec,
 		encoder:                      enc,
-	}
-}
-
-// GetAllProducts returns an endpoint that makes HTTP requests to the products
-// service getAllProducts server.
-func (c *Client) GetAllProducts() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeGetAllProductsRequest(c.encoder)
-		decodeResponse = DecodeGetAllProductsResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildGetAllProductsRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.GetAllProductsDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("products", "getAllProducts", err)
-		}
-		return decodeResponse(resp)
 	}
 }
 
@@ -122,78 +78,6 @@ func (c *Client) GetAllProductsByCategory() goa.Endpoint {
 		resp, err := c.GetAllProductsByCategoryDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("products", "getAllProductsByCategory", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// DeleteProduct returns an endpoint that makes HTTP requests to the products
-// service deleteProduct server.
-func (c *Client) DeleteProduct() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeDeleteProductRequest(c.encoder)
-		decodeResponse = DecodeDeleteProductResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildDeleteProductRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.DeleteProductDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("products", "deleteProduct", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// CreateProduct returns an endpoint that makes HTTP requests to the products
-// service createProduct server.
-func (c *Client) CreateProduct() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeCreateProductRequest(c.encoder)
-		decodeResponse = DecodeCreateProductResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildCreateProductRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.CreateProductDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("products", "createProduct", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// UpdateProduct returns an endpoint that makes HTTP requests to the products
-// service updateProduct server.
-func (c *Client) UpdateProduct() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeUpdateProductRequest(c.encoder)
-		decodeResponse = DecodeUpdateProductResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildUpdateProductRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.UpdateProductDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("products", "updateProduct", err)
 		}
 		return decodeResponse(resp)
 	}

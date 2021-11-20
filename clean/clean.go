@@ -109,8 +109,8 @@ func main() {
 						lines[i+1] = fmt.Sprintf("\t%vEndpoints *%v.Endpoints\n", method, method) + lines[i+1]
 					}
 					// INITIALIZE IT
-					if strings.Contains(line, "api.NewServer()") {
-						lines[i+1] = fmt.Sprintf("\t\t%vSvc %v.Service = api.New%v(logger, server)\n", method, method, strings.Title(method)) + lines[i+1]
+					if strings.Contains(line, "// Initialize the services.") {
+						lines[i+2] = fmt.Sprintf("\t\t%vSvc %v.Service = api.New%v(logger, server)\n", method, method, strings.Title(method)) + lines[i+1]
 					}
 					// Wrap the services
 					if strings.Contains(line, "apiEndpoints ApiEndpoints = ApiEndpoints{") {
@@ -131,7 +131,7 @@ func main() {
 				for i, line := range lines {
 					// Add to the import
 					if strings.Contains(line, `jwttokensvr "`) {
-						lines[i+1] = fmt.Sprintf(`\t%vsvr "/gen/http/%v/server"\n`, method, method) + lines[i+1]
+						lines[i+1] = fmt.Sprintf("\t"+`%vsvr "/gen/http/%v/server"`+"\n", method, method) + lines[i+1]
 					}
 					// Build the service HTTP request
 					if strings.Contains(line, "openapiServer  *openapisvr.Server") {

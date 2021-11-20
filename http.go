@@ -2,6 +2,7 @@ package main
 
 import (
 	"api_crud/config"
+	boProductssrvc "api_crud/gen/http/bo_products/server"
 	bouserssrv "api_crud/gen/http/bo_users/server"
 	jwttokensvr "api_crud/gen/http/jwt_token/server"
 	oauthsvr "api_crud/gen/http/o_auth/server"
@@ -58,17 +59,19 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 	// the service input and output data structures to HTTP requests and
 	// responses.
 	var (
-		eh                                 = errorHandler(logger)
-		openapiServer  *openapisvr.Server  = openapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("../../gen/http"))
-		bo_usersServer *bouserssrv.Server  = bouserssrv.New(api.bo_usersEndpoints, mux, dec, enc, eh, nil)
-		usersServer    *userssvr.Server    = userssvr.New(api.usersEndpoints, mux, dec, enc, eh, nil)
-		jwtTokenServer *jwttokensvr.Server = jwttokensvr.New(api.jwtTokenEndpoints, mux, dec, enc, eh, nil)
-		oAuthServer    *oauthsvr.Server    = oauthsvr.New(api.oAuthEndpoints, mux, dec, enc, eh, nil)
-		productsServer *productssvr.Server = productssvr.New(api.productsEndpoints, mux, dec, enc, eh, nil)
+		eh                                       = errorHandler(logger)
+		openapiServer     *openapisvr.Server     = openapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("../../gen/http"))
+		bo_productsServer *boProductssrvc.Server = boProductssrvc.New(api.bo_productsEndpoints, mux, dec, enc, eh, nil)
+		bo_usersServer    *bouserssrv.Server     = bouserssrv.New(api.bo_usersEndpoints, mux, dec, enc, eh, nil)
+		usersServer       *userssvr.Server       = userssvr.New(api.usersEndpoints, mux, dec, enc, eh, nil)
+		jwtTokenServer    *jwttokensvr.Server    = jwttokensvr.New(api.jwtTokenEndpoints, mux, dec, enc, eh, nil)
+		oAuthServer       *oauthsvr.Server       = oauthsvr.New(api.oAuthEndpoints, mux, dec, enc, eh, nil)
+		productsServer    *productssvr.Server    = productssvr.New(api.productsEndpoints, mux, dec, enc, eh, nil)
 	)
 	{
 		if debug {
 			servers := goahttp.Servers{
+				bo_productsServer,
 				bo_usersServer,
 				usersServer,
 				openapiServer,
@@ -81,6 +84,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 	}
 	// Configure the mux.
 	openapisvr.Mount(mux, openapiServer)
+	boProductssrvc.Mount(mux, bo_productsServer)
 	bouserssrv.Mount(mux, bo_usersServer)
 	userssvr.Mount(mux, usersServer)
 	jwttokensvr.Mount(mux, jwtTokenServer)

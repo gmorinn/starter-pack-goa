@@ -16,16 +16,8 @@ import (
 
 // Products of the E-Commerce
 type Service interface {
-	// Get All products
-	GetAllProducts(context.Context, *GetAllProductsPayload) (res *GetAllProductsResult, err error)
 	// Get All products by category
 	GetAllProductsByCategory(context.Context, *GetAllProductsByCategoryPayload) (res *GetAllProductsByCategoryResult, err error)
-	// Delete one product by ID
-	DeleteProduct(context.Context, *DeleteProductPayload) (res *DeleteProductResult, err error)
-	// Create one product
-	CreateProduct(context.Context, *CreateProductPayload) (res *CreateProductResult, err error)
-	// Update one product
-	UpdateProduct(context.Context, *UpdateProductPayload) (res *UpdateProductResult, err error)
 	// Get one product
 	GetProduct(context.Context, *GetProductPayload) (res *GetProductResult, err error)
 }
@@ -34,8 +26,6 @@ type Service interface {
 type Auther interface {
 	// OAuth2Auth implements the authorization logic for the OAuth2 security scheme.
 	OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error)
-	// JWTAuth implements the authorization logic for the JWT security scheme.
-	JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -46,22 +36,7 @@ const ServiceName = "products"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"getAllProducts", "getAllProductsByCategory", "deleteProduct", "createProduct", "updateProduct", "getProduct"}
-
-// GetAllProductsPayload is the payload type of the products service
-// getAllProducts method.
-type GetAllProductsPayload struct {
-	// Use to generate Oauth with /authorization
-	Oauth *string
-}
-
-// GetAllProductsResult is the result type of the products service
-// getAllProducts method.
-type GetAllProductsResult struct {
-	// All products by category
-	Products []*ResProduct
-	Success  bool
-}
+var MethodNames = [2]string{"getAllProductsByCategory", "getProduct"}
 
 // GetAllProductsByCategoryPayload is the payload type of the products service
 // getAllProductsByCategory method.
@@ -77,59 +52,6 @@ type GetAllProductsByCategoryResult struct {
 	// Result is an array of object
 	Products []*ResProduct
 	Success  bool
-}
-
-// DeleteProductPayload is the payload type of the products service
-// deleteProduct method.
-type DeleteProductPayload struct {
-	ID string
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
-	// Use to generate Oauth with /authorization
-	Oauth *string
-}
-
-// DeleteProductResult is the result type of the products service deleteProduct
-// method.
-type DeleteProductResult struct {
-	Success bool
-}
-
-// CreateProductPayload is the payload type of the products service
-// createProduct method.
-type CreateProductPayload struct {
-	Product *PayloadProduct
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
-	// Use to generate Oauth with /authorization
-	Oauth *string
-}
-
-// CreateProductResult is the result type of the products service createProduct
-// method.
-type CreateProductResult struct {
-	// Result is an object
-	Product *ResProduct
-	Success bool
-}
-
-// UpdateProductPayload is the payload type of the products service
-// updateProduct method.
-type UpdateProductPayload struct {
-	ID      string
-	Product *PayloadProduct
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
-	// Use to generate Oauth with /authorization
-	Oauth *string
-}
-
-// UpdateProductResult is the result type of the products service updateProduct
-// method.
-type UpdateProductResult struct {
-	// Result is an Object
-	Product *ResProduct
-	Success bool
 }
 
 // GetProductPayload is the payload type of the products service getProduct
@@ -151,13 +73,6 @@ type GetProductResult struct {
 
 type ResProduct struct {
 	ID       string
-	Name     string
-	Price    float64
-	Cover    string
-	Category string
-}
-
-type PayloadProduct struct {
 	Name     string
 	Price    float64
 	Cover    string

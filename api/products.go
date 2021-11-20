@@ -72,90 +72,6 @@ func (s *productssrvc) GetAllProductsByCategory(ctx context.Context, p *products
 	return res, nil
 }
 
-// Delete one product by ID
-func (s *productssrvc) DeleteProduct(ctx context.Context, p *products.DeleteProductPayload) (res *products.DeleteProductResult, err error) {
-	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		if err := q.DeleteProduct(ctx, uuid.MustParse(p.ID)); err != nil {
-			return fmt.Errorf("ERROR_DELETE_PRODUCT_BY_ID %v", err)
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, s.errorResponse("TX_DELETE_PRODUCT", err)
-	}
-	return &products.DeleteProductResult{Success: true}, nil
-}
-
-// Create one product
-func (s *productssrvc) CreateProduct(ctx context.Context, p *products.CreateProductPayload) (res *products.CreateProductResult, err error) {
-	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		arg := db.CreateProductParams{
-			Name:     p.Product.Name,
-			Price:    p.Product.Price,
-			Cover:    p.Product.Cover,
-			Category: db.Categories(p.Product.Category),
-		}
-		createdProduct, err := q.CreateProduct(ctx, arg)
-		if err != nil {
-			return fmt.Errorf("ERROR_CREATE_PRODUCT %v", err)
-		}
-		newProduct, err := q.GetProduct(ctx, createdProduct.ID)
-		if err != nil {
-			return fmt.Errorf("ERROR_GET_PRODUCT_BY_ID %v", err)
-		}
-		res = &products.CreateProductResult{
-			Product: &products.ResProduct{
-				ID:       newProduct.ID.String(),
-				Name:     newProduct.Name,
-				Cover:    newProduct.Cover,
-				Price:    newProduct.Price,
-				Category: string(newProduct.Category),
-			},
-			Success: true,
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, s.errorResponse("TX_CREATE_PRODUCT", err)
-	}
-	return res, nil
-}
-
-// Update one product
-func (s *productssrvc) UpdateProduct(ctx context.Context, p *products.UpdateProductPayload) (res *products.UpdateProductResult, err error) {
-	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		arg := db.UpdateProductParams{
-			ID:       uuid.MustParse(p.ID),
-			Name:     p.Product.Name,
-			Price:    p.Product.Price,
-			Cover:    p.Product.Cover,
-			Category: db.Categories(p.Product.Category),
-		}
-		if err := q.UpdateProduct(ctx, arg); err != nil {
-			return fmt.Errorf("ERROR_UPDATE_PRODUCT %v", err)
-		}
-		newProduct, err := q.GetProduct(ctx, uuid.MustParse(p.ID))
-		if err != nil {
-			return fmt.Errorf("ERROR_GET_PRODUCT_BY_ID %v", err)
-		}
-		res = &products.UpdateProductResult{
-			Product: &products.ResProduct{
-				ID:       newProduct.ID.String(),
-				Name:     newProduct.Name,
-				Cover:    newProduct.Cover,
-				Price:    newProduct.Price,
-				Category: string(newProduct.Category),
-			},
-			Success: true,
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, s.errorResponse("TX_UPDATE_PRODUCT", err)
-	}
-	return res, nil
-}
-
 // Get one product
 func (s *productssrvc) GetProduct(ctx context.Context, p *products.GetProductPayload) (res *products.GetProductResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
@@ -177,36 +93,6 @@ func (s *productssrvc) GetProduct(ctx context.Context, p *products.GetProductPay
 	})
 	if err != nil {
 		return nil, s.errorResponse("TX_GET_PRODUCT_ID", err)
-	}
-	return res, nil
-}
-
-func (s *productssrvc) GetAllProducts(ctx context.Context, p *products.GetAllProductsPayload) (res *products.GetAllProductsResult, err error) {
-	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		p, err := s.server.Store.GetAllProducts(ctx)
-		if err != nil {
-			return fmt.Errorf("ERROR_GET_ALL_PRODUCTS %v", err)
-		}
-		var ProductsResponse []*products.ResProduct
-		for _, v := range p {
-			id := v.ID.String()
-			ProductsResponse = append(ProductsResponse, &products.ResProduct{
-				ID:       id,
-				Name:     v.Name,
-				Price:    v.Price,
-				Cover:    v.Cover,
-				Category: string(v.Category),
-			})
-
-			res = &products.GetAllProductsResult{
-				Products: ProductsResponse,
-				Success:  true,
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, s.errorResponse("TX_GET_PRODUCTS", err)
 	}
 	return res, nil
 }

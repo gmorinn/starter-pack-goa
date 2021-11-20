@@ -20,11 +20,7 @@ import (
 // Server lists the products service endpoint HTTP handlers.
 type Server struct {
 	Mounts                   []*MountPoint
-	GetAllProducts           http.Handler
 	GetAllProductsByCategory http.Handler
-	DeleteProduct            http.Handler
-	CreateProduct            http.Handler
-	UpdateProduct            http.Handler
 	GetProduct               http.Handler
 	CORS                     http.Handler
 }
@@ -62,23 +58,12 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"GetAllProducts", "GET", "/v1/web/products"},
 			{"GetAllProductsByCategory", "GET", "/v1/web/products/category/{category}"},
-			{"DeleteProduct", "DELETE", "/v1/web/product/remove/{id}"},
-			{"CreateProduct", "POST", "/v1/web/product/add"},
-			{"UpdateProduct", "PUT", "/v1/web/product/{id}"},
 			{"GetProduct", "GET", "/v1/web/product/{id}"},
-			{"CORS", "OPTIONS", "/v1/web/products"},
 			{"CORS", "OPTIONS", "/v1/web/products/category/{category}"},
-			{"CORS", "OPTIONS", "/v1/web/product/remove/{id}"},
-			{"CORS", "OPTIONS", "/v1/web/product/add"},
 			{"CORS", "OPTIONS", "/v1/web/product/{id}"},
 		},
-		GetAllProducts:           NewGetAllProductsHandler(e.GetAllProducts, mux, decoder, encoder, errhandler, formatter),
 		GetAllProductsByCategory: NewGetAllProductsByCategoryHandler(e.GetAllProductsByCategory, mux, decoder, encoder, errhandler, formatter),
-		DeleteProduct:            NewDeleteProductHandler(e.DeleteProduct, mux, decoder, encoder, errhandler, formatter),
-		CreateProduct:            NewCreateProductHandler(e.CreateProduct, mux, decoder, encoder, errhandler, formatter),
-		UpdateProduct:            NewUpdateProductHandler(e.UpdateProduct, mux, decoder, encoder, errhandler, formatter),
 		GetProduct:               NewGetProductHandler(e.GetProduct, mux, decoder, encoder, errhandler, formatter),
 		CORS:                     NewCORSHandler(),
 	}
@@ -89,75 +74,16 @@ func (s *Server) Service() string { return "products" }
 
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
-	s.GetAllProducts = m(s.GetAllProducts)
 	s.GetAllProductsByCategory = m(s.GetAllProductsByCategory)
-	s.DeleteProduct = m(s.DeleteProduct)
-	s.CreateProduct = m(s.CreateProduct)
-	s.UpdateProduct = m(s.UpdateProduct)
 	s.GetProduct = m(s.GetProduct)
 	s.CORS = m(s.CORS)
 }
 
 // Mount configures the mux to serve the products endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
-	MountGetAllProductsHandler(mux, h.GetAllProducts)
 	MountGetAllProductsByCategoryHandler(mux, h.GetAllProductsByCategory)
-	MountDeleteProductHandler(mux, h.DeleteProduct)
-	MountCreateProductHandler(mux, h.CreateProduct)
-	MountUpdateProductHandler(mux, h.UpdateProduct)
 	MountGetProductHandler(mux, h.GetProduct)
 	MountCORSHandler(mux, h.CORS)
-}
-
-// MountGetAllProductsHandler configures the mux to serve the "products"
-// service "getAllProducts" endpoint.
-func MountGetAllProductsHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := HandleProductsOrigin(h).(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("GET", "/v1/web/products", f)
-}
-
-// NewGetAllProductsHandler creates a HTTP handler which loads the HTTP request
-// and calls the "products" service "getAllProducts" endpoint.
-func NewGetAllProductsHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeGetAllProductsRequest(mux, decoder)
-		encodeResponse = EncodeGetAllProductsResponse(encoder)
-		encodeError    = EncodeGetAllProductsError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "getAllProducts")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "products")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
 }
 
 // MountGetAllProductsByCategoryHandler configures the mux to serve the
@@ -191,159 +117,6 @@ func NewGetAllProductsByCategoryHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "getAllProductsByCategory")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "products")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
-}
-
-// MountDeleteProductHandler configures the mux to serve the "products" service
-// "deleteProduct" endpoint.
-func MountDeleteProductHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := HandleProductsOrigin(h).(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("DELETE", "/v1/web/product/remove/{id}", f)
-}
-
-// NewDeleteProductHandler creates a HTTP handler which loads the HTTP request
-// and calls the "products" service "deleteProduct" endpoint.
-func NewDeleteProductHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeDeleteProductRequest(mux, decoder)
-		encodeResponse = EncodeDeleteProductResponse(encoder)
-		encodeError    = EncodeDeleteProductError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "deleteProduct")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "products")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
-}
-
-// MountCreateProductHandler configures the mux to serve the "products" service
-// "createProduct" endpoint.
-func MountCreateProductHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := HandleProductsOrigin(h).(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("POST", "/v1/web/product/add", f)
-}
-
-// NewCreateProductHandler creates a HTTP handler which loads the HTTP request
-// and calls the "products" service "createProduct" endpoint.
-func NewCreateProductHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeCreateProductRequest(mux, decoder)
-		encodeResponse = EncodeCreateProductResponse(encoder)
-		encodeError    = EncodeCreateProductError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "createProduct")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "products")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
-}
-
-// MountUpdateProductHandler configures the mux to serve the "products" service
-// "updateProduct" endpoint.
-func MountUpdateProductHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := HandleProductsOrigin(h).(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("PUT", "/v1/web/product/{id}", f)
-}
-
-// NewUpdateProductHandler creates a HTTP handler which loads the HTTP request
-// and calls the "products" service "updateProduct" endpoint.
-func NewUpdateProductHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeUpdateProductRequest(mux, decoder)
-		encodeResponse = EncodeUpdateProductResponse(encoder)
-		encodeError    = EncodeUpdateProductError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "updateProduct")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "products")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -426,10 +199,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/v1/web/products", f)
 	mux.Handle("OPTIONS", "/v1/web/products/category/{category}", f)
-	mux.Handle("OPTIONS", "/v1/web/product/remove/{id}", f)
-	mux.Handle("OPTIONS", "/v1/web/product/add", f)
 	mux.Handle("OPTIONS", "/v1/web/product/{id}", f)
 }
 
