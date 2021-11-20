@@ -37,6 +37,10 @@ type Client struct {
 	// updateProduct endpoint.
 	UpdateProductDoer goahttp.Doer
 
+	// DeleteManyProducts Doer is the HTTP client used to make requests to the
+	// deleteManyProducts endpoint.
+	DeleteManyProductsDoer goahttp.Doer
+
 	// GetProduct Doer is the HTTP client used to make requests to the getProduct
 	// endpoint.
 	GetProductDoer goahttp.Doer
@@ -69,6 +73,7 @@ func NewClient(
 		DeleteProductDoer:            doer,
 		CreateProductDoer:            doer,
 		UpdateProductDoer:            doer,
+		DeleteManyProductsDoer:       doer,
 		GetProductDoer:               doer,
 		CORSDoer:                     doer,
 		RestoreResponseBody:          restoreBody,
@@ -194,6 +199,30 @@ func (c *Client) UpdateProduct() goa.Endpoint {
 		resp, err := c.UpdateProductDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("boProducts", "updateProduct", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DeleteManyProducts returns an endpoint that makes HTTP requests to the
+// boProducts service deleteManyProducts server.
+func (c *Client) DeleteManyProducts() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteManyProductsRequest(c.encoder)
+		decodeResponse = DecodeDeleteManyProductsResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDeleteManyProductsRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteManyProductsDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("boProducts", "deleteManyProducts", err)
 		}
 		return decodeResponse(resp)
 	}

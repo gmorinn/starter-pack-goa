@@ -91,9 +91,6 @@ var _ = Service("boProducts", func() {
 		})
 		HTTP(func() {
 			DELETE("/product/remove/{id}")
-			Header("jwtToken:jwtToken", String, "Jwt token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
 			Response(StatusOK)
 		})
 		Result(func() {
@@ -117,9 +114,6 @@ var _ = Service("boProducts", func() {
 		})
 		HTTP(func() {
 			POST("/product/add")
-			Header("jwtToken:jwtToken", String, "Jwt token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
 			Response(StatusCreated)
 		})
 		Result(func() {
@@ -148,15 +142,35 @@ var _ = Service("boProducts", func() {
 		})
 		HTTP(func() {
 			PUT("/product/{id}")
-			Header("jwtToken:jwtToken", String, "Jwt token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
 			Response(StatusOK)
 		})
 		Result(func() {
 			Attribute("product", resBoProduct, "Result is an Object")
 			Attribute("success", Boolean)
 			Required("product", "success")
+		})
+	})
+
+	Method("deleteManyProducts", func() {
+		Description("Delete many products with IDs send in body")
+		Security(OAuth2, JWTAuth)
+		Payload(func() {
+			Attribute("tab", ArrayOf(String))
+			TokenField(1, "jwtToken", String, func() {
+				Description("JWT used for authentication after Signin/Signup")
+			})
+			AccessTokenField(2, "oauth", String, func() {
+				Description("Use to generate Oauth with /authorization")
+			})
+			Required("tab")
+		})
+		HTTP(func() {
+			PATCH("/products/remove")
+			Response(StatusOK)
+		})
+		Result(func() {
+			Attribute("success", Boolean)
+			Required("success")
 		})
 	})
 

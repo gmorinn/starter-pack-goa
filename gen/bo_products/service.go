@@ -26,6 +26,8 @@ type Service interface {
 	CreateProduct(context.Context, *CreateProductPayload) (res *CreateProductResult, err error)
 	// Update one product
 	UpdateProduct(context.Context, *UpdateProductPayload) (res *UpdateProductResult, err error)
+	// Delete many products with IDs send in body
+	DeleteManyProducts(context.Context, *DeleteManyProductsPayload) (res *DeleteManyProductsResult, err error)
 	// Get one product
 	GetProduct(context.Context, *GetProductPayload) (res *GetProductResult, err error)
 }
@@ -46,7 +48,7 @@ const ServiceName = "boProducts"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"getAllProducts", "getAllProductsByCategory", "deleteProduct", "createProduct", "updateProduct", "getProduct"}
+var MethodNames = [7]string{"getAllProducts", "getAllProductsByCategory", "deleteProduct", "createProduct", "updateProduct", "deleteManyProducts", "getProduct"}
 
 // GetAllProductsPayload is the payload type of the boProducts service
 // getAllProducts method.
@@ -133,6 +135,22 @@ type UpdateProductPayload struct {
 type UpdateProductResult struct {
 	// Result is an Object
 	Product *ResBoProduct
+	Success bool
+}
+
+// DeleteManyProductsPayload is the payload type of the boProducts service
+// deleteManyProducts method.
+type DeleteManyProductsPayload struct {
+	Tab []string
+	// JWT used for authentication after Signin/Signup
+	JWTToken *string
+	// Use to generate Oauth with /authorization
+	Oauth *string
+}
+
+// DeleteManyProductsResult is the result type of the boProducts service
+// deleteManyProducts method.
+type DeleteManyProductsResult struct {
 	Success bool
 }
 

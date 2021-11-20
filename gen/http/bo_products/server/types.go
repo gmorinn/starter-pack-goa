@@ -26,6 +26,12 @@ type UpdateProductRequestBody struct {
 	Product *PayloadProductRequestBody `form:"product,omitempty" json:"product,omitempty" xml:"product,omitempty"`
 }
 
+// DeleteManyProductsRequestBody is the type of the "boProducts" service
+// "deleteManyProducts" endpoint HTTP request body.
+type DeleteManyProductsRequestBody struct {
+	Tab []string `form:"tab,omitempty" json:"tab,omitempty" xml:"tab,omitempty"`
+}
+
 // GetAllProductsResponseBody is the type of the "boProducts" service
 // "getAllProducts" endpoint HTTP response body.
 type GetAllProductsResponseBody struct {
@@ -62,6 +68,12 @@ type UpdateProductResponseBody struct {
 	// Result is an Object
 	Product *ResBoProductResponseBody `form:"product" json:"product" xml:"product"`
 	Success bool                      `form:"success" json:"success" xml:"success"`
+}
+
+// DeleteManyProductsResponseBody is the type of the "boProducts" service
+// "deleteManyProducts" endpoint HTTP response body.
+type DeleteManyProductsResponseBody struct {
+	Success bool `form:"success" json:"success" xml:"success"`
 }
 
 // GetProductResponseBody is the type of the "boProducts" service "getProduct"
@@ -112,6 +124,15 @@ type CreateProductUnknownErrorResponseBody struct {
 // service "updateProduct" endpoint HTTP response body for the "unknown_error"
 // error.
 type UpdateProductUnknownErrorResponseBody struct {
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
+}
+
+// DeleteManyProductsUnknownErrorResponseBody is the type of the "boProducts"
+// service "deleteManyProducts" endpoint HTTP response body for the
+// "unknown_error" error.
+type DeleteManyProductsUnknownErrorResponseBody struct {
 	Err       string `form:"err" json:"err" xml:"err"`
 	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
 	Success   bool   `form:"success" json:"success" xml:"success"`
@@ -206,6 +227,15 @@ func NewUpdateProductResponseBody(res *boproducts.UpdateProductResult) *UpdatePr
 	return body
 }
 
+// NewDeleteManyProductsResponseBody builds the HTTP response body from the
+// result of the "deleteManyProducts" endpoint of the "boProducts" service.
+func NewDeleteManyProductsResponseBody(res *boproducts.DeleteManyProductsResult) *DeleteManyProductsResponseBody {
+	body := &DeleteManyProductsResponseBody{
+		Success: res.Success,
+	}
+	return body
+}
+
 // NewGetProductResponseBody builds the HTTP response body from the result of
 // the "getProduct" endpoint of the "boProducts" service.
 func NewGetProductResponseBody(res *boproducts.GetProductResult) *GetProductResponseBody {
@@ -267,6 +297,18 @@ func NewCreateProductUnknownErrorResponseBody(res *boproducts.UnknownError) *Cre
 // the result of the "updateProduct" endpoint of the "boProducts" service.
 func NewUpdateProductUnknownErrorResponseBody(res *boproducts.UnknownError) *UpdateProductUnknownErrorResponseBody {
 	body := &UpdateProductUnknownErrorResponseBody{
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
+	}
+	return body
+}
+
+// NewDeleteManyProductsUnknownErrorResponseBody builds the HTTP response body
+// from the result of the "deleteManyProducts" endpoint of the "boProducts"
+// service.
+func NewDeleteManyProductsUnknownErrorResponseBody(res *boproducts.UnknownError) *DeleteManyProductsUnknownErrorResponseBody {
+	body := &DeleteManyProductsUnknownErrorResponseBody{
 		Err:       res.Err,
 		ErrorCode: res.ErrorCode,
 		Success:   res.Success,
@@ -340,6 +382,20 @@ func NewUpdateProductPayload(body *UpdateProductRequestBody, id string, oauth *s
 	return v
 }
 
+// NewDeleteManyProductsPayload builds a boProducts service deleteManyProducts
+// endpoint payload.
+func NewDeleteManyProductsPayload(body *DeleteManyProductsRequestBody, oauth *string, jwtToken *string) *boproducts.DeleteManyProductsPayload {
+	v := &boproducts.DeleteManyProductsPayload{}
+	v.Tab = make([]string, len(body.Tab))
+	for i, val := range body.Tab {
+		v.Tab[i] = val
+	}
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
+
+	return v
+}
+
 // NewGetProductPayload builds a boProducts service getProduct endpoint payload.
 func NewGetProductPayload(id string, oauth *string, jwtToken *string) *boproducts.GetProductPayload {
 	v := &boproducts.GetProductPayload{}
@@ -374,6 +430,15 @@ func ValidateUpdateProductRequestBody(body *UpdateProductRequestBody) (err error
 		if err2 := ValidatePayloadProductRequestBody(body.Product); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	return
+}
+
+// ValidateDeleteManyProductsRequestBody runs the validations defined on
+// DeleteManyProductsRequestBody
+func ValidateDeleteManyProductsRequestBody(body *DeleteManyProductsRequestBody) (err error) {
+	if body.Tab == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("tab", "body"))
 	}
 	return
 }

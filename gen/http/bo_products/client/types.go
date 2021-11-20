@@ -26,6 +26,12 @@ type UpdateProductRequestBody struct {
 	Product *PayloadProductRequestBody `form:"product" json:"product" xml:"product"`
 }
 
+// DeleteManyProductsRequestBody is the type of the "boProducts" service
+// "deleteManyProducts" endpoint HTTP request body.
+type DeleteManyProductsRequestBody struct {
+	Tab []string `form:"tab" json:"tab" xml:"tab"`
+}
+
 // GetAllProductsResponseBody is the type of the "boProducts" service
 // "getAllProducts" endpoint HTTP response body.
 type GetAllProductsResponseBody struct {
@@ -62,6 +68,12 @@ type UpdateProductResponseBody struct {
 	// Result is an Object
 	Product *ResBoProductResponseBody `form:"product,omitempty" json:"product,omitempty" xml:"product,omitempty"`
 	Success *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// DeleteManyProductsResponseBody is the type of the "boProducts" service
+// "deleteManyProducts" endpoint HTTP response body.
+type DeleteManyProductsResponseBody struct {
+	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // GetProductResponseBody is the type of the "boProducts" service "getProduct"
@@ -117,6 +129,15 @@ type UpdateProductUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// DeleteManyProductsUnknownErrorResponseBody is the type of the "boProducts"
+// service "deleteManyProducts" endpoint HTTP response body for the
+// "unknown_error" error.
+type DeleteManyProductsUnknownErrorResponseBody struct {
+	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
+	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
+	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
 // GetProductUnknownErrorResponseBody is the type of the "boProducts" service
 // "getProduct" endpoint HTTP response body for the "unknown_error" error.
 type GetProductUnknownErrorResponseBody struct {
@@ -158,6 +179,19 @@ func NewUpdateProductRequestBody(p *boproducts.UpdateProductPayload) *UpdateProd
 	body := &UpdateProductRequestBody{}
 	if p.Product != nil {
 		body.Product = marshalBoproductsPayloadProductToPayloadProductRequestBody(p.Product)
+	}
+	return body
+}
+
+// NewDeleteManyProductsRequestBody builds the HTTP request body from the
+// payload of the "deleteManyProducts" endpoint of the "boProducts" service.
+func NewDeleteManyProductsRequestBody(p *boproducts.DeleteManyProductsPayload) *DeleteManyProductsRequestBody {
+	body := &DeleteManyProductsRequestBody{}
+	if p.Tab != nil {
+		body.Tab = make([]string, len(p.Tab))
+		for i, val := range p.Tab {
+			body.Tab[i] = val
+		}
 	}
 	return body
 }
@@ -282,6 +316,28 @@ func NewUpdateProductUnknownError(body *UpdateProductUnknownErrorResponseBody) *
 	return v
 }
 
+// NewDeleteManyProductsResultOK builds a "boProducts" service
+// "deleteManyProducts" endpoint result from a HTTP "OK" response.
+func NewDeleteManyProductsResultOK(body *DeleteManyProductsResponseBody) *boproducts.DeleteManyProductsResult {
+	v := &boproducts.DeleteManyProductsResult{
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewDeleteManyProductsUnknownError builds a boProducts service
+// deleteManyProducts endpoint unknown_error error.
+func NewDeleteManyProductsUnknownError(body *DeleteManyProductsUnknownErrorResponseBody) *boproducts.UnknownError {
+	v := &boproducts.UnknownError{
+		Err:       *body.Err,
+		ErrorCode: *body.ErrorCode,
+		Success:   *body.Success,
+	}
+
+	return v
+}
+
 // NewGetProductResultOK builds a "boProducts" service "getProduct" endpoint
 // result from a HTTP "OK" response.
 func NewGetProductResultOK(body *GetProductResponseBody) *boproducts.GetProductResult {
@@ -386,6 +442,15 @@ func ValidateUpdateProductResponseBody(body *UpdateProductResponseBody) (err err
 	return
 }
 
+// ValidateDeleteManyProductsResponseBody runs the validations defined on
+// DeleteManyProductsResponseBody
+func ValidateDeleteManyProductsResponseBody(body *DeleteManyProductsResponseBody) (err error) {
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
 // ValidateGetProductResponseBody runs the validations defined on
 // GetProductResponseBody
 func ValidateGetProductResponseBody(body *GetProductResponseBody) (err error) {
@@ -466,6 +531,21 @@ func ValidateCreateProductUnknownErrorResponseBody(body *CreateProductUnknownErr
 // ValidateUpdateProductUnknownErrorResponseBody runs the validations defined
 // on updateProduct_unknown_error_response_body
 func ValidateUpdateProductUnknownErrorResponseBody(body *UpdateProductUnknownErrorResponseBody) (err error) {
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.ErrorCode == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
+// ValidateDeleteManyProductsUnknownErrorResponseBody runs the validations
+// defined on deleteManyProducts_unknown_error_response_body
+func ValidateDeleteManyProductsUnknownErrorResponseBody(body *DeleteManyProductsUnknownErrorResponseBody) (err error) {
 	if body.Err == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}

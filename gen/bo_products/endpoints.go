@@ -21,6 +21,7 @@ type Endpoints struct {
 	DeleteProduct            goa.Endpoint
 	CreateProduct            goa.Endpoint
 	UpdateProduct            goa.Endpoint
+	DeleteManyProducts       goa.Endpoint
 	GetProduct               goa.Endpoint
 }
 
@@ -34,6 +35,7 @@ func NewEndpoints(s Service) *Endpoints {
 		DeleteProduct:            NewDeleteProductEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		CreateProduct:            NewCreateProductEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		UpdateProduct:            NewUpdateProductEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		DeleteManyProducts:       NewDeleteManyProductsEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		GetProduct:               NewGetProductEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 	}
 }
@@ -45,6 +47,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.DeleteProduct = m(e.DeleteProduct)
 	e.CreateProduct = m(e.CreateProduct)
 	e.UpdateProduct = m(e.UpdateProduct)
+	e.DeleteManyProducts = m(e.DeleteManyProducts)
 	e.GetProduct = m(e.GetProduct)
 }
 
@@ -255,6 +258,48 @@ func NewUpdateProductEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, a
 			return nil, err
 		}
 		return s.UpdateProduct(ctx, p)
+	}
+}
+
+// NewDeleteManyProductsEndpoint returns an endpoint function that calls the
+// method "deleteManyProducts" of service "boProducts".
+func NewDeleteManyProductsEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DeleteManyProductsPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "OAuth2",
+			Scopes:         []string{"api:read"},
+			RequiredScopes: []string{},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:       "client_credentials",
+					TokenURL:   "/authorization",
+					RefreshURL: "/refresh",
+				},
+			},
+		}
+		var token string
+		if p.Oauth != nil {
+			token = *p.Oauth
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err == nil {
+			sc := security.JWTScheme{
+				Name:           "jwt",
+				Scopes:         []string{"api:read", "api:write"},
+				RequiredScopes: []string{},
+			}
+			var token string
+			if p.JWTToken != nil {
+				token = *p.JWTToken
+			}
+			ctx, err = authJWTFn(ctx, token, &sc)
+		}
+		if err != nil {
+			return nil, err
+		}
+		return s.DeleteManyProducts(ctx, p)
 	}
 }
 

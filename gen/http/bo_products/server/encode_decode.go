@@ -460,6 +460,98 @@ func EncodeUpdateProductError(encoder func(context.Context, http.ResponseWriter)
 	}
 }
 
+// EncodeDeleteManyProductsResponse returns an encoder for responses returned
+// by the boProducts deleteManyProducts endpoint.
+func EncodeDeleteManyProductsResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*boproducts.DeleteManyProductsResult)
+		enc := encoder(ctx, w)
+		body := NewDeleteManyProductsResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeDeleteManyProductsRequest returns a decoder for requests sent to the
+// boProducts deleteManyProducts endpoint.
+func DecodeDeleteManyProductsRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body DeleteManyProductsRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateDeleteManyProductsRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+
+		var (
+			oauth    *string
+			jwtToken *string
+		)
+		oauthRaw := r.Header.Get("Authorization")
+		if oauthRaw != "" {
+			oauth = &oauthRaw
+		}
+		jwtTokenRaw := r.Header.Get("jwtToken")
+		if jwtTokenRaw != "" {
+			jwtToken = &jwtTokenRaw
+		}
+		payload := NewDeleteManyProductsPayload(&body, oauth, jwtToken)
+		if payload.Oauth != nil {
+			if strings.Contains(*payload.Oauth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Oauth, " ", 2)[1]
+				payload.Oauth = &cred
+			}
+		}
+		if payload.JWTToken != nil {
+			if strings.Contains(*payload.JWTToken, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.JWTToken, " ", 2)[1]
+				payload.JWTToken = &cred
+			}
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeDeleteManyProductsError returns an encoder for errors returned by the
+// deleteManyProducts boProducts endpoint.
+func EncodeDeleteManyProductsError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unknown_error":
+			res := v.(*boproducts.UnknownError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDeleteManyProductsUnknownErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // EncodeGetProductResponse returns an encoder for responses returned by the
 // boProducts getProduct endpoint.
 func EncodeGetProductResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {

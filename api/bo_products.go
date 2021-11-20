@@ -211,3 +211,18 @@ func (s *boProductssrvc) GetProduct(ctx context.Context, p *boproducts.GetProduc
 	}
 	return res, nil
 }
+
+func (s *boProductssrvc) DeleteManyProducts(ctx context.Context, p *boproducts.DeleteManyProductsPayload) (res *boproducts.DeleteManyProductsResult, err error) {
+	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		for _, v := range p.Tab {
+			if err := q.DeleteProduct(ctx, uuid.MustParse(v)); err != nil {
+				return fmt.Errorf("ERROR_DELETE_PRODUCT_BY_ID_%v %v", v, err)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, s.errorResponse("TX_DELETE_PRODUCTS", err)
+	}
+	return &boproducts.DeleteManyProductsResult{Success: true}, nil
+}

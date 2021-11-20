@@ -202,6 +202,48 @@ func BuildUpdateProductPayload(boProductsUpdateProductBody string, boProductsUpd
 	return v, nil
 }
 
+// BuildDeleteManyProductsPayload builds the payload for the boProducts
+// deleteManyProducts endpoint from CLI flags.
+func BuildDeleteManyProductsPayload(boProductsDeleteManyProductsBody string, boProductsDeleteManyProductsOauth string, boProductsDeleteManyProductsJWTToken string) (*boproducts.DeleteManyProductsPayload, error) {
+	var err error
+	var body DeleteManyProductsRequestBody
+	{
+		err = json.Unmarshal([]byte(boProductsDeleteManyProductsBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"tab\": [\n         \"Modi deserunt cum debitis odit.\",\n         \"Ipsa sint.\"\n      ]\n   }'")
+		}
+		if body.Tab == nil {
+			err = goa.MergeErrors(err, goa.MissingFieldError("tab", "body"))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var oauth *string
+	{
+		if boProductsDeleteManyProductsOauth != "" {
+			oauth = &boProductsDeleteManyProductsOauth
+		}
+	}
+	var jwtToken *string
+	{
+		if boProductsDeleteManyProductsJWTToken != "" {
+			jwtToken = &boProductsDeleteManyProductsJWTToken
+		}
+	}
+	v := &boproducts.DeleteManyProductsPayload{}
+	if body.Tab != nil {
+		v.Tab = make([]string, len(body.Tab))
+		for i, val := range body.Tab {
+			v.Tab[i] = val
+		}
+	}
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
+
+	return v, nil
+}
+
 // BuildGetProductPayload builds the payload for the boProducts getProduct
 // endpoint from CLI flags.
 func BuildGetProductPayload(boProductsGetProductID string, boProductsGetProductOauth string, boProductsGetProductJWTToken string) (*boproducts.GetProductPayload, error) {

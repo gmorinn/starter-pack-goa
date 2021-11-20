@@ -36,6 +36,11 @@ func UpdateProductBoProductsPath(id string) string {
 	return fmt.Sprintf("/v1/bo/product/%v", id)
 }
 
+// DeleteManyProductsBoProductsPath returns the URL path to the boProducts service deleteManyProducts HTTP endpoint.
+func DeleteManyProductsBoProductsPath() string {
+	return "/v1/bo/products/remove"
+}
+
 // GetProductBoProductsPath returns the URL path to the boProducts service getProduct HTTP endpoint.
 func GetProductBoProductsPath(id string) string {
 	return fmt.Sprintf("/v1/bo/product/%v", id)

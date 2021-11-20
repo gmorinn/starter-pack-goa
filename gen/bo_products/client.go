@@ -20,17 +20,19 @@ type Client struct {
 	DeleteProductEndpoint            goa.Endpoint
 	CreateProductEndpoint            goa.Endpoint
 	UpdateProductEndpoint            goa.Endpoint
+	DeleteManyProductsEndpoint       goa.Endpoint
 	GetProductEndpoint               goa.Endpoint
 }
 
 // NewClient initializes a "boProducts" service client given the endpoints.
-func NewClient(getAllProducts, getAllProductsByCategory, deleteProduct, createProduct, updateProduct, getProduct goa.Endpoint) *Client {
+func NewClient(getAllProducts, getAllProductsByCategory, deleteProduct, createProduct, updateProduct, deleteManyProducts, getProduct goa.Endpoint) *Client {
 	return &Client{
 		GetAllProductsEndpoint:           getAllProducts,
 		GetAllProductsByCategoryEndpoint: getAllProductsByCategory,
 		DeleteProductEndpoint:            deleteProduct,
 		CreateProductEndpoint:            createProduct,
 		UpdateProductEndpoint:            updateProduct,
+		DeleteManyProductsEndpoint:       deleteManyProducts,
 		GetProductEndpoint:               getProduct,
 	}
 }
@@ -85,6 +87,17 @@ func (c *Client) UpdateProduct(ctx context.Context, p *UpdateProductPayload) (re
 		return
 	}
 	return ires.(*UpdateProductResult), nil
+}
+
+// DeleteManyProducts calls the "deleteManyProducts" endpoint of the
+// "boProducts" service.
+func (c *Client) DeleteManyProducts(ctx context.Context, p *DeleteManyProductsPayload) (res *DeleteManyProductsResult, err error) {
+	var ires interface{}
+	ires, err = c.DeleteManyProductsEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*DeleteManyProductsResult), nil
 }
 
 // GetProduct calls the "getProduct" endpoint of the "boProducts" service.

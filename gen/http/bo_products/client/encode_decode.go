@@ -538,6 +538,107 @@ func DecodeUpdateProductResponse(decoder func(*http.Response) goahttp.Decoder, r
 	}
 }
 
+// BuildDeleteManyProductsRequest instantiates a HTTP request object with
+// method and path set to call the "boProducts" service "deleteManyProducts"
+// endpoint
+func (c *Client) BuildDeleteManyProductsRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteManyProductsBoProductsPath()}
+	req, err := http.NewRequest("PATCH", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("boProducts", "deleteManyProducts", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeDeleteManyProductsRequest returns an encoder for requests sent to the
+// boProducts deleteManyProducts server.
+func EncodeDeleteManyProductsRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*boproducts.DeleteManyProductsPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("boProducts", "deleteManyProducts", "*boproducts.DeleteManyProductsPayload", v)
+		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		if p.JWTToken != nil {
+			head := *p.JWTToken
+			req.Header.Set("jwtToken", head)
+		}
+		body := NewDeleteManyProductsRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("boProducts", "deleteManyProducts", err)
+		}
+		return nil
+	}
+}
+
+// DecodeDeleteManyProductsResponse returns a decoder for responses returned by
+// the boProducts deleteManyProducts endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeDeleteManyProductsResponse may return the following errors:
+//	- "unknown_error" (type *boproducts.UnknownError): http.StatusInternalServerError
+//	- error: internal error
+func DecodeDeleteManyProductsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body DeleteManyProductsResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("boProducts", "deleteManyProducts", err)
+			}
+			err = ValidateDeleteManyProductsResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("boProducts", "deleteManyProducts", err)
+			}
+			res := NewDeleteManyProductsResultOK(&body)
+			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body DeleteManyProductsUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("boProducts", "deleteManyProducts", err)
+			}
+			err = ValidateDeleteManyProductsUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("boProducts", "deleteManyProducts", err)
+			}
+			return nil, NewDeleteManyProductsUnknownError(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("boProducts", "deleteManyProducts", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildGetProductRequest instantiates a HTTP request object with method and
 // path set to call the "boProducts" service "getProduct" endpoint
 func (c *Client) BuildGetProductRequest(ctx context.Context, v interface{}) (*http.Request, error) {
