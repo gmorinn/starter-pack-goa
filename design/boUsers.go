@@ -74,14 +74,51 @@ var _ = Service("boUsers", func() {
 	Method("createUser", func() {
 		Description("Create one User")
 		Payload(func() {
-			Attribute("user", payloadUser)
+			Attribute("firstname", String, func() {
+				Example("Guillaume")
+				MinLength(3)
+			})
+			Attribute("lastname", String, func() {
+				Example("Morin")
+				MinLength(3)
+			})
+			Attribute("email", String, func() {
+				Format(FormatEmail)
+				Example("guillaume.morin@epitech.eu")
+			})
+			Attribute("birthday", String, func() {
+				Default("")
+				Example("01/09/2002")
+			})
+			Attribute("phone", String, func() {
+				Default("")
+				Example("+262 692 12 34 56")
+			})
+			Attribute("role", String, func() {
+				Default("user")
+				Enum("user", "pro", "admin")
+				Example("user")
+			})
+			Attribute("password", String, func() {
+				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Pattern("\\d")
+				MinLength(8)
+				Example("JeSuisUnTest974")
+			})
+			Attribute("confirm_password", String, func() {
+				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Pattern("\\d")
+				MinLength(8)
+				Example("JeSuisUnTest974")
+			})
+			Required("email", "firstname", "lastname")
 			TokenField(1, "jwtToken", String, func() {
 				Description("JWT used for authentication after Signin/Signup")
 			})
 			AccessTokenField(2, "oauth", String, func() {
 				Description("Use to generate Oauth with /authorization")
 			})
-			Required("user")
+			Required("firstname", "lastname", "email", "password", "confirm_password")
 		})
 		HTTP(func() {
 			POST("/user/add")
@@ -148,6 +185,29 @@ var _ = Service("boUsers", func() {
 			Required("user", "success")
 		})
 	})
+
+	Method("deleteManyUsers", func() {
+		Description("Delete many users with IDs send in body")
+		Security(OAuth2, JWTAuth)
+		Payload(func() {
+			Attribute("tab", ArrayOf(String))
+			TokenField(1, "jwtToken", String, func() {
+				Description("JWT used for authentication after Signin/Signup")
+			})
+			AccessTokenField(2, "oauth", String, func() {
+				Description("Use to generate Oauth with /authorization")
+			})
+			Required("tab")
+		})
+		HTTP(func() {
+			PATCH("/users/remove")
+			Response(StatusOK)
+		})
+		Result(func() {
+			Attribute("success", Boolean)
+			Required("success")
+		})
+	})
 })
 
 var resBoUser = Type("resBoUser", func() {
@@ -173,6 +233,11 @@ var resBoUser = Type("resBoUser", func() {
 		Default("")
 		Example("+262 692 12 34 56")
 	})
+	Attribute("role", String, func() {
+		Default("user")
+		Enum("user", "pro", "admin")
+		Example("user")
+	})
 	Required("id", "email")
 })
 
@@ -192,6 +257,11 @@ var payloadUser = Type("payloadUser", func() {
 	Attribute("birthday", String, func() {
 		Default("")
 		Example("01/09/2002")
+	})
+	Attribute("role", String, func() {
+		Default("user")
+		Enum("user", "pro", "admin")
+		Example("user")
 	})
 	Attribute("phone", String, func() {
 		Default("")

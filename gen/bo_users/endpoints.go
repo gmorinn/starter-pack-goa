@@ -16,11 +16,12 @@ import (
 
 // Endpoints wraps the "boUsers" service endpoints.
 type Endpoints struct {
-	GetAllusers goa.Endpoint
-	DeleteUser  goa.Endpoint
-	CreateUser  goa.Endpoint
-	UpdateUser  goa.Endpoint
-	GetUser     goa.Endpoint
+	GetAllusers     goa.Endpoint
+	DeleteUser      goa.Endpoint
+	CreateUser      goa.Endpoint
+	UpdateUser      goa.Endpoint
+	GetUser         goa.Endpoint
+	DeleteManyUsers goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "boUsers" service with endpoints.
@@ -28,11 +29,12 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		GetAllusers: NewGetAllusersEndpoint(s, a.OAuth2Auth, a.JWTAuth),
-		DeleteUser:  NewDeleteUserEndpoint(s, a.OAuth2Auth, a.JWTAuth),
-		CreateUser:  NewCreateUserEndpoint(s, a.OAuth2Auth, a.JWTAuth),
-		UpdateUser:  NewUpdateUserEndpoint(s, a.OAuth2Auth, a.JWTAuth),
-		GetUser:     NewGetUserEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		GetAllusers:     NewGetAllusersEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		DeleteUser:      NewDeleteUserEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		CreateUser:      NewCreateUserEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		UpdateUser:      NewUpdateUserEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		GetUser:         NewGetUserEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		DeleteManyUsers: NewDeleteManyUsersEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 	}
 }
 
@@ -43,6 +45,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.CreateUser = m(e.CreateUser)
 	e.UpdateUser = m(e.UpdateUser)
 	e.GetUser = m(e.GetUser)
+	e.DeleteManyUsers = m(e.DeleteManyUsers)
 }
 
 // NewGetAllusersEndpoint returns an endpoint function that calls the method
@@ -252,5 +255,47 @@ func NewGetUserEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWT
 			return nil, err
 		}
 		return s.GetUser(ctx, p)
+	}
+}
+
+// NewDeleteManyUsersEndpoint returns an endpoint function that calls the
+// method "deleteManyUsers" of service "boUsers".
+func NewDeleteManyUsersEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DeleteManyUsersPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "OAuth2",
+			Scopes:         []string{"api:read"},
+			RequiredScopes: []string{},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:       "client_credentials",
+					TokenURL:   "/authorization",
+					RefreshURL: "/refresh",
+				},
+			},
+		}
+		var token string
+		if p.Oauth != nil {
+			token = *p.Oauth
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err == nil {
+			sc := security.JWTScheme{
+				Name:           "jwt",
+				Scopes:         []string{"api:read", "api:write"},
+				RequiredScopes: []string{},
+			}
+			var token string
+			if p.JWTToken != nil {
+				token = *p.JWTToken
+			}
+			ctx, err = authJWTFn(ctx, token, &sc)
+		}
+		if err != nil {
+			return nil, err
+		}
+		return s.DeleteManyUsers(ctx, p)
 	}
 }

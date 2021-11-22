@@ -11,8 +11,8 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (firstname, lastname, email, phone, birthday)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO users (firstname, lastname, email, phone, birthday, role, password)
+VALUES ($1, $2, $3, $4, $5, $6, crypt($7, gen_salt('bf')))
 RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
 `
 
@@ -22,6 +22,8 @@ type CreateUserParams struct {
 	Email     string         `json:"email"`
 	Phone     sql.NullString `json:"phone"`
 	Birthday  sql.NullString `json:"birthday"`
+	Role      Role           `json:"role"`
+	Crypt     interface{}    `json:"crypt"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -31,6 +33,8 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Email,
 		arg.Phone,
 		arg.Birthday,
+		arg.Role,
+		arg.Crypt,
 	)
 	var i User
 	err := row.Scan(
@@ -147,9 +151,10 @@ SET
     email = $3,
     phone = $4,
     birthday = $5,
+    role = $6,
     updated_at = NOW()
 WHERE
-    id = $6
+    id = $7
 RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
 `
 
@@ -159,6 +164,7 @@ type UpdateUserParams struct {
 	Email     string         `json:"email"`
 	Phone     sql.NullString `json:"phone"`
 	Birthday  sql.NullString `json:"birthday"`
+	Role      Role           `json:"role"`
 	ID        uuid.UUID      `json:"id"`
 }
 
@@ -169,6 +175,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
 		arg.Email,
 		arg.Phone,
 		arg.Birthday,
+		arg.Role,
 		arg.ID,
 	)
 	return err

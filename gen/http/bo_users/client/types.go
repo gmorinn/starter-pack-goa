@@ -17,13 +17,28 @@ import (
 // CreateUserRequestBody is the type of the "boUsers" service "createUser"
 // endpoint HTTP request body.
 type CreateUserRequestBody struct {
-	User *PayloadUserRequestBody `form:"user" json:"user" xml:"user"`
+	Firstname string `form:"firstname" json:"firstname" xml:"firstname"`
+	Lastname  string `form:"lastname" json:"lastname" xml:"lastname"`
+	Email     string `form:"email" json:"email" xml:"email"`
+	Birthday  string `form:"birthday" json:"birthday" xml:"birthday"`
+	Phone     string `form:"phone" json:"phone" xml:"phone"`
+	Role      string `form:"role" json:"role" xml:"role"`
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Password string `form:"password" json:"password" xml:"password"`
+	// Minimum 8 charactères / Chiffre Obligatoire
+	ConfirmPassword string `form:"confirm_password" json:"confirm_password" xml:"confirm_password"`
 }
 
 // UpdateUserRequestBody is the type of the "boUsers" service "updateUser"
 // endpoint HTTP request body.
 type UpdateUserRequestBody struct {
 	User *PayloadUserRequestBody `form:"User" json:"User" xml:"User"`
+}
+
+// DeleteManyUsersRequestBody is the type of the "boUsers" service
+// "deleteManyUsers" endpoint HTTP request body.
+type DeleteManyUsersRequestBody struct {
+	Tab []string `form:"tab" json:"tab" xml:"tab"`
 }
 
 // GetAllusersResponseBody is the type of the "boUsers" service "getAllusers"
@@ -62,6 +77,12 @@ type GetUserResponseBody struct {
 	// Result is an object
 	User    *ResBoUserResponseBody `form:"user,omitempty" json:"user,omitempty" xml:"user,omitempty"`
 	Success *bool                  `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// DeleteManyUsersResponseBody is the type of the "boUsers" service
+// "deleteManyUsers" endpoint HTTP response body.
+type DeleteManyUsersResponseBody struct {
+	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // GetAllusersUnknownErrorResponseBody is the type of the "boUsers" service
@@ -104,6 +125,14 @@ type GetUserUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// DeleteManyUsersUnknownErrorResponseBody is the type of the "boUsers" service
+// "deleteManyUsers" endpoint HTTP response body for the "unknown_error" error.
+type DeleteManyUsersUnknownErrorResponseBody struct {
+	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
+	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
+	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
 // ResBoUserResponseBody is used to define fields on response body types.
 type ResBoUserResponseBody struct {
 	ID        *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -112,6 +141,7 @@ type ResBoUserResponseBody struct {
 	Email     *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	Birthday  *string `form:"birthday,omitempty" json:"birthday,omitempty" xml:"birthday,omitempty"`
 	Phone     *string `form:"phone,omitempty" json:"phone,omitempty" xml:"phone,omitempty"`
+	Role      *string `form:"role,omitempty" json:"role,omitempty" xml:"role,omitempty"`
 }
 
 // PayloadUserRequestBody is used to define fields on request body types.
@@ -120,15 +150,40 @@ type PayloadUserRequestBody struct {
 	Lastname  string `form:"lastname" json:"lastname" xml:"lastname"`
 	Email     string `form:"email" json:"email" xml:"email"`
 	Birthday  string `form:"birthday" json:"birthday" xml:"birthday"`
+	Role      string `form:"role" json:"role" xml:"role"`
 	Phone     string `form:"phone" json:"phone" xml:"phone"`
 }
 
 // NewCreateUserRequestBody builds the HTTP request body from the payload of
 // the "createUser" endpoint of the "boUsers" service.
 func NewCreateUserRequestBody(p *bousers.CreateUserPayload) *CreateUserRequestBody {
-	body := &CreateUserRequestBody{}
-	if p.User != nil {
-		body.User = marshalBousersPayloadUserToPayloadUserRequestBody(p.User)
+	body := &CreateUserRequestBody{
+		Firstname:       p.Firstname,
+		Lastname:        p.Lastname,
+		Email:           p.Email,
+		Birthday:        p.Birthday,
+		Phone:           p.Phone,
+		Role:            p.Role,
+		Password:        p.Password,
+		ConfirmPassword: p.ConfirmPassword,
+	}
+	{
+		var zero string
+		if body.Birthday == zero {
+			body.Birthday = ""
+		}
+	}
+	{
+		var zero string
+		if body.Phone == zero {
+			body.Phone = ""
+		}
+	}
+	{
+		var zero string
+		if body.Role == zero {
+			body.Role = "user"
+		}
 	}
 	return body
 }
@@ -139,6 +194,19 @@ func NewUpdateUserRequestBody(p *bousers.UpdateUserPayload) *UpdateUserRequestBo
 	body := &UpdateUserRequestBody{}
 	if p.User != nil {
 		body.User = marshalBousersPayloadUserToPayloadUserRequestBody(p.User)
+	}
+	return body
+}
+
+// NewDeleteManyUsersRequestBody builds the HTTP request body from the payload
+// of the "deleteManyUsers" endpoint of the "boUsers" service.
+func NewDeleteManyUsersRequestBody(p *bousers.DeleteManyUsersPayload) *DeleteManyUsersRequestBody {
+	body := &DeleteManyUsersRequestBody{}
+	if p.Tab != nil {
+		body.Tab = make([]string, len(p.Tab))
+		for i, val := range p.Tab {
+			body.Tab[i] = val
+		}
 	}
 	return body
 }
@@ -260,6 +328,28 @@ func NewGetUserUnknownError(body *GetUserUnknownErrorResponseBody) *bousers.Unkn
 	return v
 }
 
+// NewDeleteManyUsersResultOK builds a "boUsers" service "deleteManyUsers"
+// endpoint result from a HTTP "OK" response.
+func NewDeleteManyUsersResultOK(body *DeleteManyUsersResponseBody) *bousers.DeleteManyUsersResult {
+	v := &bousers.DeleteManyUsersResult{
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewDeleteManyUsersUnknownError builds a boUsers service deleteManyUsers
+// endpoint unknown_error error.
+func NewDeleteManyUsersUnknownError(body *DeleteManyUsersUnknownErrorResponseBody) *bousers.UnknownError {
+	v := &bousers.UnknownError{
+		Err:       *body.Err,
+		ErrorCode: *body.ErrorCode,
+		Success:   *body.Success,
+	}
+
+	return v
+}
+
 // ValidateGetAllusersResponseBody runs the validations defined on
 // GetAllusersResponseBody
 func ValidateGetAllusersResponseBody(body *GetAllusersResponseBody) (err error) {
@@ -339,6 +429,15 @@ func ValidateGetUserResponseBody(body *GetUserResponseBody) (err error) {
 	return
 }
 
+// ValidateDeleteManyUsersResponseBody runs the validations defined on
+// DeleteManyUsersResponseBody
+func ValidateDeleteManyUsersResponseBody(body *DeleteManyUsersResponseBody) (err error) {
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
 // ValidateGetAllusersUnknownErrorResponseBody runs the validations defined on
 // getAllusers_unknown_error_response_body
 func ValidateGetAllusersUnknownErrorResponseBody(body *GetAllusersUnknownErrorResponseBody) (err error) {
@@ -414,6 +513,21 @@ func ValidateGetUserUnknownErrorResponseBody(body *GetUserUnknownErrorResponseBo
 	return
 }
 
+// ValidateDeleteManyUsersUnknownErrorResponseBody runs the validations defined
+// on deleteManyUsers_unknown_error_response_body
+func ValidateDeleteManyUsersUnknownErrorResponseBody(body *DeleteManyUsersUnknownErrorResponseBody) (err error) {
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.ErrorCode == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
 // ValidateResBoUserResponseBody runs the validations defined on
 // resBoUserResponseBody
 func ValidateResBoUserResponseBody(body *ResBoUserResponseBody) (err error) {
@@ -429,6 +543,11 @@ func ValidateResBoUserResponseBody(body *ResBoUserResponseBody) (err error) {
 	if body.Email != nil {
 		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", *body.Email, goa.FormatEmail))
 	}
+	if body.Role != nil {
+		if !(*body.Role == "user" || *body.Role == "pro" || *body.Role == "admin") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.role", *body.Role, []interface{}{"user", "pro", "admin"}))
+		}
+	}
 	return
 }
 
@@ -443,5 +562,8 @@ func ValidatePayloadUserRequestBody(body *PayloadUserRequestBody) (err error) {
 	}
 	err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
 
+	if !(body.Role == "user" || body.Role == "pro" || body.Role == "admin") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.role", body.Role, []interface{}{"user", "pro", "admin"}))
+	}
 	return
 }

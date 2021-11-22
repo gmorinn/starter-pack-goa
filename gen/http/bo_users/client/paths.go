@@ -35,3 +35,8 @@ func UpdateUserBoUsersPath(id string) string {
 func GetUserBoUsersPath(id string) string {
 	return fmt.Sprintf("/v1/bo/user/%v", id)
 }
+
+// DeleteManyUsersBoUsersPath returns the URL path to the boUsers service deleteManyUsers HTTP endpoint.
+func DeleteManyUsersBoUsersPath() string {
+	return "/v1/bo/users/remove"
+}

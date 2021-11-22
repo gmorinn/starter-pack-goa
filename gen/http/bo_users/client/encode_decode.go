@@ -537,6 +537,106 @@ func DecodeGetUserResponse(decoder func(*http.Response) goahttp.Decoder, restore
 	}
 }
 
+// BuildDeleteManyUsersRequest instantiates a HTTP request object with method
+// and path set to call the "boUsers" service "deleteManyUsers" endpoint
+func (c *Client) BuildDeleteManyUsersRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteManyUsersBoUsersPath()}
+	req, err := http.NewRequest("PATCH", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("boUsers", "deleteManyUsers", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeDeleteManyUsersRequest returns an encoder for requests sent to the
+// boUsers deleteManyUsers server.
+func EncodeDeleteManyUsersRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*bousers.DeleteManyUsersPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("boUsers", "deleteManyUsers", "*bousers.DeleteManyUsersPayload", v)
+		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		if p.JWTToken != nil {
+			head := *p.JWTToken
+			req.Header.Set("jwtToken", head)
+		}
+		body := NewDeleteManyUsersRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("boUsers", "deleteManyUsers", err)
+		}
+		return nil
+	}
+}
+
+// DecodeDeleteManyUsersResponse returns a decoder for responses returned by
+// the boUsers deleteManyUsers endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeDeleteManyUsersResponse may return the following errors:
+//	- "unknown_error" (type *bousers.UnknownError): http.StatusInternalServerError
+//	- error: internal error
+func DecodeDeleteManyUsersResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body DeleteManyUsersResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("boUsers", "deleteManyUsers", err)
+			}
+			err = ValidateDeleteManyUsersResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("boUsers", "deleteManyUsers", err)
+			}
+			res := NewDeleteManyUsersResultOK(&body)
+			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body DeleteManyUsersUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("boUsers", "deleteManyUsers", err)
+			}
+			err = ValidateDeleteManyUsersUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("boUsers", "deleteManyUsers", err)
+			}
+			return nil, NewDeleteManyUsersUnknownError(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("boUsers", "deleteManyUsers", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalResBoUserResponseBodyToBousersResBoUser builds a value of type
 // *bousers.ResBoUser from a value of type *ResBoUserResponseBody.
 func unmarshalResBoUserResponseBodyToBousersResBoUser(v *ResBoUserResponseBody) *bousers.ResBoUser {
@@ -552,11 +652,17 @@ func unmarshalResBoUserResponseBodyToBousersResBoUser(v *ResBoUserResponseBody) 
 	if v.Phone != nil {
 		res.Phone = *v.Phone
 	}
+	if v.Role != nil {
+		res.Role = *v.Role
+	}
 	if v.Birthday == nil {
 		res.Birthday = ""
 	}
 	if v.Phone == nil {
 		res.Phone = ""
+	}
+	if v.Role == nil {
+		res.Role = "user"
 	}
 
 	return res
@@ -570,12 +676,19 @@ func marshalBousersPayloadUserToPayloadUserRequestBody(v *bousers.PayloadUser) *
 		Lastname:  v.Lastname,
 		Email:     v.Email,
 		Birthday:  v.Birthday,
+		Role:      v.Role,
 		Phone:     v.Phone,
 	}
 	{
 		var zero string
 		if res.Birthday == zero {
 			res.Birthday = ""
+		}
+	}
+	{
+		var zero string
+		if res.Role == zero {
+			res.Role = "user"
 		}
 	}
 	{
@@ -596,12 +709,19 @@ func marshalPayloadUserRequestBodyToBousersPayloadUser(v *PayloadUserRequestBody
 		Lastname:  v.Lastname,
 		Email:     v.Email,
 		Birthday:  v.Birthday,
+		Role:      v.Role,
 		Phone:     v.Phone,
 	}
 	{
 		var zero string
 		if res.Birthday == zero {
 			res.Birthday = ""
+		}
+	}
+	{
+		var zero string
+		if res.Role == zero {
+			res.Role = "user"
 		}
 	}
 	{

@@ -27,9 +27,9 @@ paths:
             schema:
               $ref: '#/components/schemas/OAuthRequestBody'
             example:
-              client_id: Eius sed.
-              client_secret: Illum velit dicta facilis necessitatibus.
-              grant_type: Est adipisci omnis quo consequatur.
+              client_id: Aliquam dicta accusamus quis aut quisquam porro.
+              client_secret: Vitae dolorum dolorem enim.
+              grant_type: Quia natus est.
       responses:
         "201":
           description: Created response.
@@ -38,10 +38,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/OAuthResponse'
               example:
-                access_token: Voluptates vel nihil corporis eos ut.
-                expires_in: 2404884110623812833
+                access_token: Impedit voluptatum earum aperiam molestiae.
+                expires_in: 4372094714214760277
                 success: false
-                token_type: Quia exercitationem culpa.
+                token_type: Blanditiis id rerum provident consequuntur.
         "400":
           description: Bad Request response.
           content:
@@ -49,24 +49,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/OAuthResponse'
               example:
-                access_token: Est voluptas ab ex.
-                expires_in: 5980968658470230820
-                success: true
-                token_type: Ut nulla corporis in dolor velit.
+                access_token: Quam in et voluptatem perspiciatis maiores amet.
+                expires_in: 4576454520189478081
+                success: false
+                token_type: Soluta labore quo nobis voluptatem et.
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Et est occaecati voluptas et sit maxime.
+              example: Autem veniam inventore perspiciatis.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Nihil quis.
+              example: Quam adipisci id voluptate est labore expedita.
         "500":
           description: Internal Server Error response.
           content:
@@ -76,7 +76,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: false
+                success: true
   /openapi.json:
     get:
       tags:
@@ -115,7 +115,7 @@ paths:
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-                success: false
+                success: true
         "400":
           description: Bad Request response.
           content:
@@ -123,22 +123,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Et pariatur laudantium ab in et.
-                success: false
+                message: Sed dolores illum velit dicta.
+                success: true
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Voluptas atque optio officia temporibus non ut.
+              example: Voluptates vel nihil corporis eos ut.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Rerum rerum est odio eos dolore.
+              example: Est adipisci omnis quo consequatur.
         "500":
           description: Internal Server Error response.
           content:
@@ -167,7 +167,7 @@ paths:
               $ref: '#/components/schemas/AuthProvidersRequestBody'
             example:
               email: guillaume@epitech.eu
-              firebase_id_token: 7n2
+              firebase_id_token: e5g
               firebase_provider: facebook.com
               firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
               firstname: Guillaume
@@ -182,7 +182,7 @@ paths:
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-                success: false
+                success: true
         "400":
           description: Bad Request response.
           content:
@@ -190,7 +190,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Sign'
               example:
-                message: Eos culpa.
+                message: Voluptas et.
                 success: true
         "401":
           description: Unauthorized response.
@@ -198,14 +198,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Recusandae quia eius.
+              example: Ut nulla corporis in dolor velit.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Nam nobis porro ullam aliquam provident reprehenderit.
+              example: Est voluptas ab ex.
         "500":
           description: Internal Server Error response.
           content:
@@ -215,7 +215,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -253,22 +253,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Ut voluptate nostrum enim qui.
-                success: true
+                message: Quasi unde et.
+                success: false
         "401":
           description: Unauthorized response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Recusandae corporis minus omnis veritatis.
+              example: Reprehenderit harum.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Id dolores aut similique ratione ipsum aliquam.
+              example: Vel vitae nam nobis porro ullam aliquam.
         "500":
           description: Internal Server Error response.
           content:
@@ -296,7 +296,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SignupRequestBody'
             example:
-              birthday: Labore rerum repudiandae aperiam eos ad.
+              birthday: Id dolores aut similique ratione ipsum aliquam.
               confirm_password: JeSuisUnTest974
               email: guillaume@epitech.eu
               firstname: Guillaume
@@ -313,7 +313,7 @@ paths:
               example:
                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-                success: false
+                success: true
         "400":
           description: Bad Request response.
           content:
@@ -321,7 +321,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailAlreadyExist'
               example:
-                message: Ex adipisci perferendis eos voluptas numquam.
+                message: Temporibus et pariatur.
                 success: true
         "401":
           description: Unauthorized response.
@@ -329,14 +329,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: Doloremque id.
+              example: Ut mollitia aliquid minus.
         "403":
           description: Forbidden response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InvalidScopes'
-              example: In ea laboriosam quia et est.
+              example: Qui rerum rerum est odio eos.
         "500":
           description: Internal Server Error response.
           content:
@@ -460,7 +460,7 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   name: Guillaume
                   price: 69
-                success: true
+                success: false
         "500":
           description: Internal Server Error response.
           content:
@@ -470,7 +470,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -521,7 +521,7 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   name: Guillaume
                   price: 69
-                success: false
+                success: true
         "500":
           description: Internal Server Error response.
           content:
@@ -531,7 +531,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -582,7 +582,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -631,6 +631,11 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   name: Guillaume
                   price: 69
+                - category: men
+                  cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 69
                 success: true
         "500":
           description: Internal Server Error response.
@@ -641,7 +646,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -705,6 +710,11 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   name: Guillaume
                   price: 69
+                - category: men
+                  cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 69
                 success: false
         "500":
           description: Internal Server Error response.
@@ -748,8 +758,9 @@ paths:
               $ref: '#/components/schemas/DeleteManyProductsRequestBody'
             example:
               tab:
-              - Modi deserunt cum debitis odit.
-              - Ipsa sint.
+              - Ratione repellendus voluptatem.
+              - Sunt numquam exercitationem expedita.
+              - Occaecati qui.
       responses:
         "200":
           description: OK response.
@@ -758,7 +769,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeleteProductResponseBody'
               example:
-                success: true
+                success: false
         "500":
           description: Internal Server Error response.
           content:
@@ -819,6 +830,7 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   lastname: Morin
                   phone: +262 692 12 34 56
+                  role: user
         "500":
           description: Internal Server Error response.
           content:
@@ -828,7 +840,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: false
+                success: true
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -873,6 +885,7 @@ paths:
                 firstname: Guillaume
                 lastname: Morin
                 phone: +262 692 12 34 56
+                role: user
       responses:
         "200":
           description: OK response.
@@ -881,7 +894,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CreateUserResponseBody'
               example:
-                success: true
+                success: false
                 user:
                   birthday: 01/09/2002
                   email: guillaume.morin@epitech.eu
@@ -889,6 +902,7 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   lastname: Morin
                   phone: +262 692 12 34 56
+                  role: user
         "500":
           description: Internal Server Error response.
           content:
@@ -898,7 +912,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -930,12 +944,14 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateUserRequestBody'
             example:
-              user:
-                birthday: 01/09/2002
-                email: guillaume.morin@epitech.eu
-                firstname: Guillaume
-                lastname: Morin
-                phone: +262 692 12 34 56
+              birthday: 01/09/2002
+              confirm_password: JeSuisUnTest974
+              email: guillaume.morin@epitech.eu
+              firstname: Guillaume
+              lastname: Morin
+              password: JeSuisUnTest974
+              phone: +262 692 12 34 56
+              role: user
       responses:
         "201":
           description: Created response.
@@ -944,7 +960,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CreateUserResponseBody'
               example:
-                success: true
+                success: false
                 user:
                   birthday: 01/09/2002
                   email: guillaume.morin@epitech.eu
@@ -952,6 +968,7 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   lastname: Morin
                   phone: +262 692 12 34 56
+                  role: user
         "500":
           description: Internal Server Error response.
           content:
@@ -1045,7 +1062,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetAllusersResponseBody'
               example:
-                success: false
+                success: true
                 users:
                 - birthday: 01/09/2002
                   email: guillaume.morin@epitech.eu
@@ -1053,18 +1070,21 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   lastname: Morin
                   phone: +262 692 12 34 56
+                  role: user
                 - birthday: 01/09/2002
                   email: guillaume.morin@epitech.eu
                   firstname: Guillaume
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   lastname: Morin
                   phone: +262 692 12 34 56
+                  role: user
                 - birthday: 01/09/2002
                   email: guillaume.morin@epitech.eu
                   firstname: Guillaume
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   lastname: Morin
                   phone: +262 692 12 34 56
+                  role: user
         "500":
           description: Internal Server Error response.
           content:
@@ -1075,6 +1095,60 @@ paths:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
                 success: false
+      security:
+      - OAuth2_header_Authorization:
+        - api:read
+        jwt_header_jwtToken:
+        - api:read
+        - api:write
+  /v1/bo/users/remove:
+    patch:
+      tags:
+      - boUsers
+      summary: deleteManyUsers boUsers
+      description: Delete many users with IDs send in body
+      operationId: boUsers#deleteManyUsers
+      parameters:
+      - name: jwtToken
+        in: header
+        description: Jwt token
+        allowEmptyValue: true
+        schema:
+          type: string
+          description: Jwt token
+          example: "Bearer \U000FE762\U000F7069鯬\U0009B65E\U0010D28B\U0010842D"
+          pattern: ^Bearer [^ ]+$
+        example: "Bearer \U00032DC4\U000599FA\U0001D1D3\U00057A5E\U000B1A96\U000E83A2"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteManyProductsRequestBody'
+            example:
+              tab:
+              - Autem sint vel in ea laboriosam quia.
+              - Est vitae distinctio impedit optio.
+              - Nostrum doloremque id distinctio.
+      responses:
+        "200":
+          description: OK response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteProductResponseBody'
+              example:
+                success: true
+        "500":
+          description: Internal Server Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownError'
+              example:
+                err: sql no rows affected
+                error_code: TX_UPDATE_ITEM
+                success: true
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -1123,7 +1197,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: true
+                success: false
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -1169,7 +1243,12 @@ paths:
                   id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                   name: Guillaume
                   price: 69
-                success: true
+                - category: men
+                  cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+                  id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  name: Guillaume
+                  price: 69
+                success: false
         "500":
           description: Internal Server Error response.
           content:
@@ -1179,7 +1258,7 @@ paths:
               example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: false
+                success: true
       security:
       - OAuth2_header_Authorization:
         - api:read
@@ -1208,16 +1287,16 @@ paths:
         schema:
           type: string
           description: Jwt token
-          example: "Bearer \U000FE762\U000F7069鯬\U0009B65E\U0010D28B\U0010842D"
+          example: "Bearer \U00099594\U0008572E\U000A3DF9\U00023A7F\U000402B0\U0003B577"
           pattern: ^Bearer [^ ]+$
-        example: "Bearer \U00032DC4\U000599FA\U0001D1D3\U00057A5E\U000B1A96\U000E83A2"
+        example: "Bearer \U00053D84\U00053F11"
       responses:
         "200":
           description: OK response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateUserResponseBody'
+                $ref: '#/components/schemas/GetUserResponseBody'
               example:
                 success: true
                 user:
@@ -1254,7 +1333,7 @@ components:
           format: email
         firebase_id_token:
           type: string
-          example: hi8
+          example: ayb
           minLength: 400
         firebase_provider:
           type: string
@@ -1274,7 +1353,7 @@ components:
           minLength: 3
       example:
         email: guillaume@epitech.eu
-        firebase_id_token: up9
+        firebase_id_token: yuh
         firebase_provider: facebook.com
         firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
         firstname: Guillaume
@@ -1321,17 +1400,61 @@ components:
     CreateUserRequestBody:
       type: object
       properties:
-        user:
-          $ref: '#/components/schemas/PayloadUser'
+        birthday:
+          type: string
+          default: ""
+          example: 01/09/2002
+        confirm_password:
+          type: string
+          description: Minimum 8 charactères / Chiffre Obligatoire
+          example: JeSuisUnTest974
+          pattern: \d
+          minLength: 8
+        email:
+          type: string
+          example: guillaume.morin@epitech.eu
+          format: email
+        firstname:
+          type: string
+          example: Guillaume
+          minLength: 3
+        lastname:
+          type: string
+          example: Morin
+          minLength: 3
+        password:
+          type: string
+          description: Minimum 8 charactères / Chiffre Obligatoire
+          example: JeSuisUnTest974
+          pattern: \d
+          minLength: 8
+        phone:
+          type: string
+          default: ""
+          example: +262 692 12 34 56
+        role:
+          type: string
+          default: user
+          example: user
+          enum:
+          - user
+          - pro
+          - admin
       example:
-        user:
-          birthday: 01/09/2002
-          email: guillaume.morin@epitech.eu
-          firstname: Guillaume
-          lastname: Morin
-          phone: +262 692 12 34 56
+        birthday: 01/09/2002
+        confirm_password: JeSuisUnTest974
+        email: guillaume.morin@epitech.eu
+        firstname: Guillaume
+        lastname: Morin
+        password: JeSuisUnTest974
+        phone: +262 692 12 34 56
+        role: user
       required:
-      - user
+      - email
+      - firstname
+      - lastname
+      - password
+      - confirm_password
     CreateUserResponseBody:
       type: object
       properties:
@@ -1349,6 +1472,7 @@ components:
           id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           lastname: Morin
           phone: +262 692 12 34 56
+          role: user
       required:
       - user
       - success
@@ -1359,17 +1483,14 @@ components:
           type: array
           items:
             type: string
-            example: Enim suscipit incidunt et.
+            example: Quasi est aut.
           example:
-          - Nostrum ullam sint ut.
-          - Accusantium autem est.
-          - Rerum ut.
+          - Quo est quisquam non accusamus nostrum.
+          - Voluptatem eum quia minima.
       example:
         tab:
-        - Nisi nam doloremque et ea dolore.
-        - Dolor consequuntur.
-        - Voluptates perferendis est quas.
-        - Consequatur aut maxime ut.
+        - Dolores omnis officia accusantium quibusdam eligendi est.
+        - Ex ab voluptate quisquam.
       required:
       - tab
     DeleteProductResponseBody:
@@ -1377,7 +1498,7 @@ components:
       properties:
         success:
           type: boolean
-          example: true
+          example: false
       example:
         success: true
       required:
@@ -1387,14 +1508,14 @@ components:
       properties:
         message:
           type: string
-          example: Incidunt quaerat.
+          example: Sunt fuga dolores et dolor esse sit.
         success:
           type: boolean
           default: false
           example: false
       description: When email already exist
       example:
-        message: Velit et nostrum et.
+        message: Sapiente labore cumque nulla dolor.
         success: true
       required:
       - message
@@ -1418,9 +1539,19 @@ components:
             id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
             name: Guillaume
             price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
+          - category: men
+            cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+            id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+            name: Guillaume
+            price: 69
         success:
           type: boolean
-          example: false
+          example: true
       example:
         products:
         - category: men
@@ -1447,7 +1578,7 @@ components:
       properties:
         success:
           type: boolean
-          example: false
+          example: true
         users:
           type: array
           items:
@@ -1460,26 +1591,30 @@ components:
             id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
             lastname: Morin
             phone: +262 692 12 34 56
+            role: user
           - birthday: 01/09/2002
             email: guillaume.morin@epitech.eu
             firstname: Guillaume
             id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
             lastname: Morin
             phone: +262 692 12 34 56
+            role: user
           - birthday: 01/09/2002
             email: guillaume.morin@epitech.eu
             firstname: Guillaume
             id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
             lastname: Morin
             phone: +262 692 12 34 56
+            role: user
           - birthday: 01/09/2002
             email: guillaume.morin@epitech.eu
             firstname: Guillaume
             id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
             lastname: Morin
             phone: +262 692 12 34 56
+            role: user
       example:
-        success: false
+        success: true
         users:
         - birthday: 01/09/2002
           email: guillaume.morin@epitech.eu
@@ -1487,35 +1622,64 @@ components:
           id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           lastname: Morin
           phone: +262 692 12 34 56
+          role: user
         - birthday: 01/09/2002
           email: guillaume.morin@epitech.eu
           firstname: Guillaume
           id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           lastname: Morin
           phone: +262 692 12 34 56
+          role: user
+        - birthday: 01/09/2002
+          email: guillaume.morin@epitech.eu
+          firstname: Guillaume
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          lastname: Morin
+          phone: +262 692 12 34 56
+          role: user
       required:
       - users
+      - success
+    GetUserResponseBody:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        user:
+          $ref: '#/components/schemas/ResUser'
+      example:
+        success: false
+        user:
+          birthday: 01/09/2002
+          email: guillaume.morin@epitech.eu
+          firstname: Guillaume
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          lastname: Morin
+          phone: +262 692 12 34 56
+      required:
+      - user
       - success
     InvalidScopes:
       type: string
       description: Token scopes are invalid
-      example: Qui ut quod rerum.
+      example: Soluta qui.
     OAuthRequestBody:
       type: object
       properties:
         client_id:
           type: string
-          example: Deleniti impedit ex.
+          example: Cumque possimus.
         client_secret:
           type: string
-          example: Dolor similique non veniam illum consequatur nam.
+          example: Ab qui impedit aperiam.
         grant_type:
           type: string
-          example: Voluptas magni enim consequuntur sit.
+          example: Explicabo adipisci.
       example:
-        client_id: Sit accusantium et eum porro id harum.
-        client_secret: Est aut est facilis.
-        grant_type: Est quisquam non accusamus nostrum.
+        client_id: Ipsam suscipit molestiae non eum dignissimos.
+        client_secret: Voluptatem voluptatem ducimus accusamus quia qui.
+        grant_type: Animi dolor rem nihil voluptatem.
       required:
       - client_id
       - client_secret
@@ -1525,22 +1689,22 @@ components:
       properties:
         access_token:
           type: string
-          example: Voluptatem eum quia minima.
+          example: Vero et deleniti.
         expires_in:
           type: integer
-          example: 1189794678597892622
+          example: 7780840030901499397
           format: int64
         success:
           type: boolean
-          example: false
+          example: true
         token_type:
           type: string
-          example: Et dolores omnis officia accusantium quibusdam eligendi.
+          example: Id debitis occaecati minima eius ab.
       example:
-        access_token: Ab voluptate quisquam.
-        expires_in: 8138737901411142860
-        success: true
-        token_type: Quae ratione voluptate ipsa aliquid nulla.
+        access_token: Id fuga et omnis sed.
+        expires_in: 6425252934581418062
+        success: false
+        token_type: Magnam aut doloremque delectus libero nostrum vel.
       required:
       - access_token
       - token_type
@@ -1604,12 +1768,21 @@ components:
           type: string
           default: ""
           example: +262 692 12 34 56
+        role:
+          type: string
+          default: user
+          example: user
+          enum:
+          - user
+          - pro
+          - admin
       example:
         birthday: 01/09/2002
         email: guillaume.morin@epitech.eu
         firstname: Guillaume
         lastname: Morin
         phone: +262 692 12 34 56
+        role: user
       required:
       - email
       - firstname
@@ -1681,6 +1854,50 @@ components:
           type: string
           default: ""
           example: +262 692 12 34 56
+        role:
+          type: string
+          default: user
+          example: user
+          enum:
+          - user
+          - pro
+          - admin
+      example:
+        birthday: 01/09/2002
+        email: guillaume.morin@epitech.eu
+        firstname: Guillaume
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        lastname: Morin
+        phone: +262 692 12 34 56
+        role: user
+      required:
+      - id
+      - email
+    ResUser:
+      type: object
+      properties:
+        birthday:
+          type: string
+          default: ""
+          example: 01/09/2002
+        email:
+          type: string
+          example: guillaume.morin@epitech.eu
+          format: email
+        firstname:
+          type: string
+          example: Guillaume
+        id:
+          type: string
+          example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          format: uuid
+        lastname:
+          type: string
+          example: Morin
+        phone:
+          type: string
+          default: ""
+          example: +262 692 12 34 56
       example:
         birthday: 01/09/2002
         email: guillaume.morin@epitech.eu
@@ -1702,11 +1919,11 @@ components:
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         success:
           type: boolean
-          example: false
+          example: true
       example:
         access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
         refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-        success: true
+        success: false
       required:
       - access_token
       - refresh_token
@@ -1736,7 +1953,7 @@ components:
         birthday:
           type: string
           default: ""
-          example: Consequatur voluptas consequatur.
+          example: Voluptatem sint.
         confirm_password:
           type: string
           description: Minimum 8 charactères / Chiffre Obligatoire
@@ -1767,7 +1984,7 @@ components:
           default: ""
           example: +262 692 12 34 56
       example:
-        birthday: Quaerat occaecati corrupti nihil.
+        birthday: Dolorum et iure et provident eum rem.
         confirm_password: JeSuisUnTest974
         email: guillaume@epitech.eu
         firstname: Guillaume
@@ -1792,12 +2009,12 @@ components:
         success:
           type: boolean
           default: false
-          example: true
+          example: false
       description: Error not identified (500)
       example:
         err: sql no rows affected
         error_code: TX_UPDATE_ITEM
-        success: false
+        success: true
       required:
       - err
       - success
@@ -1814,6 +2031,7 @@ components:
           firstname: Guillaume
           lastname: Morin
           phone: +262 692 12 34 56
+          role: user
       required:
       - User
   securitySchemes:

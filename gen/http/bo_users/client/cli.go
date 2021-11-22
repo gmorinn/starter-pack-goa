@@ -11,6 +11,7 @@ import (
 	bousers "api_crud/gen/bo_users"
 	"encoding/json"
 	"fmt"
+	"unicode/utf8"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -78,15 +79,26 @@ func BuildCreateUserPayload(boUsersCreateUserBody string, boUsersCreateUserOauth
 	{
 		err = json.Unmarshal([]byte(boUsersCreateUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"user\": {\n         \"birthday\": \"01/09/2002\",\n         \"email\": \"guillaume.morin@epitech.eu\",\n         \"firstname\": \"Guillaume\",\n         \"lastname\": \"Morin\",\n         \"phone\": \"+262 692 12 34 56\"\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"birthday\": \"01/09/2002\",\n      \"confirm_password\": \"JeSuisUnTest974\",\n      \"email\": \"guillaume.morin@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"JeSuisUnTest974\",\n      \"phone\": \"+262 692 12 34 56\",\n      \"role\": \"user\"\n   }'")
 		}
-		if body.User == nil {
-			err = goa.MergeErrors(err, goa.MissingFieldError("user", "body"))
+		if utf8.RuneCountInString(body.Firstname) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
 		}
-		if body.User != nil {
-			if err2 := ValidatePayloadUserRequestBody(body.User); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
+		if utf8.RuneCountInString(body.Lastname) < 3 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.lastname", body.Lastname, utf8.RuneCountInString(body.Lastname), 3, true))
+		}
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
+
+		if !(body.Role == "user" || body.Role == "pro" || body.Role == "admin") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.role", body.Role, []interface{}{"user", "pro", "admin"}))
+		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", body.Password, "\\d"))
+		if utf8.RuneCountInString(body.Password) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 8, true))
+		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.confirm_password", body.ConfirmPassword, "\\d"))
+		if utf8.RuneCountInString(body.ConfirmPassword) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.confirm_password", body.ConfirmPassword, utf8.RuneCountInString(body.ConfirmPassword), 8, true))
 		}
 		if err != nil {
 			return nil, err
@@ -104,9 +116,33 @@ func BuildCreateUserPayload(boUsersCreateUserBody string, boUsersCreateUserOauth
 			jwtToken = &boUsersCreateUserJWTToken
 		}
 	}
-	v := &bousers.CreateUserPayload{}
-	if body.User != nil {
-		v.User = marshalPayloadUserRequestBodyToBousersPayloadUser(body.User)
+	v := &bousers.CreateUserPayload{
+		Firstname:       body.Firstname,
+		Lastname:        body.Lastname,
+		Email:           body.Email,
+		Birthday:        body.Birthday,
+		Phone:           body.Phone,
+		Role:            body.Role,
+		Password:        body.Password,
+		ConfirmPassword: body.ConfirmPassword,
+	}
+	{
+		var zero string
+		if v.Birthday == zero {
+			v.Birthday = ""
+		}
+	}
+	{
+		var zero string
+		if v.Phone == zero {
+			v.Phone = ""
+		}
+	}
+	{
+		var zero string
+		if v.Role == zero {
+			v.Role = "user"
+		}
 	}
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
@@ -122,7 +158,7 @@ func BuildUpdateUserPayload(boUsersUpdateUserBody string, boUsersUpdateUserID st
 	{
 		err = json.Unmarshal([]byte(boUsersUpdateUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"User\": {\n         \"birthday\": \"01/09/2002\",\n         \"email\": \"guillaume.morin@epitech.eu\",\n         \"firstname\": \"Guillaume\",\n         \"lastname\": \"Morin\",\n         \"phone\": \"+262 692 12 34 56\"\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"User\": {\n         \"birthday\": \"01/09/2002\",\n         \"email\": \"guillaume.morin@epitech.eu\",\n         \"firstname\": \"Guillaume\",\n         \"lastname\": \"Morin\",\n         \"phone\": \"+262 692 12 34 56\",\n         \"role\": \"user\"\n      }\n   }'")
 		}
 		if body.User == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("User", "body"))
@@ -195,6 +231,48 @@ func BuildGetUserPayload(boUsersGetUserID string, boUsersGetUserOauth string, bo
 	}
 	v := &bousers.GetUserPayload{}
 	v.ID = id
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
+
+	return v, nil
+}
+
+// BuildDeleteManyUsersPayload builds the payload for the boUsers
+// deleteManyUsers endpoint from CLI flags.
+func BuildDeleteManyUsersPayload(boUsersDeleteManyUsersBody string, boUsersDeleteManyUsersOauth string, boUsersDeleteManyUsersJWTToken string) (*bousers.DeleteManyUsersPayload, error) {
+	var err error
+	var body DeleteManyUsersRequestBody
+	{
+		err = json.Unmarshal([]byte(boUsersDeleteManyUsersBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"tab\": [\n         \"Autem sint vel in ea laboriosam quia.\",\n         \"Est vitae distinctio impedit optio.\",\n         \"Nostrum doloremque id distinctio.\"\n      ]\n   }'")
+		}
+		if body.Tab == nil {
+			err = goa.MergeErrors(err, goa.MissingFieldError("tab", "body"))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var oauth *string
+	{
+		if boUsersDeleteManyUsersOauth != "" {
+			oauth = &boUsersDeleteManyUsersOauth
+		}
+	}
+	var jwtToken *string
+	{
+		if boUsersDeleteManyUsersJWTToken != "" {
+			jwtToken = &boUsersDeleteManyUsersJWTToken
+		}
+	}
+	v := &bousers.DeleteManyUsersPayload{}
+	if body.Tab != nil {
+		v.Tab = make([]string, len(body.Tab))
+		for i, val := range body.Tab {
+			v.Tab[i] = val
+		}
+	}
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
 

@@ -25,12 +25,13 @@ SET
     email = $3,
     phone = $4,
     birthday = $5,
+    role = $6,
     updated_at = NOW()
 WHERE
-    id = $6
+    id = $7
 RETURNING *;
 
 -- name: CreateUser :one
-INSERT INTO users (firstname, lastname, email, phone, birthday)
-VALUES ($1, $2, $3, $4, $5)
+INSERT INTO users (firstname, lastname, email, phone, birthday, role, password)
+VALUES ($1, $2, $3, $4, $5, $6, crypt($7, gen_salt('bf')))
 RETURNING *;

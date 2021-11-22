@@ -37,6 +37,10 @@ type Client struct {
 	// endpoint.
 	GetUserDoer goahttp.Doer
 
+	// DeleteManyUsers Doer is the HTTP client used to make requests to the
+	// deleteManyUsers endpoint.
+	DeleteManyUsersDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -65,6 +69,7 @@ func NewClient(
 		CreateUserDoer:      doer,
 		UpdateUserDoer:      doer,
 		GetUserDoer:         doer,
+		DeleteManyUsersDoer: doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -189,6 +194,30 @@ func (c *Client) GetUser() goa.Endpoint {
 		resp, err := c.GetUserDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("boUsers", "getUser", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DeleteManyUsers returns an endpoint that makes HTTP requests to the boUsers
+// service deleteManyUsers server.
+func (c *Client) DeleteManyUsers() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteManyUsersRequest(c.encoder)
+		decodeResponse = DecodeDeleteManyUsersResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDeleteManyUsersRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteManyUsersDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("boUsers", "deleteManyUsers", err)
 		}
 		return decodeResponse(resp)
 	}

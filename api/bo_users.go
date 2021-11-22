@@ -61,6 +61,7 @@ func (s *boUserssrvc) GetAllusers(ctx context.Context, p *bousers.GetAllusersPay
 				Email:     v.Email,
 				Phone:     v.Phone.String,
 				Birthday:  v.Birthday.String,
+				Role:      string(v.Role),
 			})
 		}
 		res = &bousers.GetAllusersResult{
@@ -91,13 +92,18 @@ func (s *boUserssrvc) DeleteUser(ctx context.Context, p *bousers.DeleteUserPaylo
 
 // Create one User
 func (s *boUserssrvc) CreateUser(ctx context.Context, p *bousers.CreateUserPayload) (res *bousers.CreateUserResult, err error) {
+	if p.Password != p.ConfirmPassword {
+		return nil, s.errorResponse("ERROR_PASSWORD", err)
+	}
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		arg := db.CreateUserParams{
-			Firstname: p.User.Firstname,
-			Lastname:  p.User.Lastname,
-			Email:     p.User.Email,
-			Phone:     utils.NullS(p.User.Phone),
-			Birthday:  utils.NullS(p.User.Birthday),
+			Firstname: p.Firstname,
+			Lastname:  p.Lastname,
+			Email:     p.Email,
+			Role:      db.Role(p.Role),
+			Phone:     utils.NullS(p.Phone),
+			Birthday:  utils.NullS(p.Birthday),
+			Crypt:     p.Password,
 		}
 		createUser, err := q.CreateUser(ctx, arg)
 		if err != nil {
@@ -109,9 +115,11 @@ func (s *boUserssrvc) CreateUser(ctx context.Context, p *bousers.CreateUserPaylo
 		}
 		res = &bousers.CreateUserResult{
 			User: &bousers.ResBoUser{
+				ID:        NewUsers.ID.String(),
 				Firstname: &NewUsers.Firstname,
 				Lastname:  &NewUsers.Lastname,
 				Email:     NewUsers.Email,
+				Role:      string(NewUsers.Role),
 				Phone:     NewUsers.Phone.String,
 				Birthday:  NewUsers.Birthday.String,
 			},
@@ -133,6 +141,7 @@ func (s *boUserssrvc) UpdateUser(ctx context.Context, p *bousers.UpdateUserPaylo
 			Firstname: p.User.Firstname,
 			Lastname:  p.User.Lastname,
 			Email:     p.User.Email,
+			Role:      db.Role(p.User.Role),
 			Phone:     utils.NullS(p.User.Phone),
 			Birthday:  utils.NullS(p.User.Birthday),
 		}
@@ -176,6 +185,7 @@ func (s *boUserssrvc) GetUser(ctx context.Context, p *bousers.GetUserPayload) (r
 				Email:     u.Email,
 				Phone:     u.Phone.String,
 				Birthday:  u.Birthday.String,
+				Role:      string(u.Role),
 			},
 			Success: true,
 		}
@@ -185,4 +195,19 @@ func (s *boUserssrvc) GetUser(ctx context.Context, p *bousers.GetUserPayload) (r
 		return nil, s.errorResponse("TX_GET_USER_BY_ID", err)
 	}
 	return res, nil
+}
+
+func (s *boUserssrvc) DeleteManyUsers(ctx context.Context, p *bousers.DeleteManyUsersPayload) (res *bousers.DeleteManyUsersResult, err error) {
+	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		for _, v := range p.Tab {
+			if err := q.DeleteUserByID(ctx, uuid.MustParse(v)); err != nil {
+				return fmt.Errorf("ERROR_DELETE_USER_BY_ID_%v %v", v, err)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, s.errorResponse("TX_DELETE_USERS", err)
+	}
+	return &bousers.DeleteManyUsersResult{Success: true}, nil
 }

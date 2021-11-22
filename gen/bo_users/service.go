@@ -26,6 +26,8 @@ type Service interface {
 	UpdateUser(context.Context, *UpdateUserPayload) (res *UpdateUserResult, err error)
 	// Get one User
 	GetUser(context.Context, *GetUserPayload) (res *GetUserResult, err error)
+	// Delete many users with IDs send in body
+	DeleteManyUsers(context.Context, *DeleteManyUsersPayload) (res *DeleteManyUsersResult, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -44,7 +46,7 @@ const ServiceName = "boUsers"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [5]string{"getAllusers", "deleteUser", "createUser", "updateUser", "getUser"}
+var MethodNames = [6]string{"getAllusers", "deleteUser", "createUser", "updateUser", "getUser", "deleteManyUsers"}
 
 // GetAllusersPayload is the payload type of the boUsers service getAllusers
 // method.
@@ -81,7 +83,16 @@ type DeleteUserResult struct {
 // CreateUserPayload is the payload type of the boUsers service createUser
 // method.
 type CreateUserPayload struct {
-	User *PayloadUser
+	Firstname string
+	Lastname  string
+	Email     string
+	Birthday  string
+	Phone     string
+	Role      string
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Password string
+	// Minimum 8 charactères / Chiffre Obligatoire
+	ConfirmPassword string
 	// JWT used for authentication after Signin/Signup
 	JWTToken *string
 	// Use to generate Oauth with /authorization
@@ -130,6 +141,22 @@ type GetUserResult struct {
 	Success bool
 }
 
+// DeleteManyUsersPayload is the payload type of the boUsers service
+// deleteManyUsers method.
+type DeleteManyUsersPayload struct {
+	Tab []string
+	// JWT used for authentication after Signin/Signup
+	JWTToken *string
+	// Use to generate Oauth with /authorization
+	Oauth *string
+}
+
+// DeleteManyUsersResult is the result type of the boUsers service
+// deleteManyUsers method.
+type DeleteManyUsersResult struct {
+	Success bool
+}
+
 type ResBoUser struct {
 	ID        string
 	Firstname *string
@@ -137,6 +164,7 @@ type ResBoUser struct {
 	Email     string
 	Birthday  string
 	Phone     string
+	Role      string
 }
 
 type PayloadUser struct {
@@ -144,6 +172,7 @@ type PayloadUser struct {
 	Lastname  string
 	Email     string
 	Birthday  string
+	Role      string
 	Phone     string
 }
 

@@ -19,13 +19,14 @@ import (
 
 // Server lists the boUsers service endpoint HTTP handlers.
 type Server struct {
-	Mounts      []*MountPoint
-	GetAllusers http.Handler
-	DeleteUser  http.Handler
-	CreateUser  http.Handler
-	UpdateUser  http.Handler
-	GetUser     http.Handler
-	CORS        http.Handler
+	Mounts          []*MountPoint
+	GetAllusers     http.Handler
+	DeleteUser      http.Handler
+	CreateUser      http.Handler
+	UpdateUser      http.Handler
+	GetUser         http.Handler
+	DeleteManyUsers http.Handler
+	CORS            http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -66,17 +67,20 @@ func New(
 			{"CreateUser", "POST", "/v1/bo/user/add"},
 			{"UpdateUser", "PUT", "/v1/bo/user/{id}"},
 			{"GetUser", "GET", "/v1/bo/user/{id}"},
+			{"DeleteManyUsers", "PATCH", "/v1/bo/users/remove"},
 			{"CORS", "OPTIONS", "/v1/bo/users"},
 			{"CORS", "OPTIONS", "/v1/bo/user/remove/{id}"},
 			{"CORS", "OPTIONS", "/v1/bo/user/add"},
 			{"CORS", "OPTIONS", "/v1/bo/user/{id}"},
+			{"CORS", "OPTIONS", "/v1/bo/users/remove"},
 		},
-		GetAllusers: NewGetAllusersHandler(e.GetAllusers, mux, decoder, encoder, errhandler, formatter),
-		DeleteUser:  NewDeleteUserHandler(e.DeleteUser, mux, decoder, encoder, errhandler, formatter),
-		CreateUser:  NewCreateUserHandler(e.CreateUser, mux, decoder, encoder, errhandler, formatter),
-		UpdateUser:  NewUpdateUserHandler(e.UpdateUser, mux, decoder, encoder, errhandler, formatter),
-		GetUser:     NewGetUserHandler(e.GetUser, mux, decoder, encoder, errhandler, formatter),
-		CORS:        NewCORSHandler(),
+		GetAllusers:     NewGetAllusersHandler(e.GetAllusers, mux, decoder, encoder, errhandler, formatter),
+		DeleteUser:      NewDeleteUserHandler(e.DeleteUser, mux, decoder, encoder, errhandler, formatter),
+		CreateUser:      NewCreateUserHandler(e.CreateUser, mux, decoder, encoder, errhandler, formatter),
+		UpdateUser:      NewUpdateUserHandler(e.UpdateUser, mux, decoder, encoder, errhandler, formatter),
+		GetUser:         NewGetUserHandler(e.GetUser, mux, decoder, encoder, errhandler, formatter),
+		DeleteManyUsers: NewDeleteManyUsersHandler(e.DeleteManyUsers, mux, decoder, encoder, errhandler, formatter),
+		CORS:            NewCORSHandler(),
 	}
 }
 
@@ -90,6 +94,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.CreateUser = m(s.CreateUser)
 	s.UpdateUser = m(s.UpdateUser)
 	s.GetUser = m(s.GetUser)
+	s.DeleteManyUsers = m(s.DeleteManyUsers)
 	s.CORS = m(s.CORS)
 }
 
@@ -100,6 +105,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountCreateUserHandler(mux, h.CreateUser)
 	MountUpdateUserHandler(mux, h.UpdateUser)
 	MountGetUserHandler(mux, h.GetUser)
+	MountDeleteManyUsersHandler(mux, h.DeleteManyUsers)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -358,6 +364,57 @@ func NewGetUserHandler(
 	})
 }
 
+// MountDeleteManyUsersHandler configures the mux to serve the "boUsers"
+// service "deleteManyUsers" endpoint.
+func MountDeleteManyUsersHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := HandleBoUsersOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("PATCH", "/v1/bo/users/remove", f)
+}
+
+// NewDeleteManyUsersHandler creates a HTTP handler which loads the HTTP
+// request and calls the "boUsers" service "deleteManyUsers" endpoint.
+func NewDeleteManyUsersHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDeleteManyUsersRequest(mux, decoder)
+		encodeResponse = EncodeDeleteManyUsersResponse(encoder)
+		encodeError    = EncodeDeleteManyUsersError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "deleteManyUsers")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "boUsers")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service boUsers.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -372,6 +429,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/v1/bo/user/remove/{id}", f)
 	mux.Handle("OPTIONS", "/v1/bo/user/add", f)
 	mux.Handle("OPTIONS", "/v1/bo/user/{id}", f)
+	mux.Handle("OPTIONS", "/v1/bo/users/remove", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

@@ -15,21 +15,23 @@ import (
 
 // Client is the "boUsers" service client.
 type Client struct {
-	GetAllusersEndpoint goa.Endpoint
-	DeleteUserEndpoint  goa.Endpoint
-	CreateUserEndpoint  goa.Endpoint
-	UpdateUserEndpoint  goa.Endpoint
-	GetUserEndpoint     goa.Endpoint
+	GetAllusersEndpoint     goa.Endpoint
+	DeleteUserEndpoint      goa.Endpoint
+	CreateUserEndpoint      goa.Endpoint
+	UpdateUserEndpoint      goa.Endpoint
+	GetUserEndpoint         goa.Endpoint
+	DeleteManyUsersEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "boUsers" service client given the endpoints.
-func NewClient(getAllusers, deleteUser, createUser, updateUser, getUser goa.Endpoint) *Client {
+func NewClient(getAllusers, deleteUser, createUser, updateUser, getUser, deleteManyUsers goa.Endpoint) *Client {
 	return &Client{
-		GetAllusersEndpoint: getAllusers,
-		DeleteUserEndpoint:  deleteUser,
-		CreateUserEndpoint:  createUser,
-		UpdateUserEndpoint:  updateUser,
-		GetUserEndpoint:     getUser,
+		GetAllusersEndpoint:     getAllusers,
+		DeleteUserEndpoint:      deleteUser,
+		CreateUserEndpoint:      createUser,
+		UpdateUserEndpoint:      updateUser,
+		GetUserEndpoint:         getUser,
+		DeleteManyUsersEndpoint: deleteManyUsers,
 	}
 }
 
@@ -81,4 +83,15 @@ func (c *Client) GetUser(ctx context.Context, p *GetUserPayload) (res *GetUserRe
 		return
 	}
 	return ires.(*GetUserResult), nil
+}
+
+// DeleteManyUsers calls the "deleteManyUsers" endpoint of the "boUsers"
+// service.
+func (c *Client) DeleteManyUsers(ctx context.Context, p *DeleteManyUsersPayload) (res *DeleteManyUsersResult, err error) {
+	var ires interface{}
+	ires, err = c.DeleteManyUsersEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*DeleteManyUsersResult), nil
 }
