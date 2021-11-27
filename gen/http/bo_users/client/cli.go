@@ -245,7 +245,7 @@ func BuildDeleteManyUsersPayload(boUsersDeleteManyUsersBody string, boUsersDelet
 	{
 		err = json.Unmarshal([]byte(boUsersDeleteManyUsersBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"tab\": [\n         \"Autem sint vel in ea laboriosam quia.\",\n         \"Est vitae distinctio impedit optio.\",\n         \"Nostrum doloremque id distinctio.\"\n      ]\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"tab\": [\n         \"Optio maiores nostrum doloremque id distinctio inventore.\",\n         \"Sit sit est libero dolor et earum.\"\n      ]\n   }'")
 		}
 		if body.Tab == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tab", "body"))

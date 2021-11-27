@@ -41,6 +41,12 @@ type RefreshRequestBody struct {
 	RefreshToken string `form:"refresh_token" json:"refresh_token" xml:"refresh_token"`
 }
 
+// EmailExistRequestBody is the type of the "jwtToken" service "email-exist"
+// endpoint HTTP request body.
+type EmailExistRequestBody struct {
+	Email string `form:"email" json:"email" xml:"email"`
+}
+
 // AuthProvidersRequestBody is the type of the "jwtToken" service
 // "auth-providers" endpoint HTTP request body.
 type AuthProvidersRequestBody struct {
@@ -74,6 +80,13 @@ type RefreshResponseBody struct {
 	AccessToken  *string `form:"access_token,omitempty" json:"access_token,omitempty" xml:"access_token,omitempty"`
 	RefreshToken *string `form:"refresh_token,omitempty" json:"refresh_token,omitempty" xml:"refresh_token,omitempty"`
 	Success      *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// EmailExistResponseBody is the type of the "jwtToken" service "email-exist"
+// endpoint HTTP response body.
+type EmailExistResponseBody struct {
+	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+	Exist   *bool `form:"exist,omitempty" json:"exist,omitempty" xml:"exist,omitempty"`
 }
 
 // AuthProvidersCreatedResponseBody is the type of the "jwtToken" service
@@ -153,6 +166,30 @@ type RefreshInvalidScopesResponseBody string
 // "refresh" endpoint HTTP response body for the "unauthorized" error.
 type RefreshUnauthorizedResponseBody string
 
+// EmailExistEmailAlreadyExistResponseBody is the type of the "jwtToken"
+// service "email-exist" endpoint HTTP response body for the
+// "email_already_exist" error.
+type EmailExistEmailAlreadyExistResponseBody struct {
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// EmailExistUnknownErrorResponseBody is the type of the "jwtToken" service
+// "email-exist" endpoint HTTP response body for the "unknown_error" error.
+type EmailExistUnknownErrorResponseBody struct {
+	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
+	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
+	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// EmailExistInvalidScopesResponseBody is the type of the "jwtToken" service
+// "email-exist" endpoint HTTP response body for the "invalid_scopes" error.
+type EmailExistInvalidScopesResponseBody string
+
+// EmailExistUnauthorizedResponseBody is the type of the "jwtToken" service
+// "email-exist" endpoint HTTP response body for the "unauthorized" error.
+type EmailExistUnauthorizedResponseBody string
+
 // AuthProvidersEmailAlreadyExistResponseBody is the type of the "jwtToken"
 // service "auth-providers" endpoint HTTP response body for the
 // "email_already_exist" error.
@@ -227,6 +264,15 @@ func NewSigninRequestBody(p *jwttoken.SigninPayload) *SigninRequestBody {
 func NewRefreshRequestBody(p *jwttoken.RefreshPayload) *RefreshRequestBody {
 	body := &RefreshRequestBody{
 		RefreshToken: p.RefreshToken,
+	}
+	return body
+}
+
+// NewEmailExistRequestBody builds the HTTP request body from the payload of
+// the "email-exist" endpoint of the "jwtToken" service.
+func NewEmailExistRequestBody(p *jwttoken.EmailExistPayload) *EmailExistRequestBody {
+	body := &EmailExistRequestBody{
+		Email: p.Email,
 	}
 	return body
 }
@@ -398,6 +444,56 @@ func NewRefreshUnauthorized(body RefreshUnauthorizedResponseBody) jwttoken.Unaut
 	return v
 }
 
+// NewEmailExistResultOK builds a "jwtToken" service "email-exist" endpoint
+// result from a HTTP "OK" response.
+func NewEmailExistResultOK(body *EmailExistResponseBody) *jwttoken.EmailExistResult {
+	v := &jwttoken.EmailExistResult{
+		Success: *body.Success,
+		Exist:   *body.Exist,
+	}
+
+	return v
+}
+
+// NewEmailExistEmailAlreadyExist builds a jwtToken service email-exist
+// endpoint email_already_exist error.
+func NewEmailExistEmailAlreadyExist(body *EmailExistEmailAlreadyExistResponseBody) *jwttoken.EmailAlreadyExist {
+	v := &jwttoken.EmailAlreadyExist{
+		Message: *body.Message,
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewEmailExistUnknownError builds a jwtToken service email-exist endpoint
+// unknown_error error.
+func NewEmailExistUnknownError(body *EmailExistUnknownErrorResponseBody) *jwttoken.UnknownError {
+	v := &jwttoken.UnknownError{
+		Err:       *body.Err,
+		ErrorCode: *body.ErrorCode,
+		Success:   *body.Success,
+	}
+
+	return v
+}
+
+// NewEmailExistInvalidScopes builds a jwtToken service email-exist endpoint
+// invalid_scopes error.
+func NewEmailExistInvalidScopes(body EmailExistInvalidScopesResponseBody) jwttoken.InvalidScopes {
+	v := jwttoken.InvalidScopes(body)
+
+	return v
+}
+
+// NewEmailExistUnauthorized builds a jwtToken service email-exist endpoint
+// unauthorized error.
+func NewEmailExistUnauthorized(body EmailExistUnauthorizedResponseBody) jwttoken.Unauthorized {
+	v := jwttoken.Unauthorized(body)
+
+	return v
+}
+
 // NewAuthProvidersSignCreated builds a "jwtToken" service "auth-providers"
 // endpoint result from a HTTP "Created" response.
 func NewAuthProvidersSignCreated(body *AuthProvidersCreatedResponseBody) *jwttoken.Sign {
@@ -492,6 +588,18 @@ func ValidateRefreshResponseBody(body *RefreshResponseBody) (err error) {
 	return
 }
 
+// ValidateEmailExistResponseBody runs the validations defined on
+// Email-ExistResponseBody
+func ValidateEmailExistResponseBody(body *EmailExistResponseBody) (err error) {
+	if body.Exist == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("exist", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
 // ValidateAuthProvidersCreatedResponseBody runs the validations defined on
 // Auth-ProvidersCreatedResponseBody
 func ValidateAuthProvidersCreatedResponseBody(body *AuthProvidersCreatedResponseBody) (err error) {
@@ -576,6 +684,33 @@ func ValidateRefreshEmailAlreadyExistResponseBody(body *RefreshEmailAlreadyExist
 // ValidateRefreshUnknownErrorResponseBody runs the validations defined on
 // refresh_unknown_error_response_body
 func ValidateRefreshUnknownErrorResponseBody(body *RefreshUnknownErrorResponseBody) (err error) {
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.ErrorCode == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
+// ValidateEmailExistEmailAlreadyExistResponseBody runs the validations defined
+// on email-exist_email_already_exist_response_body
+func ValidateEmailExistEmailAlreadyExistResponseBody(body *EmailExistEmailAlreadyExistResponseBody) (err error) {
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateEmailExistUnknownErrorResponseBody runs the validations defined on
+// email-exist_unknown_error_response_body
+func ValidateEmailExistUnknownErrorResponseBody(body *EmailExistUnknownErrorResponseBody) (err error) {
 	if body.Err == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}

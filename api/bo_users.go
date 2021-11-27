@@ -96,6 +96,13 @@ func (s *boUserssrvc) CreateUser(ctx context.Context, p *bousers.CreateUserPaylo
 		return nil, s.errorResponse("ERROR_PASSWORD", err)
 	}
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		userExist, err := q.CheckEmailExist(ctx, p.Email)
+		if err != nil {
+			return fmt.Errorf("ERROR_EMAIL_EXIST %v", err)
+		}
+		if userExist {
+			return fmt.Errorf("EMAIL_ALREADY_EXIST")
+		}
 		arg := db.CreateUserParams{
 			Firstname: p.Firstname,
 			Lastname:  p.Lastname,

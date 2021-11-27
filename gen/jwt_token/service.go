@@ -21,6 +21,8 @@ type Service interface {
 	Signin(context.Context, *SigninPayload) (res *Sign, err error)
 	// Refresh Token
 	Refresh(context.Context, *RefreshPayload) (res *Sign, err error)
+	// Check if email exist in database
+	EmailExist(context.Context, *EmailExistPayload) (res *EmailExistResult, err error)
 	// Register or login by Google, Facebook
 	AuthProviders(context.Context, *AuthProvidersPayload) (res *Sign, err error)
 }
@@ -39,7 +41,7 @@ const ServiceName = "jwtToken"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"signup", "signin", "refresh", "auth-providers"}
+var MethodNames = [5]string{"signup", "signin", "refresh", "email-exist", "auth-providers"}
 
 // SignupPayload is the payload type of the jwtToken service signup method.
 type SignupPayload struct {
@@ -77,6 +79,21 @@ type RefreshPayload struct {
 	RefreshToken string
 	// Use to generate Oauth with /authorization
 	Oauth *string
+}
+
+// EmailExistPayload is the payload type of the jwtToken service email-exist
+// method.
+type EmailExistPayload struct {
+	Email string
+	// Use to generate Oauth with /authorization
+	Oauth *string
+}
+
+// EmailExistResult is the result type of the jwtToken service email-exist
+// method.
+type EmailExistResult struct {
+	Success bool
+	Exist   bool
 }
 
 // AuthProvidersPayload is the payload type of the jwtToken service

@@ -24,7 +24,7 @@ func BuildSignupPayload(jwtTokenSignupBody string, jwtTokenSignupOauth string) (
 	{
 		err = json.Unmarshal([]byte(jwtTokenSignupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"birthday\": \"Id dolores aut similique ratione ipsum aliquam.\",\n      \"confirm_password\": \"JeSuisUnTest974\",\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"JeSuisUnTest974\",\n      \"phone\": \"+262 692 12 34 56\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"birthday\": \"Aliquam aspernatur.\",\n      \"confirm_password\": \"JeSuisUnTest974\",\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"JeSuisUnTest974\",\n      \"phone\": \"+262 692 12 34 56\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))
@@ -141,6 +141,36 @@ func BuildRefreshPayload(jwtTokenRefreshBody string, jwtTokenRefreshOauth string
 	return v, nil
 }
 
+// BuildEmailExistPayload builds the payload for the jwtToken email-exist
+// endpoint from CLI flags.
+func BuildEmailExistPayload(jwtTokenEmailExistBody string, jwtTokenEmailExistOauth string) (*jwttoken.EmailExistPayload, error) {
+	var err error
+	var body EmailExistRequestBody
+	{
+		err = json.Unmarshal([]byte(jwtTokenEmailExistBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@gmail.com\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidateFormat("body.email", body.Email, goa.FormatEmail))
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	var oauth *string
+	{
+		if jwtTokenEmailExistOauth != "" {
+			oauth = &jwtTokenEmailExistOauth
+		}
+	}
+	v := &jwttoken.EmailExistPayload{
+		Email: body.Email,
+	}
+	v.Oauth = oauth
+
+	return v, nil
+}
+
 // BuildAuthProvidersPayload builds the payload for the jwtToken auth-providers
 // endpoint from CLI flags.
 func BuildAuthProvidersPayload(jwtTokenAuthProvidersBody string, jwtTokenAuthProvidersOauth string) (*jwttoken.AuthProvidersPayload, error) {
@@ -149,7 +179,7 @@ func BuildAuthProvidersPayload(jwtTokenAuthProvidersBody string, jwtTokenAuthPro
 	{
 		err = json.Unmarshal([]byte(jwtTokenAuthProvidersBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firebase_id_token\": \"e5g\",\n      \"firebase_provider\": \"facebook.com\",\n      \"firebase_uid\": \"zgmURRUlcJfgDMRyjJ20xs7Rxxw2\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"guillaume@epitech.eu\",\n      \"firebase_id_token\": \"o43\",\n      \"firebase_provider\": \"facebook.com\",\n      \"firebase_uid\": \"zgmURRUlcJfgDMRyjJ20xs7Rxxw2\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))

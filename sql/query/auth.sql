@@ -26,6 +26,13 @@ SELECT * FROM users
 WHERE email = $1
 AND deleted_at IS NULL;
 
+-- name: CheckEmailExist :one
+SELECT EXISTS(
+    SELECT * FROM users
+    WHERE email = $1
+    AND deleted_at IS NULL
+);
+
 -- name: SignProvider :one
 INSERT INTO users (firstname, lastname, email, password, phone, birthday, firebase_id_token, firebase_uid, firebase_provider) 
 VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5, $6, $7, $8, $9)

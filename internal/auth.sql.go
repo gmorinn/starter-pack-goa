@@ -10,6 +10,21 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkEmailExist = `-- name: CheckEmailExist :one
+SELECT EXISTS(
+    SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
+    WHERE email = $1
+    AND deleted_at IS NULL
+)
+`
+
+func (q *Queries) CheckEmailExist(ctx context.Context, email string) (bool, error) {
+	row := q.queryRow(ctx, q.checkEmailExistStmt, checkEmailExist, email)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const existGetUserByFireBaseUid = `-- name: ExistGetUserByFireBaseUid :one
 SELECT EXISTS(
 	SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users

@@ -74,6 +74,62 @@ paths:
             - error_code
       schemes:
       - https
+  /email-exist:
+    post:
+      tags:
+      - jwtToken
+      summary: email-exist jwtToken
+      description: Check if email exist in database
+      operationId: jwtToken#email-exist
+      parameters:
+      - name: Authorization
+        in: header
+        description: OAuth token
+        required: false
+        type: string
+        pattern: ^Bearer [^ ]+$
+      - name: Email-ExistRequestBody
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/JWTTokenEmailExistRequestBody'
+          required:
+          - email
+      responses:
+        "200":
+          description: OK response.
+          schema:
+            $ref: '#/definitions/JWTTokenEmailExistResponseBody'
+            required:
+            - exist
+            - success
+        "400":
+          description: Bad Request response.
+          schema:
+            $ref: '#/definitions/JWTTokenEmailExistEmailAlreadyExistResponseBody'
+            required:
+            - message
+            - success
+        "401":
+          description: Unauthorized response.
+          schema:
+            $ref: '#/definitions/JWTTokenEmailExistUnauthorizedResponseBody'
+        "403":
+          description: Forbidden response.
+          schema:
+            $ref: '#/definitions/JWTTokenEmailExistInvalidScopesResponseBody'
+        "500":
+          description: Internal Server Error response.
+          schema:
+            $ref: '#/definitions/JWTTokenEmailExistUnknownErrorResponseBody'
+            required:
+            - err
+            - success
+            - error_code
+      schemes:
+      - https
+      security:
+      - OAuth2_header_Authorization: []
   /openapi.json:
     get:
       tags:
@@ -1110,7 +1166,7 @@ definitions:
         id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
         price: 69
-      success: true
+      success: false
     required:
     - product
     - success
@@ -1127,12 +1183,12 @@ definitions:
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: false
+      success: true
     required:
     - err
     - success
@@ -1145,15 +1201,15 @@ definitions:
         type: array
         items:
           type: string
-          example: Explicabo dolorum neque repellat velit cupiditate quis.
+          example: Assumenda eum.
         example:
-        - Maxime rerum.
-        - Molestias enim adipisci et voluptatum.
+        - Fuga ratione ut error voluptas ut.
+        - Veniam sed voluptatem reiciendis itaque.
     example:
       tab:
-      - Minus corporis excepturi ab assumenda.
-      - Nam corrupti fuga ratione ut error voluptas.
-      - Architecto veniam sed voluptatem reiciendis.
+      - Similique aut sequi voluptatem.
+      - Maiores maxime et.
+      - Accusamus quos.
     required:
     - tab
   BoProductsDeleteManyProductsResponseBody:
@@ -1185,7 +1241,7 @@ definitions:
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: false
+      success: true
     required:
     - err
     - success
@@ -1196,7 +1252,7 @@ definitions:
     properties:
       success:
         type: boolean
-        example: true
+        example: false
     example:
       success: true
     required:
@@ -1249,9 +1305,14 @@ definitions:
           id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
           price: 69
+        - category: men
+          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+          name: Guillaume
+          price: 69
       success:
         type: boolean
-        example: true
+        example: false
     example:
       products:
       - category: men
@@ -1269,7 +1330,12 @@ definitions:
         id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
         price: 69
-      success: false
+      - category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
+      success: true
     required:
     - products
     - success
@@ -1291,7 +1357,7 @@ definitions:
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: false
+      success: true
     required:
     - err
     - success
@@ -1323,7 +1389,7 @@ definitions:
           price: 69
       success:
         type: boolean
-        example: true
+        example: false
     example:
       products:
       - category: men
@@ -1341,7 +1407,12 @@ definitions:
         id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
         price: 69
-      success: true
+      - category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
+      success: false
     required:
     - products
     - success
@@ -1358,7 +1429,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -1401,12 +1472,12 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: true
+      success: false
     required:
     - err
     - success
@@ -1562,7 +1633,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -1580,17 +1651,16 @@ definitions:
         type: array
         items:
           type: string
-          example: Saepe eos commodi.
+          example: Maxime quod fuga et qui ut.
         example:
-        - Est odio mollitia voluptatem.
-        - Voluptatem quisquam et dolore.
-        - Quod fuga et qui ut recusandae occaecati.
-        - Cupiditate non ut quo consequatur voluptatem sed.
+        - Repellat cupiditate non ut quo.
+        - Voluptatem sed repellat et ipsa.
+        - Sint quo.
+        - Ducimus qui.
     example:
       tab:
-      - Ipsa iure.
-      - Quo autem.
-      - Qui ipsa.
+      - Asperiores illum quo.
+      - Molestiae quas cumque.
     required:
     - tab
   BoUsersDeleteManyUsersResponseBody:
@@ -1601,7 +1671,7 @@ definitions:
         type: boolean
         example: false
     example:
-      success: true
+      success: false
     required:
     - success
   BoUsersDeleteManyUsersUnknownErrorResponseBody:
@@ -1622,7 +1692,7 @@ definitions:
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: true
+      success: false
     required:
     - err
     - success
@@ -1635,7 +1705,7 @@ definitions:
         type: boolean
         example: false
     example:
-      success: true
+      success: false
     required:
     - success
   BoUsersDeleteUserUnknownErrorResponseBody:
@@ -1651,7 +1721,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -1667,7 +1737,7 @@ definitions:
     properties:
       success:
         type: boolean
-        example: false
+        example: true
       users:
         type: array
         items:
@@ -1691,6 +1761,13 @@ definitions:
     example:
       success: false
       users:
+      - birthday: 01/09/2002
+        email: guillaume.morin@epitech.eu
+        firstname: Guillaume
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        lastname: Morin
+        phone: +262 692 12 34 56
+        role: user
       - birthday: 01/09/2002
         email: guillaume.morin@epitech.eu
         firstname: Guillaume
@@ -1744,11 +1821,11 @@ definitions:
     properties:
       success:
         type: boolean
-        example: true
+        example: false
       user:
         $ref: '#/definitions/resBoUserResponseBody'
     example:
-      success: true
+      success: false
       user:
         birthday: 01/09/2002
         email: guillaume.morin@epitech.eu
@@ -1778,7 +1855,7 @@ definitions:
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: false
+      success: true
     required:
     - err
     - success
@@ -1805,7 +1882,7 @@ definitions:
     properties:
       success:
         type: boolean
-        example: true
+        example: false
       user:
         $ref: '#/definitions/resBoUserResponseBody'
     example:
@@ -1856,11 +1933,11 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: false
+        example: true
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: false
+      success: true
     required:
     - access_token
     - refresh_token
@@ -1881,7 +1958,7 @@ definitions:
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: true
+      success: false
     required:
     - access_token
     - refresh_token
@@ -1892,15 +1969,15 @@ definitions:
     properties:
       message:
         type: string
-        example: Error et voluptatibus laborum.
+        example: Placeat possimus enim suscipit incidunt et.
       success:
         type: boolean
         default: false
         example: false
     description: When email already exist
     example:
-      message: Delectus eos quia qui in minima.
-      success: false
+      message: Nostrum ullam sint ut.
+      success: true
     required:
     - message
     - success
@@ -1908,7 +1985,7 @@ definitions:
     title: JWTTokenAuthProvidersInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Impedit reiciendis pariatur non enim et.
+    example: Culpa rerum ut alias officiis nisi nam.
   JWTTokenAuthProvidersRequestBody:
     title: JWTTokenAuthProvidersRequestBody
     type: object
@@ -1919,7 +1996,7 @@ definitions:
         format: email
       firebase_id_token:
         type: string
-        example: dqq
+        example: d0r
         minLength: 400
       firebase_provider:
         type: string
@@ -1939,7 +2016,7 @@ definitions:
         minLength: 3
     example:
       email: guillaume@epitech.eu
-      firebase_id_token: crg
+      firebase_id_token: aot
       firebase_provider: facebook.com
       firebase_uid: zgmURRUlcJfgDMRyjJ20xs7Rxxw2
       firstname: Guillaume
@@ -1955,7 +2032,7 @@ definitions:
     title: JWTTokenAuthProvidersUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Odio mollitia fugit.
+    example: Et ea dolore consequatur dolor consequuntur.
   JWTTokenAuthProvidersUnknownErrorResponseBody:
     title: JWTTokenAuthProvidersUnknownErrorResponseBody
     type: object
@@ -1969,7 +2046,86 @@ definitions:
       success:
         type: boolean
         default: false
+        example: false
+    description: Error not identified (500)
+    example:
+      err: sql no rows affected
+      error_code: TX_UPDATE_ITEM
+      success: true
+    required:
+    - err
+    - success
+    - error_code
+  JWTTokenEmailExistEmailAlreadyExistResponseBody:
+    title: JWTTokenEmailExistEmailAlreadyExistResponseBody
+    type: object
+    properties:
+      message:
+        type: string
+        example: Eos quia.
+      success:
+        type: boolean
+        default: false
+        example: false
+    description: When email already exist
+    example:
+      message: Minima labore nihil voluptatem a impedit reiciendis.
+      success: true
+    required:
+    - message
+    - success
+  JWTTokenEmailExistInvalidScopesResponseBody:
+    title: JWTTokenEmailExistInvalidScopesResponseBody
+    type: string
+    description: Token scopes are invalid
+    example: Corrupti odio mollitia fugit saepe.
+  JWTTokenEmailExistRequestBody:
+    title: JWTTokenEmailExistRequestBody
+    type: object
+    properties:
+      email:
+        type: string
+        example: guillaume@gmail.com
+        format: email
+    example:
+      email: guillaume@gmail.com
+    required:
+    - email
+  JWTTokenEmailExistResponseBody:
+    title: JWTTokenEmailExistResponseBody
+    type: object
+    properties:
+      exist:
+        type: boolean
         example: true
+      success:
+        type: boolean
+        example: true
+    example:
+      exist: false
+      success: false
+    required:
+    - exist
+    - success
+  JWTTokenEmailExistUnauthorizedResponseBody:
+    title: JWTTokenEmailExistUnauthorizedResponseBody
+    type: string
+    description: Identifiers are invalid
+    example: Qui porro saepe pariatur quis ipsa molestiae.
+  JWTTokenEmailExistUnknownErrorResponseBody:
+    title: JWTTokenEmailExistUnknownErrorResponseBody
+    type: object
+    properties:
+      err:
+        type: string
+        example: sql no rows affected
+      error_code:
+        type: string
+        example: TX_UPDATE_ITEM
+      success:
+        type: boolean
+        default: false
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -1985,14 +2141,14 @@ definitions:
     properties:
       message:
         type: string
-        example: Ut ea.
+        example: Delectus consequuntur odio molestias sed.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: When email already exist
     example:
-      message: Ab quia nesciunt delectus consequuntur odio.
+      message: Alias beatae quibusdam voluptas.
       success: false
     required:
     - message
@@ -2001,7 +2157,7 @@ definitions:
     title: JWTTokenRefreshInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Alias beatae quibusdam voluptas.
+    example: Sit nesciunt ducimus.
   JWTTokenRefreshRequestBody:
     title: JWTTokenRefreshRequestBody
     type: object
@@ -2025,7 +2181,7 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: true
+        example: false
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
@@ -2038,7 +2194,7 @@ definitions:
     title: JWTTokenRefreshUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Quo deleniti ea.
+    example: Necessitatibus error et.
   JWTTokenRefreshUnknownErrorResponseBody:
     title: JWTTokenRefreshUnknownErrorResponseBody
     type: object
@@ -2052,12 +2208,12 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: true
+      success: false
     required:
     - err
     - success
@@ -2068,14 +2224,14 @@ definitions:
     properties:
       message:
         type: string
-        example: Et exercitationem quia sint iusto dolor magni.
+        example: Nisi in dolorem quaerat expedita illum explicabo.
       success:
         type: boolean
         default: false
         example: false
     description: When email already exist
     example:
-      message: Dolorem quaerat expedita illum explicabo.
+      message: Ut aperiam excepturi iusto sed.
       success: false
     required:
     - message
@@ -2084,7 +2240,7 @@ definitions:
     title: JWTTokenSigninInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Excepturi iusto sed et.
+    example: Aut voluptatum esse.
   JWTTokenSigninRequestBody:
     title: JWTTokenSigninRequestBody
     type: object
@@ -2117,7 +2273,7 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       success:
         type: boolean
-        example: true
+        example: false
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
@@ -2130,7 +2286,7 @@ definitions:
     title: JWTTokenSigninUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Maxime et aut voluptatum esse.
+    example: Quidem est ut ea eligendi ea.
   JWTTokenSigninUnknownErrorResponseBody:
     title: JWTTokenSigninUnknownErrorResponseBody
     type: object
@@ -2144,7 +2300,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -2160,14 +2316,14 @@ definitions:
     properties:
       message:
         type: string
-        example: Quo dolorum molestiae quas.
+        example: Eveniet ad aut dolor et.
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: When email already exist
     example:
-      message: Occaecati earum eveniet ad aut dolor.
+      message: Quo voluptatem ullam.
       success: true
     required:
     - message
@@ -2176,7 +2332,7 @@ definitions:
     title: JWTTokenSignupInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Voluptatem ullam omnis.
+    example: Doloribus rerum non.
   JWTTokenSignupRequestBody:
     title: JWTTokenSignupRequestBody
     type: object
@@ -2184,7 +2340,7 @@ definitions:
       birthday:
         type: string
         default: ""
-        example: Rerum non dolor et omnis.
+        example: Enim et.
       confirm_password:
         type: string
         description: Minimum 8 charactères / Chiffre Obligatoire
@@ -2215,7 +2371,7 @@ definitions:
         default: ""
         example: +262 692 12 34 56
     example:
-      birthday: Illum occaecati enim et ut.
+      birthday: Laborum pariatur explicabo et exercitationem quia sint.
       confirm_password: JeSuisUnTest974
       email: guillaume@epitech.eu
       firstname: Guillaume
@@ -2244,7 +2400,7 @@ definitions:
     example:
       access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
       refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-      success: false
+      success: true
     required:
     - access_token
     - refresh_token
@@ -2253,7 +2409,7 @@ definitions:
     title: JWTTokenSignupUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Quia et.
+    example: Et omnis perferendis illum.
   JWTTokenSignupUnknownErrorResponseBody:
     title: JWTTokenSignupUnknownErrorResponseBody
     type: object
@@ -2267,7 +2423,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -2283,22 +2439,22 @@ definitions:
     properties:
       access_token:
         type: string
-        example: Alias officiis.
+        example: Nostrum et illo voluptatem qui ut.
       expires_in:
         type: integer
-        example: 2359270780176165571
+        example: 7056729753685205022
         format: int64
       success:
         type: boolean
-        example: false
+        example: true
       token_type:
         type: string
-        example: Nam doloremque et.
+        example: Rerum laboriosam et.
     example:
-      access_token: Dolor consequuntur.
-      expires_in: 7814232681844349458
+      access_token: Eum qui cum enim deleniti impedit.
+      expires_in: 7571738850208908960
       success: true
-      token_type: Voluptates perferendis est quas.
+      token_type: Non dolor similique.
     required:
     - access_token
     - token_type
@@ -2310,22 +2466,22 @@ definitions:
     properties:
       access_token:
         type: string
-        example: Dolores error illo.
+        example: Ut quae facere architecto.
       expires_in:
         type: integer
-        example: 8070703223833498
+        example: 61862101030804271
         format: int64
       success:
         type: boolean
         example: false
       token_type:
         type: string
-        example: Dolorem placeat possimus enim suscipit incidunt.
+        example: Iusto atque ut consequatur voluptas consequatur.
     example:
-      access_token: Nostrum ullam sint ut.
-      expires_in: 6604322627466109254
+      access_token: Corrupti nihil et voluptatem ipsum.
+      expires_in: 6760904190596678975
       success: true
-      token_type: Accusantium autem est.
+      token_type: Quaerat omnis.
     required:
     - access_token
     - token_type
@@ -2335,24 +2491,24 @@ definitions:
     title: OAuthOAuthInvalidScopesResponseBody
     type: string
     description: Token scopes are invalid
-    example: Quae facere architecto expedita iusto atque ut.
+    example: Nam voluptas.
   OAuthOAuthRequestBody:
     title: OAuthOAuthRequestBody
     type: object
     properties:
       client_id:
         type: string
-        example: Et voluptatem ipsum incidunt quaerat.
+        example: Porro id harum quasi.
       client_secret:
         type: string
-        example: Dolor velit et.
+        example: Aut est facilis quo est quisquam non.
       grant_type:
         type: string
-        example: Et illo.
+        example: Nostrum quas voluptatem eum quia.
     example:
-      client_id: Qui ut quod rerum.
-      client_secret: Et nam.
-      grant_type: Officiis eum qui cum enim.
+      client_id: Quidem et dolores omnis officia.
+      client_secret: Quibusdam eligendi.
+      grant_type: At ex.
     required:
     - client_id
     - client_secret
@@ -2361,7 +2517,7 @@ definitions:
     title: OAuthOAuthUnauthorizedResponseBody
     type: string
     description: Identifiers are invalid
-    example: Voluptas consequatur hic quaerat occaecati corrupti.
+    example: Enim consequuntur sit magnam sit accusantium et.
   OAuthOAuthUnknownErrorResponseBody:
     title: OAuthOAuthUnknownErrorResponseBody
     type: object
@@ -2380,7 +2536,7 @@ definitions:
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: true
+      success: false
     required:
     - err
     - success
@@ -2405,14 +2561,9 @@ definitions:
           id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
           name: Guillaume
           price: 69
-        - category: men
-          cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
-          id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-          name: Guillaume
-          price: 69
       success:
         type: boolean
-        example: false
+        example: true
     example:
       products:
       - category: men
@@ -2425,7 +2576,12 @@ definitions:
         id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         name: Guillaume
         price: 69
-      success: false
+      - category: men
+        cover: https://i.ibb.co/ypkgK0X/blue-beanie.png
+        id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+        name: Guillaume
+        price: 69
+      success: true
     required:
     - products
     - success
@@ -2442,7 +2598,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -2485,7 +2641,7 @@ definitions:
       success:
         type: boolean
         default: false
-        example: false
+        example: true
     description: Error not identified (500)
     example:
       err: sql no rows affected
@@ -2501,7 +2657,7 @@ definitions:
     properties:
       success:
         type: boolean
-        example: false
+        example: true
       user:
         $ref: '#/definitions/resUserResponseBody'
     example:
@@ -2529,12 +2685,12 @@ definitions:
       success:
         type: boolean
         default: false
-        example: true
+        example: false
     description: Error not identified (500)
     example:
       err: sql no rows affected
       error_code: TX_UPDATE_ITEM
-      success: false
+      success: true
     required:
     - err
     - success

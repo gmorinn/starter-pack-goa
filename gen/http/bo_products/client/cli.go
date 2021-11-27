@@ -210,7 +210,7 @@ func BuildDeleteManyProductsPayload(boProductsDeleteManyProductsBody string, boP
 	{
 		err = json.Unmarshal([]byte(boProductsDeleteManyProductsBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"tab\": [\n         \"Ratione repellendus voluptatem.\",\n         \"Sunt numquam exercitationem expedita.\",\n         \"Occaecati qui.\"\n      ]\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"tab\": [\n         \"Numquam exercitationem expedita et occaecati qui.\",\n         \"Quibusdam nemo.\",\n         \"Iure sequi doloremque.\",\n         \"Est cupiditate dicta tempore omnis in vel.\"\n      ]\n   }'")
 		}
 		if body.Tab == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tab", "body"))
