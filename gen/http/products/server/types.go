@@ -19,6 +19,14 @@ type GetAllProductsByCategoryResponseBody struct {
 	Success  bool                      `form:"success" json:"success" xml:"success"`
 }
 
+// GetAllProductsResponseBody is the type of the "products" service
+// "getAllProducts" endpoint HTTP response body.
+type GetAllProductsResponseBody struct {
+	// Result is an array of object
+	Products []*ResProductResponseBody `form:"products" json:"products" xml:"products"`
+	Success  bool                      `form:"success" json:"success" xml:"success"`
+}
+
 // GetProductResponseBody is the type of the "products" service "getProduct"
 // endpoint HTTP response body.
 type GetProductResponseBody struct {
@@ -31,6 +39,14 @@ type GetProductResponseBody struct {
 // "products" service "getAllProductsByCategory" endpoint HTTP response body
 // for the "unknown_error" error.
 type GetAllProductsByCategoryUnknownErrorResponseBody struct {
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
+}
+
+// GetAllProductsUnknownErrorResponseBody is the type of the "products" service
+// "getAllProducts" endpoint HTTP response body for the "unknown_error" error.
+type GetAllProductsUnknownErrorResponseBody struct {
 	Err       string `form:"err" json:"err" xml:"err"`
 	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
 	Success   bool   `form:"success" json:"success" xml:"success"`
@@ -69,6 +85,21 @@ func NewGetAllProductsByCategoryResponseBody(res *products.GetAllProductsByCateg
 	return body
 }
 
+// NewGetAllProductsResponseBody builds the HTTP response body from the result
+// of the "getAllProducts" endpoint of the "products" service.
+func NewGetAllProductsResponseBody(res *products.GetAllProductsResult) *GetAllProductsResponseBody {
+	body := &GetAllProductsResponseBody{
+		Success: res.Success,
+	}
+	if res.Products != nil {
+		body.Products = make([]*ResProductResponseBody, len(res.Products))
+		for i, val := range res.Products {
+			body.Products[i] = marshalProductsResProductToResProductResponseBody(val)
+		}
+	}
+	return body
+}
+
 // NewGetProductResponseBody builds the HTTP response body from the result of
 // the "getProduct" endpoint of the "products" service.
 func NewGetProductResponseBody(res *products.GetProductResult) *GetProductResponseBody {
@@ -93,6 +124,17 @@ func NewGetAllProductsByCategoryUnknownErrorResponseBody(res *products.UnknownEr
 	return body
 }
 
+// NewGetAllProductsUnknownErrorResponseBody builds the HTTP response body from
+// the result of the "getAllProducts" endpoint of the "products" service.
+func NewGetAllProductsUnknownErrorResponseBody(res *products.UnknownError) *GetAllProductsUnknownErrorResponseBody {
+	body := &GetAllProductsUnknownErrorResponseBody{
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
+	}
+	return body
+}
+
 // NewGetProductUnknownErrorResponseBody builds the HTTP response body from the
 // result of the "getProduct" endpoint of the "products" service.
 func NewGetProductUnknownErrorResponseBody(res *products.UnknownError) *GetProductUnknownErrorResponseBody {
@@ -109,6 +151,15 @@ func NewGetProductUnknownErrorResponseBody(res *products.UnknownError) *GetProdu
 func NewGetAllProductsByCategoryPayload(category string, oauth *string) *products.GetAllProductsByCategoryPayload {
 	v := &products.GetAllProductsByCategoryPayload{}
 	v.Category = category
+	v.Oauth = oauth
+
+	return v
+}
+
+// NewGetAllProductsPayload builds a products service getAllProducts endpoint
+// payload.
+func NewGetAllProductsPayload(oauth *string) *products.GetAllProductsPayload {
+	v := &products.GetAllProductsPayload{}
 	v.Oauth = oauth
 
 	return v

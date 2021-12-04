@@ -218,3 +218,25 @@ func (s *boUserssrvc) DeleteManyUsers(ctx context.Context, p *bousers.DeleteMany
 	}
 	return &bousers.DeleteManyUsersResult{Success: true}, nil
 }
+
+func (s *boUserssrvc) NewPassword(ctx context.Context, p *bousers.NewPasswordPayload) (res *bousers.NewPasswordResult, err error) {
+	if p.Password != p.Confirm {
+		return nil, s.errorResponse("ERROR_NOT_SAME_PASSWORD", nil)
+	}
+	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		arg := db.UpdateUserPasswordParams{
+			ID:    uuid.MustParse(p.ID),
+			Crypt: p.Password,
+		}
+		if err := q.UpdateUserPassword(ctx, arg); err != nil {
+			return fmt.Errorf("ERROR_UPDATE_NEW_PASSWORD %v", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, s.errorResponse("TX_UPDATE_NEW_PASSWORD", err)
+	}
+	return &bousers.NewPasswordResult{
+		Success: true,
+	}, nil
+}

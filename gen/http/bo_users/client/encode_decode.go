@@ -637,6 +637,116 @@ func DecodeDeleteManyUsersResponse(decoder func(*http.Response) goahttp.Decoder,
 	}
 }
 
+// BuildNewPasswordRequest instantiates a HTTP request object with method and
+// path set to call the "boUsers" service "newPassword" endpoint
+func (c *Client) BuildNewPasswordRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		id string
+	)
+	{
+		p, ok := v.(*bousers.NewPasswordPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("boUsers", "newPassword", "*bousers.NewPasswordPayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: NewPasswordBoUsersPath(id)}
+	req, err := http.NewRequest("PATCH", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("boUsers", "newPassword", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeNewPasswordRequest returns an encoder for requests sent to the boUsers
+// newPassword server.
+func EncodeNewPasswordRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*bousers.NewPasswordPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("boUsers", "newPassword", "*bousers.NewPasswordPayload", v)
+		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		if p.JWTToken != nil {
+			head := *p.JWTToken
+			req.Header.Set("jwtToken", head)
+		}
+		body := NewNewPasswordRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("boUsers", "newPassword", err)
+		}
+		return nil
+	}
+}
+
+// DecodeNewPasswordResponse returns a decoder for responses returned by the
+// boUsers newPassword endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeNewPasswordResponse may return the following errors:
+//	- "unknown_error" (type *bousers.UnknownError): http.StatusInternalServerError
+//	- error: internal error
+func DecodeNewPasswordResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body NewPasswordResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("boUsers", "newPassword", err)
+			}
+			err = ValidateNewPasswordResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("boUsers", "newPassword", err)
+			}
+			res := NewNewPasswordResultOK(&body)
+			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body NewPasswordUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("boUsers", "newPassword", err)
+			}
+			err = ValidateNewPasswordUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("boUsers", "newPassword", err)
+			}
+			return nil, NewNewPasswordUnknownError(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("boUsers", "newPassword", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalResBoUserResponseBodyToBousersResBoUser builds a value of type
 // *bousers.ResBoUser from a value of type *ResBoUserResponseBody.
 func unmarshalResBoUserResponseBodyToBousersResBoUser(v *ResBoUserResponseBody) *bousers.ResBoUser {

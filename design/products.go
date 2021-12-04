@@ -46,6 +46,24 @@ var _ = Service("products", func() {
 		})
 	})
 
+	Method("getAllProducts", func() {
+		Description("Get All products")
+		Payload(func() {
+			AccessTokenField(2, "oauth", String, func() {
+				Description("Use to generate Oauth with /authorization")
+			})
+		})
+		HTTP(func() {
+			GET("/products")
+			Response(StatusOK)
+		})
+		Result(func() {
+			Attribute("products", ArrayOf(resProduct), "Result is an array of object")
+			Attribute("success", Boolean)
+			Required("products", "success")
+		})
+	})
+
 	Method("getProduct", func() {
 		Description("Get one product")
 		Payload(func() {

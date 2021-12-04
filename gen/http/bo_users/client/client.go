@@ -41,6 +41,10 @@ type Client struct {
 	// deleteManyUsers endpoint.
 	DeleteManyUsersDoer goahttp.Doer
 
+	// NewPassword Doer is the HTTP client used to make requests to the newPassword
+	// endpoint.
+	NewPasswordDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -70,6 +74,7 @@ func NewClient(
 		UpdateUserDoer:      doer,
 		GetUserDoer:         doer,
 		DeleteManyUsersDoer: doer,
+		NewPasswordDoer:     doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -218,6 +223,30 @@ func (c *Client) DeleteManyUsers() goa.Endpoint {
 		resp, err := c.DeleteManyUsersDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("boUsers", "deleteManyUsers", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// NewPassword returns an endpoint that makes HTTP requests to the boUsers
+// service newPassword server.
+func (c *Client) NewPassword() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeNewPasswordRequest(c.encoder)
+		decodeResponse = DecodeNewPasswordResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildNewPasswordRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.NewPasswordDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("boUsers", "newPassword", err)
 		}
 		return decodeResponse(resp)
 	}

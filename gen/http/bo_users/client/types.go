@@ -41,6 +41,15 @@ type DeleteManyUsersRequestBody struct {
 	Tab []string `form:"tab" json:"tab" xml:"tab"`
 }
 
+// NewPasswordRequestBody is the type of the "boUsers" service "newPassword"
+// endpoint HTTP request body.
+type NewPasswordRequestBody struct {
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Password string `form:"password" json:"password" xml:"password"`
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Confirm string `form:"confirm" json:"confirm" xml:"confirm"`
+}
+
 // GetAllusersResponseBody is the type of the "boUsers" service "getAllusers"
 // endpoint HTTP response body.
 type GetAllusersResponseBody struct {
@@ -82,6 +91,12 @@ type GetUserResponseBody struct {
 // DeleteManyUsersResponseBody is the type of the "boUsers" service
 // "deleteManyUsers" endpoint HTTP response body.
 type DeleteManyUsersResponseBody struct {
+	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// NewPasswordResponseBody is the type of the "boUsers" service "newPassword"
+// endpoint HTTP response body.
+type NewPasswordResponseBody struct {
 	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
@@ -128,6 +143,14 @@ type GetUserUnknownErrorResponseBody struct {
 // DeleteManyUsersUnknownErrorResponseBody is the type of the "boUsers" service
 // "deleteManyUsers" endpoint HTTP response body for the "unknown_error" error.
 type DeleteManyUsersUnknownErrorResponseBody struct {
+	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
+	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
+	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// NewPasswordUnknownErrorResponseBody is the type of the "boUsers" service
+// "newPassword" endpoint HTTP response body for the "unknown_error" error.
+type NewPasswordUnknownErrorResponseBody struct {
 	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
@@ -207,6 +230,16 @@ func NewDeleteManyUsersRequestBody(p *bousers.DeleteManyUsersPayload) *DeleteMan
 		for i, val := range p.Tab {
 			body.Tab[i] = val
 		}
+	}
+	return body
+}
+
+// NewNewPasswordRequestBody builds the HTTP request body from the payload of
+// the "newPassword" endpoint of the "boUsers" service.
+func NewNewPasswordRequestBody(p *bousers.NewPasswordPayload) *NewPasswordRequestBody {
+	body := &NewPasswordRequestBody{
+		Password: p.Password,
+		Confirm:  p.Confirm,
 	}
 	return body
 }
@@ -350,6 +383,28 @@ func NewDeleteManyUsersUnknownError(body *DeleteManyUsersUnknownErrorResponseBod
 	return v
 }
 
+// NewNewPasswordResultOK builds a "boUsers" service "newPassword" endpoint
+// result from a HTTP "OK" response.
+func NewNewPasswordResultOK(body *NewPasswordResponseBody) *bousers.NewPasswordResult {
+	v := &bousers.NewPasswordResult{
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewNewPasswordUnknownError builds a boUsers service newPassword endpoint
+// unknown_error error.
+func NewNewPasswordUnknownError(body *NewPasswordUnknownErrorResponseBody) *bousers.UnknownError {
+	v := &bousers.UnknownError{
+		Err:       *body.Err,
+		ErrorCode: *body.ErrorCode,
+		Success:   *body.Success,
+	}
+
+	return v
+}
+
 // ValidateGetAllusersResponseBody runs the validations defined on
 // GetAllusersResponseBody
 func ValidateGetAllusersResponseBody(body *GetAllusersResponseBody) (err error) {
@@ -438,6 +493,15 @@ func ValidateDeleteManyUsersResponseBody(body *DeleteManyUsersResponseBody) (err
 	return
 }
 
+// ValidateNewPasswordResponseBody runs the validations defined on
+// NewPasswordResponseBody
+func ValidateNewPasswordResponseBody(body *NewPasswordResponseBody) (err error) {
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
 // ValidateGetAllusersUnknownErrorResponseBody runs the validations defined on
 // getAllusers_unknown_error_response_body
 func ValidateGetAllusersUnknownErrorResponseBody(body *GetAllusersUnknownErrorResponseBody) (err error) {
@@ -516,6 +580,21 @@ func ValidateGetUserUnknownErrorResponseBody(body *GetUserUnknownErrorResponseBo
 // ValidateDeleteManyUsersUnknownErrorResponseBody runs the validations defined
 // on deleteManyUsers_unknown_error_response_body
 func ValidateDeleteManyUsersUnknownErrorResponseBody(body *DeleteManyUsersUnknownErrorResponseBody) (err error) {
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.ErrorCode == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
+// ValidateNewPasswordUnknownErrorResponseBody runs the validations defined on
+// newPassword_unknown_error_response_body
+func ValidateNewPasswordUnknownErrorResponseBody(body *NewPasswordUnknownErrorResponseBody) (err error) {
 	if body.Err == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}

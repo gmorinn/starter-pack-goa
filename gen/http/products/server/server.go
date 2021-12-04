@@ -21,6 +21,7 @@ import (
 type Server struct {
 	Mounts                   []*MountPoint
 	GetAllProductsByCategory http.Handler
+	GetAllProducts           http.Handler
 	GetProduct               http.Handler
 	CORS                     http.Handler
 }
@@ -59,11 +60,14 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"GetAllProductsByCategory", "GET", "/v1/web/products/category/{category}"},
+			{"GetAllProducts", "GET", "/v1/web/products"},
 			{"GetProduct", "GET", "/v1/web/product/{id}"},
 			{"CORS", "OPTIONS", "/v1/web/products/category/{category}"},
+			{"CORS", "OPTIONS", "/v1/web/products"},
 			{"CORS", "OPTIONS", "/v1/web/product/{id}"},
 		},
 		GetAllProductsByCategory: NewGetAllProductsByCategoryHandler(e.GetAllProductsByCategory, mux, decoder, encoder, errhandler, formatter),
+		GetAllProducts:           NewGetAllProductsHandler(e.GetAllProducts, mux, decoder, encoder, errhandler, formatter),
 		GetProduct:               NewGetProductHandler(e.GetProduct, mux, decoder, encoder, errhandler, formatter),
 		CORS:                     NewCORSHandler(),
 	}
@@ -75,6 +79,7 @@ func (s *Server) Service() string { return "products" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.GetAllProductsByCategory = m(s.GetAllProductsByCategory)
+	s.GetAllProducts = m(s.GetAllProducts)
 	s.GetProduct = m(s.GetProduct)
 	s.CORS = m(s.CORS)
 }
@@ -82,6 +87,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 // Mount configures the mux to serve the products endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountGetAllProductsByCategoryHandler(mux, h.GetAllProductsByCategory)
+	MountGetAllProductsHandler(mux, h.GetAllProducts)
 	MountGetProductHandler(mux, h.GetProduct)
 	MountCORSHandler(mux, h.CORS)
 }
@@ -117,6 +123,57 @@ func NewGetAllProductsByCategoryHandler(
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
 		ctx = context.WithValue(ctx, goa.MethodKey, "getAllProductsByCategory")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "products")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountGetAllProductsHandler configures the mux to serve the "products"
+// service "getAllProducts" endpoint.
+func MountGetAllProductsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := HandleProductsOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/v1/web/products", f)
+}
+
+// NewGetAllProductsHandler creates a HTTP handler which loads the HTTP request
+// and calls the "products" service "getAllProducts" endpoint.
+func NewGetAllProductsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeGetAllProductsRequest(mux, decoder)
+		encodeResponse = EncodeGetAllProductsResponse(encoder)
+		encodeError    = EncodeGetAllProductsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "getAllProducts")
 		ctx = context.WithValue(ctx, goa.ServiceKey, "products")
 		payload, err := decodeRequest(r)
 		if err != nil {
@@ -200,6 +257,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/v1/web/products/category/{category}", f)
+	mux.Handle("OPTIONS", "/v1/web/products", f)
 	mux.Handle("OPTIONS", "/v1/web/product/{id}", f)
 }
 

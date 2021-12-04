@@ -29,33 +29,33 @@ import (
 //
 func UsageCommands() string {
 	return `bo-products (get-all-products|get-all-products-by-category|delete-product|create-product|update-product|delete-many-products|get-product)
-bo-users (get-allusers|delete-user|create-user|update-user|get-user|delete-many-users)
+bo-users (get-allusers|delete-user|create-user|update-user|get-user|delete-many-users|new-password)
 jwt-token (signup|signin|refresh|email-exist|auth-providers)
 o-auth o-auth
-products (get-all-products-by-category|get-product)
+products (get-all-products-by-category|get-all-products|get-product)
 users get-user
 `
 }
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` bo-products get-all-products --oauth "Nesciunt harum sed." --jwt-token "Nihil et accusantium quam."` + "\n" +
+	return os.Args[0] + ` bo-products get-all-products --oauth "Et accusantium." --jwt-token "Optio expedita quibusdam at iste quia neque."` + "\n" +
 		os.Args[0] + ` bo-users get-allusers --oauth "Impedit ab rerum qui." --jwt-token "Dignissimos provident."` + "\n" +
 		os.Args[0] + ` jwt-token signup --body '{
-      "birthday": "Aliquam aspernatur.",
+      "birthday": "Reiciendis commodi inventore laudantium.",
       "confirm_password": "JeSuisUnTest974",
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
       "password": "JeSuisUnTest974",
       "phone": "+262 692 12 34 56"
-   }' --oauth "Corporis minus omnis."` + "\n" +
+   }' --oauth "Harum temporibus et pariatur."` + "\n" +
 		os.Args[0] + ` o-auth o-auth --body '{
-      "client_id": "Voluptas vitae.",
-      "client_secret": "Adipisci id voluptate est labore expedita repudiandae.",
-      "grant_type": "Veniam inventore perspiciatis magnam quam in et."
+      "client_id": "In et voluptatem perspiciatis maiores amet soluta.",
+      "client_secret": "Labore quo nobis voluptatem et dolores.",
+      "grant_type": "Occaecati quidem quaerat voluptates qui nihil."
    }'` + "\n" +
-		os.Args[0] + ` products get-all-products-by-category --category "men" --oauth "Voluptatem quod in."` + "\n" +
+		os.Args[0] + ` products get-all-products-by-category --category "men" --oauth "Ut molestiae molestias iusto quo."` + "\n" +
 		""
 }
 
@@ -138,6 +138,12 @@ func ParseEndpoint(
 		boUsersDeleteManyUsersOauthFlag    = boUsersDeleteManyUsersFlags.String("oauth", "", "")
 		boUsersDeleteManyUsersJWTTokenFlag = boUsersDeleteManyUsersFlags.String("jwt-token", "", "")
 
+		boUsersNewPasswordFlags        = flag.NewFlagSet("new-password", flag.ExitOnError)
+		boUsersNewPasswordBodyFlag     = boUsersNewPasswordFlags.String("body", "REQUIRED", "")
+		boUsersNewPasswordIDFlag       = boUsersNewPasswordFlags.String("id", "REQUIRED", "Unique ID of the User")
+		boUsersNewPasswordOauthFlag    = boUsersNewPasswordFlags.String("oauth", "", "")
+		boUsersNewPasswordJWTTokenFlag = boUsersNewPasswordFlags.String("jwt-token", "", "")
+
 		jwtTokenFlags = flag.NewFlagSet("jwt-token", flag.ContinueOnError)
 
 		jwtTokenSignupFlags     = flag.NewFlagSet("signup", flag.ExitOnError)
@@ -171,6 +177,9 @@ func ParseEndpoint(
 		productsGetAllProductsByCategoryCategoryFlag = productsGetAllProductsByCategoryFlags.String("category", "REQUIRED", "")
 		productsGetAllProductsByCategoryOauthFlag    = productsGetAllProductsByCategoryFlags.String("oauth", "", "")
 
+		productsGetAllProductsFlags     = flag.NewFlagSet("get-all-products", flag.ExitOnError)
+		productsGetAllProductsOauthFlag = productsGetAllProductsFlags.String("oauth", "", "")
+
 		productsGetProductFlags     = flag.NewFlagSet("get-product", flag.ExitOnError)
 		productsGetProductIDFlag    = productsGetProductFlags.String("id", "REQUIRED", "Unique ID of the product")
 		productsGetProductOauthFlag = productsGetProductFlags.String("oauth", "", "")
@@ -198,6 +207,7 @@ func ParseEndpoint(
 	boUsersUpdateUserFlags.Usage = boUsersUpdateUserUsage
 	boUsersGetUserFlags.Usage = boUsersGetUserUsage
 	boUsersDeleteManyUsersFlags.Usage = boUsersDeleteManyUsersUsage
+	boUsersNewPasswordFlags.Usage = boUsersNewPasswordUsage
 
 	jwtTokenFlags.Usage = jwtTokenUsage
 	jwtTokenSignupFlags.Usage = jwtTokenSignupUsage
@@ -211,6 +221,7 @@ func ParseEndpoint(
 
 	productsFlags.Usage = productsUsage
 	productsGetAllProductsByCategoryFlags.Usage = productsGetAllProductsByCategoryUsage
+	productsGetAllProductsFlags.Usage = productsGetAllProductsUsage
 	productsGetProductFlags.Usage = productsGetProductUsage
 
 	usersFlags.Usage = usersUsage
@@ -303,6 +314,9 @@ func ParseEndpoint(
 			case "delete-many-users":
 				epf = boUsersDeleteManyUsersFlags
 
+			case "new-password":
+				epf = boUsersNewPasswordFlags
+
 			}
 
 		case "jwt-token":
@@ -335,6 +349,9 @@ func ParseEndpoint(
 			switch epn {
 			case "get-all-products-by-category":
 				epf = productsGetAllProductsByCategoryFlags
+
+			case "get-all-products":
+				epf = productsGetAllProductsFlags
 
 			case "get-product":
 				epf = productsGetProductFlags
@@ -414,6 +431,9 @@ func ParseEndpoint(
 			case "delete-many-users":
 				endpoint = c.DeleteManyUsers()
 				data, err = bousersc.BuildDeleteManyUsersPayload(*boUsersDeleteManyUsersBodyFlag, *boUsersDeleteManyUsersOauthFlag, *boUsersDeleteManyUsersJWTTokenFlag)
+			case "new-password":
+				endpoint = c.NewPassword()
+				data, err = bousersc.BuildNewPasswordPayload(*boUsersNewPasswordBodyFlag, *boUsersNewPasswordIDFlag, *boUsersNewPasswordOauthFlag, *boUsersNewPasswordJWTTokenFlag)
 			}
 		case "jwt-token":
 			c := jwttokenc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -447,6 +467,9 @@ func ParseEndpoint(
 			case "get-all-products-by-category":
 				endpoint = c.GetAllProductsByCategory()
 				data, err = productsc.BuildGetAllProductsByCategoryPayload(*productsGetAllProductsByCategoryCategoryFlag, *productsGetAllProductsByCategoryOauthFlag)
+			case "get-all-products":
+				endpoint = c.GetAllProducts()
+				data, err = productsc.BuildGetAllProductsPayload(*productsGetAllProductsOauthFlag)
 			case "get-product":
 				endpoint = c.GetProduct()
 				data, err = productsc.BuildGetProductPayload(*productsGetProductIDFlag, *productsGetProductOauthFlag)
@@ -495,7 +518,7 @@ Get All products
     -jwt-token STRING: 
 
 Example:
-    %[1]s bo-products get-all-products --oauth "Nesciunt harum sed." --jwt-token "Nihil et accusantium quam."
+    %[1]s bo-products get-all-products --oauth "Et accusantium." --jwt-token "Optio expedita quibusdam at iste quia neque."
 `, os.Args[0])
 }
 
@@ -508,7 +531,7 @@ Get All products by category
     -jwt-token STRING: 
 
 Example:
-    %[1]s bo-products get-all-products-by-category --category "men" --oauth "Quia neque." --jwt-token "Ex qui non sint maxime voluptatem."
+    %[1]s bo-products get-all-products-by-category --category "men" --oauth "Maxime voluptatem dolores modi deserunt." --jwt-token "Debitis odit."
 `, os.Args[0])
 }
 
@@ -521,7 +544,7 @@ Delete one product by ID
     -jwt-token STRING: 
 
 Example:
-    %[1]s bo-products delete-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Debitis odit." --jwt-token "Ipsa sint."
+    %[1]s bo-products delete-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Rerum voluptates doloremque." --jwt-token "Dolor et quaerat repellat nihil."
 `, os.Args[0])
 }
 
@@ -541,7 +564,7 @@ Example:
          "name": "Guillaume",
          "price": 69
       }
-   }' --oauth "Doloremque et dolor." --jwt-token "Quaerat repellat."
+   }' --oauth "Rem nulla culpa enim dolor atque molestias." --jwt-token "Voluptatem et pariatur."
 `, os.Args[0])
 }
 
@@ -562,7 +585,7 @@ Example:
          "name": "Guillaume",
          "price": 69
       }
-   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Quae rem nulla culpa enim dolor atque." --jwt-token "Rerum voluptatem et pariatur ratione."
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Quam sunt numquam." --jwt-token "Expedita et occaecati."
 `, os.Args[0])
 }
 
@@ -577,12 +600,10 @@ Delete many products with IDs send in body
 Example:
     %[1]s bo-products delete-many-products --body '{
       "tab": [
-         "Numquam exercitationem expedita et occaecati qui.",
-         "Quibusdam nemo.",
-         "Iure sequi doloremque.",
-         "Est cupiditate dicta tempore omnis in vel."
+         "Temporibus iure sequi doloremque sequi est.",
+         "Dicta tempore omnis in vel ullam."
       ]
-   }' --oauth "Officia ipsam repudiandae expedita." --jwt-token "Facere expedita nihil omnis assumenda qui qui."
+   }' --oauth "Ipsam repudiandae expedita animi." --jwt-token "Expedita nihil omnis assumenda qui qui."
 `, os.Args[0])
 }
 
@@ -612,6 +633,7 @@ COMMAND:
     update-user: Update one User
     get-user: Get one User
     delete-many-users: Delete many users with IDs send in body
+    new-password: Change your current password from Back Office
 
 Additional help:
     %[1]s bo-users COMMAND --help
@@ -718,6 +740,23 @@ Example:
 `, os.Args[0])
 }
 
+func boUsersNewPasswordUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] bo-users new-password -body JSON -id STRING -oauth STRING -jwt-token STRING
+
+Change your current password from Back Office
+    -body JSON: 
+    -id STRING: Unique ID of the User
+    -oauth STRING: 
+    -jwt-token STRING: 
+
+Example:
+    %[1]s bo-users new-password --body '{
+      "confirm": "JeSuisUnTest974",
+      "password": "JeSuisUnTest974"
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Aliquam aspernatur." --jwt-token "Corporis minus omnis."
+`, os.Args[0])
+}
+
 // jwt-tokenUsage displays the usage of the jwt-token command and its
 // subcommands.
 func jwtTokenUsage() {
@@ -745,14 +784,14 @@ signup to generate jwt token
 
 Example:
     %[1]s jwt-token signup --body '{
-      "birthday": "Aliquam aspernatur.",
+      "birthday": "Reiciendis commodi inventore laudantium.",
       "confirm_password": "JeSuisUnTest974",
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
       "password": "JeSuisUnTest974",
       "phone": "+262 692 12 34 56"
-   }' --oauth "Corporis minus omnis."
+   }' --oauth "Harum temporibus et pariatur."
 `, os.Args[0])
 }
 
@@ -767,7 +806,7 @@ Example:
     %[1]s jwt-token signin --body '{
       "email": "guillaume@epitech.eu",
       "password": "JeSuisUnTest974"
-   }' --oauth "Et eos culpa."
+   }' --oauth "Vel vitae nam nobis porro ullam aliquam."
 `, os.Args[0])
 }
 
@@ -781,7 +820,7 @@ Refresh Token
 Example:
     %[1]s jwt-token refresh --body '{
       "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
-   }' --oauth "Velit dicta facilis necessitatibus."
+   }' --oauth "Voluptates vel nihil corporis eos ut."
 `, os.Args[0])
 }
 
@@ -795,7 +834,7 @@ Check if email exist in database
 Example:
     %[1]s jwt-token email-exist --body '{
       "email": "guillaume@gmail.com"
-   }' --oauth "Occaecati nihil quis labore."
+   }' --oauth "Ut nulla corporis in dolor velit."
 `, os.Args[0])
 }
 
@@ -809,12 +848,12 @@ Register or login by Google, Facebook
 Example:
     %[1]s jwt-token auth-providers --body '{
       "email": "guillaume@epitech.eu",
-      "firebase_id_token": "o43",
+      "firebase_id_token": "klq",
       "firebase_provider": "facebook.com",
       "firebase_uid": "zgmURRUlcJfgDMRyjJ20xs7Rxxw2",
       "firstname": "Guillaume",
       "lastname": "Morin"
-   }' --oauth "Quis aut quisquam porro quis."
+   }' --oauth "Accusamus blanditiis id."
 `, os.Args[0])
 }
 
@@ -839,9 +878,9 @@ oAuth
 
 Example:
     %[1]s o-auth o-auth --body '{
-      "client_id": "Voluptas vitae.",
-      "client_secret": "Adipisci id voluptate est labore expedita repudiandae.",
-      "grant_type": "Veniam inventore perspiciatis magnam quam in et."
+      "client_id": "In et voluptatem perspiciatis maiores amet soluta.",
+      "client_secret": "Labore quo nobis voluptatem et dolores.",
+      "grant_type": "Occaecati quidem quaerat voluptates qui nihil."
    }'
 `, os.Args[0])
 }
@@ -854,6 +893,7 @@ Usage:
 
 COMMAND:
     get-all-products-by-category: Get All products by category
+    get-all-products: Get All products
     get-product: Get one product
 
 Additional help:
@@ -868,7 +908,18 @@ Get All products by category
     -oauth STRING: 
 
 Example:
-    %[1]s products get-all-products-by-category --category "men" --oauth "Voluptatem quod in."
+    %[1]s products get-all-products-by-category --category "men" --oauth "Ut molestiae molestias iusto quo."
+`, os.Args[0])
+}
+
+func productsGetAllProductsUsage() {
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] products get-all-products -oauth STRING
+
+Get All products
+    -oauth STRING: 
+
+Example:
+    %[1]s products get-all-products --oauth "Consequatur occaecati."
 `, os.Args[0])
 }
 
@@ -880,7 +931,7 @@ Get one product
     -oauth STRING: 
 
 Example:
-    %[1]s products get-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Ut modi."
+    %[1]s products get-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Neque repellat velit."
 `, os.Args[0])
 }
 
@@ -906,6 +957,6 @@ Get one User
     -jwt-token STRING: 
 
 Example:
-    %[1]s users get-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Atque est id ut molestiae." --jwt-token "Iusto quo."
+    %[1]s users get-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Aut maxime." --jwt-token "Similique molestias enim."
 `, os.Args[0])
 }

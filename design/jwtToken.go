@@ -199,11 +199,11 @@ var _ = Service("jwtToken", func() {
 })
 
 var emailAlreadyExist = Type("emailAlreadyExist", func() {
-	Field(1, "message", String)
+	Field(1, "err", String)
 	Field(2, "success", Boolean, func() {
 		Default(false)
 	})
-	Required("message", "success")
+	Required("err", "success")
 })
 
 var Sign = Type("Sign", func() {

@@ -21,7 +21,7 @@ func BuildOAuthPayload(oAuthOAuthBody string) (*oauth.OauthPayload, error) {
 	{
 		err = json.Unmarshal([]byte(oAuthOAuthBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"client_id\": \"Voluptas vitae.\",\n      \"client_secret\": \"Adipisci id voluptate est labore expedita repudiandae.\",\n      \"grant_type\": \"Veniam inventore perspiciatis magnam quam in et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"client_id\": \"In et voluptatem perspiciatis maiores amet soluta.\",\n      \"client_secret\": \"Labore quo nobis voluptatem et dolores.\",\n      \"grant_type\": \"Occaecati quidem quaerat voluptates qui nihil.\"\n   }'")
 		}
 	}
 	v := &oauth.OauthPayload{

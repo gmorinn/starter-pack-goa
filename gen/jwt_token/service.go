@@ -110,7 +110,7 @@ type AuthProvidersPayload struct {
 }
 
 type EmailAlreadyExist struct {
-	Message string
+	Err     string
 	Success bool
 }
 

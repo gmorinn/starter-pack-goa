@@ -278,3 +278,57 @@ func BuildDeleteManyUsersPayload(boUsersDeleteManyUsersBody string, boUsersDelet
 
 	return v, nil
 }
+
+// BuildNewPasswordPayload builds the payload for the boUsers newPassword
+// endpoint from CLI flags.
+func BuildNewPasswordPayload(boUsersNewPasswordBody string, boUsersNewPasswordID string, boUsersNewPasswordOauth string, boUsersNewPasswordJWTToken string) (*bousers.NewPasswordPayload, error) {
+	var err error
+	var body NewPasswordRequestBody
+	{
+		err = json.Unmarshal([]byte(boUsersNewPasswordBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"confirm\": \"JeSuisUnTest974\",\n      \"password\": \"JeSuisUnTest974\"\n   }'")
+		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.password", body.Password, "\\d"))
+		if utf8.RuneCountInString(body.Password) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.password", body.Password, utf8.RuneCountInString(body.Password), 8, true))
+		}
+		err = goa.MergeErrors(err, goa.ValidatePattern("body.confirm", body.Confirm, "\\d"))
+		if utf8.RuneCountInString(body.Confirm) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError("body.confirm", body.Confirm, utf8.RuneCountInString(body.Confirm), 8, true))
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	var id string
+	{
+		id = boUsersNewPasswordID
+		err = goa.MergeErrors(err, goa.ValidateFormat("id", id, goa.FormatUUID))
+
+		if err != nil {
+			return nil, err
+		}
+	}
+	var oauth *string
+	{
+		if boUsersNewPasswordOauth != "" {
+			oauth = &boUsersNewPasswordOauth
+		}
+	}
+	var jwtToken *string
+	{
+		if boUsersNewPasswordJWTToken != "" {
+			jwtToken = &boUsersNewPasswordJWTToken
+		}
+	}
+	v := &bousers.NewPasswordPayload{
+		Password: body.Password,
+		Confirm:  body.Confirm,
+	}
+	v.ID = id
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
+
+	return v, nil
+}

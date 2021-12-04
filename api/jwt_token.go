@@ -21,7 +21,7 @@ type jwtTokensrvc struct {
 
 func errorEmail() *jwttoken.EmailAlreadyExist {
 	return &jwttoken.EmailAlreadyExist{
-		Message: "EMAIL_ALREADY_EXIST",
+		Err: "EMAIL_ALREADY_EXIST",
 	}
 }
 

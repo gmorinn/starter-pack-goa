@@ -40,6 +40,21 @@ func BuildGetAllProductsByCategoryPayload(productsGetAllProductsByCategoryCatego
 	return v, nil
 }
 
+// BuildGetAllProductsPayload builds the payload for the products
+// getAllProducts endpoint from CLI flags.
+func BuildGetAllProductsPayload(productsGetAllProductsOauth string) (*products.GetAllProductsPayload, error) {
+	var oauth *string
+	{
+		if productsGetAllProductsOauth != "" {
+			oauth = &productsGetAllProductsOauth
+		}
+	}
+	v := &products.GetAllProductsPayload{}
+	v.Oauth = oauth
+
+	return v, nil
+}
+
 // BuildGetProductPayload builds the payload for the products getProduct
 // endpoint from CLI flags.
 func BuildGetProductPayload(productsGetProductID string, productsGetProductOauth string) (*products.GetProductPayload, error) {

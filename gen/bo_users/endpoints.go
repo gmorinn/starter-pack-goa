@@ -22,6 +22,7 @@ type Endpoints struct {
 	UpdateUser      goa.Endpoint
 	GetUser         goa.Endpoint
 	DeleteManyUsers goa.Endpoint
+	NewPassword     goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "boUsers" service with endpoints.
@@ -35,6 +36,7 @@ func NewEndpoints(s Service) *Endpoints {
 		UpdateUser:      NewUpdateUserEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		GetUser:         NewGetUserEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 		DeleteManyUsers: NewDeleteManyUsersEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		NewPassword:     NewNewPasswordEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 	}
 }
 
@@ -46,6 +48,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.UpdateUser = m(e.UpdateUser)
 	e.GetUser = m(e.GetUser)
 	e.DeleteManyUsers = m(e.DeleteManyUsers)
+	e.NewPassword = m(e.NewPassword)
 }
 
 // NewGetAllusersEndpoint returns an endpoint function that calls the method
@@ -297,5 +300,47 @@ func NewDeleteManyUsersEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func,
 			return nil, err
 		}
 		return s.DeleteManyUsers(ctx, p)
+	}
+}
+
+// NewNewPasswordEndpoint returns an endpoint function that calls the method
+// "newPassword" of service "boUsers".
+func NewNewPasswordEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*NewPasswordPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "OAuth2",
+			Scopes:         []string{"api:read"},
+			RequiredScopes: []string{},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:       "client_credentials",
+					TokenURL:   "/authorization",
+					RefreshURL: "/refresh",
+				},
+			},
+		}
+		var token string
+		if p.Oauth != nil {
+			token = *p.Oauth
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err == nil {
+			sc := security.JWTScheme{
+				Name:           "jwt",
+				Scopes:         []string{"api:read", "api:write"},
+				RequiredScopes: []string{},
+			}
+			var token string
+			if p.JWTToken != nil {
+				token = *p.JWTToken
+			}
+			ctx, err = authJWTFn(ctx, token, &sc)
+		}
+		if err != nil {
+			return nil, err
+		}
+		return s.NewPassword(ctx, p)
 	}
 }

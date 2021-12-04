@@ -18,6 +18,8 @@ import (
 type Service interface {
 	// Get All products by category
 	GetAllProductsByCategory(context.Context, *GetAllProductsByCategoryPayload) (res *GetAllProductsByCategoryResult, err error)
+	// Get All products
+	GetAllProducts(context.Context, *GetAllProductsPayload) (res *GetAllProductsResult, err error)
 	// Get one product
 	GetProduct(context.Context, *GetProductPayload) (res *GetProductResult, err error)
 }
@@ -36,7 +38,7 @@ const ServiceName = "products"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"getAllProductsByCategory", "getProduct"}
+var MethodNames = [3]string{"getAllProductsByCategory", "getAllProducts", "getProduct"}
 
 // GetAllProductsByCategoryPayload is the payload type of the products service
 // getAllProductsByCategory method.
@@ -49,6 +51,21 @@ type GetAllProductsByCategoryPayload struct {
 // GetAllProductsByCategoryResult is the result type of the products service
 // getAllProductsByCategory method.
 type GetAllProductsByCategoryResult struct {
+	// Result is an array of object
+	Products []*ResProduct
+	Success  bool
+}
+
+// GetAllProductsPayload is the payload type of the products service
+// getAllProducts method.
+type GetAllProductsPayload struct {
+	// Use to generate Oauth with /authorization
+	Oauth *string
+}
+
+// GetAllProductsResult is the result type of the products service
+// getAllProducts method.
+type GetAllProductsResult struct {
 	// Result is an array of object
 	Products []*ResProduct
 	Success  bool

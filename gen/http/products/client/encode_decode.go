@@ -122,6 +122,98 @@ func DecodeGetAllProductsByCategoryResponse(decoder func(*http.Response) goahttp
 	}
 }
 
+// BuildGetAllProductsRequest instantiates a HTTP request object with method
+// and path set to call the "products" service "getAllProducts" endpoint
+func (c *Client) BuildGetAllProductsRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetAllProductsProductsPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("products", "getAllProducts", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeGetAllProductsRequest returns an encoder for requests sent to the
+// products getAllProducts server.
+func EncodeGetAllProductsRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*products.GetAllProductsPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("products", "getAllProducts", "*products.GetAllProductsPayload", v)
+		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeGetAllProductsResponse returns a decoder for responses returned by the
+// products getAllProducts endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeGetAllProductsResponse may return the following errors:
+//	- "unknown_error" (type *products.UnknownError): http.StatusInternalServerError
+//	- error: internal error
+func DecodeGetAllProductsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body GetAllProductsResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("products", "getAllProducts", err)
+			}
+			err = ValidateGetAllProductsResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("products", "getAllProducts", err)
+			}
+			res := NewGetAllProductsResultOK(&body)
+			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body GetAllProductsUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("products", "getAllProducts", err)
+			}
+			err = ValidateGetAllProductsUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("products", "getAllProducts", err)
+			}
+			return nil, NewGetAllProductsUnknownError(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("products", "getAllProducts", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildGetProductRequest instantiates a HTTP request object with method and
 // path set to call the "products" service "getProduct" endpoint
 func (c *Client) BuildGetProductRequest(ctx context.Context, v interface{}) (*http.Request, error) {

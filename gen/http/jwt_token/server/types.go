@@ -101,7 +101,7 @@ type AuthProvidersCreatedResponseBody struct {
 // SignupEmailAlreadyExistResponseBody is the type of the "jwtToken" service
 // "signup" endpoint HTTP response body for the "email_already_exist" error.
 type SignupEmailAlreadyExistResponseBody struct {
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
 
@@ -124,7 +124,7 @@ type SignupUnauthorizedResponseBody string
 // SigninEmailAlreadyExistResponseBody is the type of the "jwtToken" service
 // "signin" endpoint HTTP response body for the "email_already_exist" error.
 type SigninEmailAlreadyExistResponseBody struct {
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
 
@@ -147,7 +147,7 @@ type SigninUnauthorizedResponseBody string
 // RefreshEmailAlreadyExistResponseBody is the type of the "jwtToken" service
 // "refresh" endpoint HTTP response body for the "email_already_exist" error.
 type RefreshEmailAlreadyExistResponseBody struct {
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
 
@@ -171,7 +171,7 @@ type RefreshUnauthorizedResponseBody string
 // service "email-exist" endpoint HTTP response body for the
 // "email_already_exist" error.
 type EmailExistEmailAlreadyExistResponseBody struct {
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
 
@@ -195,7 +195,7 @@ type EmailExistUnauthorizedResponseBody string
 // service "auth-providers" endpoint HTTP response body for the
 // "email_already_exist" error.
 type AuthProvidersEmailAlreadyExistResponseBody struct {
-	Message string `form:"message" json:"message" xml:"message"`
+	Err     string `form:"err" json:"err" xml:"err"`
 	Success bool   `form:"success" json:"success" xml:"success"`
 }
 
@@ -273,7 +273,7 @@ func NewAuthProvidersCreatedResponseBody(res *jwttoken.Sign) *AuthProvidersCreat
 // the result of the "signup" endpoint of the "jwtToken" service.
 func NewSignupEmailAlreadyExistResponseBody(res *jwttoken.EmailAlreadyExist) *SignupEmailAlreadyExistResponseBody {
 	body := &SignupEmailAlreadyExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		Success: res.Success,
 	}
 	return body
@@ -308,7 +308,7 @@ func NewSignupUnauthorizedResponseBody(res jwttoken.Unauthorized) SignupUnauthor
 // the result of the "signin" endpoint of the "jwtToken" service.
 func NewSigninEmailAlreadyExistResponseBody(res *jwttoken.EmailAlreadyExist) *SigninEmailAlreadyExistResponseBody {
 	body := &SigninEmailAlreadyExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		Success: res.Success,
 	}
 	return body
@@ -343,7 +343,7 @@ func NewSigninUnauthorizedResponseBody(res jwttoken.Unauthorized) SigninUnauthor
 // the result of the "refresh" endpoint of the "jwtToken" service.
 func NewRefreshEmailAlreadyExistResponseBody(res *jwttoken.EmailAlreadyExist) *RefreshEmailAlreadyExistResponseBody {
 	body := &RefreshEmailAlreadyExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		Success: res.Success,
 	}
 	return body
@@ -378,7 +378,7 @@ func NewRefreshUnauthorizedResponseBody(res jwttoken.Unauthorized) RefreshUnauth
 // from the result of the "email-exist" endpoint of the "jwtToken" service.
 func NewEmailExistEmailAlreadyExistResponseBody(res *jwttoken.EmailAlreadyExist) *EmailExistEmailAlreadyExistResponseBody {
 	body := &EmailExistEmailAlreadyExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		Success: res.Success,
 	}
 	return body
@@ -413,7 +413,7 @@ func NewEmailExistUnauthorizedResponseBody(res jwttoken.Unauthorized) EmailExist
 // from the result of the "auth-providers" endpoint of the "jwtToken" service.
 func NewAuthProvidersEmailAlreadyExistResponseBody(res *jwttoken.EmailAlreadyExist) *AuthProvidersEmailAlreadyExistResponseBody {
 	body := &AuthProvidersEmailAlreadyExistResponseBody{
-		Message: res.Message,
+		Err:     res.Err,
 		Success: res.Success,
 	}
 	return body

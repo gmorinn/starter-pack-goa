@@ -21,10 +21,11 @@ type Client struct {
 	UpdateUserEndpoint      goa.Endpoint
 	GetUserEndpoint         goa.Endpoint
 	DeleteManyUsersEndpoint goa.Endpoint
+	NewPasswordEndpoint     goa.Endpoint
 }
 
 // NewClient initializes a "boUsers" service client given the endpoints.
-func NewClient(getAllusers, deleteUser, createUser, updateUser, getUser, deleteManyUsers goa.Endpoint) *Client {
+func NewClient(getAllusers, deleteUser, createUser, updateUser, getUser, deleteManyUsers, newPassword goa.Endpoint) *Client {
 	return &Client{
 		GetAllusersEndpoint:     getAllusers,
 		DeleteUserEndpoint:      deleteUser,
@@ -32,6 +33,7 @@ func NewClient(getAllusers, deleteUser, createUser, updateUser, getUser, deleteM
 		UpdateUserEndpoint:      updateUser,
 		GetUserEndpoint:         getUser,
 		DeleteManyUsersEndpoint: deleteManyUsers,
+		NewPasswordEndpoint:     newPassword,
 	}
 }
 
@@ -94,4 +96,14 @@ func (c *Client) DeleteManyUsers(ctx context.Context, p *DeleteManyUsersPayload)
 		return
 	}
 	return ires.(*DeleteManyUsersResult), nil
+}
+
+// NewPassword calls the "newPassword" endpoint of the "boUsers" service.
+func (c *Client) NewPassword(ctx context.Context, p *NewPasswordPayload) (res *NewPasswordResult, err error) {
+	var ires interface{}
+	ires, err = c.NewPasswordEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*NewPasswordResult), nil
 }

@@ -100,7 +100,7 @@ type AuthProvidersCreatedResponseBody struct {
 // SignupEmailAlreadyExistResponseBody is the type of the "jwtToken" service
 // "signup" endpoint HTTP response body for the "email_already_exist" error.
 type SignupEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
@@ -123,7 +123,7 @@ type SignupUnauthorizedResponseBody string
 // SigninEmailAlreadyExistResponseBody is the type of the "jwtToken" service
 // "signin" endpoint HTTP response body for the "email_already_exist" error.
 type SigninEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
@@ -146,7 +146,7 @@ type SigninUnauthorizedResponseBody string
 // RefreshEmailAlreadyExistResponseBody is the type of the "jwtToken" service
 // "refresh" endpoint HTTP response body for the "email_already_exist" error.
 type RefreshEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
@@ -170,7 +170,7 @@ type RefreshUnauthorizedResponseBody string
 // service "email-exist" endpoint HTTP response body for the
 // "email_already_exist" error.
 type EmailExistEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
@@ -194,7 +194,7 @@ type EmailExistUnauthorizedResponseBody string
 // service "auth-providers" endpoint HTTP response body for the
 // "email_already_exist" error.
 type AuthProvidersEmailAlreadyExistResponseBody struct {
-	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
@@ -307,7 +307,7 @@ func NewSignupSignOK(body *SignupResponseBody) *jwttoken.Sign {
 // email_already_exist error.
 func NewSignupEmailAlreadyExist(body *SignupEmailAlreadyExistResponseBody) *jwttoken.EmailAlreadyExist {
 	v := &jwttoken.EmailAlreadyExist{
-		Message: *body.Message,
+		Err:     *body.Err,
 		Success: *body.Success,
 	}
 
@@ -358,7 +358,7 @@ func NewSigninSignOK(body *SigninResponseBody) *jwttoken.Sign {
 // email_already_exist error.
 func NewSigninEmailAlreadyExist(body *SigninEmailAlreadyExistResponseBody) *jwttoken.EmailAlreadyExist {
 	v := &jwttoken.EmailAlreadyExist{
-		Message: *body.Message,
+		Err:     *body.Err,
 		Success: *body.Success,
 	}
 
@@ -409,7 +409,7 @@ func NewRefreshSignOK(body *RefreshResponseBody) *jwttoken.Sign {
 // email_already_exist error.
 func NewRefreshEmailAlreadyExist(body *RefreshEmailAlreadyExistResponseBody) *jwttoken.EmailAlreadyExist {
 	v := &jwttoken.EmailAlreadyExist{
-		Message: *body.Message,
+		Err:     *body.Err,
 		Success: *body.Success,
 	}
 
@@ -459,7 +459,7 @@ func NewEmailExistResultOK(body *EmailExistResponseBody) *jwttoken.EmailExistRes
 // endpoint email_already_exist error.
 func NewEmailExistEmailAlreadyExist(body *EmailExistEmailAlreadyExistResponseBody) *jwttoken.EmailAlreadyExist {
 	v := &jwttoken.EmailAlreadyExist{
-		Message: *body.Message,
+		Err:     *body.Err,
 		Success: *body.Success,
 	}
 
@@ -510,7 +510,7 @@ func NewAuthProvidersSignCreated(body *AuthProvidersCreatedResponseBody) *jwttok
 // endpoint email_already_exist error.
 func NewAuthProvidersEmailAlreadyExist(body *AuthProvidersEmailAlreadyExistResponseBody) *jwttoken.EmailAlreadyExist {
 	v := &jwttoken.EmailAlreadyExist{
-		Message: *body.Message,
+		Err:     *body.Err,
 		Success: *body.Success,
 	}
 
@@ -618,8 +618,8 @@ func ValidateAuthProvidersCreatedResponseBody(body *AuthProvidersCreatedResponse
 // ValidateSignupEmailAlreadyExistResponseBody runs the validations defined on
 // signup_email_already_exist_response_body
 func ValidateSignupEmailAlreadyExistResponseBody(body *SignupEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}
 	if body.Success == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
@@ -645,8 +645,8 @@ func ValidateSignupUnknownErrorResponseBody(body *SignupUnknownErrorResponseBody
 // ValidateSigninEmailAlreadyExistResponseBody runs the validations defined on
 // signin_email_already_exist_response_body
 func ValidateSigninEmailAlreadyExistResponseBody(body *SigninEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}
 	if body.Success == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
@@ -672,8 +672,8 @@ func ValidateSigninUnknownErrorResponseBody(body *SigninUnknownErrorResponseBody
 // ValidateRefreshEmailAlreadyExistResponseBody runs the validations defined on
 // refresh_email_already_exist_response_body
 func ValidateRefreshEmailAlreadyExistResponseBody(body *RefreshEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}
 	if body.Success == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
@@ -699,8 +699,8 @@ func ValidateRefreshUnknownErrorResponseBody(body *RefreshUnknownErrorResponseBo
 // ValidateEmailExistEmailAlreadyExistResponseBody runs the validations defined
 // on email-exist_email_already_exist_response_body
 func ValidateEmailExistEmailAlreadyExistResponseBody(body *EmailExistEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}
 	if body.Success == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
@@ -726,8 +726,8 @@ func ValidateEmailExistUnknownErrorResponseBody(body *EmailExistUnknownErrorResp
 // ValidateAuthProvidersEmailAlreadyExistResponseBody runs the validations
 // defined on auth-providers_email_already_exist_response_body
 func ValidateAuthProvidersEmailAlreadyExistResponseBody(body *AuthProvidersEmailAlreadyExistResponseBody) (err error) {
-	if body.Message == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}
 	if body.Success == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))

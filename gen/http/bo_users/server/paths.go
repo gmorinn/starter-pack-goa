@@ -40,3 +40,8 @@ func GetUserBoUsersPath(id string) string {
 func DeleteManyUsersBoUsersPath() string {
 	return "/v1/bo/users/remove"
 }
+
+// NewPasswordBoUsersPath returns the URL path to the boUsers service newPassword HTTP endpoint.
+func NewPasswordBoUsersPath(id string) string {
+	return fmt.Sprintf("/v1/bo/user/change/password/%v", id)
+}

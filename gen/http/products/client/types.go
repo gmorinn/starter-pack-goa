@@ -21,6 +21,14 @@ type GetAllProductsByCategoryResponseBody struct {
 	Success  *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// GetAllProductsResponseBody is the type of the "products" service
+// "getAllProducts" endpoint HTTP response body.
+type GetAllProductsResponseBody struct {
+	// Result is an array of object
+	Products []*ResProductResponseBody `form:"products,omitempty" json:"products,omitempty" xml:"products,omitempty"`
+	Success  *bool                     `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
 // GetProductResponseBody is the type of the "products" service "getProduct"
 // endpoint HTTP response body.
 type GetProductResponseBody struct {
@@ -33,6 +41,14 @@ type GetProductResponseBody struct {
 // "products" service "getAllProductsByCategory" endpoint HTTP response body
 // for the "unknown_error" error.
 type GetAllProductsByCategoryUnknownErrorResponseBody struct {
+	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
+	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
+	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// GetAllProductsUnknownErrorResponseBody is the type of the "products" service
+// "getAllProducts" endpoint HTTP response body for the "unknown_error" error.
+type GetAllProductsUnknownErrorResponseBody struct {
 	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
@@ -72,6 +88,32 @@ func NewGetAllProductsByCategoryResultOK(body *GetAllProductsByCategoryResponseB
 // NewGetAllProductsByCategoryUnknownError builds a products service
 // getAllProductsByCategory endpoint unknown_error error.
 func NewGetAllProductsByCategoryUnknownError(body *GetAllProductsByCategoryUnknownErrorResponseBody) *products.UnknownError {
+	v := &products.UnknownError{
+		Err:       *body.Err,
+		ErrorCode: *body.ErrorCode,
+		Success:   *body.Success,
+	}
+
+	return v
+}
+
+// NewGetAllProductsResultOK builds a "products" service "getAllProducts"
+// endpoint result from a HTTP "OK" response.
+func NewGetAllProductsResultOK(body *GetAllProductsResponseBody) *products.GetAllProductsResult {
+	v := &products.GetAllProductsResult{
+		Success: *body.Success,
+	}
+	v.Products = make([]*products.ResProduct, len(body.Products))
+	for i, val := range body.Products {
+		v.Products[i] = unmarshalResProductResponseBodyToProductsResProduct(val)
+	}
+
+	return v
+}
+
+// NewGetAllProductsUnknownError builds a products service getAllProducts
+// endpoint unknown_error error.
+func NewGetAllProductsUnknownError(body *GetAllProductsUnknownErrorResponseBody) *products.UnknownError {
 	v := &products.UnknownError{
 		Err:       *body.Err,
 		ErrorCode: *body.ErrorCode,
@@ -123,6 +165,25 @@ func ValidateGetAllProductsByCategoryResponseBody(body *GetAllProductsByCategory
 	return
 }
 
+// ValidateGetAllProductsResponseBody runs the validations defined on
+// GetAllProductsResponseBody
+func ValidateGetAllProductsResponseBody(body *GetAllProductsResponseBody) (err error) {
+	if body.Products == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("products", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	for _, e := range body.Products {
+		if e != nil {
+			if err2 := ValidateResProductResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // ValidateGetProductResponseBody runs the validations defined on
 // GetProductResponseBody
 func ValidateGetProductResponseBody(body *GetProductResponseBody) (err error) {
@@ -143,6 +204,21 @@ func ValidateGetProductResponseBody(body *GetProductResponseBody) (err error) {
 // ValidateGetAllProductsByCategoryUnknownErrorResponseBody runs the
 // validations defined on getAllProductsByCategory_unknown_error_response_body
 func ValidateGetAllProductsByCategoryUnknownErrorResponseBody(body *GetAllProductsByCategoryUnknownErrorResponseBody) (err error) {
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.ErrorCode == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
+// ValidateGetAllProductsUnknownErrorResponseBody runs the validations defined
+// on getAllProducts_unknown_error_response_body
+func ValidateGetAllProductsUnknownErrorResponseBody(body *GetAllProductsUnknownErrorResponseBody) (err error) {
 	if body.Err == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}

@@ -21,6 +21,10 @@ type Client struct {
 	// the getAllProductsByCategory endpoint.
 	GetAllProductsByCategoryDoer goahttp.Doer
 
+	// GetAllProducts Doer is the HTTP client used to make requests to the
+	// getAllProducts endpoint.
+	GetAllProductsDoer goahttp.Doer
+
 	// GetProduct Doer is the HTTP client used to make requests to the getProduct
 	// endpoint.
 	GetProductDoer goahttp.Doer
@@ -49,6 +53,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		GetAllProductsByCategoryDoer: doer,
+		GetAllProductsDoer:           doer,
 		GetProductDoer:               doer,
 		CORSDoer:                     doer,
 		RestoreResponseBody:          restoreBody,
@@ -78,6 +83,30 @@ func (c *Client) GetAllProductsByCategory() goa.Endpoint {
 		resp, err := c.GetAllProductsByCategoryDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("products", "getAllProductsByCategory", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// GetAllProducts returns an endpoint that makes HTTP requests to the products
+// service getAllProducts server.
+func (c *Client) GetAllProducts() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeGetAllProductsRequest(c.encoder)
+		decodeResponse = DecodeGetAllProductsResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildGetAllProductsRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GetAllProductsDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("products", "getAllProducts", err)
 		}
 		return decodeResponse(resp)
 	}

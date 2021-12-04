@@ -1,6 +1,8 @@
 package design
 
-import . "goa.design/goa/v3/dsl"
+import (
+	. "goa.design/goa/v3/dsl"
+)
 
 // Service describes a service
 var _ = Service("boUsers", func() {
@@ -206,6 +208,47 @@ var _ = Service("boUsers", func() {
 		Result(func() {
 			Attribute("success", Boolean)
 			Required("success")
+		})
+	})
+
+	Method("newPassword", func() {
+		Description("Change your current password from Back Office")
+
+		Payload(func() {
+			Attribute("id", String, func() {
+				Format(FormatUUID)
+				Description("Unique ID of the User")
+				Example("5dfb0bf7-597a-4250-b7ad-63a43ff59c25")
+			})
+			Attribute("password", String, func() {
+				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Pattern("\\d")
+				MinLength(8)
+				Example("JeSuisUnTest974")
+			})
+			Attribute("confirm", String, func() {
+				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Pattern("\\d")
+				MinLength(8)
+				Example("JeSuisUnTest974")
+			})
+			TokenField(1, "jwtToken", String, func() {
+				Description("JWT used for authentication after Signin/Signup")
+			})
+			AccessTokenField(2, "oauth", String, func() {
+				Description("Use to generate Oauth with /authorization")
+			})
+			Required("id", "password", "confirm")
+		})
+
+		Result(func() {
+			Attribute("success", Boolean)
+			Required("success")
+		})
+
+		HTTP(func() {
+			PATCH("/user/change/password/{id}")
+			Response(StatusOK)
 		})
 	})
 })

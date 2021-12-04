@@ -28,6 +28,8 @@ type Service interface {
 	GetUser(context.Context, *GetUserPayload) (res *GetUserResult, err error)
 	// Delete many users with IDs send in body
 	DeleteManyUsers(context.Context, *DeleteManyUsersPayload) (res *DeleteManyUsersResult, err error)
+	// Change your current password from Back Office
+	NewPassword(context.Context, *NewPasswordPayload) (res *NewPasswordResult, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -46,7 +48,7 @@ const ServiceName = "boUsers"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [6]string{"getAllusers", "deleteUser", "createUser", "updateUser", "getUser", "deleteManyUsers"}
+var MethodNames = [7]string{"getAllusers", "deleteUser", "createUser", "updateUser", "getUser", "deleteManyUsers", "newPassword"}
 
 // GetAllusersPayload is the payload type of the boUsers service getAllusers
 // method.
@@ -154,6 +156,27 @@ type DeleteManyUsersPayload struct {
 // DeleteManyUsersResult is the result type of the boUsers service
 // deleteManyUsers method.
 type DeleteManyUsersResult struct {
+	Success bool
+}
+
+// NewPasswordPayload is the payload type of the boUsers service newPassword
+// method.
+type NewPasswordPayload struct {
+	// Unique ID of the User
+	ID string
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Password string
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Confirm string
+	// JWT used for authentication after Signin/Signup
+	JWTToken *string
+	// Use to generate Oauth with /authorization
+	Oauth *string
+}
+
+// NewPasswordResult is the result type of the boUsers service newPassword
+// method.
+type NewPasswordResult struct {
 	Success bool
 }
 

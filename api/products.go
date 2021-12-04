@@ -72,6 +72,37 @@ func (s *productssrvc) GetAllProductsByCategory(ctx context.Context, p *products
 	return res, nil
 }
 
+// Get All products
+func (s *productssrvc) GetAllProducts(ctx context.Context, p *products.GetAllProductsPayload) (res *products.GetAllProductsResult, err error) {
+	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		data, err := s.server.Store.GetAllProducts(ctx)
+		if err != nil {
+			return fmt.Errorf("ERROR_GET_ALL_PRODUCTS %v", err)
+		}
+		var ProductsResponse []*products.ResProduct
+		for _, v := range data {
+			id := v.ID.String()
+			ProductsResponse = append(ProductsResponse, &products.ResProduct{
+				ID:       id,
+				Name:     v.Name,
+				Price:    v.Price,
+				Cover:    v.Cover,
+				Category: string(v.Category),
+			})
+
+			res = &products.GetAllProductsResult{
+				Products: ProductsResponse,
+				Success:  true,
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, s.errorResponse("TX_GET_PRODUCTS", err)
+	}
+	return res, nil
+}
+
 // Get one product
 func (s *productssrvc) GetProduct(ctx context.Context, p *products.GetProductPayload) (res *products.GetProductResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {

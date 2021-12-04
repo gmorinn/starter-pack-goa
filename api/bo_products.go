@@ -45,12 +45,12 @@ func (s *boProductssrvc) JWTAuth(ctx context.Context, token string, scheme *secu
 // Get All products
 func (s *boProductssrvc) GetAllProducts(ctx context.Context, p *boproducts.GetAllProductsPayload) (res *boproducts.GetAllProductsResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		p, err := s.server.Store.GetAllProducts(ctx)
+		products, err := s.server.Store.GetAllProducts(ctx)
 		if err != nil {
 			return fmt.Errorf("ERROR_GET_ALL_PRODUCTS %v", err)
 		}
 		var ProductsResponse []*boproducts.ResBoProduct
-		for _, v := range p {
+		for _, v := range products {
 			id := v.ID.String()
 			ProductsResponse = append(ProductsResponse, &boproducts.ResBoProduct{
 				ID:       id,
