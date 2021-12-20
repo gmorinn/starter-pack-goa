@@ -53,9 +53,11 @@ type NewPasswordRequestBody struct {
 // GetAllusersResponseBody is the type of the "boUsers" service "getAllusers"
 // endpoint HTTP response body.
 type GetAllusersResponseBody struct {
-	// All users by category
-	Users   []*ResBoUserResponseBody `form:"users" json:"users" xml:"users"`
-	Success bool                     `form:"success" json:"success" xml:"success"`
+	// All users
+	Users []*ResBoUserResponseBody `form:"users" json:"users" xml:"users"`
+	// total of users
+	Count   int64 `form:"count" json:"count" xml:"count"`
+	Success bool  `form:"success" json:"success" xml:"success"`
 }
 
 // DeleteUserResponseBody is the type of the "boUsers" service "deleteUser"
@@ -181,6 +183,7 @@ type PayloadUserRequestBody struct {
 // the "getAllusers" endpoint of the "boUsers" service.
 func NewGetAllusersResponseBody(res *bousers.GetAllusersResult) *GetAllusersResponseBody {
 	body := &GetAllusersResponseBody{
+		Count:   res.Count,
 		Success: res.Success,
 	}
 	if res.Users != nil {
@@ -333,8 +336,12 @@ func NewNewPasswordUnknownErrorResponseBody(res *bousers.UnknownError) *NewPassw
 }
 
 // NewGetAllusersPayload builds a boUsers service getAllusers endpoint payload.
-func NewGetAllusersPayload(oauth *string, jwtToken *string) *bousers.GetAllusersPayload {
+func NewGetAllusersPayload(offset int32, limit int32, field string, direction string, oauth *string, jwtToken *string) *bousers.GetAllusersPayload {
 	v := &bousers.GetAllusersPayload{}
+	v.Offset = offset
+	v.Limit = limit
+	v.Field = field
+	v.Direction = direction
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
 

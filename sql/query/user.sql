@@ -1,6 +1,12 @@
--- name: GetAllUsers :many
-SELECT * FROM users
+-- name: GetCountsUser :one
+SELECT COUNT(*) FROM users
 WHERE deleted_at IS NULL;
+
+-- name: GetBoAllUsers :many
+SELECT * FROM users
+WHERE deleted_at IS NULL
+ORDER BY sqlc.arg('order')::text
+LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset');
 
 -- name: GetUserByID :one
 SELECT * FROM users

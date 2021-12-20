@@ -25,6 +25,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.checkEmailExistStmt, err = db.PrepareContext(ctx, checkEmailExist); err != nil {
 		return nil, fmt.Errorf("error preparing query CheckEmailExist: %w", err)
 	}
+	if q.createFileStmt, err = db.PrepareContext(ctx, createFile); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateFile: %w", err)
+	}
 	if q.createProductStmt, err = db.PrepareContext(ctx, createProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateProduct: %w", err)
 	}
@@ -33,6 +36,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
+	}
+	if q.deleteFileStmt, err = db.PrepareContext(ctx, deleteFile); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteFile: %w", err)
 	}
 	if q.deleteOldRefreshTokenStmt, err = db.PrepareContext(ctx, deleteOldRefreshToken); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteOldRefreshToken: %w", err)
@@ -52,14 +58,29 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.existUserByEmailStmt, err = db.PrepareContext(ctx, existUserByEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query ExistUserByEmail: %w", err)
 	}
+	if q.existUserByEmailAndConfirmCodeStmt, err = db.PrepareContext(ctx, existUserByEmailAndConfirmCode); err != nil {
+		return nil, fmt.Errorf("error preparing query ExistUserByEmailAndConfirmCode: %w", err)
+	}
 	if q.findUserByEmailStmt, err = db.PrepareContext(ctx, findUserByEmail); err != nil {
 		return nil, fmt.Errorf("error preparing query FindUserByEmail: %w", err)
 	}
 	if q.getAllProductsStmt, err = db.PrepareContext(ctx, getAllProducts); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllProducts: %w", err)
 	}
-	if q.getAllUsersStmt, err = db.PrepareContext(ctx, getAllUsers); err != nil {
-		return nil, fmt.Errorf("error preparing query GetAllUsers: %w", err)
+	if q.getBoAllProductsStmt, err = db.PrepareContext(ctx, getBoAllProducts); err != nil {
+		return nil, fmt.Errorf("error preparing query GetBoAllProducts: %w", err)
+	}
+	if q.getBoAllUsersStmt, err = db.PrepareContext(ctx, getBoAllUsers); err != nil {
+		return nil, fmt.Errorf("error preparing query GetBoAllUsers: %w", err)
+	}
+	if q.getCountsProductsStmt, err = db.PrepareContext(ctx, getCountsProducts); err != nil {
+		return nil, fmt.Errorf("error preparing query GetCountsProducts: %w", err)
+	}
+	if q.getCountsUserStmt, err = db.PrepareContext(ctx, getCountsUser); err != nil {
+		return nil, fmt.Errorf("error preparing query GetCountsUser: %w", err)
+	}
+	if q.getFileByURLStmt, err = db.PrepareContext(ctx, getFileByURL); err != nil {
+		return nil, fmt.Errorf("error preparing query GetFileByURL: %w", err)
 	}
 	if q.getProductStmt, err = db.PrepareContext(ctx, getProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProduct: %w", err)
@@ -88,11 +109,17 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.signupStmt, err = db.PrepareContext(ctx, signup); err != nil {
 		return nil, fmt.Errorf("error preparing query Signup: %w", err)
 	}
+	if q.updatePasswordUserWithconfirmCodeStmt, err = db.PrepareContext(ctx, updatePasswordUserWithconfirmCode); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdatePasswordUserWithconfirmCode: %w", err)
+	}
 	if q.updateProductStmt, err = db.PrepareContext(ctx, updateProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateProduct: %w", err)
 	}
 	if q.updateUserStmt, err = db.PrepareContext(ctx, updateUser); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUser: %w", err)
+	}
+	if q.updateUserConfirmCodeStmt, err = db.PrepareContext(ctx, updateUserConfirmCode); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserConfirmCode: %w", err)
 	}
 	if q.updateUserPasswordStmt, err = db.PrepareContext(ctx, updateUserPassword); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUserPassword: %w", err)
@@ -110,6 +137,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing checkEmailExistStmt: %w", cerr)
 		}
 	}
+	if q.createFileStmt != nil {
+		if cerr := q.createFileStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createFileStmt: %w", cerr)
+		}
+	}
 	if q.createProductStmt != nil {
 		if cerr := q.createProductStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createProductStmt: %w", cerr)
@@ -123,6 +155,11 @@ func (q *Queries) Close() error {
 	if q.createUserStmt != nil {
 		if cerr := q.createUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
+		}
+	}
+	if q.deleteFileStmt != nil {
+		if cerr := q.deleteFileStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteFileStmt: %w", cerr)
 		}
 	}
 	if q.deleteOldRefreshTokenStmt != nil {
@@ -155,6 +192,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing existUserByEmailStmt: %w", cerr)
 		}
 	}
+	if q.existUserByEmailAndConfirmCodeStmt != nil {
+		if cerr := q.existUserByEmailAndConfirmCodeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing existUserByEmailAndConfirmCodeStmt: %w", cerr)
+		}
+	}
 	if q.findUserByEmailStmt != nil {
 		if cerr := q.findUserByEmailStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing findUserByEmailStmt: %w", cerr)
@@ -165,9 +207,29 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getAllProductsStmt: %w", cerr)
 		}
 	}
-	if q.getAllUsersStmt != nil {
-		if cerr := q.getAllUsersStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getAllUsersStmt: %w", cerr)
+	if q.getBoAllProductsStmt != nil {
+		if cerr := q.getBoAllProductsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getBoAllProductsStmt: %w", cerr)
+		}
+	}
+	if q.getBoAllUsersStmt != nil {
+		if cerr := q.getBoAllUsersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getBoAllUsersStmt: %w", cerr)
+		}
+	}
+	if q.getCountsProductsStmt != nil {
+		if cerr := q.getCountsProductsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getCountsProductsStmt: %w", cerr)
+		}
+	}
+	if q.getCountsUserStmt != nil {
+		if cerr := q.getCountsUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getCountsUserStmt: %w", cerr)
+		}
+	}
+	if q.getFileByURLStmt != nil {
+		if cerr := q.getFileByURLStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getFileByURLStmt: %w", cerr)
 		}
 	}
 	if q.getProductStmt != nil {
@@ -215,6 +277,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing signupStmt: %w", cerr)
 		}
 	}
+	if q.updatePasswordUserWithconfirmCodeStmt != nil {
+		if cerr := q.updatePasswordUserWithconfirmCodeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updatePasswordUserWithconfirmCodeStmt: %w", cerr)
+		}
+	}
 	if q.updateProductStmt != nil {
 		if cerr := q.updateProductStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateProductStmt: %w", cerr)
@@ -223,6 +290,11 @@ func (q *Queries) Close() error {
 	if q.updateUserStmt != nil {
 		if cerr := q.updateUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateUserStmt: %w", cerr)
+		}
+	}
+	if q.updateUserConfirmCodeStmt != nil {
+		if cerr := q.updateUserConfirmCodeStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserConfirmCodeStmt: %w", cerr)
 		}
 	}
 	if q.updateUserPasswordStmt != nil {
@@ -272,65 +344,83 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                            DBTX
-	tx                            *sql.Tx
-	checkEmailExistStmt           *sql.Stmt
-	createProductStmt             *sql.Stmt
-	createRefreshTokenStmt        *sql.Stmt
-	createUserStmt                *sql.Stmt
-	deleteOldRefreshTokenStmt     *sql.Stmt
-	deleteProductStmt             *sql.Stmt
-	deleteRefreshTokenStmt        *sql.Stmt
-	deleteUserByIDStmt            *sql.Stmt
-	existGetUserByFireBaseUidStmt *sql.Stmt
-	existUserByEmailStmt          *sql.Stmt
-	findUserByEmailStmt           *sql.Stmt
-	getAllProductsStmt            *sql.Stmt
-	getAllUsersStmt               *sql.Stmt
-	getProductStmt                *sql.Stmt
-	getProductsByCategoryStmt     *sql.Stmt
-	getRefreshTokenStmt           *sql.Stmt
-	getUserByFireBaseUidStmt      *sql.Stmt
-	getUserByIDStmt               *sql.Stmt
-	listRefreshTokenByUserIDStmt  *sql.Stmt
-	loginUserStmt                 *sql.Stmt
-	signProviderStmt              *sql.Stmt
-	signupStmt                    *sql.Stmt
-	updateProductStmt             *sql.Stmt
-	updateUserStmt                *sql.Stmt
-	updateUserPasswordStmt        *sql.Stmt
-	updateUserProviderStmt        *sql.Stmt
+	db                                    DBTX
+	tx                                    *sql.Tx
+	checkEmailExistStmt                   *sql.Stmt
+	createFileStmt                        *sql.Stmt
+	createProductStmt                     *sql.Stmt
+	createRefreshTokenStmt                *sql.Stmt
+	createUserStmt                        *sql.Stmt
+	deleteFileStmt                        *sql.Stmt
+	deleteOldRefreshTokenStmt             *sql.Stmt
+	deleteProductStmt                     *sql.Stmt
+	deleteRefreshTokenStmt                *sql.Stmt
+	deleteUserByIDStmt                    *sql.Stmt
+	existGetUserByFireBaseUidStmt         *sql.Stmt
+	existUserByEmailStmt                  *sql.Stmt
+	existUserByEmailAndConfirmCodeStmt    *sql.Stmt
+	findUserByEmailStmt                   *sql.Stmt
+	getAllProductsStmt                    *sql.Stmt
+	getBoAllProductsStmt                  *sql.Stmt
+	getBoAllUsersStmt                     *sql.Stmt
+	getCountsProductsStmt                 *sql.Stmt
+	getCountsUserStmt                     *sql.Stmt
+	getFileByURLStmt                      *sql.Stmt
+	getProductStmt                        *sql.Stmt
+	getProductsByCategoryStmt             *sql.Stmt
+	getRefreshTokenStmt                   *sql.Stmt
+	getUserByFireBaseUidStmt              *sql.Stmt
+	getUserByIDStmt                       *sql.Stmt
+	listRefreshTokenByUserIDStmt          *sql.Stmt
+	loginUserStmt                         *sql.Stmt
+	signProviderStmt                      *sql.Stmt
+	signupStmt                            *sql.Stmt
+	updatePasswordUserWithconfirmCodeStmt *sql.Stmt
+	updateProductStmt                     *sql.Stmt
+	updateUserStmt                        *sql.Stmt
+	updateUserConfirmCodeStmt             *sql.Stmt
+	updateUserPasswordStmt                *sql.Stmt
+	updateUserProviderStmt                *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                            tx,
-		tx:                            tx,
-		checkEmailExistStmt:           q.checkEmailExistStmt,
-		createProductStmt:             q.createProductStmt,
-		createRefreshTokenStmt:        q.createRefreshTokenStmt,
-		createUserStmt:                q.createUserStmt,
-		deleteOldRefreshTokenStmt:     q.deleteOldRefreshTokenStmt,
-		deleteProductStmt:             q.deleteProductStmt,
-		deleteRefreshTokenStmt:        q.deleteRefreshTokenStmt,
-		deleteUserByIDStmt:            q.deleteUserByIDStmt,
-		existGetUserByFireBaseUidStmt: q.existGetUserByFireBaseUidStmt,
-		existUserByEmailStmt:          q.existUserByEmailStmt,
-		findUserByEmailStmt:           q.findUserByEmailStmt,
-		getAllProductsStmt:            q.getAllProductsStmt,
-		getAllUsersStmt:               q.getAllUsersStmt,
-		getProductStmt:                q.getProductStmt,
-		getProductsByCategoryStmt:     q.getProductsByCategoryStmt,
-		getRefreshTokenStmt:           q.getRefreshTokenStmt,
-		getUserByFireBaseUidStmt:      q.getUserByFireBaseUidStmt,
-		getUserByIDStmt:               q.getUserByIDStmt,
-		listRefreshTokenByUserIDStmt:  q.listRefreshTokenByUserIDStmt,
-		loginUserStmt:                 q.loginUserStmt,
-		signProviderStmt:              q.signProviderStmt,
-		signupStmt:                    q.signupStmt,
-		updateProductStmt:             q.updateProductStmt,
-		updateUserStmt:                q.updateUserStmt,
-		updateUserPasswordStmt:        q.updateUserPasswordStmt,
-		updateUserProviderStmt:        q.updateUserProviderStmt,
+		db:                                    tx,
+		tx:                                    tx,
+		checkEmailExistStmt:                   q.checkEmailExistStmt,
+		createFileStmt:                        q.createFileStmt,
+		createProductStmt:                     q.createProductStmt,
+		createRefreshTokenStmt:                q.createRefreshTokenStmt,
+		createUserStmt:                        q.createUserStmt,
+		deleteFileStmt:                        q.deleteFileStmt,
+		deleteOldRefreshTokenStmt:             q.deleteOldRefreshTokenStmt,
+		deleteProductStmt:                     q.deleteProductStmt,
+		deleteRefreshTokenStmt:                q.deleteRefreshTokenStmt,
+		deleteUserByIDStmt:                    q.deleteUserByIDStmt,
+		existGetUserByFireBaseUidStmt:         q.existGetUserByFireBaseUidStmt,
+		existUserByEmailStmt:                  q.existUserByEmailStmt,
+		existUserByEmailAndConfirmCodeStmt:    q.existUserByEmailAndConfirmCodeStmt,
+		findUserByEmailStmt:                   q.findUserByEmailStmt,
+		getAllProductsStmt:                    q.getAllProductsStmt,
+		getBoAllProductsStmt:                  q.getBoAllProductsStmt,
+		getBoAllUsersStmt:                     q.getBoAllUsersStmt,
+		getCountsProductsStmt:                 q.getCountsProductsStmt,
+		getCountsUserStmt:                     q.getCountsUserStmt,
+		getFileByURLStmt:                      q.getFileByURLStmt,
+		getProductStmt:                        q.getProductStmt,
+		getProductsByCategoryStmt:             q.getProductsByCategoryStmt,
+		getRefreshTokenStmt:                   q.getRefreshTokenStmt,
+		getUserByFireBaseUidStmt:              q.getUserByFireBaseUidStmt,
+		getUserByIDStmt:                       q.getUserByIDStmt,
+		listRefreshTokenByUserIDStmt:          q.listRefreshTokenByUserIDStmt,
+		loginUserStmt:                         q.loginUserStmt,
+		signProviderStmt:                      q.signProviderStmt,
+		signupStmt:                            q.signupStmt,
+		updatePasswordUserWithconfirmCodeStmt: q.updatePasswordUserWithconfirmCodeStmt,
+		updateProductStmt:                     q.updateProductStmt,
+		updateUserStmt:                        q.updateUserStmt,
+		updateUserConfirmCodeStmt:             q.updateUserConfirmCodeStmt,
+		updateUserPasswordStmt:                q.updateUserPasswordStmt,
+		updateUserProviderStmt:                q.updateUserProviderStmt,
 	}
 }

@@ -318,30 +318,3 @@ func (server *Server) CheckJWT(ctx context.Context, token string, schema *securi
 	})
 	return ctx, nil
 }
-
-func (s *jwtTokensrvc) EmailExist(ctx context.Context, p *jwttoken.EmailExistPayload) (res *jwttoken.EmailExistResult, err error) {
-	var isExist bool = false
-	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		email, err := q.CheckEmailExist(ctx, p.Email)
-		if err != nil {
-			return fmt.Errorf("ERROR_GET_EMAIL_EXIST_BY_ID %v", err)
-		}
-		if email {
-			isExist = true
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, s.errorResponse("TX_UPDATE_EMAIL_EXIST", err)
-	}
-	if !isExist {
-		return &jwttoken.EmailExistResult{
-			Success: true,
-			Exist:   false,
-		}, nil
-	}
-	return &jwttoken.EmailExistResult{
-		Success: true,
-		Exist:   true,
-	}, nil
-}

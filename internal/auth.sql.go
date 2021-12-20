@@ -12,7 +12,7 @@ import (
 
 const checkEmailExist = `-- name: CheckEmailExist :one
 SELECT EXISTS(
-    SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
+    SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
     WHERE email = $1
     AND deleted_at IS NULL
 )
@@ -27,7 +27,7 @@ func (q *Queries) CheckEmailExist(ctx context.Context, email string) (bool, erro
 
 const existGetUserByFireBaseUid = `-- name: ExistGetUserByFireBaseUid :one
 SELECT EXISTS(
-	SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
+	SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
 	WHERE deleted_at IS NULL
 	AND firebase_uid = $1
 )
@@ -42,7 +42,7 @@ func (q *Queries) ExistGetUserByFireBaseUid(ctx context.Context, firebaseUid sql
 
 const existUserByEmail = `-- name: ExistUserByEmail :one
 SELECT EXISTS(
-    SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
+    SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
     WHERE email = $1
     AND deleted_at IS NULL
 )
@@ -55,8 +55,29 @@ func (q *Queries) ExistUserByEmail(ctx context.Context, email string) (bool, err
 	return exists, err
 }
 
+const existUserByEmailAndConfirmCode = `-- name: ExistUserByEmailAndConfirmCode :one
+SELECT EXISTS(
+    SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
+    WHERE deleted_at IS NULL
+    AND email = $1
+    AND password_confirm_code = $2
+)
+`
+
+type ExistUserByEmailAndConfirmCodeParams struct {
+	Email               string         `json:"email"`
+	PasswordConfirmCode sql.NullString `json:"password_confirm_code"`
+}
+
+func (q *Queries) ExistUserByEmailAndConfirmCode(ctx context.Context, arg ExistUserByEmailAndConfirmCodeParams) (bool, error) {
+	row := q.queryRow(ctx, q.existUserByEmailAndConfirmCodeStmt, existUserByEmailAndConfirmCode, arg.Email, arg.PasswordConfirmCode)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const findUserByEmail = `-- name: FindUserByEmail :one
-SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
+SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
 WHERE email = $1
 AND deleted_at IS NULL
 `
@@ -76,6 +97,7 @@ func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, erro
 		&i.Role,
 		&i.Birthday,
 		&i.Phone,
+		&i.PasswordConfirmCode,
 		&i.FirebaseIDToken,
 		&i.FirebaseUid,
 		&i.FirebaseProvider,
@@ -84,7 +106,7 @@ func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, erro
 }
 
 const getUserByFireBaseUid = `-- name: GetUserByFireBaseUid :one
-SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
+SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
 WHERE deleted_at IS NULL
 AND firebase_uid = $1
 `
@@ -104,6 +126,7 @@ func (q *Queries) GetUserByFireBaseUid(ctx context.Context, firebaseUid sql.Null
 		&i.Role,
 		&i.Birthday,
 		&i.Phone,
+		&i.PasswordConfirmCode,
 		&i.FirebaseIDToken,
 		&i.FirebaseUid,
 		&i.FirebaseProvider,
@@ -147,7 +170,7 @@ func (q *Queries) LoginUser(ctx context.Context, arg LoginUserParams) (LoginUser
 const signProvider = `-- name: SignProvider :one
 INSERT INTO users (firstname, lastname, email, password, phone, birthday, firebase_id_token, firebase_uid, firebase_provider) 
 VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5, $6, $7, $8, $9)
-RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
+RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider
 `
 
 type SignProviderParams struct {
@@ -187,6 +210,7 @@ func (q *Queries) SignProvider(ctx context.Context, arg SignProviderParams) (Use
 		&i.Role,
 		&i.Birthday,
 		&i.Phone,
+		&i.PasswordConfirmCode,
 		&i.FirebaseIDToken,
 		&i.FirebaseUid,
 		&i.FirebaseProvider,
@@ -197,7 +221,7 @@ func (q *Queries) SignProvider(ctx context.Context, arg SignProviderParams) (Use
 const signup = `-- name: Signup :one
 INSERT INTO users (firstname, lastname, email, password, phone, birthday) 
 VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5, $6)
-RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
+RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider
 `
 
 type SignupParams struct {
@@ -231,11 +255,50 @@ func (q *Queries) Signup(ctx context.Context, arg SignupParams) (User, error) {
 		&i.Role,
 		&i.Birthday,
 		&i.Phone,
+		&i.PasswordConfirmCode,
 		&i.FirebaseIDToken,
 		&i.FirebaseUid,
 		&i.FirebaseProvider,
 	)
 	return i, err
+}
+
+const updatePasswordUserWithconfirmCode = `-- name: UpdatePasswordUserWithconfirmCode :exec
+UPDATE users
+SET password_confirm_code = NULL,
+    updated_at = NOW(),
+    password = crypt($3, gen_salt('bf'))
+WHERE email = $1
+AND password_confirm_code = $2
+`
+
+type UpdatePasswordUserWithconfirmCodeParams struct {
+	Email               string         `json:"email"`
+	PasswordConfirmCode sql.NullString `json:"password_confirm_code"`
+	Crypt               interface{}    `json:"crypt"`
+}
+
+func (q *Queries) UpdatePasswordUserWithconfirmCode(ctx context.Context, arg UpdatePasswordUserWithconfirmCodeParams) error {
+	_, err := q.exec(ctx, q.updatePasswordUserWithconfirmCodeStmt, updatePasswordUserWithconfirmCode, arg.Email, arg.PasswordConfirmCode, arg.Crypt)
+	return err
+}
+
+const updateUserConfirmCode = `-- name: UpdateUserConfirmCode :exec
+UPDATE users
+SET password_confirm_code = $2,
+    updated_at = NOW()
+WHERE email = $1
+AND deleted_at IS NULL
+`
+
+type UpdateUserConfirmCodeParams struct {
+	Email               string         `json:"email"`
+	PasswordConfirmCode sql.NullString `json:"password_confirm_code"`
+}
+
+func (q *Queries) UpdateUserConfirmCode(ctx context.Context, arg UpdateUserConfirmCodeParams) error {
+	_, err := q.exec(ctx, q.updateUserConfirmCodeStmt, updateUserConfirmCode, arg.Email, arg.PasswordConfirmCode)
+	return err
 }
 
 const updateUserPassword = `-- name: UpdateUserPassword :exec
@@ -258,7 +321,7 @@ const updateUserProvider = `-- name: UpdateUserProvider :exec
 UPDATE users
 SET firebase_id_token = $2, firebase_uid = $3, firebase_provider = $4, updated_at = NOW()
 WHERE id = $1
-RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
+RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider
 `
 
 type UpdateUserProviderParams struct {

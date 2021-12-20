@@ -11,6 +11,7 @@ import (
 	bousers "api_crud/gen/bo_users"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"unicode/utf8"
 
 	goa "goa.design/goa/v3/pkg"
@@ -18,7 +19,44 @@ import (
 
 // BuildGetAllusersPayload builds the payload for the boUsers getAllusers
 // endpoint from CLI flags.
-func BuildGetAllusersPayload(boUsersGetAllusersOauth string, boUsersGetAllusersJWTToken string) (*bousers.GetAllusersPayload, error) {
+func BuildGetAllusersPayload(boUsersGetAllusersOffset string, boUsersGetAllusersLimit string, boUsersGetAllusersField string, boUsersGetAllusersDirection string, boUsersGetAllusersOauth string, boUsersGetAllusersJWTToken string) (*bousers.GetAllusersPayload, error) {
+	var err error
+	var offset int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(boUsersGetAllusersOffset, 10, 32)
+		offset = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for offset, must be INT32")
+		}
+	}
+	var limit int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(boUsersGetAllusersLimit, 10, 32)
+		limit = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for limit, must be INT32")
+		}
+	}
+	var field string
+	{
+		if boUsersGetAllusersField != "" {
+			field = boUsersGetAllusersField
+		}
+	}
+	var direction string
+	{
+		if boUsersGetAllusersDirection != "" {
+			direction = boUsersGetAllusersDirection
+			if !(direction == "asc" || direction == "desc") {
+				err = goa.MergeErrors(err, goa.InvalidEnumValueError("direction", direction, []interface{}{"asc", "desc"}))
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
 	var oauth *string
 	{
 		if boUsersGetAllusersOauth != "" {
@@ -32,6 +70,10 @@ func BuildGetAllusersPayload(boUsersGetAllusersOauth string, boUsersGetAllusersJ
 		}
 	}
 	v := &bousers.GetAllusersPayload{}
+	v.Offset = offset
+	v.Limit = limit
+	v.Field = field
+	v.Direction = direction
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
 
@@ -245,7 +287,7 @@ func BuildDeleteManyUsersPayload(boUsersDeleteManyUsersBody string, boUsersDelet
 	{
 		err = json.Unmarshal([]byte(boUsersDeleteManyUsersBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"tab\": [\n         \"Optio maiores nostrum doloremque id distinctio inventore.\",\n         \"Sit sit est libero dolor et earum.\"\n      ]\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"tab\": [\n         \"Eos dolore nobis.\",\n         \"Atque optio.\",\n         \"Temporibus non ut mollitia.\",\n         \"Minus unde.\"\n      ]\n   }'")
 		}
 		if body.Tab == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tab", "body"))

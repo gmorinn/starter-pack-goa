@@ -53,6 +53,14 @@ var MethodNames = [7]string{"getAllProducts", "getAllProductsByCategory", "delet
 // GetAllProductsPayload is the payload type of the boProducts service
 // getAllProducts method.
 type GetAllProductsPayload struct {
+	// Offset for pagination
+	Offset int32
+	// Limit of items listed for pagination
+	Limit int32
+	// Items order by {field}
+	Field string
+	// Items order by {field} ASC/DESC
+	Direction string
 	// JWT used for authentication after Signin/Signup
 	JWTToken *string
 	// Use to generate Oauth with /authorization
@@ -64,7 +72,9 @@ type GetAllProductsPayload struct {
 type GetAllProductsResult struct {
 	// All products by category
 	Products []*ResBoProduct
-	Success  bool
+	// total of products
+	Count   int64
+	Success bool
 }
 
 // GetAllProductsByCategoryPayload is the payload type of the boProducts

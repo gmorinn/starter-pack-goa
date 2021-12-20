@@ -11,6 +11,7 @@ import (
 	products "api_crud/gen/products"
 	"context"
 	"net/http"
+	"regexp"
 
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -271,6 +272,7 @@ func NewCORSHandler() http.Handler {
 // HandleProductsOrigin applies the CORS response headers corresponding to the
 // origin for the service products.
 func HandleProductsOrigin(h http.Handler) http.Handler {
+	spec0 := regexp.MustCompile(".*localhost.*")
 	origHndlr := h.(http.HandlerFunc)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -279,7 +281,7 @@ func HandleProductsOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Content-Type, Origin")

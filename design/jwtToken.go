@@ -128,32 +128,6 @@ var _ = Service("jwtToken", func() {
 		})
 	})
 
-	Method("email-exist", func() {
-		Description("Check if email exist in database")
-
-		Payload(func() {
-			Attribute("email", String, func() {
-				Example("guillaume@gmail.com")
-				Format(FormatEmail)
-			})
-			AccessTokenField(1, "oauth", String, func() {
-				Description("Use to generate Oauth with /authorization")
-			})
-			Required("email")
-		})
-
-		Result(func() {
-			Attribute("success", Boolean)
-			Attribute("exist", Boolean)
-			Required("exist", "success")
-		})
-
-		HTTP(func() {
-			POST("/email-exist")
-			Response(StatusOK)
-		})
-	})
-
 	Method("auth-providers", func() {
 		Description("Register or login by Google, Facebook")
 

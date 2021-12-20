@@ -11,6 +11,7 @@ import (
 	bousers "api_crud/gen/bo_users"
 	"context"
 	"net/http"
+	"regexp"
 
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -63,14 +64,14 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"GetAllusers", "GET", "/v1/bo/users"},
+			{"GetAllusers", "GET", "/v1/bo/users/{offset}/{limit}"},
 			{"DeleteUser", "DELETE", "/v1/bo/user/remove/{id}"},
 			{"CreateUser", "POST", "/v1/bo/user/add"},
 			{"UpdateUser", "PUT", "/v1/bo/user/{id}"},
 			{"GetUser", "GET", "/v1/bo/user/{id}"},
 			{"DeleteManyUsers", "PATCH", "/v1/bo/users/remove"},
 			{"NewPassword", "PATCH", "/v1/bo/user/change/password/{id}"},
-			{"CORS", "OPTIONS", "/v1/bo/users"},
+			{"CORS", "OPTIONS", "/v1/bo/users/{offset}/{limit}"},
 			{"CORS", "OPTIONS", "/v1/bo/user/remove/{id}"},
 			{"CORS", "OPTIONS", "/v1/bo/user/add"},
 			{"CORS", "OPTIONS", "/v1/bo/user/{id}"},
@@ -124,7 +125,7 @@ func MountGetAllusersHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/v1/bo/users", f)
+	mux.Handle("GET", "/v1/bo/users/{offset}/{limit}", f)
 }
 
 // NewGetAllusersHandler creates a HTTP handler which loads the HTTP request
@@ -482,7 +483,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/v1/bo/users", f)
+	mux.Handle("OPTIONS", "/v1/bo/users/{offset}/{limit}", f)
 	mux.Handle("OPTIONS", "/v1/bo/user/remove/{id}", f)
 	mux.Handle("OPTIONS", "/v1/bo/user/add", f)
 	mux.Handle("OPTIONS", "/v1/bo/user/{id}", f)
@@ -500,6 +501,7 @@ func NewCORSHandler() http.Handler {
 // HandleBoUsersOrigin applies the CORS response headers corresponding to the
 // origin for the service boUsers.
 func HandleBoUsersOrigin(h http.Handler) http.Handler {
+	spec0 := regexp.MustCompile(".*localhost.*")
 	origHndlr := h.(http.HandlerFunc)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -508,7 +510,7 @@ func HandleBoUsersOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Content-Type, Origin")

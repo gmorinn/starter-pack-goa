@@ -37,7 +37,9 @@ type DeleteManyProductsRequestBody struct {
 type GetAllProductsResponseBody struct {
 	// All products by category
 	Products []*ResBoProductResponseBody `form:"products" json:"products" xml:"products"`
-	Success  bool                        `form:"success" json:"success" xml:"success"`
+	// total of products
+	Count   int64 `form:"count" json:"count" xml:"count"`
+	Success bool  `form:"success" json:"success" xml:"success"`
 }
 
 // GetAllProductsByCategoryResponseBody is the type of the "boProducts" service
@@ -167,6 +169,7 @@ type PayloadProductRequestBody struct {
 // of the "getAllProducts" endpoint of the "boProducts" service.
 func NewGetAllProductsResponseBody(res *boproducts.GetAllProductsResult) *GetAllProductsResponseBody {
 	body := &GetAllProductsResponseBody{
+		Count:   res.Count,
 		Success: res.Success,
 	}
 	if res.Products != nil {
@@ -329,8 +332,12 @@ func NewGetProductUnknownErrorResponseBody(res *boproducts.UnknownError) *GetPro
 
 // NewGetAllProductsPayload builds a boProducts service getAllProducts endpoint
 // payload.
-func NewGetAllProductsPayload(oauth *string, jwtToken *string) *boproducts.GetAllProductsPayload {
+func NewGetAllProductsPayload(offset int32, limit int32, field string, direction string, oauth *string, jwtToken *string) *boproducts.GetAllProductsPayload {
 	v := &boproducts.GetAllProductsPayload{}
+	v.Offset = offset
+	v.Limit = limit
+	v.Field = field
+	v.Direction = direction
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
 

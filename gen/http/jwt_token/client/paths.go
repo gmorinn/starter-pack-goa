@@ -22,11 +22,6 @@ func RefreshJWTTokenPath() string {
 	return "/resfresh"
 }
 
-// EmailExistJWTTokenPath returns the URL path to the jwtToken service email-exist HTTP endpoint.
-func EmailExistJWTTokenPath() string {
-	return "/email-exist"
-}
-
 // AuthProvidersJWTTokenPath returns the URL path to the jwtToken service auth-providers HTTP endpoint.
 func AuthProvidersJWTTokenPath() string {
 	return "/sign-providers"

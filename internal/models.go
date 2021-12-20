@@ -53,6 +53,17 @@ func (e *Role) Scan(src interface{}) error {
 	return nil
 }
 
+type File struct {
+	ID        uuid.UUID      `json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt sql.NullTime   `json:"deleted_at"`
+	Name      sql.NullString `json:"name"`
+	Url       sql.NullString `json:"url"`
+	Mime      sql.NullString `json:"mime"`
+	Size      sql.NullInt64  `json:"size"`
+}
+
 type Product struct {
 	ID        uuid.UUID    `json:"id"`
 	CreatedAt time.Time    `json:"created_at"`
@@ -75,18 +86,19 @@ type RefreshToken struct {
 }
 
 type User struct {
-	ID               uuid.UUID      `json:"id"`
-	CreatedAt        time.Time      `json:"created_at"`
-	UpdatedAt        time.Time      `json:"updated_at"`
-	DeletedAt        sql.NullTime   `json:"deleted_at"`
-	Lastname         string         `json:"lastname"`
-	Firstname        string         `json:"firstname"`
-	Email            string         `json:"email"`
-	Password         string         `json:"password"`
-	Role             Role           `json:"role"`
-	Birthday         sql.NullString `json:"birthday"`
-	Phone            sql.NullString `json:"phone"`
-	FirebaseIDToken  sql.NullString `json:"firebase_id_token"`
-	FirebaseUid      sql.NullString `json:"firebase_uid"`
-	FirebaseProvider sql.NullString `json:"firebase_provider"`
+	ID                  uuid.UUID      `json:"id"`
+	CreatedAt           time.Time      `json:"created_at"`
+	UpdatedAt           time.Time      `json:"updated_at"`
+	DeletedAt           sql.NullTime   `json:"deleted_at"`
+	Lastname            string         `json:"lastname"`
+	Firstname           string         `json:"firstname"`
+	Email               string         `json:"email"`
+	Password            string         `json:"password"`
+	Role                Role           `json:"role"`
+	Birthday            sql.NullString `json:"birthday"`
+	Phone               sql.NullString `json:"phone"`
+	PasswordConfirmCode sql.NullString `json:"password_confirm_code"`
+	FirebaseIDToken     sql.NullString `json:"firebase_id_token"`
+	FirebaseUid         sql.NullString `json:"firebase_uid"`
+	FirebaseProvider    sql.NullString `json:"firebase_provider"`
 }

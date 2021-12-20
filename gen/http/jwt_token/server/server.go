@@ -11,6 +11,7 @@ import (
 	jwttoken "api_crud/gen/jwt_token"
 	"context"
 	"net/http"
+	"regexp"
 
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -23,7 +24,6 @@ type Server struct {
 	Signup        http.Handler
 	Signin        http.Handler
 	Refresh       http.Handler
-	EmailExist    http.Handler
 	AuthProviders http.Handler
 	CORS          http.Handler
 }
@@ -64,18 +64,15 @@ func New(
 			{"Signup", "POST", "/signup"},
 			{"Signin", "POST", "/signin"},
 			{"Refresh", "POST", "/resfresh"},
-			{"EmailExist", "POST", "/email-exist"},
 			{"AuthProviders", "POST", "/sign-providers"},
 			{"CORS", "OPTIONS", "/signup"},
 			{"CORS", "OPTIONS", "/signin"},
 			{"CORS", "OPTIONS", "/resfresh"},
-			{"CORS", "OPTIONS", "/email-exist"},
 			{"CORS", "OPTIONS", "/sign-providers"},
 		},
 		Signup:        NewSignupHandler(e.Signup, mux, decoder, encoder, errhandler, formatter),
 		Signin:        NewSigninHandler(e.Signin, mux, decoder, encoder, errhandler, formatter),
 		Refresh:       NewRefreshHandler(e.Refresh, mux, decoder, encoder, errhandler, formatter),
-		EmailExist:    NewEmailExistHandler(e.EmailExist, mux, decoder, encoder, errhandler, formatter),
 		AuthProviders: NewAuthProvidersHandler(e.AuthProviders, mux, decoder, encoder, errhandler, formatter),
 		CORS:          NewCORSHandler(),
 	}
@@ -89,7 +86,6 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Signup = m(s.Signup)
 	s.Signin = m(s.Signin)
 	s.Refresh = m(s.Refresh)
-	s.EmailExist = m(s.EmailExist)
 	s.AuthProviders = m(s.AuthProviders)
 	s.CORS = m(s.CORS)
 }
@@ -99,7 +95,6 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountSignupHandler(mux, h.Signup)
 	MountSigninHandler(mux, h.Signin)
 	MountRefreshHandler(mux, h.Refresh)
-	MountEmailExistHandler(mux, h.EmailExist)
 	MountAuthProvidersHandler(mux, h.AuthProviders)
 	MountCORSHandler(mux, h.CORS)
 }
@@ -257,57 +252,6 @@ func NewRefreshHandler(
 	})
 }
 
-// MountEmailExistHandler configures the mux to serve the "jwtToken" service
-// "email-exist" endpoint.
-func MountEmailExistHandler(mux goahttp.Muxer, h http.Handler) {
-	f, ok := HandleJWTTokenOrigin(h).(http.HandlerFunc)
-	if !ok {
-		f = func(w http.ResponseWriter, r *http.Request) {
-			h.ServeHTTP(w, r)
-		}
-	}
-	mux.Handle("POST", "/email-exist", f)
-}
-
-// NewEmailExistHandler creates a HTTP handler which loads the HTTP request and
-// calls the "jwtToken" service "email-exist" endpoint.
-func NewEmailExistHandler(
-	endpoint goa.Endpoint,
-	mux goahttp.Muxer,
-	decoder func(*http.Request) goahttp.Decoder,
-	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
-	errhandler func(context.Context, http.ResponseWriter, error),
-	formatter func(err error) goahttp.Statuser,
-) http.Handler {
-	var (
-		decodeRequest  = DecodeEmailExistRequest(mux, decoder)
-		encodeResponse = EncodeEmailExistResponse(encoder)
-		encodeError    = EncodeEmailExistError(encoder, formatter)
-	)
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
-		ctx = context.WithValue(ctx, goa.MethodKey, "email-exist")
-		ctx = context.WithValue(ctx, goa.ServiceKey, "jwtToken")
-		payload, err := decodeRequest(r)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		res, err := endpoint(ctx, payload)
-		if err != nil {
-			if err := encodeError(ctx, w, err); err != nil {
-				errhandler(ctx, w, err)
-			}
-			return
-		}
-		if err := encodeResponse(ctx, w, res); err != nil {
-			errhandler(ctx, w, err)
-		}
-	})
-}
-
 // MountAuthProvidersHandler configures the mux to serve the "jwtToken" service
 // "auth-providers" endpoint.
 func MountAuthProvidersHandler(mux goahttp.Muxer, h http.Handler) {
@@ -372,7 +316,6 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/signup", f)
 	mux.Handle("OPTIONS", "/signin", f)
 	mux.Handle("OPTIONS", "/resfresh", f)
-	mux.Handle("OPTIONS", "/email-exist", f)
 	mux.Handle("OPTIONS", "/sign-providers", f)
 }
 
@@ -386,6 +329,7 @@ func NewCORSHandler() http.Handler {
 // HandleJWTTokenOrigin applies the CORS response headers corresponding to the
 // origin for the service jwtToken.
 func HandleJWTTokenOrigin(h http.Handler) http.Handler {
+	spec0 := regexp.MustCompile(".*localhost.*")
 	origHndlr := h.(http.HandlerFunc)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -394,7 +338,7 @@ func HandleJWTTokenOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Content-Type, Origin")

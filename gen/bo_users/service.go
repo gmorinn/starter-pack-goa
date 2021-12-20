@@ -53,6 +53,14 @@ var MethodNames = [7]string{"getAllusers", "deleteUser", "createUser", "updateUs
 // GetAllusersPayload is the payload type of the boUsers service getAllusers
 // method.
 type GetAllusersPayload struct {
+	// Offset for pagination
+	Offset int32
+	// Limit of items listed for pagination
+	Limit int32
+	// Items order by {field}
+	Field string
+	// Items order by {field} ASC/DESC
+	Direction string
 	// JWT used for authentication after Signin/Signup
 	JWTToken *string
 	// Use to generate Oauth with /authorization
@@ -62,8 +70,10 @@ type GetAllusersPayload struct {
 // GetAllusersResult is the result type of the boUsers service getAllusers
 // method.
 type GetAllusersResult struct {
-	// All users by category
-	Users   []*ResBoUser
+	// All users
+	Users []*ResBoUser
+	// total of users
+	Count   int64
 	Success bool
 }
 

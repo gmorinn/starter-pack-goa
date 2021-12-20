@@ -90,6 +90,63 @@ func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
 	return items, nil
 }
 
+const getBoAllProducts = `-- name: GetBoAllProducts :many
+SELECT id, created_at, updated_at, deleted_at, name, category, cover, price FROM products
+WHERE deleted_at IS NULL
+ORDER BY $1::text
+LIMIT $3 OFFSET $2
+`
+
+type GetBoAllProductsParams struct {
+	Order  string `json:"order"`
+	Offset int32  `json:"offset"`
+	Limit  int32  `json:"limit"`
+}
+
+func (q *Queries) GetBoAllProducts(ctx context.Context, arg GetBoAllProductsParams) ([]Product, error) {
+	rows, err := q.query(ctx, q.getBoAllProductsStmt, getBoAllProducts, arg.Order, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Product{}
+	for rows.Next() {
+		var i Product
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.Name,
+			&i.Category,
+			&i.Cover,
+			&i.Price,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCountsProducts = `-- name: GetCountsProducts :one
+SELECT COUNT(*) FROM products
+WHERE deleted_at IS NULL
+`
+
+func (q *Queries) GetCountsProducts(ctx context.Context) (int64, error) {
+	row := q.queryRow(ctx, q.getCountsProductsStmt, getCountsProducts)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getProduct = `-- name: GetProduct :one
 SELECT id, created_at, updated_at, deleted_at, name, category, cover, price FROM products
 WHERE deleted_at IS NULL

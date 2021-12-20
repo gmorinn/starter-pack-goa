@@ -13,7 +13,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (firstname, lastname, email, phone, birthday, role, password)
 VALUES ($1, $2, $3, $4, $5, $6, crypt($7, gen_salt('bf')))
-RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
+RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider
 `
 
 type CreateUserParams struct {
@@ -49,6 +49,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Role,
 		&i.Birthday,
 		&i.Phone,
+		&i.PasswordConfirmCode,
 		&i.FirebaseIDToken,
 		&i.FirebaseUid,
 		&i.FirebaseProvider,
@@ -70,13 +71,21 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const getAllUsers = `-- name: GetAllUsers :many
-SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
+const getBoAllUsers = `-- name: GetBoAllUsers :many
+SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
 WHERE deleted_at IS NULL
+ORDER BY $1::text
+LIMIT $3 OFFSET $2
 `
 
-func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.query(ctx, q.getAllUsersStmt, getAllUsers)
+type GetBoAllUsersParams struct {
+	Order  string `json:"order"`
+	Offset int32  `json:"offset"`
+	Limit  int32  `json:"limit"`
+}
+
+func (q *Queries) GetBoAllUsers(ctx context.Context, arg GetBoAllUsersParams) ([]User, error) {
+	rows, err := q.query(ctx, q.getBoAllUsersStmt, getBoAllUsers, arg.Order, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -96,6 +105,7 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 			&i.Role,
 			&i.Birthday,
 			&i.Phone,
+			&i.PasswordConfirmCode,
 			&i.FirebaseIDToken,
 			&i.FirebaseUid,
 			&i.FirebaseProvider,
@@ -113,8 +123,20 @@ func (q *Queries) GetAllUsers(ctx context.Context) ([]User, error) {
 	return items, nil
 }
 
+const getCountsUser = `-- name: GetCountsUser :one
+SELECT COUNT(*) FROM users
+WHERE deleted_at IS NULL
+`
+
+func (q *Queries) GetCountsUser(ctx context.Context) (int64, error) {
+	row := q.queryRow(ctx, q.getCountsUserStmt, getCountsUser)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider FROM users
+SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
 WHERE id = $1
 AND deleted_at IS NULL
 LIMIT 1
@@ -135,6 +157,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.Role,
 		&i.Birthday,
 		&i.Phone,
+		&i.PasswordConfirmCode,
 		&i.FirebaseIDToken,
 		&i.FirebaseUid,
 		&i.FirebaseProvider,
@@ -155,7 +178,7 @@ SET
     updated_at = NOW()
 WHERE
     id = $7
-RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, firebase_id_token, firebase_uid, firebase_provider
+RETURNING id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider
 `
 
 type UpdateUserParams struct {

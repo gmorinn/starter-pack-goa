@@ -53,9 +53,11 @@ type NewPasswordRequestBody struct {
 // GetAllusersResponseBody is the type of the "boUsers" service "getAllusers"
 // endpoint HTTP response body.
 type GetAllusersResponseBody struct {
-	// All users by category
-	Users   []*ResBoUserResponseBody `form:"users,omitempty" json:"users,omitempty" xml:"users,omitempty"`
-	Success *bool                    `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+	// All users
+	Users []*ResBoUserResponseBody `form:"users,omitempty" json:"users,omitempty" xml:"users,omitempty"`
+	// total of users
+	Count   *int64 `form:"count,omitempty" json:"count,omitempty" xml:"count,omitempty"`
+	Success *bool  `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // DeleteUserResponseBody is the type of the "boUsers" service "deleteUser"
@@ -248,6 +250,7 @@ func NewNewPasswordRequestBody(p *bousers.NewPasswordPayload) *NewPasswordReques
 // result from a HTTP "OK" response.
 func NewGetAllusersResultOK(body *GetAllusersResponseBody) *bousers.GetAllusersResult {
 	v := &bousers.GetAllusersResult{
+		Count:   *body.Count,
 		Success: *body.Success,
 	}
 	v.Users = make([]*bousers.ResBoUser, len(body.Users))
@@ -413,6 +416,9 @@ func ValidateGetAllusersResponseBody(body *GetAllusersResponseBody) (err error) 
 	}
 	if body.Success == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.Count == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("count", "body"))
 	}
 	for _, e := range body.Users {
 		if e != nil {

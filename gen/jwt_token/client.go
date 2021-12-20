@@ -18,17 +18,15 @@ type Client struct {
 	SignupEndpoint        goa.Endpoint
 	SigninEndpoint        goa.Endpoint
 	RefreshEndpoint       goa.Endpoint
-	EmailExistEndpoint    goa.Endpoint
 	AuthProvidersEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "jwtToken" service client given the endpoints.
-func NewClient(signup, signin, refresh, emailExist, authProviders goa.Endpoint) *Client {
+func NewClient(signup, signin, refresh, authProviders goa.Endpoint) *Client {
 	return &Client{
 		SignupEndpoint:        signup,
 		SigninEndpoint:        signin,
 		RefreshEndpoint:       refresh,
-		EmailExistEndpoint:    emailExist,
 		AuthProvidersEndpoint: authProviders,
 	}
 }
@@ -61,16 +59,6 @@ func (c *Client) Refresh(ctx context.Context, p *RefreshPayload) (res *Sign, err
 		return
 	}
 	return ires.(*Sign), nil
-}
-
-// EmailExist calls the "email-exist" endpoint of the "jwtToken" service.
-func (c *Client) EmailExist(ctx context.Context, p *EmailExistPayload) (res *EmailExistResult, err error) {
-	var ires interface{}
-	ires, err = c.EmailExistEndpoint(ctx, p)
-	if err != nil {
-		return
-	}
-	return ires.(*EmailExistResult), nil
 }
 
 // AuthProviders calls the "auth-providers" endpoint of the "jwtToken" service.

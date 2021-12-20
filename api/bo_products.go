@@ -45,7 +45,12 @@ func (s *boProductssrvc) JWTAuth(ctx context.Context, token string, scheme *secu
 // Get All products
 func (s *boProductssrvc) GetAllProducts(ctx context.Context, p *boproducts.GetAllProductsPayload) (res *boproducts.GetAllProductsResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		products, err := s.server.Store.GetAllProducts(ctx)
+		arg := db.GetBoAllProductsParams{
+			Limit:  p.Limit,
+			Offset: p.Offset,
+			Order:  p.Field + " " + p.Direction,
+		}
+		products, err := q.GetBoAllProducts(ctx, arg)
 		if err != nil {
 			return fmt.Errorf("ERROR_GET_ALL_PRODUCTS %v", err)
 		}
@@ -60,10 +65,15 @@ func (s *boProductssrvc) GetAllProducts(ctx context.Context, p *boproducts.GetAl
 				Category: string(v.Category),
 			})
 
-			res = &boproducts.GetAllProductsResult{
-				Products: ProductsResponse,
-				Success:  true,
-			}
+		}
+		total, err := q.GetCountsProducts(ctx)
+		if err != nil {
+			return fmt.Errorf("ERROR_COUNT_PRODUCTS %v", err)
+		}
+		res = &boproducts.GetAllProductsResult{
+			Products: ProductsResponse,
+			Count:    total,
+			Success:  true,
 		}
 		return nil
 	})

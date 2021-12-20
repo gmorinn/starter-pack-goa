@@ -1,15 +1,12 @@
-# build stage
-FROM golang:alpine AS builder
-RUN apk --no-cache add gcc g++ make git
+FROM golang:1.14.6-alpine3.12 as builder
+COPY go.mod go.sum /go/src/app/
 WORKDIR /go/src/app
-COPY . .
-RUN GOOS=linux go build -ldflags="-s -w" -o ./bin/go-production
+RUN go mod download
+COPY . /go/src/app
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o build/bucketeer app
 
-# final stage
-FROM alpine:latest
-WORKDIR /root
-RUN apk --no-cache add ca-certificates tzdata
-COPY --from=builder /go/src/app/bin /go/bin
-COPY --from=builder /go/src/app/favicon.ico /go/bin
-RUN mkdir -p /go/bin/public/uploads
-CMD /go/bin/go-production
+FROM alpine
+RUN apk add --no-cache ca-certificates && update-ca-certificates
+COPY --from=builder /go/src/app/build/bucketeer /usr/bin/bucketeer
+EXPOSE 8088 8088
+ENTRYPOINT ["/usr/bin/bucketeer"]

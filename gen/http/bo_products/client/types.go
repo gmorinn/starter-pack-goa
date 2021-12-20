@@ -37,7 +37,9 @@ type DeleteManyProductsRequestBody struct {
 type GetAllProductsResponseBody struct {
 	// All products by category
 	Products []*ResBoProductResponseBody `form:"products,omitempty" json:"products,omitempty" xml:"products,omitempty"`
-	Success  *bool                       `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+	// total of products
+	Count   *int64 `form:"count,omitempty" json:"count,omitempty" xml:"count,omitempty"`
+	Success *bool  `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // GetAllProductsByCategoryResponseBody is the type of the "boProducts" service
@@ -200,6 +202,7 @@ func NewDeleteManyProductsRequestBody(p *boproducts.DeleteManyProductsPayload) *
 // endpoint result from a HTTP "OK" response.
 func NewGetAllProductsResultOK(body *GetAllProductsResponseBody) *boproducts.GetAllProductsResult {
 	v := &boproducts.GetAllProductsResult{
+		Count:   *body.Count,
 		Success: *body.Success,
 	}
 	v.Products = make([]*boproducts.ResBoProduct, len(body.Products))
@@ -369,6 +372,9 @@ func ValidateGetAllProductsResponseBody(body *GetAllProductsResponseBody) (err e
 	}
 	if body.Success == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.Count == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("count", "body"))
 	}
 	for _, e := range body.Products {
 		if e != nil {

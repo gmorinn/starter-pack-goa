@@ -18,7 +18,7 @@ var _ = API("E-Commerce", func() {
 	Description("Best API REST building with GoaDesign")
 	Version("1.0")
 
-	cors.Origin(cnf.FronHost, func() {
+	cors.Origin("/.*localhost.*/", func() {
 		cors.Headers("Authorization", "Content-Type", "jwtToken", "Origin")
 		cors.Methods("POST", "GET", "PUT", "OPTIONS", "DELETE", "PATCH")
 		cors.Expose("Content-Type", "Origin")

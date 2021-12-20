@@ -11,6 +11,7 @@ import (
 	boproducts "api_crud/gen/bo_products"
 	"context"
 	"net/http"
+	"regexp"
 
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
@@ -63,14 +64,14 @@ func New(
 ) *Server {
 	return &Server{
 		Mounts: []*MountPoint{
-			{"GetAllProducts", "GET", "/v1/bo/products"},
+			{"GetAllProducts", "GET", "/v1/bo/products/{offset}/{limit}"},
 			{"GetAllProductsByCategory", "GET", "/v1/bo/products/category/{category}"},
 			{"DeleteProduct", "DELETE", "/v1/bo/product/remove/{id}"},
 			{"CreateProduct", "POST", "/v1/bo/product/add"},
 			{"UpdateProduct", "PUT", "/v1/bo/product/{id}"},
 			{"DeleteManyProducts", "PATCH", "/v1/bo/products/remove"},
 			{"GetProduct", "GET", "/v1/bo/product/{id}"},
-			{"CORS", "OPTIONS", "/v1/bo/products"},
+			{"CORS", "OPTIONS", "/v1/bo/products/{offset}/{limit}"},
 			{"CORS", "OPTIONS", "/v1/bo/products/category/{category}"},
 			{"CORS", "OPTIONS", "/v1/bo/product/remove/{id}"},
 			{"CORS", "OPTIONS", "/v1/bo/product/add"},
@@ -124,7 +125,7 @@ func MountGetAllProductsHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("GET", "/v1/bo/products", f)
+	mux.Handle("GET", "/v1/bo/products/{offset}/{limit}", f)
 }
 
 // NewGetAllProductsHandler creates a HTTP handler which loads the HTTP request
@@ -483,7 +484,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/v1/bo/products", f)
+	mux.Handle("OPTIONS", "/v1/bo/products/{offset}/{limit}", f)
 	mux.Handle("OPTIONS", "/v1/bo/products/category/{category}", f)
 	mux.Handle("OPTIONS", "/v1/bo/product/remove/{id}", f)
 	mux.Handle("OPTIONS", "/v1/bo/product/add", f)
@@ -501,6 +502,7 @@ func NewCORSHandler() http.Handler {
 // HandleBoProductsOrigin applies the CORS response headers corresponding to
 // the origin for the service boProducts.
 func HandleBoProductsOrigin(h http.Handler) http.Handler {
+	spec0 := regexp.MustCompile(".*localhost.*")
 	origHndlr := h.(http.HandlerFunc)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -509,7 +511,7 @@ func HandleBoProductsOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Content-Type, Origin")

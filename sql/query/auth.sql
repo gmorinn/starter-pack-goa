@@ -56,3 +56,26 @@ UPDATE users
 SET firebase_id_token = $2, firebase_uid = $3, firebase_provider = $4, updated_at = NOW()
 WHERE id = $1
 RETURNING *;
+
+-- name: UpdateUserConfirmCode :exec
+UPDATE users
+SET password_confirm_code = $2,
+    updated_at = NOW()
+WHERE email = $1
+AND deleted_at IS NULL;
+
+-- name: UpdatePasswordUserWithconfirmCode :exec
+UPDATE users
+SET password_confirm_code = NULL,
+    updated_at = NOW(),
+    password = crypt($3, gen_salt('bf'))
+WHERE email = $1
+AND password_confirm_code = $2;
+
+-- name: ExistUserByEmailAndConfirmCode :one
+SELECT EXISTS(
+    SELECT * FROM users
+    WHERE deleted_at IS NULL
+    AND email = $1
+    AND password_confirm_code = $2
+);

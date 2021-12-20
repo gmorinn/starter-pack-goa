@@ -2,6 +2,7 @@ package main
 
 import (
 	"api_crud/config"
+	authsvr "api_crud/gen/http/auth/server"
 	boProductssrvc "api_crud/gen/http/bo_products/server"
 	bouserssrv "api_crud/gen/http/bo_users/server"
 	jwttokensvr "api_crud/gen/http/jwt_token/server"
@@ -66,11 +67,13 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 		usersServer       *userssvr.Server       = userssvr.New(api.usersEndpoints, mux, dec, enc, eh, nil)
 		jwtTokenServer    *jwttokensvr.Server    = jwttokensvr.New(api.jwtTokenEndpoints, mux, dec, enc, eh, nil)
 		oAuthServer       *oauthsvr.Server       = oauthsvr.New(api.oAuthEndpoints, mux, dec, enc, eh, nil)
+		authServer        *authsvr.Server        = authsvr.New(api.authEndpoints, mux, dec, enc, eh, nil)
 		productsServer    *productssvr.Server    = productssvr.New(api.productsEndpoints, mux, dec, enc, eh, nil)
 	)
 	{
 		if debug {
 			servers := goahttp.Servers{
+				authServer,
 				bo_productsServer,
 				bo_usersServer,
 				usersServer,
@@ -84,6 +87,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 	}
 	// Configure the mux.
 	openapisvr.Mount(mux, openapiServer)
+	authsvr.Mount(mux, authServer)
 	boProductssrvc.Mount(mux, bo_productsServer)
 	bouserssrv.Mount(mux, bo_usersServer)
 	userssvr.Mount(mux, usersServer)

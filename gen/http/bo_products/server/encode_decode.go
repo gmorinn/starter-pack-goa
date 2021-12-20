@@ -12,6 +12,7 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	goahttp "goa.design/goa/v3/http"
@@ -35,9 +36,47 @@ func EncodeGetAllProductsResponse(encoder func(context.Context, http.ResponseWri
 func DecodeGetAllProductsRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			oauth    *string
-			jwtToken *string
+			offset    int32
+			limit     int32
+			field     string
+			direction string
+			oauth     *string
+			jwtToken  *string
+			err       error
+
+			params = mux.Vars(r)
 		)
+		{
+			offsetRaw := params["offset"]
+			v, err2 := strconv.ParseInt(offsetRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("offset", offsetRaw, "integer"))
+			}
+			offset = int32(v)
+		}
+		{
+			limitRaw := params["limit"]
+			v, err2 := strconv.ParseInt(limitRaw, 10, 32)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("limit", limitRaw, "integer"))
+			}
+			limit = int32(v)
+		}
+		fieldRaw := r.URL.Query().Get("field")
+		if fieldRaw != "" {
+			field = fieldRaw
+		} else {
+			field = "name"
+		}
+		directionRaw := r.URL.Query().Get("direction")
+		if directionRaw != "" {
+			direction = directionRaw
+		} else {
+			direction = "asc"
+		}
+		if !(direction == "asc" || direction == "desc") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError("direction", direction, []interface{}{"asc", "desc"}))
+		}
 		oauthRaw := r.Header.Get("Authorization")
 		if oauthRaw != "" {
 			oauth = &oauthRaw
@@ -46,7 +85,10 @@ func DecodeGetAllProductsRequest(mux goahttp.Muxer, decoder func(*http.Request) 
 		if jwtTokenRaw != "" {
 			jwtToken = &jwtTokenRaw
 		}
-		payload := NewGetAllProductsPayload(oauth, jwtToken)
+		if err != nil {
+			return nil, err
+		}
+		payload := NewGetAllProductsPayload(offset, limit, field, direction, oauth, jwtToken)
 		if payload.Oauth != nil {
 			if strings.Contains(*payload.Oauth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")

@@ -22,7 +22,19 @@ import (
 // BuildGetAllusersRequest instantiates a HTTP request object with method and
 // path set to call the "boUsers" service "getAllusers" endpoint
 func (c *Client) BuildGetAllusersRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetAllusersBoUsersPath()}
+	var (
+		offset int32
+		limit  int32
+	)
+	{
+		p, ok := v.(*bousers.GetAllusersPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("boUsers", "getAllusers", "*bousers.GetAllusersPayload", v)
+		}
+		offset = p.Offset
+		limit = p.Limit
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetAllusersBoUsersPath(offset, limit)}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("boUsers", "getAllusers", u.String(), err)
@@ -54,6 +66,10 @@ func EncodeGetAllusersRequest(encoder func(*http.Request) goahttp.Encoder) func(
 			head := *p.JWTToken
 			req.Header.Set("jwtToken", head)
 		}
+		values := req.URL.Query()
+		values.Add("field", p.Field)
+		values.Add("direction", p.Direction)
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }

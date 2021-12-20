@@ -22,7 +22,19 @@ import (
 // BuildGetAllProductsRequest instantiates a HTTP request object with method
 // and path set to call the "boProducts" service "getAllProducts" endpoint
 func (c *Client) BuildGetAllProductsRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetAllProductsBoProductsPath()}
+	var (
+		offset int32
+		limit  int32
+	)
+	{
+		p, ok := v.(*boproducts.GetAllProductsPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("boProducts", "getAllProducts", "*boproducts.GetAllProductsPayload", v)
+		}
+		offset = p.Offset
+		limit = p.Limit
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetAllProductsBoProductsPath(offset, limit)}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("boProducts", "getAllProducts", u.String(), err)
@@ -54,6 +66,10 @@ func EncodeGetAllProductsRequest(encoder func(*http.Request) goahttp.Encoder) fu
 			head := *p.JWTToken
 			req.Header.Set("jwtToken", head)
 		}
+		values := req.URL.Query()
+		values.Add("field", p.Field)
+		values.Add("direction", p.Direction)
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }

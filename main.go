@@ -2,12 +2,13 @@ package main
 
 import (
 	"api_crud/api"
+	auth "api_crud/gen/auth"
 	boproducts "api_crud/gen/bo_products"
 	bousers "api_crud/gen/bo_users"
 	jwttoken "api_crud/gen/jwt_token"
 	oauth "api_crud/gen/o_auth"
 	products "api_crud/gen/products"
-	"api_crud/gen/users"
+	users "api_crud/gen/users"
 	"context"
 	"flag"
 	"fmt"
@@ -21,9 +22,10 @@ import (
 )
 
 type ApiEndpoints struct {
+	authEndpoints        *auth.Endpoints
 	bo_productsEndpoints *boproducts.Endpoints
-	bo_usersEndpoints    *bousers.Endpoints
 	usersEndpoints       *users.Endpoints
+	bo_usersEndpoints    *bousers.Endpoints
 	jwtTokenEndpoints    *jwttoken.Endpoints
 	oAuthEndpoints       *oauth.Endpoints
 	productsEndpoints    *products.Endpoints
@@ -42,8 +44,9 @@ func main() {
 
 	// Initialize the services.
 	var (
-		usersSvc      users.Service      = api.NewUsers(logger, server)
+		authSvc       auth.Service       = api.NewAuth(logger, server)
 		boproductsSvc boproducts.Service = api.NewBoProducts(logger, server)
+		usersSvc      users.Service      = api.NewUsers(logger, server)
 		bo_usersSvc   bousers.Service    = api.NewBoUsers(logger, server)
 		jwtTokenSvc   jwttoken.Service   = api.NewJWTToken(logger, server)
 		oAuthSvc      oauth.Service      = api.NewOAuth(logger, server)
@@ -54,6 +57,7 @@ func main() {
 	// potentially running in different processes.
 	var (
 		apiEndpoints ApiEndpoints = ApiEndpoints{
+			authEndpoints:        auth.NewEndpoints(authSvc),
 			bo_productsEndpoints: boproducts.NewEndpoints(boproductsSvc),
 			bo_usersEndpoints:    bousers.NewEndpoints(bo_usersSvc),
 			usersEndpoints:       users.NewEndpoints(usersSvc),

@@ -11,13 +11,51 @@ import (
 	boproducts "api_crud/gen/bo_products"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildGetAllProductsPayload builds the payload for the boProducts
 // getAllProducts endpoint from CLI flags.
-func BuildGetAllProductsPayload(boProductsGetAllProductsOauth string, boProductsGetAllProductsJWTToken string) (*boproducts.GetAllProductsPayload, error) {
+func BuildGetAllProductsPayload(boProductsGetAllProductsOffset string, boProductsGetAllProductsLimit string, boProductsGetAllProductsField string, boProductsGetAllProductsDirection string, boProductsGetAllProductsOauth string, boProductsGetAllProductsJWTToken string) (*boproducts.GetAllProductsPayload, error) {
+	var err error
+	var offset int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(boProductsGetAllProductsOffset, 10, 32)
+		offset = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for offset, must be INT32")
+		}
+	}
+	var limit int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(boProductsGetAllProductsLimit, 10, 32)
+		limit = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for limit, must be INT32")
+		}
+	}
+	var field string
+	{
+		if boProductsGetAllProductsField != "" {
+			field = boProductsGetAllProductsField
+		}
+	}
+	var direction string
+	{
+		if boProductsGetAllProductsDirection != "" {
+			direction = boProductsGetAllProductsDirection
+			if !(direction == "asc" || direction == "desc") {
+				err = goa.MergeErrors(err, goa.InvalidEnumValueError("direction", direction, []interface{}{"asc", "desc"}))
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
 	var oauth *string
 	{
 		if boProductsGetAllProductsOauth != "" {
@@ -31,6 +69,10 @@ func BuildGetAllProductsPayload(boProductsGetAllProductsOauth string, boProducts
 		}
 	}
 	v := &boproducts.GetAllProductsPayload{}
+	v.Offset = offset
+	v.Limit = limit
+	v.Field = field
+	v.Direction = direction
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
 
@@ -210,7 +252,7 @@ func BuildDeleteManyProductsPayload(boProductsDeleteManyProductsBody string, boP
 	{
 		err = json.Unmarshal([]byte(boProductsDeleteManyProductsBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"tab\": [\n         \"Temporibus iure sequi doloremque sequi est.\",\n         \"Dicta tempore omnis in vel ullam.\"\n      ]\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"tab\": [\n         \"Iste enim ipsum aut mollitia.\",\n         \"Labore architecto non dolor temporibus.\",\n         \"Rerum repudiandae aperiam eos.\",\n         \"Porro optio qui delectus molestias dolores aut.\"\n      ]\n   }'")
 		}
 		if body.Tab == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("tab", "body"))

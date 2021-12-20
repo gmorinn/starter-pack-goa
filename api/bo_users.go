@@ -46,7 +46,12 @@ func (s *boUserssrvc) JWTAuth(ctx context.Context, token string, scheme *securit
 // Get All users
 func (s *boUserssrvc) GetAllusers(ctx context.Context, p *bousers.GetAllusersPayload) (res *bousers.GetAllusersResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		uS, err := q.GetAllUsers(ctx)
+		arg := db.GetBoAllUsersParams{
+			Limit:  p.Limit,
+			Offset: p.Offset,
+			Order:  p.Field + " " + p.Direction,
+		}
+		uS, err := q.GetBoAllUsers(ctx, arg)
 		if err != nil {
 			return fmt.Errorf("ERROR_GET_ALL_USERS %v", err)
 		}
@@ -64,8 +69,13 @@ func (s *boUserssrvc) GetAllusers(ctx context.Context, p *bousers.GetAllusersPay
 				Role:      string(v.Role),
 			})
 		}
+		total, err := q.GetCountsUser(ctx)
+		if err != nil {
+			return fmt.Errorf("ERROR_COUNT_USERS %v", err)
+		}
 		res = &bousers.GetAllusersResult{
 			Users:   allUsers,
+			Count:   total,
 			Success: true,
 		}
 		return nil

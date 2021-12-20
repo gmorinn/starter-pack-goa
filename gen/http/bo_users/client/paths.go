@@ -12,8 +12,8 @@ import (
 )
 
 // GetAllusersBoUsersPath returns the URL path to the boUsers service getAllusers HTTP endpoint.
-func GetAllusersBoUsersPath() string {
-	return "/v1/bo/users"
+func GetAllusersBoUsersPath(offset int32, limit int32) string {
+	return fmt.Sprintf("/v1/bo/users/%v/%v", offset, limit)
 }
 
 // DeleteUserBoUsersPath returns the URL path to the boUsers service deleteUser HTTP endpoint.

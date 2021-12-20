@@ -7,6 +7,16 @@ AND category = $1;
 SELECT * FROM products
 WHERE deleted_at IS NULL;
 
+-- name: GetCountsProducts :one
+SELECT COUNT(*) FROM products
+WHERE deleted_at IS NULL;
+
+-- name: GetBoAllProducts :many
+SELECT * FROM products
+WHERE deleted_at IS NULL
+ORDER BY sqlc.arg('order')::text
+LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset');
+
 -- name: GetProduct :one
 SELECT * FROM products
 WHERE deleted_at IS NULL

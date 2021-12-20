@@ -12,8 +12,8 @@ import (
 )
 
 // GetAllProductsBoProductsPath returns the URL path to the boProducts service getAllProducts HTTP endpoint.
-func GetAllProductsBoProductsPath() string {
-	return "/v1/bo/products"
+func GetAllProductsBoProductsPath(offset int32, limit int32) string {
+	return fmt.Sprintf("/v1/bo/products/%v/%v", offset, limit)
 }
 
 // GetAllProductsByCategoryBoProductsPath returns the URL path to the boProducts service getAllProductsByCategory HTTP endpoint.

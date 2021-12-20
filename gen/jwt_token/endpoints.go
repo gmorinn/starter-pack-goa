@@ -19,7 +19,6 @@ type Endpoints struct {
 	Signup        goa.Endpoint
 	Signin        goa.Endpoint
 	Refresh       goa.Endpoint
-	EmailExist    goa.Endpoint
 	AuthProviders goa.Endpoint
 }
 
@@ -31,7 +30,6 @@ func NewEndpoints(s Service) *Endpoints {
 		Signup:        NewSignupEndpoint(s, a.OAuth2Auth),
 		Signin:        NewSigninEndpoint(s, a.OAuth2Auth),
 		Refresh:       NewRefreshEndpoint(s, a.OAuth2Auth),
-		EmailExist:    NewEmailExistEndpoint(s, a.OAuth2Auth),
 		AuthProviders: NewAuthProvidersEndpoint(s, a.OAuth2Auth),
 	}
 }
@@ -41,7 +39,6 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Signup = m(e.Signup)
 	e.Signin = m(e.Signin)
 	e.Refresh = m(e.Refresh)
-	e.EmailExist = m(e.EmailExist)
 	e.AuthProviders = m(e.AuthProviders)
 }
 
@@ -132,36 +129,6 @@ func NewRefreshEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.End
 			return nil, err
 		}
 		return s.Refresh(ctx, p)
-	}
-}
-
-// NewEmailExistEndpoint returns an endpoint function that calls the method
-// "email-exist" of service "jwtToken".
-func NewEmailExistEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
-	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*EmailExistPayload)
-		var err error
-		sc := security.OAuth2Scheme{
-			Name:           "OAuth2",
-			Scopes:         []string{"api:read"},
-			RequiredScopes: []string{},
-			Flows: []*security.OAuthFlow{
-				&security.OAuthFlow{
-					Type:       "client_credentials",
-					TokenURL:   "/authorization",
-					RefreshURL: "/refresh",
-				},
-			},
-		}
-		var token string
-		if p.Oauth != nil {
-			token = *p.Oauth
-		}
-		ctx, err = authOAuth2Fn(ctx, token, &sc)
-		if err != nil {
-			return nil, err
-		}
-		return s.EmailExist(ctx, p)
 	}
 }
 

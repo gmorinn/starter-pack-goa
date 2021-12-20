@@ -11,6 +11,7 @@ import (
 	openapi "api_crud/gen/openapi"
 	"context"
 	"net/http"
+	"regexp"
 
 	goahttp "goa.design/goa/v3/http"
 	"goa.design/plugins/v3/cors"
@@ -111,6 +112,7 @@ func NewCORSHandler() http.Handler {
 // HandleOpenapiOrigin applies the CORS response headers corresponding to the
 // origin for the service openapi.
 func HandleOpenapiOrigin(h http.Handler) http.Handler {
+	spec0 := regexp.MustCompile(".*localhost.*")
 	origHndlr := h.(http.HandlerFunc)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
@@ -119,7 +121,7 @@ func HandleOpenapiOrigin(h http.Handler) http.Handler {
 			origHndlr(w, r)
 			return
 		}
-		if cors.MatchOrigin(origin, "http://localhost:3000") {
+		if cors.MatchOriginRegexp(origin, spec0) {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Content-Type, Origin")

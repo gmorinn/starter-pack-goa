@@ -27,10 +27,6 @@ type Client struct {
 	// endpoint.
 	RefreshDoer goahttp.Doer
 
-	// EmailExist Doer is the HTTP client used to make requests to the email-exist
-	// endpoint.
-	EmailExistDoer goahttp.Doer
-
 	// AuthProviders Doer is the HTTP client used to make requests to the
 	// auth-providers endpoint.
 	AuthProvidersDoer goahttp.Doer
@@ -61,7 +57,6 @@ func NewClient(
 		SignupDoer:          doer,
 		SigninDoer:          doer,
 		RefreshDoer:         doer,
-		EmailExistDoer:      doer,
 		AuthProvidersDoer:   doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
@@ -139,30 +134,6 @@ func (c *Client) Refresh() goa.Endpoint {
 		resp, err := c.RefreshDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("jwtToken", "refresh", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// EmailExist returns an endpoint that makes HTTP requests to the jwtToken
-// service email-exist server.
-func (c *Client) EmailExist() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeEmailExistRequest(c.encoder)
-		decodeResponse = DecodeEmailExistResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildEmailExistRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.EmailExistDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("jwtToken", "email-exist", err)
 		}
 		return decodeResponse(resp)
 	}
