@@ -92,7 +92,11 @@ func main() {
 	var wg sync.WaitGroup
 	ctx, cancel := context.WithCancel(context.Background())
 
-	fmt.Println("==> " + server.Config.Host)
+	if server.Config.SSL {
+		fmt.Printf("https://%s", server.Config.Host)
+	} else {
+		fmt.Printf("http://%s", server.Config.Host)
+	}
 	// Start the servers and send errors (if any) to the error channel.
 	switch *hostF {
 	case server.Config.Domain:

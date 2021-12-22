@@ -56,9 +56,9 @@ func (store *Store) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) er
 
 func NewServer() *Server {
 	cnf := config.New()
-	source := fmt.Sprintf("user=%s password=%s host=%s port=%v dbname=%s sslmode=disable TimeZone=%s", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database, cnf.TZ)
+	source := fmt.Sprintf("postgresql://%s:%s@%s:%v/%s?sslmode=disable", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database)
 	fmt.Println(source)
-	pg, err := sql.Open("postgres", "user=root password=secret host=127.0.0.1 port=5432 dbname=root sslmode=disable TimeZone=Europe/Paris")
+	pg, err := sql.Open("postgres", source)
 	if err != nil {
 		log.Fatal("Err DB ==> ", err)
 	}

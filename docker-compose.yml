@@ -1,24 +1,41 @@
 version: "3.4"
 services:
-  database:
-    image: postgres
-    restart: always
+  golang:
+    tty: true
+    image: golang:1.16
+    volumes:
+      - .:/app/src/service/api
+    working_dir: /app/src/service/api
     env_file:
       - .env
+    command: bash -c "go get -u github.com/cosmtrek/air && air -c
+      /app/src/service/api/air.toml ."
+    expose:
+      - "${API_PORT}"
     ports:
-      - "5432:5432"
-    volumes:
-      - data:/var/lib/postgresql/data
-  server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file: .env
+      - "${API_PORT}:${API_PORT}"
     depends_on:
       - database
-    networks:
-      - default
+    links:
+      - database
+
+  database:
+    image: "postgres:13"
+    expose:
+      - "${POSTGRES_PORT}"
     ports:
-    - "8088:8088"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    environment:
+      TZ: ${API_TZ}
+      LC_ALL: C.UTF-8
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    command: -p ${POSTGRES_PORT} -c log_statement=all -c log_destination=stderr
+
 volumes:
-  data:
+  data: null

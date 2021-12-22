@@ -2,6 +2,7 @@ package design
 
 import (
 	"api_crud/config"
+	"fmt"
 
 	. "goa.design/goa/v3/dsl"
 	cors "goa.design/plugins/v3/cors/dsl"
@@ -13,12 +14,19 @@ var _ = API("E-Commerce", func() {
 
 	// Get .env
 	cnf := config.New()
+	var host string
+
+	if cnf.SSL {
+		host = fmt.Sprintf("https://%s", cnf.Host)
+	} else {
+		host = fmt.Sprintf("http://%s", cnf.Host)
+	}
 
 	Title("Starter Pack")
 	Description("Best API REST building with GoaDesign")
 	Version("1.0")
 
-	cors.Origin("/.*localhost.*/", func() {
+	cors.Origin(fmt.Sprintf("/.*%v.*/", cnf.Domain), func() {
 		cors.Headers("Authorization", "Content-Type", "jwtToken", "Origin")
 		cors.Methods("POST", "GET", "PUT", "OPTIONS", "DELETE", "PATCH")
 		cors.Expose("Content-Type", "Origin")
@@ -28,7 +36,7 @@ var _ = API("E-Commerce", func() {
 
 	Server("api", func() {
 		Host(cnf.Domain, func() {
-			URI(cnf.Host)
+			URI(host)
 		})
 	})
 

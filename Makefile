@@ -32,13 +32,22 @@ api-gen:
 	@echo -e "\n\t🧠\n"
 	@sqlc generate
 
-
 backup-db:
 	@echo -e "\n\t🐘\n"
 	@pg_dump --inserts -h  ${POSTGRES_HOST} -d ${POSTGRES_DB} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -f ./backup.sql
 
+createdb:
+	docker exec -it postgres createdb --username=${POSTGRES_USER} --owner=${POSTGRES_USER} test_docker
+
+dropdb:
+	docker exec -it postgres dropdb test_docker
+
+startpostgres:
+	docker run --name postgres -p ${POSTGRES_PORT}:${POSTGRES_PORT} -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres:12-alpine
+
 api-dev:
-	@echo "\n\t💣\n"
+	@echo -e "\n\t💣\n"
 	docker-compose -p $(DIR) up --build --force-recreate --remove-orphans
 
-.PHONY: api-init api-gen api-doc api-goa show-schema api-dev backup-db
+.PHONY: api-init api-gen api-doc api-goa show-schema api-dev backup-db createdb dropdb startpostgres
+
