@@ -38,7 +38,7 @@ func main() {
 		server *api.Server
 	)
 	{
-		logger = log.New(os.Stderr, "[ecommerce] ", log.Ltime)
+		logger = log.New(os.Stderr, fmt.Sprintf("[%v]", os.Getenv("PROJECT")), log.Ltime)
 		server = api.NewServer()
 	}
 
@@ -93,9 +93,9 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	if server.Config.SSL {
-		fmt.Printf("https://%s", server.Config.Host)
+		fmt.Printf("https://%s:%v\n", server.Config.Domain, server.Config.Port)
 	} else {
-		fmt.Printf("http://%s", server.Config.Host)
+		fmt.Printf("http://%s:%v\n", server.Config.Domain, server.Config.Port)
 	}
 	// Start the servers and send errors (if any) to the error channel.
 	switch *hostF {

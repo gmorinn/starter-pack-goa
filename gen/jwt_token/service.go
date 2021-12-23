@@ -19,6 +19,8 @@ type Service interface {
 	Signup(context.Context, *SignupPayload) (res *Sign, err error)
 	// signin
 	Signin(context.Context, *SigninPayload) (res *Sign, err error)
+	// signin Bo
+	SigninBo(context.Context, *SigninBoPayload) (res *Sign, err error)
 	// Refresh Token
 	Refresh(context.Context, *RefreshPayload) (res *Sign, err error)
 	// Register or login by Google, Facebook
@@ -39,7 +41,7 @@ const ServiceName = "jwtToken"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"signup", "signin", "refresh", "auth-providers"}
+var MethodNames = [5]string{"signup", "signin", "signin Bo", "refresh", "auth-providers"}
 
 // SignupPayload is the payload type of the jwtToken service signup method.
 type SignupPayload struct {
@@ -65,6 +67,15 @@ type Sign struct {
 
 // SigninPayload is the payload type of the jwtToken service signin method.
 type SigninPayload struct {
+	Email string
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Password string
+	// Use to generate Oauth with /authorization
+	Oauth *string
+}
+
+// SigninBoPayload is the payload type of the jwtToken service signin Bo method.
+type SigninBoPayload struct {
 	Email string
 	// Minimum 8 charactères / Chiffre Obligatoire
 	Password string

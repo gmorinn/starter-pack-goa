@@ -5,6 +5,7 @@ import (
 	db "api_crud/internal"
 	"api_crud/utils"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -317,4 +318,45 @@ func (server *Server) CheckJWT(ctx context.Context, token string, schema *securi
 		jwtToken: claims,
 	})
 	return ctx, nil
+}
+
+func (s *jwtTokensrvc) SigninBo(ctx context.Context, p *jwttoken.SigninBoPayload) (res *jwttoken.Sign, err error) {
+
+	var response jwttoken.Sign
+	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		// Request Login
+		arg := db.LoginUserParams{
+			Email: p.Email,
+			Crypt: p.Password,
+		}
+		user, err := q.LoginUser(ctx, arg)
+		if err != nil {
+			return fmt.Errorf("ERROR_LOGIN_USER %v", err)
+		}
+
+		getUser, err := q.GetUserByID(ctx, user.ID)
+		if err != nil {
+			return fmt.Errorf("ERROR_GET_USER %v", err)
+		}
+		if getUser.Role != "admin" {
+			return fmt.Errorf("ERROR_BAD_ROLE %v", errors.New("Bad role"))
+		}
+		t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID), string(user.Role))
+		if err != nil {
+			return fmt.Errorf("ERROR_TOKEN %v", err)
+		}
+		if err := s.server.StoreRefresh(ctx, r, expt, user.ID); err != nil {
+			return fmt.Errorf("ERROR_REFRESH_TOKEN %v", err)
+		}
+		response = jwttoken.Sign{
+			AccessToken:  t,
+			RefreshToken: r,
+			Success:      true,
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, s.errorResponse("TX_SIGNIN_BO", err)
+	}
+	return &response, nil
 }

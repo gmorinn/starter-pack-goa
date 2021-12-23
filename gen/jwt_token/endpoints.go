@@ -18,6 +18,7 @@ import (
 type Endpoints struct {
 	Signup        goa.Endpoint
 	Signin        goa.Endpoint
+	SigninBo      goa.Endpoint
 	Refresh       goa.Endpoint
 	AuthProviders goa.Endpoint
 }
@@ -29,6 +30,7 @@ func NewEndpoints(s Service) *Endpoints {
 	return &Endpoints{
 		Signup:        NewSignupEndpoint(s, a.OAuth2Auth),
 		Signin:        NewSigninEndpoint(s, a.OAuth2Auth),
+		SigninBo:      NewSigninBoEndpoint(s, a.OAuth2Auth),
 		Refresh:       NewRefreshEndpoint(s, a.OAuth2Auth),
 		AuthProviders: NewAuthProvidersEndpoint(s, a.OAuth2Auth),
 	}
@@ -38,6 +40,7 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Signup = m(e.Signup)
 	e.Signin = m(e.Signin)
+	e.SigninBo = m(e.SigninBo)
 	e.Refresh = m(e.Refresh)
 	e.AuthProviders = m(e.AuthProviders)
 }
@@ -99,6 +102,36 @@ func NewSigninEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endp
 			return nil, err
 		}
 		return s.Signin(ctx, p)
+	}
+}
+
+// NewSigninBoEndpoint returns an endpoint function that calls the method
+// "signin Bo" of service "jwtToken".
+func NewSigninBoEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*SigninBoPayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "OAuth2",
+			Scopes:         []string{"api:read"},
+			RequiredScopes: []string{},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:       "client_credentials",
+					TokenURL:   "/authorization",
+					RefreshURL: "/refresh",
+				},
+			},
+		}
+		var token string
+		if p.Oauth != nil {
+			token = *p.Oauth
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.SigninBo(ctx, p)
 	}
 }
 

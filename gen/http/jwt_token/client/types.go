@@ -35,6 +35,14 @@ type SigninRequestBody struct {
 	Password string `form:"password" json:"password" xml:"password"`
 }
 
+// SigninBoRequestBody is the type of the "jwtToken" service "signin Bo"
+// endpoint HTTP request body.
+type SigninBoRequestBody struct {
+	Email string `form:"email" json:"email" xml:"email"`
+	// Minimum 8 charactères / Chiffre Obligatoire
+	Password string `form:"password" json:"password" xml:"password"`
+}
+
 // RefreshRequestBody is the type of the "jwtToken" service "refresh" endpoint
 // HTTP request body.
 type RefreshRequestBody struct {
@@ -63,6 +71,14 @@ type SignupResponseBody struct {
 // SigninResponseBody is the type of the "jwtToken" service "signin" endpoint
 // HTTP response body.
 type SigninResponseBody struct {
+	AccessToken  *string `form:"access_token,omitempty" json:"access_token,omitempty" xml:"access_token,omitempty"`
+	RefreshToken *string `form:"refresh_token,omitempty" json:"refresh_token,omitempty" xml:"refresh_token,omitempty"`
+	Success      *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// SigninBoResponseBody is the type of the "jwtToken" service "signin Bo"
+// endpoint HTTP response body.
+type SigninBoResponseBody struct {
 	AccessToken  *string `form:"access_token,omitempty" json:"access_token,omitempty" xml:"access_token,omitempty"`
 	RefreshToken *string `form:"refresh_token,omitempty" json:"refresh_token,omitempty" xml:"refresh_token,omitempty"`
 	Success      *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
@@ -129,6 +145,29 @@ type SigninInvalidScopesResponseBody string
 // SigninUnauthorizedResponseBody is the type of the "jwtToken" service
 // "signin" endpoint HTTP response body for the "unauthorized" error.
 type SigninUnauthorizedResponseBody string
+
+// SigninBoEmailAlreadyExistResponseBody is the type of the "jwtToken" service
+// "signin Bo" endpoint HTTP response body for the "email_already_exist" error.
+type SigninBoEmailAlreadyExistResponseBody struct {
+	Err     *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
+	Success *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// SigninBoUnknownErrorResponseBody is the type of the "jwtToken" service
+// "signin Bo" endpoint HTTP response body for the "unknown_error" error.
+type SigninBoUnknownErrorResponseBody struct {
+	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
+	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
+	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// SigninBoInvalidScopesResponseBody is the type of the "jwtToken" service
+// "signin Bo" endpoint HTTP response body for the "invalid_scopes" error.
+type SigninBoInvalidScopesResponseBody string
+
+// SigninBoUnauthorizedResponseBody is the type of the "jwtToken" service
+// "signin Bo" endpoint HTTP response body for the "unauthorized" error.
+type SigninBoUnauthorizedResponseBody string
 
 // RefreshEmailAlreadyExistResponseBody is the type of the "jwtToken" service
 // "refresh" endpoint HTTP response body for the "email_already_exist" error.
@@ -216,6 +255,16 @@ func NewSignupRequestBody(p *jwttoken.SignupPayload) *SignupRequestBody {
 // "signin" endpoint of the "jwtToken" service.
 func NewSigninRequestBody(p *jwttoken.SigninPayload) *SigninRequestBody {
 	body := &SigninRequestBody{
+		Email:    p.Email,
+		Password: p.Password,
+	}
+	return body
+}
+
+// NewSigninBoRequestBody builds the HTTP request body from the payload of the
+// "signin Bo" endpoint of the "jwtToken" service.
+func NewSigninBoRequestBody(p *jwttoken.SigninBoPayload) *SigninBoRequestBody {
+	body := &SigninBoRequestBody{
 		Email:    p.Email,
 		Password: p.Password,
 	}
@@ -342,6 +391,57 @@ func NewSigninInvalidScopes(body SigninInvalidScopesResponseBody) jwttoken.Inval
 // NewSigninUnauthorized builds a jwtToken service signin endpoint unauthorized
 // error.
 func NewSigninUnauthorized(body SigninUnauthorizedResponseBody) jwttoken.Unauthorized {
+	v := jwttoken.Unauthorized(body)
+
+	return v
+}
+
+// NewSigninBoSignOK builds a "jwtToken" service "signin Bo" endpoint result
+// from a HTTP "OK" response.
+func NewSigninBoSignOK(body *SigninBoResponseBody) *jwttoken.Sign {
+	v := &jwttoken.Sign{
+		AccessToken:  *body.AccessToken,
+		RefreshToken: *body.RefreshToken,
+		Success:      *body.Success,
+	}
+
+	return v
+}
+
+// NewSigninBoEmailAlreadyExist builds a jwtToken service signin Bo endpoint
+// email_already_exist error.
+func NewSigninBoEmailAlreadyExist(body *SigninBoEmailAlreadyExistResponseBody) *jwttoken.EmailAlreadyExist {
+	v := &jwttoken.EmailAlreadyExist{
+		Err:     *body.Err,
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewSigninBoUnknownError builds a jwtToken service signin Bo endpoint
+// unknown_error error.
+func NewSigninBoUnknownError(body *SigninBoUnknownErrorResponseBody) *jwttoken.UnknownError {
+	v := &jwttoken.UnknownError{
+		Err:       *body.Err,
+		ErrorCode: *body.ErrorCode,
+		Success:   *body.Success,
+	}
+
+	return v
+}
+
+// NewSigninBoInvalidScopes builds a jwtToken service signin Bo endpoint
+// invalid_scopes error.
+func NewSigninBoInvalidScopes(body SigninBoInvalidScopesResponseBody) jwttoken.InvalidScopes {
+	v := jwttoken.InvalidScopes(body)
+
+	return v
+}
+
+// NewSigninBoUnauthorized builds a jwtToken service signin Bo endpoint
+// unauthorized error.
+func NewSigninBoUnauthorized(body SigninBoUnauthorizedResponseBody) jwttoken.Unauthorized {
 	v := jwttoken.Unauthorized(body)
 
 	return v
@@ -477,6 +577,21 @@ func ValidateSigninResponseBody(body *SigninResponseBody) (err error) {
 	return
 }
 
+// ValidateSigninBoResponseBody runs the validations defined on Signin
+// BoResponseBody
+func ValidateSigninBoResponseBody(body *SigninBoResponseBody) (err error) {
+	if body.AccessToken == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("access_token", "body"))
+	}
+	if body.RefreshToken == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("refresh_token", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
 // ValidateRefreshResponseBody runs the validations defined on
 // RefreshResponseBody
 func ValidateRefreshResponseBody(body *RefreshResponseBody) (err error) {
@@ -549,6 +664,33 @@ func ValidateSigninEmailAlreadyExistResponseBody(body *SigninEmailAlreadyExistRe
 // ValidateSigninUnknownErrorResponseBody runs the validations defined on
 // signin_unknown_error_response_body
 func ValidateSigninUnknownErrorResponseBody(body *SigninUnknownErrorResponseBody) (err error) {
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.ErrorCode == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
+// ValidateSigninBoEmailAlreadyExistResponseBody runs the validations defined
+// on signin Bo_email_already_exist_response_body
+func ValidateSigninBoEmailAlreadyExistResponseBody(body *SigninBoEmailAlreadyExistResponseBody) (err error) {
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
+// ValidateSigninBoUnknownErrorResponseBody runs the validations defined on
+// signin Bo_unknown_error_response_body
+func ValidateSigninBoUnknownErrorResponseBody(body *SigninBoUnknownErrorResponseBody) (err error) {
 	if body.Err == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}

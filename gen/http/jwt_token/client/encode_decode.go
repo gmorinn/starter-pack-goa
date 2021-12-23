@@ -285,6 +285,139 @@ func DecodeSigninResponse(decoder func(*http.Response) goahttp.Decoder, restoreB
 	}
 }
 
+// BuildSigninBoRequest instantiates a HTTP request object with method and path
+// set to call the "jwtToken" service "signin Bo" endpoint
+func (c *Client) BuildSigninBoRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: SigninBoJWTTokenPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("jwtToken", "signin Bo", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeSigninBoRequest returns an encoder for requests sent to the jwtToken
+// signin Bo server.
+func EncodeSigninBoRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*jwttoken.SigninBoPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("jwtToken", "signin Bo", "*jwttoken.SigninBoPayload", v)
+		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		body := NewSigninBoRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("jwtToken", "signin Bo", err)
+		}
+		return nil
+	}
+}
+
+// DecodeSigninBoResponse returns a decoder for responses returned by the
+// jwtToken signin Bo endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeSigninBoResponse may return the following errors:
+//	- "email_already_exist" (type *jwttoken.EmailAlreadyExist): http.StatusBadRequest
+//	- "unknown_error" (type *jwttoken.UnknownError): http.StatusInternalServerError
+//	- "invalid_scopes" (type jwttoken.InvalidScopes): http.StatusForbidden
+//	- "unauthorized" (type jwttoken.Unauthorized): http.StatusUnauthorized
+//	- error: internal error
+func DecodeSigninBoResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body SigninBoResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "signin Bo", err)
+			}
+			err = ValidateSigninBoResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("jwtToken", "signin Bo", err)
+			}
+			res := NewSigninBoSignOK(&body)
+			return res, nil
+		case http.StatusBadRequest:
+			var (
+				body SigninBoEmailAlreadyExistResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "signin Bo", err)
+			}
+			err = ValidateSigninBoEmailAlreadyExistResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("jwtToken", "signin Bo", err)
+			}
+			return nil, NewSigninBoEmailAlreadyExist(&body)
+		case http.StatusInternalServerError:
+			var (
+				body SigninBoUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "signin Bo", err)
+			}
+			err = ValidateSigninBoUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("jwtToken", "signin Bo", err)
+			}
+			return nil, NewSigninBoUnknownError(&body)
+		case http.StatusForbidden:
+			var (
+				body SigninBoInvalidScopesResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "signin Bo", err)
+			}
+			return nil, NewSigninBoInvalidScopes(body)
+		case http.StatusUnauthorized:
+			var (
+				body SigninBoUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("jwtToken", "signin Bo", err)
+			}
+			return nil, NewSigninBoUnauthorized(body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("jwtToken", "signin Bo", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildRefreshRequest instantiates a HTTP request object with method and path
 // set to call the "jwtToken" service "refresh" endpoint
 func (c *Client) BuildRefreshRequest(ctx context.Context, v interface{}) (*http.Request, error) {

@@ -17,15 +17,17 @@ import (
 type Client struct {
 	SignupEndpoint        goa.Endpoint
 	SigninEndpoint        goa.Endpoint
+	SigninBoEndpoint      goa.Endpoint
 	RefreshEndpoint       goa.Endpoint
 	AuthProvidersEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "jwtToken" service client given the endpoints.
-func NewClient(signup, signin, refresh, authProviders goa.Endpoint) *Client {
+func NewClient(signup, signin, signinBo, refresh, authProviders goa.Endpoint) *Client {
 	return &Client{
 		SignupEndpoint:        signup,
 		SigninEndpoint:        signin,
+		SigninBoEndpoint:      signinBo,
 		RefreshEndpoint:       refresh,
 		AuthProvidersEndpoint: authProviders,
 	}
@@ -45,6 +47,16 @@ func (c *Client) Signup(ctx context.Context, p *SignupPayload) (res *Sign, err e
 func (c *Client) Signin(ctx context.Context, p *SigninPayload) (res *Sign, err error) {
 	var ires interface{}
 	ires, err = c.SigninEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*Sign), nil
+}
+
+// SigninBo calls the "signin Bo" endpoint of the "jwtToken" service.
+func (c *Client) SigninBo(ctx context.Context, p *SigninBoPayload) (res *Sign, err error) {
+	var ires interface{}
+	ires, err = c.SigninBoEndpoint(ctx, p)
 	if err != nil {
 		return
 	}

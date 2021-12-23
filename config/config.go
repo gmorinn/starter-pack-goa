@@ -17,6 +17,7 @@ type API struct {
 	SSL      bool
 	Host     string
 	Port     int
+	Project  string
 	Cert     string
 	Cors     string
 	Key      string
@@ -51,6 +52,7 @@ func New() *API {
 
 	config.Mode = os.Getenv("API_MODE")
 	config.Domain = os.Getenv("API_DOMAIN")
+	config.Project = os.Getenv("PROJECT")
 
 	config.TZ = os.Getenv("TZ")
 	config.Port, _ = getenvInt("API_PORT")

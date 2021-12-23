@@ -23,6 +23,10 @@ type Client struct {
 	// Signin Doer is the HTTP client used to make requests to the signin endpoint.
 	SigninDoer goahttp.Doer
 
+	// SigninBo Doer is the HTTP client used to make requests to the signin Bo
+	// endpoint.
+	SigninBoDoer goahttp.Doer
+
 	// Refresh Doer is the HTTP client used to make requests to the refresh
 	// endpoint.
 	RefreshDoer goahttp.Doer
@@ -56,6 +60,7 @@ func NewClient(
 	return &Client{
 		SignupDoer:          doer,
 		SigninDoer:          doer,
+		SigninBoDoer:        doer,
 		RefreshDoer:         doer,
 		AuthProvidersDoer:   doer,
 		CORSDoer:            doer,
@@ -110,6 +115,30 @@ func (c *Client) Signin() goa.Endpoint {
 		resp, err := c.SigninDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("jwtToken", "signin", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// SigninBo returns an endpoint that makes HTTP requests to the jwtToken
+// service signin Bo server.
+func (c *Client) SigninBo() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeSigninBoRequest(c.encoder)
+		decodeResponse = DecodeSigninBoResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildSigninBoRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.SigninBoDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("jwtToken", "signin Bo", err)
 		}
 		return decodeResponse(resp)
 	}

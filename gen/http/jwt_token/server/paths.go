@@ -17,6 +17,11 @@ func SigninJWTTokenPath() string {
 	return "/signin"
 }
 
+// SigninBoJWTTokenPath returns the URL path to the jwtToken service signin Bo HTTP endpoint.
+func SigninBoJWTTokenPath() string {
+	return "/bo/signin"
+}
+
 // RefreshJWTTokenPath returns the URL path to the jwtToken service refresh HTTP endpoint.
 func RefreshJWTTokenPath() string {
 	return "/resfresh"

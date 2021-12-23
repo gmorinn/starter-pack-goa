@@ -107,6 +107,34 @@ var _ = Service("jwtToken", func() {
 		})
 	})
 
+	Method("signin Bo", func() {
+		Description("signin Bo")
+
+		Payload(func() {
+			Attribute("email", String, func() {
+				Format(FormatEmail)
+				Example("guillaume@epitech.eu")
+			})
+			Attribute("password", String, func() {
+				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Pattern("\\d")
+				MinLength(8)
+				Example("JeSuisUnTest974")
+			})
+			AccessTokenField(1, "oauth", String, func() {
+				Description("Use to generate Oauth with /authorization")
+			})
+			Required("password", "email")
+		})
+
+		Result(Sign)
+
+		HTTP(func() {
+			POST("/bo/signin")
+			Response(StatusOK)
+		})
+	})
+
 	Method("refresh", func() {
 		Description("Refresh Token")
 

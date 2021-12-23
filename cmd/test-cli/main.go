@@ -66,7 +66,7 @@ func main() {
 		case "http", "https":
 			endpoint, payload, err = doHTTP(scheme, host, timeout, debug)
 		default:
-			fmt.Fprintf(os.Stderr, "invalid scheme: %q (valid schemes: https)\n", scheme)
+			fmt.Fprintf(os.Stderr, "invalid scheme: %q (valid schemes: http)\n", scheme)
 			os.Exit(1)
 		}
 	}
@@ -92,7 +92,7 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, `%s is a command line client for the Project Name API.
+	fmt.Fprintf(os.Stderr, `%s is a command line client for the Test API.
 
 Usage:
     %s [-host HOST][-url URL][-timeout SECONDS][-verbose|-v] SERVICE ENDPOINT [flags]
