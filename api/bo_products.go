@@ -3,6 +3,7 @@ package api
 import (
 	boproducts "api_crud/gen/bo_products"
 	db "api_crud/internal"
+	"api_crud/utils"
 	"context"
 	"fmt"
 	"log"
@@ -46,9 +47,10 @@ func (s *boProductssrvc) JWTAuth(ctx context.Context, token string, scheme *secu
 func (s *boProductssrvc) GetAllProducts(ctx context.Context, p *boproducts.GetAllProductsPayload) (res *boproducts.GetAllProductsResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		arg := db.GetBoAllProductsParams{
-			Limit:  p.Limit,
-			Offset: p.Offset,
-			Order:  p.Field + " " + p.Direction,
+			Limit:    p.Limit,
+			Offset:   p.Offset,
+			NameDesc: utils.FilterOrderBy(p.Field, p.Direction, "NameDesc"),
+			NameAsc:  utils.FilterOrderBy(p.Field, p.Direction, "NameAsc"),
 		}
 		products, err := q.GetBoAllProducts(ctx, arg)
 		if err != nil {

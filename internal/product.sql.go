@@ -93,18 +93,38 @@ func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
 const getBoAllProducts = `-- name: GetBoAllProducts :many
 SELECT id, created_at, updated_at, deleted_at, name, category, cover, price FROM products
 WHERE deleted_at IS NULL
-ORDER BY $1::text
-LIMIT $3 OFFSET $2
+ORDER BY
+  CASE WHEN $1::bool THEN name END asc,
+  CASE WHEN $2::bool THEN name END desc,
+  CASE WHEN $3::bool THEN category END asc,
+  CASE WHEN $4::bool THEN category END desc,
+  CASE WHEN $5::bool THEN price END asc,
+  CASE WHEN $6::bool THEN price END desc
+LIMIT $8 OFFSET $7
 `
 
 type GetBoAllProductsParams struct {
-	Order  string `json:"order"`
-	Offset int32  `json:"offset"`
-	Limit  int32  `json:"limit"`
+	NameAsc      bool  `json:"name_asc"`
+	NameDesc     bool  `json:"name_desc"`
+	CategoryAsc  bool  `json:"category_asc"`
+	CategoryDesc bool  `json:"category_desc"`
+	PriceAsc     bool  `json:"price_asc"`
+	PriceDesc    bool  `json:"price_desc"`
+	Offset       int32 `json:"offset"`
+	Limit        int32 `json:"limit"`
 }
 
 func (q *Queries) GetBoAllProducts(ctx context.Context, arg GetBoAllProductsParams) ([]Product, error) {
-	rows, err := q.query(ctx, q.getBoAllProductsStmt, getBoAllProducts, arg.Order, arg.Offset, arg.Limit)
+	rows, err := q.query(ctx, q.getBoAllProductsStmt, getBoAllProducts,
+		arg.NameAsc,
+		arg.NameDesc,
+		arg.CategoryAsc,
+		arg.CategoryDesc,
+		arg.PriceAsc,
+		arg.PriceDesc,
+		arg.Offset,
+		arg.Limit,
+	)
 	if err != nil {
 		return nil, err
 	}

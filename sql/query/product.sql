@@ -14,7 +14,13 @@ WHERE deleted_at IS NULL;
 -- name: GetBoAllProducts :many
 SELECT * FROM products
 WHERE deleted_at IS NULL
-ORDER BY sqlc.arg('order')::text
+ORDER BY
+  CASE WHEN sqlc.arg('name_asc')::bool THEN name END asc,
+  CASE WHEN sqlc.arg('name_desc')::bool THEN name END desc,
+  CASE WHEN sqlc.arg('category_asc')::bool THEN category END asc,
+  CASE WHEN sqlc.arg('category_desc')::bool THEN category END desc,
+  CASE WHEN sqlc.arg('price_asc')::bool THEN price END asc,
+  CASE WHEN sqlc.arg('price_desc')::bool THEN price END desc
 LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset');
 
 -- name: GetProduct :one
