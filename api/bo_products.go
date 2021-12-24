@@ -47,10 +47,14 @@ func (s *boProductssrvc) JWTAuth(ctx context.Context, token string, scheme *secu
 func (s *boProductssrvc) GetAllProducts(ctx context.Context, p *boproducts.GetAllProductsPayload) (res *boproducts.GetAllProductsResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		arg := db.GetBoAllProductsParams{
-			Limit:    p.Limit,
-			Offset:   p.Offset,
-			NameDesc: utils.FilterOrderBy(p.Field, p.Direction, "NameDesc"),
-			NameAsc:  utils.FilterOrderBy(p.Field, p.Direction, "NameAsc"),
+			Limit:        p.Limit,
+			Offset:       p.Offset,
+			NameDesc:     utils.FilterOrderBy(p.Field, p.Direction, "NameDesc"),
+			NameAsc:      utils.FilterOrderBy(p.Field, p.Direction, "NameAsc"),
+			PriceAsc:     utils.FilterOrderBy(p.Field, p.Direction, "PriceAsc"),
+			PriceDesc:    utils.FilterOrderBy(p.Field, p.Direction, "PriceDesc"),
+			CategoryAsc:  utils.FilterOrderBy(p.Field, p.Direction, "CategoryAsc"),
+			CategoryDesc: utils.FilterOrderBy(p.Field, p.Direction, "CategoryDesc"),
 		}
 		products, err := q.GetBoAllProducts(ctx, arg)
 		if err != nil {

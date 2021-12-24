@@ -3,7 +3,7 @@ FROM golang:alpine AS builder
 RUN apk --no-cache add gcc g++ make git
 WORKDIR /app
 COPY . .
-RUN GOOS=linux go build -ldflags="-s -w" -o start
+RUN GOOS=linux go build -ldflags="-s -w" -o ./bin/api
 
 # Run stage
 FROM alpine:latest
@@ -15,4 +15,4 @@ COPY --from=builder /app/favicon.ico .
 RUN mkdir -p /app/uploads
 
 EXPOSE 8088
-CMD [ "/app/start" ]
+CMD [ "/app/cmd/api" ]

@@ -74,18 +74,44 @@ func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
 const getBoAllUsers = `-- name: GetBoAllUsers :many
 SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
 WHERE deleted_at IS NULL
-ORDER BY $1::text
-LIMIT $3 OFFSET $2
+ORDER BY
+  CASE WHEN $1::bool THEN firstname END asc,
+  CASE WHEN $2::bool THEN firstname END desc,
+  CASE WHEN $3::bool THEN lastname END asc,
+  CASE WHEN $4::bool THEN lastname END desc,
+  CASE WHEN $5::bool THEN email END asc,
+  CASE WHEN $6::bool THEN email END desc,
+  CASE WHEN $7::bool THEN role END asc,
+  CASE WHEN $8::bool THEN role END desc
+LIMIT $10 OFFSET $9
 `
 
 type GetBoAllUsersParams struct {
-	Order  string `json:"order"`
-	Offset int32  `json:"offset"`
-	Limit  int32  `json:"limit"`
+	FirstnameAsc  bool  `json:"firstname_asc"`
+	FirstnameDesc bool  `json:"firstname_desc"`
+	LastnameAsc   bool  `json:"lastname_asc"`
+	LastnameDesc  bool  `json:"lastname_desc"`
+	EmailAsc      bool  `json:"email_asc"`
+	EmailDesc     bool  `json:"email_desc"`
+	RoleAsc       bool  `json:"role_asc"`
+	RoleDesc      bool  `json:"role_desc"`
+	Offset        int32 `json:"offset"`
+	Limit         int32 `json:"limit"`
 }
 
 func (q *Queries) GetBoAllUsers(ctx context.Context, arg GetBoAllUsersParams) ([]User, error) {
-	rows, err := q.query(ctx, q.getBoAllUsersStmt, getBoAllUsers, arg.Order, arg.Offset, arg.Limit)
+	rows, err := q.query(ctx, q.getBoAllUsersStmt, getBoAllUsers,
+		arg.FirstnameAsc,
+		arg.FirstnameDesc,
+		arg.LastnameAsc,
+		arg.LastnameDesc,
+		arg.EmailAsc,
+		arg.EmailDesc,
+		arg.RoleAsc,
+		arg.RoleDesc,
+		arg.Offset,
+		arg.Limit,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -16,12 +16,12 @@ api-goa:
 	@cp -f gen/http/openapi3.json ./
 	@echo -e "\nWait...⌛\n\nGOA GM will generate functions for you❤️\n"
 	@goa example $(DIR)/design
-	@go build -o cl clean/clean.go clean/cleanHTTP.go clean/cleanMAIN.go clean/cleanFolderAPI.go && ./cl
+	@go build -o cl cmd/clean/clean.go cmd/clean/cleanHTTP.go cmd/clean/cleanMAIN.go cmd/clean/cleanFolderAPI.go && ./cl
 	@rm cl
 	@echo -e "\nEnjoy🐿️\n=> Documentation make api-doc"
 
 api-doc:
-	@cd documentation && live-server
+	@cd cmd/documentation && live-server
 
 api-init:
 	@echo -e "\n\t🔑\n"

@@ -47,9 +47,16 @@ func (s *boUserssrvc) JWTAuth(ctx context.Context, token string, scheme *securit
 func (s *boUserssrvc) GetAllusers(ctx context.Context, p *bousers.GetAllusersPayload) (res *bousers.GetAllusersResult, err error) {
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
 		arg := db.GetBoAllUsersParams{
-			Limit:  p.Limit,
-			Offset: p.Offset,
-			Order:  p.Field + " " + p.Direction,
+			Limit:         p.Limit,
+			Offset:        p.Offset,
+			FirstnameAsc:  utils.FilterOrderBy(p.Field, p.Direction, "FirstnameAsc"),
+			FirstnameDesc: utils.FilterOrderBy(p.Field, p.Direction, "FirstnameDesc"),
+			EmailAsc:      utils.FilterOrderBy(p.Field, p.Direction, "EmailAsc"),
+			EmailDesc:     utils.FilterOrderBy(p.Field, p.Direction, "EmailDesc"),
+			LastnameAsc:   utils.FilterOrderBy(p.Field, p.Direction, "LastnameAsc"),
+			LastnameDesc:  utils.FilterOrderBy(p.Field, p.Direction, "LastnameDesc"),
+			RoleAsc:       utils.FilterOrderBy(p.Field, p.Direction, "RoleAsc"),
+			RoleDesc:      utils.FilterOrderBy(p.Field, p.Direction, "RoleDesc"),
 		}
 		uS, err := q.GetBoAllUsers(ctx, arg)
 		if err != nil {

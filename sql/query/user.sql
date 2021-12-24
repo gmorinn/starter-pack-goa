@@ -5,6 +5,19 @@ WHERE deleted_at IS NULL;
 -- name: GetBoAllUsers :many
 SELECT * FROM users
 WHERE deleted_at IS NULL
+ORDER BY
+  CASE WHEN sqlc.arg('firstname_asc')::bool THEN firstname END asc,
+  CASE WHEN sqlc.arg('firstname_desc')::bool THEN firstname END desc,
+  CASE WHEN sqlc.arg('lastname_asc')::bool THEN lastname END asc,
+  CASE WHEN sqlc.arg('lastname_desc')::bool THEN lastname END desc,
+  CASE WHEN sqlc.arg('email_asc')::bool THEN email END asc,
+  CASE WHEN sqlc.arg('email_desc')::bool THEN email END desc,
+  CASE WHEN sqlc.arg('role_asc')::bool THEN role END asc,
+  CASE WHEN sqlc.arg('role_desc')::bool THEN role END desc
+LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset');
+
+SELECT * FROM users
+WHERE deleted_at IS NULL
 ORDER BY sqlc.arg('order')::text
 LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset');
 
