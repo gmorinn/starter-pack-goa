@@ -50,7 +50,7 @@ func (s *oAuthsrvc) OAuth(ctx context.Context, p *oauth.OauthPayload) (res *oaut
 	}
 
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":        time.Now().Add(time.Duration(time.Hour * 2)).Unix(),
+		"exp":        time.Now().Add(time.Duration(time.Hour * 1)).Unix(),
 		"scopes":     []string{"api:read", "api:write"},
 		"token_type": "Bearer",
 	})
@@ -62,7 +62,7 @@ func (s *oAuthsrvc) OAuth(ctx context.Context, p *oauth.OauthPayload) (res *oaut
 
 	res = &oauth.OAuthResponse{
 		AccessToken: t,
-		ExpiresIn:   time.Now().Add(time.Duration(time.Hour * 2)).Unix(),
+		ExpiresIn:   time.Now().Add(time.Duration(time.Hour * 1)).Unix(),
 		TokenType:   "Bearer",
 		Success:     true,
 	}
