@@ -1,10 +1,12 @@
 package main
 
 import (
+	filesclient "api_crud/api"
 	"api_crud/config"
 	authsvr "api_crud/gen/http/auth/server"
 	boProductssrvc "api_crud/gen/http/bo_products/server"
 	bouserssrv "api_crud/gen/http/bo_users/server"
+	filessvr "api_crud/gen/http/files/server"
 	jwttokensvr "api_crud/gen/http/jwt_token/server"
 	oauthsvr "api_crud/gen/http/o_auth/server"
 	openapisvr "api_crud/gen/http/openapi/server"
@@ -62,6 +64,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 	var (
 		eh                                       = errorHandler(logger)
 		openapiServer     *openapisvr.Server     = openapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("gen/http"))
+		filesServer       *filessvr.Server       = filessvr.New(api.filesEndpoints, mux, dec, enc, eh, nil, filesclient.FilesImportFileDecoderFunc)
 		bo_productsServer *boProductssrvc.Server = boProductssrvc.New(api.bo_productsEndpoints, mux, dec, enc, eh, nil)
 		bo_usersServer    *bouserssrv.Server     = bouserssrv.New(api.bo_usersEndpoints, mux, dec, enc, eh, nil)
 		usersServer       *userssvr.Server       = userssvr.New(api.usersEndpoints, mux, dec, enc, eh, nil)
@@ -73,6 +76,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 	{
 		if debug {
 			servers := goahttp.Servers{
+				filesServer,
 				authServer,
 				bo_productsServer,
 				bo_usersServer,
@@ -87,6 +91,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 	}
 	// Configure the mux.
 	openapisvr.Mount(mux, openapiServer)
+	filessvr.Mount(mux, filesServer)
 	authsvr.Mount(mux, authServer)
 	boProductssrvc.Mount(mux, bo_productsServer)
 	bouserssrv.Mount(mux, bo_usersServer)

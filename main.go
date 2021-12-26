@@ -5,6 +5,7 @@ import (
 	auth "api_crud/gen/auth"
 	boproducts "api_crud/gen/bo_products"
 	bousers "api_crud/gen/bo_users"
+	files "api_crud/gen/files"
 	jwttoken "api_crud/gen/jwt_token"
 	oauth "api_crud/gen/o_auth"
 	products "api_crud/gen/products"
@@ -22,6 +23,7 @@ import (
 )
 
 type ApiEndpoints struct {
+	filesEndpoints       *files.Endpoints
 	authEndpoints        *auth.Endpoints
 	bo_productsEndpoints *boproducts.Endpoints
 	usersEndpoints       *users.Endpoints
@@ -49,6 +51,7 @@ func main() {
 		usersSvc      users.Service      = api.NewUsers(logger, server)
 		bo_usersSvc   bousers.Service    = api.NewBoUsers(logger, server)
 		jwtTokenSvc   jwttoken.Service   = api.NewJWTToken(logger, server)
+		filesSvc      files.Service      = api.NewFiles(logger, server)
 		oAuthSvc      oauth.Service      = api.NewOAuth(logger, server)
 		productsSvc   products.Service   = api.NewProducts(logger, server)
 	)
@@ -57,6 +60,7 @@ func main() {
 	// potentially running in different processes.
 	var (
 		apiEndpoints ApiEndpoints = ApiEndpoints{
+			filesEndpoints:       files.NewEndpoints(filesSvc),
 			authEndpoints:        auth.NewEndpoints(authSvc),
 			bo_productsEndpoints: boproducts.NewEndpoints(boproductsSvc),
 			bo_usersEndpoints:    bousers.NewEndpoints(bo_usersSvc),

@@ -1,6 +1,7 @@
 package main
 
 import (
+	filesc "api_crud/api"
 	cli "api_crud/gen/http/cli/test"
 	"net/http"
 	"time"
@@ -27,6 +28,7 @@ func doHTTP(scheme, host string, timeout int, debug bool) (goa.Endpoint, interfa
 		goahttp.RequestEncoder,
 		goahttp.ResponseDecoder,
 		debug,
+		filesc.FilesImportFileEncoderFunc,
 	)
 }
 

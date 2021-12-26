@@ -442,14 +442,14 @@ func NewNewPasswordPayload(body *NewPasswordRequestBody, id string, oauth *strin
 // ValidateCreateUserRequestBody runs the validations defined on
 // CreateUserRequestBody
 func ValidateCreateUserRequestBody(body *CreateUserRequestBody) (err error) {
-	if body.Email == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
-	}
 	if body.Firstname == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("firstname", "body"))
 	}
 	if body.Lastname == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("lastname", "body"))
+	}
+	if body.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("email", "body"))
 	}
 	if body.Password == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("password", "body"))

@@ -64,29 +64,35 @@ func main() {
 
 				/////////: WRITE IN THE NEW FILE IN API's FOLDER ////////////
 				fmt.Println("Clean files in api's folder")
-				lines := cleanFolderApi(input, v.Name())
-				output := strings.Join(lines, "\n")
-				err = ioutil.WriteFile("./api/"+v.Name(), []byte(output), 0644)
-				if err != nil {
-					log.Fatal("write in new file => ", err)
-					os.Exit(84)
+				if !strings.Contains(v.Name(), "multipart") {
+					lines := cleanFolderApi(input, v.Name())
+					output := strings.Join(lines, "\n")
+					err = ioutil.WriteFile("./api/"+v.Name(), []byte(output), 0644)
+					if err != nil {
+						log.Fatal("write in new file => ", err)
+						os.Exit(84)
+					}
 				}
 				// ////////////////////////////////////////////////////////////
 
 				// /////// ONCE FILE IS CHANGED, ADD THE NEW METHOD IN main.go //
 				fmt.Println("Clean main.go")
 				method := strings.ReplaceAll(v.Name(), ".go", "")
-				if err := cleanMain(method); err != nil {
-					log.Fatal("change in main.go => ", err)
-					os.Exit(84)
+				if !strings.Contains(v.Name(), "multipart") {
+					if err := cleanMain(method); err != nil {
+						log.Fatal("change in main.go => ", err)
+						os.Exit(84)
+					}
 				}
 				// ////////////////////////////////////////////////////////////
 
 				////// WE ALSO NEED TO ADD THE METHOD IN THE HTTP.GO ////
 				fmt.Println("Clean http.go")
-				if err := cleanHttp(method); err != nil {
-					log.Fatal("change in http.go => ", err)
-					os.Exit(84)
+				if !strings.Contains(v.Name(), "multipart") {
+					if err := cleanHttp(method); err != nil {
+						log.Fatal("change in http.go => ", err)
+						os.Exit(84)
+					}
 				}
 				// ////////////////////////////////////////////////////:
 			}

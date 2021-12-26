@@ -147,7 +147,6 @@ var _ = Service("boUsers", func() {
 				MinLength(8)
 				Example("JeSuisUnTest974")
 			})
-			Required("email", "firstname", "lastname")
 			TokenField(1, "jwtToken", String, func() {
 				Description("JWT used for authentication after Signin/Signup")
 			})
