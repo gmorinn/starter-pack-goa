@@ -140,6 +140,16 @@ paths:
       security:
       - OAuth2_header_Authorization:
         - api:read
+  /open.png:
+    get:
+      tags:
+      - fileapi
+      summary: Download openapi.png
+      description: Serve static content.
+      operationId: fileapi#/open.png
+      responses:
+        "200":
+          description: File downloaded
   /openapi.json:
     get:
       tags:
@@ -2792,6 +2802,7 @@ components:
       scheme: bearer
 tags:
 - name: openapi
+- name: fileapi
 - name: auth
   description: Forget password / reset password / send Email Code
 - name: boProducts

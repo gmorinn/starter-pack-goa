@@ -5,6 +5,7 @@ import (
 	auth "api_crud/gen/auth"
 	boproducts "api_crud/gen/bo_products"
 	bousers "api_crud/gen/bo_users"
+	fileapi "api_crud/gen/fileapi"
 	files "api_crud/gen/files"
 	jwttoken "api_crud/gen/jwt_token"
 	oauth "api_crud/gen/o_auth"
@@ -23,6 +24,7 @@ import (
 )
 
 type ApiEndpoints struct {
+	fileapiEndpoints     *fileapi.Endpoints
 	filesEndpoints       *files.Endpoints
 	authEndpoints        *auth.Endpoints
 	bo_productsEndpoints *boproducts.Endpoints
@@ -51,6 +53,7 @@ func main() {
 		usersSvc      users.Service      = api.NewUsers(logger, server)
 		bo_usersSvc   bousers.Service    = api.NewBoUsers(logger, server)
 		jwtTokenSvc   jwttoken.Service   = api.NewJWTToken(logger, server)
+		fileapiSvc    fileapi.Service    = api.NewFileapi(logger)
 		filesSvc      files.Service      = api.NewFiles(logger, server)
 		oAuthSvc      oauth.Service      = api.NewOAuth(logger, server)
 		productsSvc   products.Service   = api.NewProducts(logger, server)
@@ -60,6 +63,7 @@ func main() {
 	// potentially running in different processes.
 	var (
 		apiEndpoints ApiEndpoints = ApiEndpoints{
+			fileapiEndpoints:     fileapi.NewEndpoints(fileapiSvc),
 			filesEndpoints:       files.NewEndpoints(filesSvc),
 			authEndpoints:        auth.NewEndpoints(authSvc),
 			bo_productsEndpoints: boproducts.NewEndpoints(boproductsSvc),
@@ -73,7 +77,7 @@ func main() {
 	// Define command line flags, add any other flag required to configure the
 	// service.
 	var (
-		hostF     = flag.String("host", "localhost", "Server host (valid values: localhost)")
+		hostF     = flag.String("host", server.Config.Domain, "Server host (valid values: localhost)")
 		domainF   = flag.String("domain", "", "Host domain name (overrides host domain specified in service design)")
 		httpPortF = flag.String("http-port", "", "HTTP port (overrides host HTTP port specified in service design)")
 		secureF   = flag.Bool("secure", server.Config.SSL, "Use secure scheme (https or grpcs)")

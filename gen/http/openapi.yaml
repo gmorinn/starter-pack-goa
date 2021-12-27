@@ -132,6 +132,20 @@ paths:
       - http
       security:
       - OAuth2_header_Authorization: []
+  /open.png:
+    get:
+      tags:
+      - fileapi
+      summary: Download openapi.png
+      description: Serve static content.
+      operationId: fileapi#/open.png
+      responses:
+        "200":
+          description: File downloaded
+          schema:
+            type: file
+      schemes:
+      - http
   /openapi.json:
     get:
       tags:

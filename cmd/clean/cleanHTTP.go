@@ -24,9 +24,9 @@ func cleanHttp(method string) error {
 		if strings.Contains(line, `jwttokensvr "`) {
 			lines[i+1] = fmt.Sprintf("\t"+`%vsvr "%v/gen/http/%v/server"`+"\n", method, name, method) + lines[i+1]
 		}
-		// if strings.Contains(line, `jwtTokenServer    *jwttokensvr.Server"`) {
-		// 	lines[i+1] = fmt.Sprintf("\t%vServer\t*%vsvr.Server\t=%vsvr.New(api.%vEndpoints, mux, dec, enc, eh, nil)\n%v", method, method, method, method, lines[i+1])
-		// }
+		if strings.Contains(line, `*jwttokensvr.Server`) {
+			lines[i+1] = fmt.Sprintf("\t%vServer\t*%vsvr.Server\t=%vsvr.New(api.%vEndpoints, mux, dec, enc, eh, nil)\n%v", method, method, method, method, lines[i+1])
+		}
 		// Build the service HTTP request
 		if strings.Contains(line, "openapiServer  *openapisvr.Server") {
 			lines[i+1] = fmt.Sprintf("\t\t\t%vServer *%vsvr.Server = %vsvr.New(api.%vEndpoints, mux, dec, enc, eh, nil)\n", method, method, method, method) + lines[i+1]

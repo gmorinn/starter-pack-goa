@@ -65,6 +65,13 @@ var _ = Service("openapi", func() {
 	})
 })
 
+// Access File
+var _ = Service("fileapi", func() {
+	Files("/open.png", "openapi.png", func() {
+		Description("Serve static content.")
+	})
+})
+
 var unknownError = Type("unknownError", func() {
 	Field(1, "err", String, func() {
 		Example("sql no rows affected")
