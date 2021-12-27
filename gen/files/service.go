@@ -18,6 +18,8 @@ import (
 type Service interface {
 	// Import file
 	ImportFile(context.Context, *ImportFilePayload) (res *ImportFileResult, err error)
+	// Delete one file by ID
+	DeleteFile(context.Context, *DeleteFilePayload) (res *DeleteFileResult, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -36,7 +38,7 @@ const ServiceName = "files"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"importFile"}
+var MethodNames = [2]string{"importFile", "deleteFile"}
 
 // ImportFilePayload is the payload type of the files service importFile method.
 type ImportFilePayload struct {
@@ -61,6 +63,20 @@ type ImportFilePayload struct {
 // ImportFileResult is the result type of the files service importFile method.
 type ImportFileResult struct {
 	File    *ResFile
+	Success bool
+}
+
+// DeleteFilePayload is the payload type of the files service deleteFile method.
+type DeleteFilePayload struct {
+	URL string
+	// JWT used for authentication after Signin/Signup
+	JWTToken *string
+	// Use to generate Oauth with /authorization
+	Oauth *string
+}
+
+// DeleteFileResult is the result type of the files service deleteFile method.
+type DeleteFileResult struct {
 	Success bool
 }
 

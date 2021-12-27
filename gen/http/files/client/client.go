@@ -23,6 +23,10 @@ type Client struct {
 	// endpoint.
 	ImportFileDoer goahttp.Doer
 
+	// DeleteFile Doer is the HTTP client used to make requests to the deleteFile
+	// endpoint.
+	DeleteFileDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -51,6 +55,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		ImportFileDoer:      doer,
+		DeleteFileDoer:      doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -79,6 +84,30 @@ func (c *Client) ImportFile(filesImportFileEncoderFn FilesImportFileEncoderFunc)
 		resp, err := c.ImportFileDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("files", "importFile", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DeleteFile returns an endpoint that makes HTTP requests to the files service
+// deleteFile server.
+func (c *Client) DeleteFile() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteFileRequest(c.encoder)
+		decodeResponse = DecodeDeleteFileResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDeleteFileRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteFileDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("files", "deleteFile", err)
 		}
 		return decodeResponse(resp)
 	}

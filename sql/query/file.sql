@@ -9,6 +9,4 @@ WHERE deleted_at IS NULL
 AND url = $1;
 
 -- name: DeleteFile :exec
-UPDATE files
-SET deleted_at = NOW()
-WHERE id = $1;
+DELETE FROM files WHERE url = $1;

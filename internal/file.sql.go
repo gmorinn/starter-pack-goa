@@ -50,13 +50,11 @@ func (q *Queries) CreateFile(ctx context.Context, arg CreateFileParams) (CreateF
 }
 
 const deleteFile = `-- name: DeleteFile :exec
-UPDATE files
-SET deleted_at = NOW()
-WHERE id = $1
+DELETE FROM files WHERE url = $1
 `
 
-func (q *Queries) DeleteFile(ctx context.Context, id uuid.UUID) error {
-	_, err := q.exec(ctx, q.deleteFileStmt, deleteFile, id)
+func (q *Queries) DeleteFile(ctx context.Context, url sql.NullString) error {
+	_, err := q.exec(ctx, q.deleteFileStmt, deleteFile, url)
 	return err
 }
 

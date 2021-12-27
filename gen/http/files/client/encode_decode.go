@@ -137,6 +137,112 @@ func DecodeImportFileResponse(decoder func(*http.Response) goahttp.Decoder, rest
 	}
 }
 
+// BuildDeleteFileRequest instantiates a HTTP request object with method and
+// path set to call the "files" service "deleteFile" endpoint
+func (c *Client) BuildDeleteFileRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		url_ string
+	)
+	{
+		p, ok := v.(*files.DeleteFilePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("files", "deleteFile", "*files.DeleteFilePayload", v)
+		}
+		url_ = p.URL
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteFileFilesPath(url_)}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("files", "deleteFile", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeDeleteFileRequest returns an encoder for requests sent to the files
+// deleteFile server.
+func EncodeDeleteFileRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*files.DeleteFilePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("files", "deleteFile", "*files.DeleteFilePayload", v)
+		}
+		if p.Oauth != nil {
+			head := *p.Oauth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		if p.JWTToken != nil {
+			head := *p.JWTToken
+			req.Header.Set("jwtToken", head)
+		}
+		return nil
+	}
+}
+
+// DecodeDeleteFileResponse returns a decoder for responses returned by the
+// files deleteFile endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeDeleteFileResponse may return the following errors:
+//	- "unknown_error" (type *files.UnknownError): http.StatusInternalServerError
+//	- error: internal error
+func DecodeDeleteFileResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body DeleteFileResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("files", "deleteFile", err)
+			}
+			err = ValidateDeleteFileResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("files", "deleteFile", err)
+			}
+			res := NewDeleteFileResultOK(&body)
+			return res, nil
+		case http.StatusInternalServerError:
+			var (
+				body DeleteFileUnknownErrorResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("files", "deleteFile", err)
+			}
+			err = ValidateDeleteFileUnknownErrorResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("files", "deleteFile", err)
+			}
+			return nil, NewDeleteFileUnknownError(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("files", "deleteFile", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // unmarshalResFileResponseBodyToFilesResFile builds a value of type
 // *files.ResFile from a value of type *ResFileResponseBody.
 func unmarshalResFileResponseBodyToFilesResFile(v *ResFileResponseBody) *files.ResFile {

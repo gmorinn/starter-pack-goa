@@ -37,9 +37,23 @@ type ImportFileResponseBody struct {
 	Success *bool                `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// DeleteFileResponseBody is the type of the "files" service "deleteFile"
+// endpoint HTTP response body.
+type DeleteFileResponseBody struct {
+	Success *bool `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
 // ImportFileUnknownErrorResponseBody is the type of the "files" service
 // "importFile" endpoint HTTP response body for the "unknown_error" error.
 type ImportFileUnknownErrorResponseBody struct {
+	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
+	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
+	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+}
+
+// DeleteFileUnknownErrorResponseBody is the type of the "files" service
+// "deleteFile" endpoint HTTP response body for the "unknown_error" error.
+type DeleteFileUnknownErrorResponseBody struct {
 	Err       *string `form:"err,omitempty" json:"err,omitempty" xml:"err,omitempty"`
 	ErrorCode *string `form:"error_code,omitempty" json:"error_code,omitempty" xml:"error_code,omitempty"`
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
@@ -91,6 +105,28 @@ func NewImportFileUnknownError(body *ImportFileUnknownErrorResponseBody) *files.
 	return v
 }
 
+// NewDeleteFileResultOK builds a "files" service "deleteFile" endpoint result
+// from a HTTP "OK" response.
+func NewDeleteFileResultOK(body *DeleteFileResponseBody) *files.DeleteFileResult {
+	v := &files.DeleteFileResult{
+		Success: *body.Success,
+	}
+
+	return v
+}
+
+// NewDeleteFileUnknownError builds a files service deleteFile endpoint
+// unknown_error error.
+func NewDeleteFileUnknownError(body *DeleteFileUnknownErrorResponseBody) *files.UnknownError {
+	v := &files.UnknownError{
+		Err:       *body.Err,
+		ErrorCode: *body.ErrorCode,
+		Success:   *body.Success,
+	}
+
+	return v
+}
+
 // ValidateImportFileResponseBody runs the validations defined on
 // ImportFileResponseBody
 func ValidateImportFileResponseBody(body *ImportFileResponseBody) (err error) {
@@ -108,9 +144,33 @@ func ValidateImportFileResponseBody(body *ImportFileResponseBody) (err error) {
 	return
 }
 
+// ValidateDeleteFileResponseBody runs the validations defined on
+// DeleteFileResponseBody
+func ValidateDeleteFileResponseBody(body *DeleteFileResponseBody) (err error) {
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	return
+}
+
 // ValidateImportFileUnknownErrorResponseBody runs the validations defined on
 // importFile_unknown_error_response_body
 func ValidateImportFileUnknownErrorResponseBody(body *ImportFileUnknownErrorResponseBody) (err error) {
+	if body.Err == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
+	}
+	if body.Success == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("success", "body"))
+	}
+	if body.ErrorCode == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
+// ValidateDeleteFileUnknownErrorResponseBody runs the validations defined on
+// deleteFile_unknown_error_response_body
+func ValidateDeleteFileUnknownErrorResponseBody(body *DeleteFileUnknownErrorResponseBody) (err error) {
 	if body.Err == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("err", "body"))
 	}

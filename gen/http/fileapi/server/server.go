@@ -19,9 +19,9 @@ import (
 
 // Server lists the fileapi service endpoint HTTP handlers.
 type Server struct {
-	Mounts     []*MountPoint
-	CORS       http.Handler
-	OpenapiPng http.Handler
+	Mounts    []*MountPoint
+	CORS      http.Handler
+	BinPublic http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -54,18 +54,18 @@ func New(
 	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
 	errhandler func(context.Context, http.ResponseWriter, error),
 	formatter func(err error) goahttp.Statuser,
-	fileSystemOpenapiPng http.FileSystem,
+	fileSystemBinPublic http.FileSystem,
 ) *Server {
-	if fileSystemOpenapiPng == nil {
-		fileSystemOpenapiPng = http.Dir(".")
+	if fileSystemBinPublic == nil {
+		fileSystemBinPublic = http.Dir(".")
 	}
 	return &Server{
 		Mounts: []*MountPoint{
-			{"CORS", "OPTIONS", "/open.png"},
-			{"openapi.png", "GET", "/open.png"},
+			{"CORS", "OPTIONS", "/public/{*path}"},
+			{"bin/public", "GET", "/public"},
 		},
-		CORS:       NewCORSHandler(),
-		OpenapiPng: http.FileServer(fileSystemOpenapiPng),
+		CORS:      NewCORSHandler(),
+		BinPublic: http.FileServer(fileSystemBinPublic),
 	}
 }
 
@@ -80,12 +80,13 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 // Mount configures the mux to serve the fileapi endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountCORSHandler(mux, h.CORS)
-	MountOpenapiPng(mux, goahttp.Replace("", "/openapi.png", h.OpenapiPng))
+	MountBinPublic(mux, goahttp.Replace("/public", "/bin/public", h.BinPublic))
 }
 
-// MountOpenapiPng configures the mux to serve GET request made to "/open.png".
-func MountOpenapiPng(mux goahttp.Muxer, h http.Handler) {
-	mux.Handle("GET", "/open.png", HandleFileapiOrigin(h).ServeHTTP)
+// MountBinPublic configures the mux to serve GET request made to "/public".
+func MountBinPublic(mux goahttp.Muxer, h http.Handler) {
+	mux.Handle("GET", "/public/", HandleFileapiOrigin(h).ServeHTTP)
+	mux.Handle("GET", "/public/*path", HandleFileapiOrigin(h).ServeHTTP)
 }
 
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
@@ -98,7 +99,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("OPTIONS", "/open.png", f)
+	mux.Handle("OPTIONS", "/public/{*path}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

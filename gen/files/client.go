@@ -16,12 +16,14 @@ import (
 // Client is the "files" service client.
 type Client struct {
 	ImportFileEndpoint goa.Endpoint
+	DeleteFileEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "files" service client given the endpoints.
-func NewClient(importFile goa.Endpoint) *Client {
+func NewClient(importFile, deleteFile goa.Endpoint) *Client {
 	return &Client{
 		ImportFileEndpoint: importFile,
+		DeleteFileEndpoint: deleteFile,
 	}
 }
 
@@ -33,4 +35,14 @@ func (c *Client) ImportFile(ctx context.Context, p *ImportFilePayload) (res *Imp
 		return
 	}
 	return ires.(*ImportFileResult), nil
+}
+
+// DeleteFile calls the "deleteFile" endpoint of the "files" service.
+func (c *Client) DeleteFile(ctx context.Context, p *DeleteFilePayload) (res *DeleteFileResult, err error) {
+	var ires interface{}
+	ires, err = c.DeleteFileEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*DeleteFileResult), nil
 }

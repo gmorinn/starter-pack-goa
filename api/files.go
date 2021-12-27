@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"goa.design/goa/v3/security"
 )
@@ -76,4 +77,25 @@ func (s *filessrvc) ImportFile(ctx context.Context, p *files.ImportFilePayload) 
 		return nil, s.errorResponse("TX_CREATE_FILE", err)
 	}
 	return result, nil
+}
+
+// Delete file
+func (s *filessrvc) DeleteFile(ctx context.Context, p *files.DeleteFilePayload) (res *files.DeleteFileResult, err error) {
+	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
+		file, err := q.GetFileByURL(ctx, utils.NullS(p.URL))
+		if err != nil {
+			return fmt.Errorf("ERROR_GET_FILE_BY_URL %v", err)
+		}
+		if err := q.DeleteFile(ctx, utils.NullS(file.Url.String)); err != nil {
+			return fmt.Errorf("ERROR_DELETE_FILE_BY_ID %v", err)
+		}
+		if err = os.Remove(utils.Dir() + file.Url.String); err != nil {
+			return fmt.Errorf("ERROR_REMOVE_FILE_IN_FOLDER %v", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, s.errorResponse("TX_DELETE_FILE", err)
+	}
+	return &files.DeleteFileResult{Success: true}, nil
 }

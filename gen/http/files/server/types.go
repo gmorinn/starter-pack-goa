@@ -37,9 +37,23 @@ type ImportFileResponseBody struct {
 	Success bool                 `form:"success" json:"success" xml:"success"`
 }
 
+// DeleteFileResponseBody is the type of the "files" service "deleteFile"
+// endpoint HTTP response body.
+type DeleteFileResponseBody struct {
+	Success bool `form:"success" json:"success" xml:"success"`
+}
+
 // ImportFileUnknownErrorResponseBody is the type of the "files" service
 // "importFile" endpoint HTTP response body for the "unknown_error" error.
 type ImportFileUnknownErrorResponseBody struct {
+	Err       string `form:"err" json:"err" xml:"err"`
+	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
+	Success   bool   `form:"success" json:"success" xml:"success"`
+}
+
+// DeleteFileUnknownErrorResponseBody is the type of the "files" service
+// "deleteFile" endpoint HTTP response body for the "unknown_error" error.
+type DeleteFileUnknownErrorResponseBody struct {
 	Err       string `form:"err" json:"err" xml:"err"`
 	ErrorCode string `form:"error_code" json:"error_code" xml:"error_code"`
 	Success   bool   `form:"success" json:"success" xml:"success"`
@@ -66,10 +80,30 @@ func NewImportFileResponseBody(res *files.ImportFileResult) *ImportFileResponseB
 	return body
 }
 
+// NewDeleteFileResponseBody builds the HTTP response body from the result of
+// the "deleteFile" endpoint of the "files" service.
+func NewDeleteFileResponseBody(res *files.DeleteFileResult) *DeleteFileResponseBody {
+	body := &DeleteFileResponseBody{
+		Success: res.Success,
+	}
+	return body
+}
+
 // NewImportFileUnknownErrorResponseBody builds the HTTP response body from the
 // result of the "importFile" endpoint of the "files" service.
 func NewImportFileUnknownErrorResponseBody(res *files.UnknownError) *ImportFileUnknownErrorResponseBody {
 	body := &ImportFileUnknownErrorResponseBody{
+		Err:       res.Err,
+		ErrorCode: res.ErrorCode,
+		Success:   res.Success,
+	}
+	return body
+}
+
+// NewDeleteFileUnknownErrorResponseBody builds the HTTP response body from the
+// result of the "deleteFile" endpoint of the "files" service.
+func NewDeleteFileUnknownErrorResponseBody(res *files.UnknownError) *DeleteFileUnknownErrorResponseBody {
+	body := &DeleteFileUnknownErrorResponseBody{
 		Err:       res.Err,
 		ErrorCode: res.ErrorCode,
 		Success:   res.Success,
@@ -87,6 +121,16 @@ func NewImportFilePayload(body *ImportFileRequestBody, oauth *string, jwtToken *
 		Size:     body.Size,
 		Format:   *body.Format,
 	}
+	v.Oauth = oauth
+	v.JWTToken = jwtToken
+
+	return v
+}
+
+// NewDeleteFilePayload builds a files service deleteFile endpoint payload.
+func NewDeleteFilePayload(url_ string, oauth *string, jwtToken *string) *files.DeleteFilePayload {
+	v := &files.DeleteFilePayload{}
+	v.URL = url_
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
 

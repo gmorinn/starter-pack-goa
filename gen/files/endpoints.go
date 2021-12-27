@@ -17,6 +17,7 @@ import (
 // Endpoints wraps the "files" service endpoints.
 type Endpoints struct {
 	ImportFile goa.Endpoint
+	DeleteFile goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "files" service with endpoints.
@@ -25,12 +26,14 @@ func NewEndpoints(s Service) *Endpoints {
 	a := s.(Auther)
 	return &Endpoints{
 		ImportFile: NewImportFileEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		DeleteFile: NewDeleteFileEndpoint(s, a.OAuth2Auth, a.JWTAuth),
 	}
 }
 
 // Use applies the given middleware to all the "files" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.ImportFile = m(e.ImportFile)
+	e.DeleteFile = m(e.DeleteFile)
 }
 
 // NewImportFileEndpoint returns an endpoint function that calls the method
@@ -72,5 +75,47 @@ func NewImportFileEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, auth
 			return nil, err
 		}
 		return s.ImportFile(ctx, p)
+	}
+}
+
+// NewDeleteFileEndpoint returns an endpoint function that calls the method
+// "deleteFile" of service "files".
+func NewDeleteFileEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DeleteFilePayload)
+		var err error
+		sc := security.OAuth2Scheme{
+			Name:           "OAuth2",
+			Scopes:         []string{"api:read"},
+			RequiredScopes: []string{},
+			Flows: []*security.OAuthFlow{
+				&security.OAuthFlow{
+					Type:       "client_credentials",
+					TokenURL:   "/authorization",
+					RefreshURL: "/refresh",
+				},
+			},
+		}
+		var token string
+		if p.Oauth != nil {
+			token = *p.Oauth
+		}
+		ctx, err = authOAuth2Fn(ctx, token, &sc)
+		if err == nil {
+			sc := security.JWTScheme{
+				Name:           "jwt",
+				Scopes:         []string{"api:read", "api:write"},
+				RequiredScopes: []string{},
+			}
+			var token string
+			if p.JWTToken != nil {
+				token = *p.JWTToken
+			}
+			ctx, err = authJWTFn(ctx, token, &sc)
+		}
+		if err != nil {
+			return nil, err
+		}
+		return s.DeleteFile(ctx, p)
 	}
 }

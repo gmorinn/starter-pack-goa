@@ -117,6 +117,86 @@ func EncodeImportFileError(encoder func(context.Context, http.ResponseWriter) go
 	}
 }
 
+// EncodeDeleteFileResponse returns an encoder for responses returned by the
+// files deleteFile endpoint.
+func EncodeDeleteFileResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res, _ := v.(*files.DeleteFileResult)
+		enc := encoder(ctx, w)
+		body := NewDeleteFileResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeDeleteFileRequest returns a decoder for requests sent to the files
+// deleteFile endpoint.
+func DecodeDeleteFileRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			url_     string
+			oauth    *string
+			jwtToken *string
+
+			params = mux.Vars(r)
+		)
+		url_ = params["url"]
+		oauthRaw := r.Header.Get("Authorization")
+		if oauthRaw != "" {
+			oauth = &oauthRaw
+		}
+		jwtTokenRaw := r.Header.Get("jwtToken")
+		if jwtTokenRaw != "" {
+			jwtToken = &jwtTokenRaw
+		}
+		payload := NewDeleteFilePayload(url_, oauth, jwtToken)
+		if payload.Oauth != nil {
+			if strings.Contains(*payload.Oauth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Oauth, " ", 2)[1]
+				payload.Oauth = &cred
+			}
+		}
+		if payload.JWTToken != nil {
+			if strings.Contains(*payload.JWTToken, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.JWTToken, " ", 2)[1]
+				payload.JWTToken = &cred
+			}
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeDeleteFileError returns an encoder for errors returned by the
+// deleteFile files endpoint.
+func EncodeDeleteFileError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unknown_error":
+			res := v.(*files.UnknownError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewDeleteFileUnknownErrorResponseBody(res)
+			}
+			w.Header().Set("goa-error", res.ErrorName())
+			w.WriteHeader(http.StatusInternalServerError)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
 // marshalFilesResFileToResFileResponseBody builds a value of type
 // *ResFileResponseBody from a value of type *files.ResFile.
 func marshalFilesResFileToResFileResponseBody(v *files.ResFile) *ResFileResponseBody {

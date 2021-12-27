@@ -11,7 +11,7 @@ type fileapisrvc struct {
 	logger *log.Logger
 }
 
-// Give access to see files for client
+// NewFileapi returns the fileapi service implementation.
 func NewFileapi(logger *log.Logger) fileapi.Service {
 	return &fileapisrvc{logger}
 }

@@ -70,7 +70,7 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 		bo_usersServer    *bouserssrv.Server     = bouserssrv.New(api.bo_usersEndpoints, mux, dec, enc, eh, nil)
 		usersServer       *userssvr.Server       = userssvr.New(api.usersEndpoints, mux, dec, enc, eh, nil)
 		jwtTokenServer    *jwttokensvr.Server    = jwttokensvr.New(api.jwtTokenEndpoints, mux, dec, enc, eh, nil)
-		fileapiServer     *fileapisvr.Server     = fileapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("cmd"))
+		fileapiServer     *fileapisvr.Server     = fileapisvr.New(nil, mux, dec, enc, nil, nil, http.Dir("./"))
 		oAuthServer       *oauthsvr.Server       = oauthsvr.New(api.oAuthEndpoints, mux, dec, enc, eh, nil)
 		authServer        *authsvr.Server        = authsvr.New(api.authEndpoints, mux, dec, enc, eh, nil)
 		productsServer    *productssvr.Server    = productssvr.New(api.productsEndpoints, mux, dec, enc, eh, nil)

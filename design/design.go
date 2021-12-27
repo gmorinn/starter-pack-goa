@@ -67,7 +67,7 @@ var _ = Service("openapi", func() {
 
 // Access File
 var _ = Service("fileapi", func() {
-	Files("/open.png", "openapi.png", func() {
+	Files("/public/{*path}", "bin/public", func() {
 		Description("Serve static content.")
 	})
 })
