@@ -116,3 +116,17 @@ func EncodeImportFileError(encoder func(context.Context, http.ResponseWriter) go
 		}
 	}
 }
+
+// marshalFilesResFileToResFileResponseBody builds a value of type
+// *ResFileResponseBody from a value of type *files.ResFile.
+func marshalFilesResFileToResFileResponseBody(v *files.ResFile) *ResFileResponseBody {
+	res := &ResFileResponseBody{
+		ID:   v.ID,
+		Name: v.Name,
+		URL:  v.URL,
+		Mime: v.Mime,
+		Size: v.Size,
+	}
+
+	return res
+}

@@ -17,9 +17,15 @@ import (
 // endpoint HTTP request body.
 type ImportFileRequestBody struct {
 	// uploaded file name
-	FileName *string `form:"file_name,omitempty" json:"file_name,omitempty" xml:"file_name,omitempty"`
+	Filename *string `form:"filename,omitempty" json:"filename,omitempty" xml:"filename,omitempty"`
+	// url file
+	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	// url file
+	Mime *string `form:"mime,omitempty" json:"mime,omitempty" xml:"mime,omitempty"`
 	// content of image
 	Content []byte `form:"content,omitempty" json:"content,omitempty" xml:"content,omitempty"`
+	// size of image
+	Size *int64 `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
 	// uploaded file format
 	Format *string `form:"format,omitempty" json:"format,omitempty" xml:"format,omitempty"`
 }
@@ -27,7 +33,8 @@ type ImportFileRequestBody struct {
 // ImportFileResponseBody is the type of the "files" service "importFile"
 // endpoint HTTP response body.
 type ImportFileResponseBody struct {
-	Success bool `form:"success" json:"success" xml:"success"`
+	File    *ResFileResponseBody `form:"file" json:"file" xml:"file"`
+	Success bool                 `form:"success" json:"success" xml:"success"`
 }
 
 // ImportFileUnknownErrorResponseBody is the type of the "files" service
@@ -38,11 +45,23 @@ type ImportFileUnknownErrorResponseBody struct {
 	Success   bool   `form:"success" json:"success" xml:"success"`
 }
 
+// ResFileResponseBody is used to define fields on response body types.
+type ResFileResponseBody struct {
+	ID   string  `form:"id" json:"id" xml:"id"`
+	Name string  `form:"name" json:"name" xml:"name"`
+	URL  string  `form:"url" json:"url" xml:"url"`
+	Mime *string `form:"mime,omitempty" json:"mime,omitempty" xml:"mime,omitempty"`
+	Size *int64  `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
+}
+
 // NewImportFileResponseBody builds the HTTP response body from the result of
 // the "importFile" endpoint of the "files" service.
 func NewImportFileResponseBody(res *files.ImportFileResult) *ImportFileResponseBody {
 	body := &ImportFileResponseBody{
 		Success: res.Success,
+	}
+	if res.File != nil {
+		body.File = marshalFilesResFileToResFileResponseBody(res.File)
 	}
 	return body
 }
@@ -61,8 +80,11 @@ func NewImportFileUnknownErrorResponseBody(res *files.UnknownError) *ImportFileU
 // NewImportFilePayload builds a files service importFile endpoint payload.
 func NewImportFilePayload(body *ImportFileRequestBody, oauth *string, jwtToken *string) *files.ImportFilePayload {
 	v := &files.ImportFilePayload{
-		FileName: *body.FileName,
+		Filename: *body.Filename,
+		URL:      body.URL,
+		Mime:     body.Mime,
 		Content:  body.Content,
+		Size:     body.Size,
 		Format:   *body.Format,
 	}
 	v.Oauth = oauth
@@ -74,8 +96,8 @@ func NewImportFilePayload(body *ImportFileRequestBody, oauth *string, jwtToken *
 // ValidateImportFileRequestBody runs the validations defined on
 // ImportFileRequestBody
 func ValidateImportFileRequestBody(body *ImportFileRequestBody) (err error) {
-	if body.FileName == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("file_name", "body"))
+	if body.Filename == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("filename", "body"))
 	}
 	if body.Content == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("content", "body"))

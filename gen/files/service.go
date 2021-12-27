@@ -41,9 +41,15 @@ var MethodNames = [1]string{"importFile"}
 // ImportFilePayload is the payload type of the files service importFile method.
 type ImportFilePayload struct {
 	// uploaded file name
-	FileName string
+	Filename string
+	// url file
+	URL *string
+	// url file
+	Mime *string
 	// content of image
 	Content []byte
+	// size of image
+	Size *int64
 	// uploaded file format
 	Format string
 	// JWT used for authentication after Signin/Signup
@@ -54,7 +60,16 @@ type ImportFilePayload struct {
 
 // ImportFileResult is the result type of the files service importFile method.
 type ImportFileResult struct {
+	File    *ResFile
 	Success bool
+}
+
+type ResFile struct {
+	ID   string
+	Name string
+	URL  string
+	Mime *string
+	Size *int64
 }
 
 type UnknownError struct {

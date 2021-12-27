@@ -136,3 +136,17 @@ func DecodeImportFileResponse(decoder func(*http.Response) goahttp.Decoder, rest
 		}
 	}
 }
+
+// unmarshalResFileResponseBodyToFilesResFile builds a value of type
+// *files.ResFile from a value of type *ResFileResponseBody.
+func unmarshalResFileResponseBodyToFilesResFile(v *ResFileResponseBody) *files.ResFile {
+	res := &files.ResFile{
+		ID:   *v.ID,
+		Name: *v.Name,
+		URL:  *v.URL,
+		Mime: v.Mime,
+		Size: v.Size,
+	}
+
+	return res
+}

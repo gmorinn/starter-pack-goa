@@ -45,23 +45,26 @@ users get-user
 func UsageExamples() string {
 	return os.Args[0] + ` auth email-exist --body '{
       "email": "guillaume@gmail.com"
-   }' --oauth "Qui rerum dolor laboriosam molestiae corporis."` + "\n" +
-		os.Args[0] + ` bo-products get-all-products --offset 0 --limit 9 --field "name" --direction "asc" --oauth "Enim sint a sint fugit sint." --jwt-token "Veritatis placeat sint dolorem commodi voluptatum accusantium."` + "\n" +
-		os.Args[0] + ` bo-users get-allusers --offset 0 --limit 9 --field "name" --direction "asc" --oauth "Sit velit eveniet." --jwt-token "Quo nam omnis velit optio at quia."` + "\n" +
+   }' --oauth "Et quasi quod id accusamus."` + "\n" +
+		os.Args[0] + ` bo-products get-all-products --offset 0 --limit 9 --field "name" --direction "asc" --oauth "Commodi voluptatum accusantium eligendi explicabo ullam aperiam." --jwt-token "Quod similique accusantium quod doloremque sint tempore."` + "\n" +
+		os.Args[0] + ` bo-users get-allusers --offset 0 --limit 9 --field "name" --direction "asc" --oauth "Aperiam commodi." --jwt-token "Nostrum id aut est quisquam."` + "\n" +
 		os.Args[0] + ` files import-file --body '{
-      "content": "QWxpYXMgcmF0aW9uZSBpbnZlbnRvcmUgbnVtcXVhbSB1dCBtYWduYW0gc2VkLg==",
-      "file_name": "foo.jpg",
-      "format": "image/jpeg"
-   }' --oauth "Est debitis incidunt reiciendis." --jwt-token "Vel et nihil aspernatur dolorem voluptatem ratione."` + "\n" +
+      "content": "TWluaW1hIGFsaWFzIGN1cGlkaXRhdGUu",
+      "filename": "foo.jpg",
+      "format": "image/jpeg",
+      "mime": "In debitis id voluptate eaque fugiat suscipit.",
+      "size": 3404113326015607736,
+      "url": "A rerum quod quaerat et necessitatibus."
+   }' --oauth "Earum vel beatae sit aut." --jwt-token "Nostrum totam."` + "\n" +
 		os.Args[0] + ` jwt-token signup --body '{
-      "birthday": "Corrupti dolore repellat.",
+      "birthday": "In beatae maxime et unde porro.",
       "confirm_password": "JeSuisUnTest974",
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
       "password": "JeSuisUnTest974",
       "phone": "+262 692 12 34 56"
-   }' --oauth "Soluta a rerum quod quaerat et."` + "\n" +
+   }' --oauth "Consectetur vel qui odio ipsam reprehenderit debitis."` + "\n" +
 		""
 }
 
@@ -603,7 +606,7 @@ Check if email exist in database
 Example:
     %[1]s auth email-exist --body '{
       "email": "guillaume@gmail.com"
-   }' --oauth "Qui rerum dolor laboriosam molestiae corporis."
+   }' --oauth "Et quasi quod id accusamus."
 `, os.Args[0])
 }
 
@@ -617,7 +620,7 @@ Check if email exist in database and send code by email to reset password
 Example:
     %[1]s auth send-confirmation --body '{
       "email": "guillaume@gmail.com"
-   }' --oauth "Unde consequatur temporibus ratione et quasi quod."
+   }' --oauth "Sapiente distinctio quia."
 `, os.Args[0])
 }
 
@@ -634,7 +637,7 @@ Example:
       "confirm_password": "JeSuisUnTest974",
       "email": "guillaume@gmail.com",
       "password": "JeSuisUnTest974"
-   }' --oauth "Corrupti minus sit."
+   }' --oauth "Fugit sint quae veritatis."
 `, os.Args[0])
 }
 
@@ -670,7 +673,7 @@ Get All products
     -jwt-token STRING: 
 
 Example:
-    %[1]s bo-products get-all-products --offset 0 --limit 9 --field "name" --direction "asc" --oauth "Enim sint a sint fugit sint." --jwt-token "Veritatis placeat sint dolorem commodi voluptatum accusantium."
+    %[1]s bo-products get-all-products --offset 0 --limit 9 --field "name" --direction "asc" --oauth "Commodi voluptatum accusantium eligendi explicabo ullam aperiam." --jwt-token "Quod similique accusantium quod doloremque sint tempore."
 `, os.Args[0])
 }
 
@@ -683,7 +686,7 @@ Get All products by category
     -jwt-token STRING: 
 
 Example:
-    %[1]s bo-products get-all-products-by-category --category "men" --oauth "Quod similique accusantium quod doloremque sint tempore." --jwt-token "Consectetur reprehenderit quia fuga tenetur non."
+    %[1]s bo-products get-all-products-by-category --category "men" --oauth "Tenetur non saepe ipsam placeat adipisci ut." --jwt-token "Voluptate autem voluptate."
 `, os.Args[0])
 }
 
@@ -696,7 +699,7 @@ Delete one product by ID
     -jwt-token STRING: 
 
 Example:
-    %[1]s bo-products delete-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Ut qui." --jwt-token "Autem voluptate tempora est."
+    %[1]s bo-products delete-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Sunt dolores est cupiditate." --jwt-token "Reprehenderit amet cum nesciunt."
 `, os.Args[0])
 }
 
@@ -716,7 +719,7 @@ Example:
          "name": "Guillaume",
          "price": 69
       }
-   }' --oauth "Dolores est cupiditate." --jwt-token "Reprehenderit amet cum nesciunt."
+   }' --oauth "Laboriosam quisquam." --jwt-token "Atque aut vel occaecati perspiciatis doloremque totam."
 `, os.Args[0])
 }
 
@@ -737,7 +740,7 @@ Example:
          "name": "Guillaume",
          "price": 69
       }
-   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Laboriosam quisquam." --jwt-token "Atque aut vel occaecati perspiciatis doloremque totam."
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Repellat quis repellat distinctio autem et reiciendis." --jwt-token "Ipsum in voluptatum et quibusdam repellat autem."
 `, os.Args[0])
 }
 
@@ -752,11 +755,12 @@ Delete many products with IDs send in body
 Example:
     %[1]s bo-products delete-many-products --body '{
       "tab": [
-         "Quis repellat distinctio autem.",
-         "Reiciendis debitis.",
-         "In voluptatum."
+         "Expedita occaecati sit quis nisi aut.",
+         "Quia aut odio eum occaecati vel.",
+         "Necessitatibus doloremque repellendus magnam odit perspiciatis.",
+         "Laborum asperiores sit velit eveniet voluptas quo."
       ]
-   }' --oauth "Quibusdam repellat autem." --jwt-token "Ut qui eos expedita occaecati sit quis."
+   }' --oauth "Omnis velit." --jwt-token "At quia alias fuga."
 `, os.Args[0])
 }
 
@@ -769,7 +773,7 @@ Get one product
     -jwt-token STRING: 
 
 Example:
-    %[1]s bo-products get-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Quia aut odio eum occaecati vel." --jwt-token "Necessitatibus doloremque repellendus magnam odit perspiciatis."
+    %[1]s bo-products get-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Odit qui et mollitia et." --jwt-token "Deserunt consequuntur."
 `, os.Args[0])
 }
 
@@ -804,7 +808,7 @@ Get All users
     -jwt-token STRING: 
 
 Example:
-    %[1]s bo-users get-allusers --offset 0 --limit 9 --field "name" --direction "asc" --oauth "Sit velit eveniet." --jwt-token "Quo nam omnis velit optio at quia."
+    %[1]s bo-users get-allusers --offset 0 --limit 9 --field "name" --direction "asc" --oauth "Aperiam commodi." --jwt-token "Nostrum id aut est quisquam."
 `, os.Args[0])
 }
 
@@ -817,7 +821,7 @@ Delete one User by ID
     -jwt-token STRING: 
 
 Example:
-    %[1]s bo-users delete-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Odit qui et mollitia et." --jwt-token "Deserunt consequuntur."
+    %[1]s bo-users delete-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Omnis ratione modi numquam sunt." --jwt-token "Aspernatur vel omnis."
 `, os.Args[0])
 }
 
@@ -839,7 +843,7 @@ Example:
       "password": "JeSuisUnTest974",
       "phone": "+262 692 12 34 56",
       "role": "user"
-   }' --oauth "Aperiam commodi." --jwt-token "Nostrum id aut est quisquam."
+   }' --oauth "Est praesentium eum distinctio." --jwt-token "Molestiae eveniet sed qui nobis cupiditate voluptatum."
 `, os.Args[0])
 }
 
@@ -862,7 +866,7 @@ Example:
          "phone": "+262 692 12 34 56",
          "role": "user"
       }
-   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Est accusantium omnis." --jwt-token "Modi numquam."
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Illum eius harum." --jwt-token "Qui molestias minima voluptatum qui vel."
 `, os.Args[0])
 }
 
@@ -875,7 +879,7 @@ Get one User
     -jwt-token STRING: 
 
 Example:
-    %[1]s bo-users get-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Vel omnis corrupti magni labore." --jwt-token "Praesentium eum distinctio."
+    %[1]s bo-users get-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Quaerat voluptate incidunt perspiciatis enim laboriosam sit." --jwt-token "Et quibusdam et voluptatem atque blanditiis."
 `, os.Args[0])
 }
 
@@ -890,12 +894,10 @@ Delete many users with IDs send in body
 Example:
     %[1]s bo-users delete-many-users --body '{
       "tab": [
-         "Qui nobis cupiditate voluptatum eum est nemo.",
-         "Eius harum qui qui.",
-         "Minima voluptatum.",
-         "Vel molestiae in animi quaerat voluptate."
+         "Vel soluta.",
+         "Esse unde."
       ]
-   }' --oauth "Perspiciatis enim." --jwt-token "Sit consequatur."
+   }' --oauth "Alias ratione inventore numquam ut magnam sed." --jwt-token "Est debitis incidunt reiciendis."
 `, os.Args[0])
 }
 
@@ -912,7 +914,7 @@ Example:
     %[1]s bo-users new-password --body '{
       "confirm": "JeSuisUnTest974",
       "password": "JeSuisUnTest974"
-   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Voluptatem atque." --jwt-token "Rerum eum quis voluptas vel soluta aut."
+   }' --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Nihil aspernatur." --jwt-token "Voluptatem ratione dolorum ut amet corrupti dolore."
 `, os.Args[0])
 }
 
@@ -939,10 +941,13 @@ Import file
 
 Example:
     %[1]s files import-file --body '{
-      "content": "QWxpYXMgcmF0aW9uZSBpbnZlbnRvcmUgbnVtcXVhbSB1dCBtYWduYW0gc2VkLg==",
-      "file_name": "foo.jpg",
-      "format": "image/jpeg"
-   }' --oauth "Est debitis incidunt reiciendis." --jwt-token "Vel et nihil aspernatur dolorem voluptatem ratione."
+      "content": "TWluaW1hIGFsaWFzIGN1cGlkaXRhdGUu",
+      "filename": "foo.jpg",
+      "format": "image/jpeg",
+      "mime": "In debitis id voluptate eaque fugiat suscipit.",
+      "size": 3404113326015607736,
+      "url": "A rerum quod quaerat et necessitatibus."
+   }' --oauth "Earum vel beatae sit aut." --jwt-token "Nostrum totam."
 `, os.Args[0])
 }
 
@@ -973,14 +978,14 @@ signup to generate jwt token
 
 Example:
     %[1]s jwt-token signup --body '{
-      "birthday": "Corrupti dolore repellat.",
+      "birthday": "In beatae maxime et unde porro.",
       "confirm_password": "JeSuisUnTest974",
       "email": "guillaume@epitech.eu",
       "firstname": "Guillaume",
       "lastname": "Morin",
       "password": "JeSuisUnTest974",
       "phone": "+262 692 12 34 56"
-   }' --oauth "Soluta a rerum quod quaerat et."
+   }' --oauth "Consectetur vel qui odio ipsam reprehenderit debitis."
 `, os.Args[0])
 }
 
@@ -995,7 +1000,7 @@ Example:
     %[1]s jwt-token signin --body '{
       "email": "guillaume@epitech.eu",
       "password": "JeSuisUnTest974"
-   }' --oauth "Ut in beatae maxime."
+   }' --oauth "Illo odit quas illo libero voluptates rerum."
 `, os.Args[0])
 }
 
@@ -1010,7 +1015,7 @@ Example:
     %[1]s jwt-token signin- -bo --body '{
       "email": "guillaume@epitech.eu",
       "password": "JeSuisUnTest974"
-   }' --oauth "Ipsa nam hic omnis."
+   }' --oauth "Reprehenderit totam et numquam et quaerat."
 `, os.Args[0])
 }
 
@@ -1024,7 +1029,7 @@ Refresh Token
 Example:
     %[1]s jwt-token refresh --body '{
       "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
-   }' --oauth "Illo odit quas illo libero voluptates rerum."
+   }' --oauth "Dolore eligendi qui enim."
 `, os.Args[0])
 }
 
@@ -1038,12 +1043,12 @@ Register or login by Google, Facebook
 Example:
     %[1]s jwt-token auth-providers --body '{
       "email": "guillaume@epitech.eu",
-      "firebase_id_token": "17r",
+      "firebase_id_token": "qpt",
       "firebase_provider": "facebook.com",
       "firebase_uid": "zgmURRUlcJfgDMRyjJ20xs7Rxxw2",
       "firstname": "Guillaume",
       "lastname": "Morin"
-   }' --oauth "Et quaerat dolorem possimus."
+   }' --oauth "Quisquam quo."
 `, os.Args[0])
 }
 
@@ -1068,9 +1073,9 @@ oAuth
 
 Example:
     %[1]s o-auth o-auth --body '{
-      "client_id": "Tempore quis et magni et mollitia et.",
-      "client_secret": "Ab culpa aspernatur ea.",
-      "grant_type": "Vel occaecati recusandae."
+      "client_id": "In dolorem eum id quibusdam.",
+      "client_secret": "Aperiam ut quisquam eum blanditiis.",
+      "grant_type": "Rerum voluptatem doloribus deleniti totam sed."
    }'
 `, os.Args[0])
 }
@@ -1098,7 +1103,7 @@ Get All products by category
     -oauth STRING: 
 
 Example:
-    %[1]s products get-all-products-by-category --category "men" --oauth "Praesentium consequatur asperiores est nisi."
+    %[1]s products get-all-products-by-category --category "men" --oauth "Quibusdam doloribus voluptatum quod laborum."
 `, os.Args[0])
 }
 
@@ -1109,7 +1114,7 @@ Get All products
     -oauth STRING: 
 
 Example:
-    %[1]s products get-all-products --oauth "Saepe asperiores molestiae aut et unde."
+    %[1]s products get-all-products --oauth "Voluptatem laboriosam illum dolores distinctio ut et."
 `, os.Args[0])
 }
 
@@ -1121,7 +1126,7 @@ Get one product
     -oauth STRING: 
 
 Example:
-    %[1]s products get-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Quidem beatae."
+    %[1]s products get-product --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Neque ut ut facere hic quibusdam aut."
 `, os.Args[0])
 }
 
@@ -1147,6 +1152,6 @@ Get one User
     -jwt-token STRING: 
 
 Example:
-    %[1]s users get-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Dolorem ab sit est eius enim illo." --jwt-token "Dolor velit quibusdam."
+    %[1]s users get-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Fugiat quidem rerum ad." --jwt-token "Corrupti veniam modi reiciendis cum repellendus ad."
 `, os.Args[0])
 }

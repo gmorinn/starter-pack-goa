@@ -12,7 +12,7 @@ RUN apk --no-cache add ca-certificates tzdata
 COPY --from=builder /app/start .
 COPY --from=builder /app/favicon.ico .
 
-RUN mkdir -p /app/uploads
+RUN mkdir -p /app/bin/public/uploads
 
 EXPOSE 8088
 CMD [ "/app/cmd/api" ]
