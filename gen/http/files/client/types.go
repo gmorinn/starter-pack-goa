@@ -30,6 +30,12 @@ type ImportFileRequestBody struct {
 	Format string `form:"format" json:"format" xml:"format"`
 }
 
+// DeleteFileRequestBody is the type of the "files" service "deleteFile"
+// endpoint HTTP request body.
+type DeleteFileRequestBody struct {
+	URL string `form:"url" json:"url" xml:"url"`
+}
+
 // ImportFileResponseBody is the type of the "files" service "importFile"
 // endpoint HTTP response body.
 type ImportFileResponseBody struct {
@@ -78,6 +84,15 @@ func NewImportFileRequestBody(p *files.ImportFilePayload) *ImportFileRequestBody
 		Content:  p.Content,
 		Size:     p.Size,
 		Format:   p.Format,
+	}
+	return body
+}
+
+// NewDeleteFileRequestBody builds the HTTP request body from the payload of
+// the "deleteFile" endpoint of the "files" service.
+func NewDeleteFileRequestBody(p *files.DeleteFilePayload) *DeleteFileRequestBody {
+	body := &DeleteFileRequestBody{
+		URL: p.URL,
 	}
 	return body
 }

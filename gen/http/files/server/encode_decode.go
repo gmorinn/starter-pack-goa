@@ -10,6 +10,7 @@ package server
 import (
 	files "api_crud/gen/files"
 	"context"
+	"io"
 	"net/http"
 	"strings"
 
@@ -134,13 +135,25 @@ func EncodeDeleteFileResponse(encoder func(context.Context, http.ResponseWriter)
 func DecodeDeleteFileRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
 	return func(r *http.Request) (interface{}, error) {
 		var (
-			url_     string
+			body DeleteFileRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateDeleteFileRequestBody(&body)
+		if err != nil {
+			return nil, err
+		}
+
+		var (
 			oauth    *string
 			jwtToken *string
-
-			params = mux.Vars(r)
 		)
-		url_ = params["url"]
 		oauthRaw := r.Header.Get("Authorization")
 		if oauthRaw != "" {
 			oauth = &oauthRaw
@@ -149,7 +162,7 @@ func DecodeDeleteFileRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 		if jwtTokenRaw != "" {
 			jwtToken = &jwtTokenRaw
 		}
-		payload := NewDeleteFilePayload(url_, oauth, jwtToken)
+		payload := NewDeleteFilePayload(&body, oauth, jwtToken)
 		if payload.Oauth != nil {
 			if strings.Contains(*payload.Oauth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")

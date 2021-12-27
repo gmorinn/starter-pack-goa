@@ -79,7 +79,7 @@ var _ = Service("files", func() {
 			Required("url")
 		})
 		HTTP(func() {
-			DELETE("/remove/{url}")
+			PATCH("/remove")
 			Response(StatusOK)
 		})
 		Result(func() {

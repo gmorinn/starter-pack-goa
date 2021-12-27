@@ -30,6 +30,12 @@ type ImportFileRequestBody struct {
 	Format *string `form:"format,omitempty" json:"format,omitempty" xml:"format,omitempty"`
 }
 
+// DeleteFileRequestBody is the type of the "files" service "deleteFile"
+// endpoint HTTP request body.
+type DeleteFileRequestBody struct {
+	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+}
+
 // ImportFileResponseBody is the type of the "files" service "importFile"
 // endpoint HTTP response body.
 type ImportFileResponseBody struct {
@@ -128,9 +134,10 @@ func NewImportFilePayload(body *ImportFileRequestBody, oauth *string, jwtToken *
 }
 
 // NewDeleteFilePayload builds a files service deleteFile endpoint payload.
-func NewDeleteFilePayload(url_ string, oauth *string, jwtToken *string) *files.DeleteFilePayload {
-	v := &files.DeleteFilePayload{}
-	v.URL = url_
+func NewDeleteFilePayload(body *DeleteFileRequestBody, oauth *string, jwtToken *string) *files.DeleteFilePayload {
+	v := &files.DeleteFilePayload{
+		URL: *body.URL,
+	}
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
 
@@ -148,6 +155,15 @@ func ValidateImportFileRequestBody(body *ImportFileRequestBody) (err error) {
 	}
 	if body.Format == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("format", "body"))
+	}
+	return
+}
+
+// ValidateDeleteFileRequestBody runs the validations defined on
+// DeleteFileRequestBody
+func ValidateDeleteFileRequestBody(body *DeleteFileRequestBody) (err error) {
+	if body.URL == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("url", "body"))
 	}
 	return
 }

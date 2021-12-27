@@ -66,9 +66,9 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"ImportFile", "POST", "/v1/bo/files/add"},
-			{"DeleteFile", "DELETE", "/v1/bo/files/remove/{url}"},
+			{"DeleteFile", "PATCH", "/v1/bo/files/remove"},
 			{"CORS", "OPTIONS", "/v1/bo/files/add"},
-			{"CORS", "OPTIONS", "/v1/bo/files/remove/{url}"},
+			{"CORS", "OPTIONS", "/v1/bo/files/remove"},
 		},
 		ImportFile: NewImportFileHandler(e.ImportFile, mux, NewFilesImportFileDecoder(mux, filesImportFileDecoderFn), encoder, errhandler, formatter),
 		DeleteFile: NewDeleteFileHandler(e.DeleteFile, mux, decoder, encoder, errhandler, formatter),
@@ -153,7 +153,7 @@ func MountDeleteFileHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("DELETE", "/v1/bo/files/remove/{url}", f)
+	mux.Handle("PATCH", "/v1/bo/files/remove", f)
 }
 
 // NewDeleteFileHandler creates a HTTP handler which loads the HTTP request and
@@ -206,7 +206,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/v1/bo/files/add", f)
-	mux.Handle("OPTIONS", "/v1/bo/files/remove/{url}", f)
+	mux.Handle("OPTIONS", "/v1/bo/files/remove", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

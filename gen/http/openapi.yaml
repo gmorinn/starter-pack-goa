@@ -463,18 +463,14 @@ paths:
       security:
       - OAuth2_header_Authorization: []
         jwt_header_jwtToken: []
-  /v1/bo/files/remove/{url}:
-    delete:
+  /v1/bo/files/remove:
+    patch:
       tags:
       - files
       summary: deleteFile files
       description: Delete one file by ID
       operationId: files#deleteFile
       parameters:
-      - name: url
-        in: path
-        required: true
-        type: string
       - name: Authorization
         in: header
         description: OAuth token
@@ -487,6 +483,13 @@ paths:
         required: false
         type: string
         pattern: ^Bearer [^ ]+$
+      - name: DeleteFileRequestBody
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/FilesDeleteFileRequestBody'
+          required:
+          - url
       responses:
         "200":
           description: OK response.
@@ -2576,6 +2579,17 @@ definitions:
     - temporary
     - timeout
     - fault
+  FilesDeleteFileRequestBody:
+    title: FilesDeleteFileRequestBody
+    type: object
+    properties:
+      url:
+        type: string
+        example: /public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png
+    example:
+      url: /public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png
+    required:
+    - url
   FilesDeleteFileResponseBody:
     title: FilesDeleteFileResponseBody
     type: object

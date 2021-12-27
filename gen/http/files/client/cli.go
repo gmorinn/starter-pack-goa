@@ -60,10 +60,14 @@ func BuildImportFilePayload(filesImportFileBody string, filesImportFileOauth str
 
 // BuildDeleteFilePayload builds the payload for the files deleteFile endpoint
 // from CLI flags.
-func BuildDeleteFilePayload(filesDeleteFileURL string, filesDeleteFileOauth string, filesDeleteFileJWTToken string) (*files.DeleteFilePayload, error) {
-	var url_ string
+func BuildDeleteFilePayload(filesDeleteFileBody string, filesDeleteFileOauth string, filesDeleteFileJWTToken string) (*files.DeleteFilePayload, error) {
+	var err error
+	var body DeleteFileRequestBody
 	{
-		url_ = filesDeleteFileURL
+		err = json.Unmarshal([]byte(filesDeleteFileBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"url\": \"/public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png\"\n   }'")
+		}
 	}
 	var oauth *string
 	{
@@ -77,8 +81,9 @@ func BuildDeleteFilePayload(filesDeleteFileURL string, filesDeleteFileOauth stri
 			jwtToken = &filesDeleteFileJWTToken
 		}
 	}
-	v := &files.DeleteFilePayload{}
-	v.URL = url_
+	v := &files.DeleteFilePayload{
+		URL: body.URL,
+	}
 	v.Oauth = oauth
 	v.JWTToken = jwtToken
 

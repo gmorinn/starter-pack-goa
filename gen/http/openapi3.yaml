@@ -516,21 +516,14 @@ paths:
         jwt_header_jwtToken:
         - api:read
         - api:write
-  /v1/bo/files/remove/{url}:
-    delete:
+  /v1/bo/files/remove:
+    patch:
       tags:
       - files
       summary: deleteFile files
       description: Delete one file by ID
       operationId: files#deleteFile
       parameters:
-      - name: url
-        in: path
-        required: true
-        schema:
-          type: string
-          example: /public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png
-        example: /public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png
       - name: jwtToken
         in: header
         description: Jwt token
@@ -541,6 +534,14 @@ paths:
           example: "Bearer \U0007B8F3\U00052C8F\U00017C88\U00059813"
           pattern: ^Bearer [^ ]+$
         example: "Bearer \U000C36CA\U00097315"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteFileRequestBody'
+            example:
+              url: /public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png
       responses:
         "200":
           description: OK response.
@@ -1981,6 +1982,16 @@ components:
       required:
       - user
       - success
+    DeleteFileRequestBody:
+      type: object
+      properties:
+        url:
+          type: string
+          example: /public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png
+      example:
+        url: /public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png
+      required:
+      - url
     DeleteManyProductsRequestBody:
       type: object
       properties:

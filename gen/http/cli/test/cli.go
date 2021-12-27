@@ -184,7 +184,7 @@ func ParseEndpoint(
 		filesImportFileJWTTokenFlag = filesImportFileFlags.String("jwt-token", "", "")
 
 		filesDeleteFileFlags        = flag.NewFlagSet("delete-file", flag.ExitOnError)
-		filesDeleteFileURLFlag      = filesDeleteFileFlags.String("url", "REQUIRED", "")
+		filesDeleteFileBodyFlag     = filesDeleteFileFlags.String("body", "REQUIRED", "")
 		filesDeleteFileOauthFlag    = filesDeleteFileFlags.String("oauth", "", "")
 		filesDeleteFileJWTTokenFlag = filesDeleteFileFlags.String("jwt-token", "", "")
 
@@ -536,7 +536,7 @@ func ParseEndpoint(
 				data, err = filesc.BuildImportFilePayload(*filesImportFileBodyFlag, *filesImportFileOauthFlag, *filesImportFileJWTTokenFlag)
 			case "delete-file":
 				endpoint = c.DeleteFile()
-				data, err = filesc.BuildDeleteFilePayload(*filesDeleteFileURLFlag, *filesDeleteFileOauthFlag, *filesDeleteFileJWTTokenFlag)
+				data, err = filesc.BuildDeleteFilePayload(*filesDeleteFileBodyFlag, *filesDeleteFileOauthFlag, *filesDeleteFileJWTTokenFlag)
 			}
 		case "jwt-token":
 			c := jwttokenc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -965,15 +965,17 @@ Example:
 }
 
 func filesDeleteFileUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] files delete-file -url STRING -oauth STRING -jwt-token STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] files delete-file -body JSON -oauth STRING -jwt-token STRING
 
 Delete one file by ID
-    -url STRING: 
+    -body JSON: 
     -oauth STRING: 
     -jwt-token STRING: 
 
 Example:
-    %[1]s files delete-file --url "/public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png" --oauth "In beatae maxime et unde porro." --jwt-token "Consectetur vel qui odio ipsam reprehenderit debitis."
+    %[1]s files delete-file --body '{
+      "url": "/public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png"
+   }' --oauth "In beatae maxime et unde porro." --jwt-token "Consectetur vel qui odio ipsam reprehenderit debitis."
 `, os.Args[0])
 }
 

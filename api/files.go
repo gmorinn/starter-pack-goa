@@ -89,7 +89,7 @@ func (s *filessrvc) DeleteFile(ctx context.Context, p *files.DeleteFilePayload) 
 		if err := q.DeleteFile(ctx, utils.NullS(file.Url.String)); err != nil {
 			return fmt.Errorf("ERROR_DELETE_FILE_BY_ID %v", err)
 		}
-		if err = os.Remove(utils.Dir() + file.Url.String); err != nil {
+		if err = os.Remove("bin/" + p.URL); err != nil {
 			return fmt.Errorf("ERROR_REMOVE_FILE_IN_FOLDER %v", err)
 		}
 		return nil

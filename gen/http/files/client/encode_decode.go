@@ -140,18 +140,8 @@ func DecodeImportFileResponse(decoder func(*http.Response) goahttp.Decoder, rest
 // BuildDeleteFileRequest instantiates a HTTP request object with method and
 // path set to call the "files" service "deleteFile" endpoint
 func (c *Client) BuildDeleteFileRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	var (
-		url_ string
-	)
-	{
-		p, ok := v.(*files.DeleteFilePayload)
-		if !ok {
-			return nil, goahttp.ErrInvalidType("files", "deleteFile", "*files.DeleteFilePayload", v)
-		}
-		url_ = p.URL
-	}
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteFileFilesPath(url_)}
-	req, err := http.NewRequest("DELETE", u.String(), nil)
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteFileFilesPath()}
+	req, err := http.NewRequest("PATCH", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("files", "deleteFile", u.String(), err)
 	}
@@ -181,6 +171,10 @@ func EncodeDeleteFileRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 		if p.JWTToken != nil {
 			head := *p.JWTToken
 			req.Header.Set("jwtToken", head)
+		}
+		body := NewDeleteFileRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("files", "deleteFile", err)
 		}
 		return nil
 	}
