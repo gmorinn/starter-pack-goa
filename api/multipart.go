@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"fmt"
 	"image"
+	"image/jpeg"
 	"image/png"
 	"io"
 	"io/ioutil"
@@ -18,6 +19,24 @@ import (
 
 	"github.com/google/uuid"
 )
+
+func convertByteToImg(format string, file **os.File, img *image.Image) error {
+	switch true {
+	case strings.Contains(format, "png"):
+		if err := png.Encode(*file, *img); err != nil {
+			return err
+		}
+		break
+	case strings.Contains(format, "jpeg"):
+		if err := jpeg.Encode(*file, *img, &jpeg.Options{}); err != nil {
+			return err
+		}
+		break
+	default:
+		break
+	}
+	return nil
+}
 
 func uploadDir() (string, string) {
 	t := time.Now()
@@ -83,8 +102,7 @@ func FilesImportFileDecoderFunc(mr *multipart.Reader, p **files.ImportFilePayloa
 			return err
 		}
 
-		err = png.Encode(dst, img)
-		if err != nil {
+		if err := convertByteToImg(disposition, &dst, &img); err != nil {
 			fmt.Printf("Error 8 => %v\n", err)
 			return err
 		}

@@ -48,7 +48,6 @@ func (s *filessrvc) JWTAuth(ctx context.Context, token string, scheme *security.
 // Import file
 func (s *filessrvc) ImportFile(ctx context.Context, p *files.ImportFilePayload) (res *files.ImportFileResult, err error) {
 	result := &files.ImportFileResult{}
-	// fmt.Println("content => ", p.Content)
 	fmt.Println("name => ", p.Filename)
 	fmt.Println("format => ", p.Format)
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
