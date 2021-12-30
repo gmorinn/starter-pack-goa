@@ -48,28 +48,26 @@ func (s *filessrvc) JWTAuth(ctx context.Context, token string, scheme *security.
 // Import file
 func (s *filessrvc) ImportFile(ctx context.Context, p *files.ImportFilePayload) (res *files.ImportFileResult, err error) {
 	result := &files.ImportFileResult{}
-	fmt.Println("name => ", p.Filename)
-	fmt.Println("format => ", p.Format)
 	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		// arg := db.CreateFileParams{
-		// 	Name: utils.NullS(p.Filename),
-		// 	Url:  utils.NullS(*p.URL),
-		// 	Mime: utils.NullS(*p.Mime),
-		// }
-		// newFile, err := q.CreateFile(ctx, arg)
-		// if err != nil {
-		// 	return fmt.Errorf("ERROR_CREATE_FILE %v", err)
-		// }
-		// result = &files.ImportFileResult{
-		// 	File: &files.ResFile{
-		// 		ID:   newFile.ID.String(),
-		// 		Name: newFile.Name.String,
-		// 		Mime: &newFile.Mime.String,
-		// 		Size: &newFile.Size.Int64,
-		// 		URL:  newFile.Url.String,
-		// 	},
-		// 	Success: true,
-		// }
+		arg := db.CreateFileParams{
+			Name: utils.NullS(p.Filename),
+			Url:  utils.NullS(*p.URL),
+			Mime: utils.NullS(*p.Mime),
+		}
+		newFile, err := q.CreateFile(ctx, arg)
+		if err != nil {
+			return fmt.Errorf("ERROR_CREATE_FILE %v", err)
+		}
+		result = &files.ImportFileResult{
+			File: &files.ResFile{
+				ID:   newFile.ID.String(),
+				Name: newFile.Name.String,
+				Mime: &newFile.Mime.String,
+				Size: &newFile.Size.Int64,
+				URL:  newFile.Url.String,
+			},
+			Success: true,
+		}
 		return nil
 	})
 	if err != nil {
