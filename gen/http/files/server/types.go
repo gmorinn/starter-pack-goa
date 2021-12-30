@@ -20,6 +20,10 @@ type ImportFileRequestBody struct {
 	Filename *string `form:"filename,omitempty" json:"filename,omitempty" xml:"filename,omitempty"`
 	// url file
 	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	// width of image if you crop
+	W *int64 `form:"w,omitempty" json:"w,omitempty" xml:"w,omitempty"`
+	// height of image if you crop
+	H *int64 `form:"h,omitempty" json:"h,omitempty" xml:"h,omitempty"`
 	// url file
 	Mime *string `form:"mime,omitempty" json:"mime,omitempty" xml:"mime,omitempty"`
 	// content of image
@@ -122,6 +126,8 @@ func NewImportFilePayload(body *ImportFileRequestBody, oauth *string, jwtToken *
 	v := &files.ImportFilePayload{
 		Filename: *body.Filename,
 		URL:      body.URL,
+		W:        body.W,
+		H:        body.H,
 		Mime:     body.Mime,
 		Content:  body.Content,
 		Size:     body.Size,

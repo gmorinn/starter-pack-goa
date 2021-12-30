@@ -20,6 +20,10 @@ type ImportFileRequestBody struct {
 	Filename string `form:"filename" json:"filename" xml:"filename"`
 	// url file
 	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	// width of image if you crop
+	W *int64 `form:"w,omitempty" json:"w,omitempty" xml:"w,omitempty"`
+	// height of image if you crop
+	H *int64 `form:"h,omitempty" json:"h,omitempty" xml:"h,omitempty"`
 	// url file
 	Mime *string `form:"mime,omitempty" json:"mime,omitempty" xml:"mime,omitempty"`
 	// content of image
@@ -80,6 +84,8 @@ func NewImportFileRequestBody(p *files.ImportFilePayload) *ImportFileRequestBody
 	body := &ImportFileRequestBody{
 		Filename: p.Filename,
 		URL:      p.URL,
+		W:        p.W,
+		H:        p.H,
 		Mime:     p.Mime,
 		Content:  p.Content,
 		Size:     p.Size,

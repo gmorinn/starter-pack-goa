@@ -34,6 +34,8 @@ var _ = Service("files", func() {
 				Example("foo.jpg")
 			})
 			Attribute("url", String, "url file")
+			Attribute("w", Int64, "width of image if you crop")
+			Attribute("h", Int64, "height of image if you crop")
 			Attribute("mime", String, "url file")
 			Attribute("content", Bytes, "content of image")
 			Attribute("size", Int64, "size of image")

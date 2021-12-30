@@ -24,7 +24,7 @@ func BuildSignupPayload(jwtTokenSignupBody string, jwtTokenSignupOauth string) (
 	{
 		err = json.Unmarshal([]byte(jwtTokenSignupBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"birthday\": \"Sit enim.\",\n      \"confirm_password\": \"JeSuisUnTest974\",\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"JeSuisUnTest974\",\n      \"phone\": \"+262 692 12 34 56\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"birthday\": \"Reprehenderit debitis.\",\n      \"confirm_password\": \"JeSuisUnTest974\",\n      \"email\": \"guillaume@epitech.eu\",\n      \"firstname\": \"Guillaume\",\n      \"lastname\": \"Morin\",\n      \"password\": \"JeSuisUnTest974\",\n      \"phone\": \"+262 692 12 34 56\"\n   }'")
 		}
 		if utf8.RuneCountInString(body.Firstname) < 3 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError("body.firstname", body.Firstname, utf8.RuneCountInString(body.Firstname), 3, true))

@@ -46,6 +46,10 @@ type ImportFilePayload struct {
 	Filename string
 	// url file
 	URL *string
+	// width of image if you crop
+	W *int64
+	// height of image if you crop
+	H *int64
 	// url file
 	Mime *string
 	// content of image
