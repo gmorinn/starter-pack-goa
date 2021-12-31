@@ -12,7 +12,7 @@ export DIR
 api-goa:
 	@echo -e "\n\t🔥GOA GM\n\n\tLoading...⌛\n"
 	@goa gen $(DIR)/design
-	@cp -f gen/http/openapi.json ./documentation
+	@cp -f gen/http/openapi.json ./cmd/documentation/
 	@cp -f gen/http/openapi3.json ./
 	@echo -e "\nWait...⌛\n\nGOA GM will generate functions for you❤️\n"
 	@goa example $(DIR)/design

@@ -7,3 +7,4 @@ bin/*
 public/uploads
 data.db
 api.log
+backup.sql
