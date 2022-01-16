@@ -30,26 +30,26 @@ make api-doc
 In this documentation you will have:
 - All possible requests
 
-![](documentation/doc.png)
+![](cmd/documentation/doc.png)
 
 --------------------------
 
 - All expected payloads for each request with examples
 
-![](documentation/parameters.png)
+![](cmd/documentation/parameters.png)
 
 
 --------------------------
 
 - All responses to each request
 
-![](documentation/response.png)
+![](cmd/documentation/response.png)
 
 --------------------------
 
 - All expected structures with their types (int, float, string, boolean)
 
-![](documentation/struct.png)
+![](cmd/documentation/struct.png)
 
 **Reason n°3: 70% of your code is generated**
 
@@ -136,7 +136,7 @@ Just do:
 cd cmd/api-cli && go build -o cmd
 ```
 
-![](documentation/cli.png)
+![](cmd/documentation/cli.png)
 
 --------------------------
 
@@ -166,7 +166,7 @@ SQL:
 
 ***Example to create an item***
 
-![Alt Text](documentation/snippet.gif)
+![Alt Text](cmd/documentation/snippet.gif)
 
 **To start with docker, do:**
 
