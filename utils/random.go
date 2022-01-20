@@ -18,3 +18,12 @@ func RandStringRunes(n int) string {
 	}
 	return string(b)
 }
+
+func RandomInt(min, max int64) int64 {
+	return min + rand.Int63n(max-min+1)
+}
+
+func RandomAttribut(tab []string) string {
+	n := len(tab)
+	return tab[rand.Intn(n)]
+}
