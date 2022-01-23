@@ -24,7 +24,7 @@ func createRandomProduct(t *testing.T) Product {
 	require.NotEmpty(t, product.Cover)
 	require.NotEmpty(t, product.ID)
 	require.NotEmpty(t, product.Name)
-	require.NotEmpty(t, product.Price)
+	require.GreaterOrEqual(t, product.Price, 0.0)
 	require.NotEmpty(t, product.CreatedAt)
 
 	require.Equal(t, arg.Name, product.Name)
@@ -119,7 +119,7 @@ func TestCountProducts(t *testing.T) {
 		createRandomProduct(t)
 	}
 
-	var min int64
+	var min int64 = 9
 	count, err := testQueries.GetCountsProducts(context.Background())
 	require.NoError(t, err)
 	require.GreaterOrEqual(t, count, min)

@@ -40,21 +40,6 @@ func (q *Queries) ExistGetUserByFireBaseUid(ctx context.Context, firebaseUid sql
 	return exists, err
 }
 
-const existUserByEmail = `-- name: ExistUserByEmail :one
-SELECT EXISTS(
-    SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
-    WHERE email = $1
-    AND deleted_at IS NULL
-)
-`
-
-func (q *Queries) ExistUserByEmail(ctx context.Context, email string) (bool, error) {
-	row := q.queryRow(ctx, q.existUserByEmailStmt, existUserByEmail, email)
-	var exists bool
-	err := row.Scan(&exists)
-	return exists, err
-}
-
 const existUserByEmailAndConfirmCode = `-- name: ExistUserByEmailAndConfirmCode :one
 SELECT EXISTS(
     SELECT id, created_at, updated_at, deleted_at, lastname, firstname, email, password, role, birthday, phone, password_confirm_code, firebase_id_token, firebase_uid, firebase_provider FROM users
