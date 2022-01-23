@@ -54,7 +54,7 @@ func (s *jwtTokensrvc) Signup(ctx context.Context, p *jwttoken.SignupPayload) (r
 		return nil, ErrInvalidPassword
 	}
 
-	isExist, err := s.server.Store.ExistUserByEmail(ctx, p.Email)
+	isExist, err := s.server.Store.CheckEmailExist(ctx, p.Email)
 	if err != nil {
 		return nil, s.errorResponse("ERROR_GET_MAIL", err)
 	}
@@ -218,7 +218,7 @@ func (s *jwtTokensrvc) AuthProviders(ctx context.Context, p *jwttoken.AuthProvid
 			}
 		} else {
 			// CHECK IF USER ALREADY EXIST IN DATABASE
-			existEmail, err := q.ExistUserByEmail(ctx, p.Email)
+			existEmail, err := q.CheckEmailExist(ctx, p.Email)
 			if err != nil {
 				return fmt.Errorf("EXIST_EMAIL: %v", err.Error())
 			}

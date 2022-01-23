@@ -41,7 +41,7 @@ createdb:
 dropdb:
 	docker exec -it postgres dropdb ${POSTGRES_DB}
 
-test:
+api-test:
 	go test -v -cover ./internal
 
 startpostgres:
@@ -51,5 +51,5 @@ api-dev:
 	@echo -e "\n\t💣\n"
 	docker-compose -p $(DIR) up --build --force-recreate --remove-orphans
 
-.PHONY: api-init api-gen api-doc api-goa show-schema api-dev backup-db createdb dropdb startpostgres test
+.PHONY: api-init api-gen api-doc api-goa show-schema api-dev backup-db createdb dropdb startpostgres api-test
 

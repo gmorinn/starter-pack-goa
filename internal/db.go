@@ -55,9 +55,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.existGetUserByFireBaseUidStmt, err = db.PrepareContext(ctx, existGetUserByFireBaseUid); err != nil {
 		return nil, fmt.Errorf("error preparing query ExistGetUserByFireBaseUid: %w", err)
 	}
-	if q.existUserByEmailStmt, err = db.PrepareContext(ctx, existUserByEmail); err != nil {
-		return nil, fmt.Errorf("error preparing query ExistUserByEmail: %w", err)
-	}
 	if q.existUserByEmailAndConfirmCodeStmt, err = db.PrepareContext(ctx, existUserByEmailAndConfirmCode); err != nil {
 		return nil, fmt.Errorf("error preparing query ExistUserByEmailAndConfirmCode: %w", err)
 	}
@@ -185,11 +182,6 @@ func (q *Queries) Close() error {
 	if q.existGetUserByFireBaseUidStmt != nil {
 		if cerr := q.existGetUserByFireBaseUidStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing existGetUserByFireBaseUidStmt: %w", cerr)
-		}
-	}
-	if q.existUserByEmailStmt != nil {
-		if cerr := q.existUserByEmailStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing existUserByEmailStmt: %w", cerr)
 		}
 	}
 	if q.existUserByEmailAndConfirmCodeStmt != nil {
@@ -357,7 +349,6 @@ type Queries struct {
 	deleteRefreshTokenStmt                *sql.Stmt
 	deleteUserByIDStmt                    *sql.Stmt
 	existGetUserByFireBaseUidStmt         *sql.Stmt
-	existUserByEmailStmt                  *sql.Stmt
 	existUserByEmailAndConfirmCodeStmt    *sql.Stmt
 	findUserByEmailStmt                   *sql.Stmt
 	getAllProductsStmt                    *sql.Stmt
@@ -398,7 +389,6 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteRefreshTokenStmt:                q.deleteRefreshTokenStmt,
 		deleteUserByIDStmt:                    q.deleteUserByIDStmt,
 		existGetUserByFireBaseUidStmt:         q.existGetUserByFireBaseUidStmt,
-		existUserByEmailStmt:                  q.existUserByEmailStmt,
 		existUserByEmailAndConfirmCodeStmt:    q.existUserByEmailAndConfirmCodeStmt,
 		findUserByEmailStmt:                   q.findUserByEmailStmt,
 		getAllProductsStmt:                    q.getAllProductsStmt,
