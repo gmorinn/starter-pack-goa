@@ -42,7 +42,9 @@ dropdb:
 	docker exec -it postgres dropdb ${POSTGRES_DB}
 
 api-test:
-	go test -v -cover ./internal
+	@go test -coverprofile=coverage.out ./internal/
+	@	go tool cover -html=coverage.out
+
 
 startpostgres:
 	docker run --name postgres -p ${POSTGRES_PORT}:${POSTGRES_PORT} -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres:12-alpine

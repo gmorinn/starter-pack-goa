@@ -13,7 +13,7 @@ import (
 func createRandomProduct(t *testing.T) Product {
 	arg := CreateProductParams{
 		Name:     utils.RandStringRunes(12),
-		Price:    float64(utils.RandomInt(0, 299)),
+		Price:    float64(utils.RandomInt(1, 299)),
 		Cover:    utils.RandStringRunes(50),
 		Category: Categories(utils.RandomAttribut([]string{"sneaker", "hat", "women", "men", "jacket"})),
 	}

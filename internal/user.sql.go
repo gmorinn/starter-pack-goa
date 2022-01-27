@@ -27,7 +27,7 @@ type CreateUserParams struct {
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.queryRow(ctx, q.createUserStmt, createUser,
+	row := q.db.QueryRowContext(ctx, createUser,
 		arg.Firstname,
 		arg.Lastname,
 		arg.Email,
@@ -67,7 +67,7 @@ WHERE
 `
 
 func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
-	_, err := q.exec(ctx, q.deleteUserByIDStmt, deleteUserByID, id)
+	_, err := q.db.ExecContext(ctx, deleteUserByID, id)
 	return err
 }
 
@@ -100,7 +100,7 @@ type GetBoAllUsersParams struct {
 }
 
 func (q *Queries) GetBoAllUsers(ctx context.Context, arg GetBoAllUsersParams) ([]User, error) {
-	rows, err := q.query(ctx, q.getBoAllUsersStmt, getBoAllUsers,
+	rows, err := q.db.QueryContext(ctx, getBoAllUsers,
 		arg.FirstnameAsc,
 		arg.FirstnameDesc,
 		arg.LastnameAsc,
@@ -155,7 +155,7 @@ WHERE deleted_at IS NULL
 `
 
 func (q *Queries) GetCountsUser(ctx context.Context) (int64, error) {
-	row := q.queryRow(ctx, q.getCountsUserStmt, getCountsUser)
+	row := q.db.QueryRowContext(ctx, getCountsUser)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -169,7 +169,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.queryRow(ctx, q.getUserByIDStmt, getUserByID, id)
+	row := q.db.QueryRowContext(ctx, getUserByID, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -218,7 +218,7 @@ type UpdateUserParams struct {
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
-	_, err := q.exec(ctx, q.updateUserStmt, updateUser,
+	_, err := q.db.ExecContext(ctx, updateUser,
 		arg.Firstname,
 		arg.Lastname,
 		arg.Email,

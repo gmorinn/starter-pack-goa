@@ -19,6 +19,16 @@ func RandStringRunes(n int) string {
 	return string(b)
 }
 
+var numberRunes = []rune("0123456789")
+
+func RandNumberRunes(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = numberRunes[rand.Intn(len(numberRunes))]
+	}
+	return string(b)
+}
+
 func RandomInt(min, max int64) int64 {
 	return min + rand.Int63n(max-min+1)
 }

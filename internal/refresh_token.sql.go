@@ -23,7 +23,7 @@ type CreateRefreshTokenParams struct {
 }
 
 func (q *Queries) CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) error {
-	_, err := q.exec(ctx, q.createRefreshTokenStmt, createRefreshToken, arg.Token, arg.ExpirOn, arg.UserID)
+	_, err := q.db.ExecContext(ctx, createRefreshToken, arg.Token, arg.ExpirOn, arg.UserID)
 	return err
 }
 
@@ -34,7 +34,7 @@ WHERE expir_on < NOW()
 `
 
 func (q *Queries) DeleteOldRefreshToken(ctx context.Context) error {
-	_, err := q.exec(ctx, q.deleteOldRefreshTokenStmt, deleteOldRefreshToken)
+	_, err := q.db.ExecContext(ctx, deleteOldRefreshToken)
 	return err
 }
 
@@ -45,7 +45,7 @@ WHERE id = $1
 `
 
 func (q *Queries) DeleteRefreshToken(ctx context.Context, id uuid.UUID) error {
-	_, err := q.exec(ctx, q.deleteRefreshTokenStmt, deleteRefreshToken, id)
+	_, err := q.db.ExecContext(ctx, deleteRefreshToken, id)
 	return err
 }
 
@@ -77,7 +77,7 @@ type GetRefreshTokenRow struct {
 }
 
 func (q *Queries) GetRefreshToken(ctx context.Context, token string) (GetRefreshTokenRow, error) {
-	row := q.queryRow(ctx, q.getRefreshTokenStmt, getRefreshToken, token)
+	row := q.db.QueryRowContext(ctx, getRefreshToken, token)
 	var i GetRefreshTokenRow
 	err := row.Scan(
 		&i.ID,
@@ -110,7 +110,7 @@ type ListRefreshTokenByUserIDParams struct {
 }
 
 func (q *Queries) ListRefreshTokenByUserID(ctx context.Context, arg ListRefreshTokenByUserIDParams) ([]RefreshToken, error) {
-	rows, err := q.query(ctx, q.listRefreshTokenByUserIDStmt, listRefreshTokenByUserID, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listRefreshTokenByUserID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
