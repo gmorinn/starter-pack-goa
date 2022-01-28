@@ -17,29 +17,32 @@ import (
 	"log"
 )
 
-type Store struct {
+type Store interface {
+	db.Querier
+	ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) error
+}
+
+type SQLStore struct {
 	*sqlc.Queries
 	db *sql.DB
 }
 
 type Server struct {
-	Store    *Store
+	Store    Store
 	Config   *config.API
 	cronTask *cron.Cron
 }
 
 // NewStore create new Store
-func NewStore(db *sql.DB) *Store {
-	// db.SetMaxOpenConns(140)
-	// db.SetMaxIdleConns(140)
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: sqlc.New(db),
 	}
 }
 
 // execTx executes a function within a database transaction
-func (store *Store) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) error {
+func (store *SQLStore) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err

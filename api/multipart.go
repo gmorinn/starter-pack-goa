@@ -17,7 +17,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/disintegration/imageorient"
 	"github.com/disintegration/imaging"
@@ -70,13 +69,6 @@ func crop(file string, w, h int) {
 	if err != nil {
 		fmt.Printf("Error crop\n")
 	}
-}
-
-func uploadDir() (string, string) {
-	t := time.Now()
-	upldir := fmt.Sprintf("public/uploads/%s/%s", t.Format("2006"), t.Format("01"))
-	os.MkdirAll(utils.Dir()+"/"+upldir, os.ModePerm)
-	return upldir, utils.Dir() + "/" + upldir
 }
 
 func parsePart(part *multipart.Part) (int, error) {
@@ -152,7 +144,7 @@ func FilesImportFileDecoderFunc(mr *multipart.Reader, p **files.ImportFilePayloa
 			}
 
 			// OPEN FILE
-			upldir, uploadDirFull := uploadDir()
+			upldir, uploadDirFull := utils.UploadDir()
 			ext := filepath.Ext(params["filename"])
 			un := fmt.Sprintf("%s%s", uuid.New(), ext)
 			fn = fmt.Sprintf("%s/%s", upldir, un)
