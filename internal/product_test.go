@@ -20,10 +20,7 @@ func createRandomProduct(t *testing.T) Product {
 	product, err := testQueries.CreateProduct(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, product)
-	require.NotEmpty(t, product.Category)
-	require.NotEmpty(t, product.Cover)
 	require.NotEmpty(t, product.ID)
-	require.NotEmpty(t, product.Name)
 	require.GreaterOrEqual(t, product.Price, 0.0)
 	require.NotEmpty(t, product.CreatedAt)
 

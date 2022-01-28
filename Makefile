@@ -43,7 +43,7 @@ dropdb:
 
 api-test:
 	@go test -coverprofile=coverage.out ./internal/
-	@	go tool cover -html=coverage.out
+	@go tool cover -html=coverage.out
 
 
 startpostgres:
