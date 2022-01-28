@@ -19,7 +19,7 @@ SELECT EXISTS(
 `
 
 func (q *Queries) CheckEmailExist(ctx context.Context, email string) (bool, error) {
-	row := q.queryRow(ctx, q.checkEmailExistStmt, checkEmailExist, email)
+	row := q.db.QueryRowContext(ctx, checkEmailExist, email)
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
@@ -34,7 +34,7 @@ SELECT EXISTS(
 `
 
 func (q *Queries) ExistGetUserByFireBaseUid(ctx context.Context, firebaseUid sql.NullString) (bool, error) {
-	row := q.queryRow(ctx, q.existGetUserByFireBaseUidStmt, existGetUserByFireBaseUid, firebaseUid)
+	row := q.db.QueryRowContext(ctx, existGetUserByFireBaseUid, firebaseUid)
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
@@ -55,7 +55,7 @@ type ExistUserByEmailAndConfirmCodeParams struct {
 }
 
 func (q *Queries) ExistUserByEmailAndConfirmCode(ctx context.Context, arg ExistUserByEmailAndConfirmCodeParams) (bool, error) {
-	row := q.queryRow(ctx, q.existUserByEmailAndConfirmCodeStmt, existUserByEmailAndConfirmCode, arg.Email, arg.PasswordConfirmCode)
+	row := q.db.QueryRowContext(ctx, existUserByEmailAndConfirmCode, arg.Email, arg.PasswordConfirmCode)
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
@@ -68,7 +68,7 @@ AND deleted_at IS NULL
 `
 
 func (q *Queries) FindUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.queryRow(ctx, q.findUserByEmailStmt, findUserByEmail, email)
+	row := q.db.QueryRowContext(ctx, findUserByEmail, email)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -97,7 +97,7 @@ AND firebase_uid = $1
 `
 
 func (q *Queries) GetUserByFireBaseUid(ctx context.Context, firebaseUid sql.NullString) (User, error) {
-	row := q.queryRow(ctx, q.getUserByFireBaseUidStmt, getUserByFireBaseUid, firebaseUid)
+	row := q.db.QueryRowContext(ctx, getUserByFireBaseUid, firebaseUid)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -140,7 +140,7 @@ type LoginUserRow struct {
 }
 
 func (q *Queries) LoginUser(ctx context.Context, arg LoginUserParams) (LoginUserRow, error) {
-	row := q.queryRow(ctx, q.loginUserStmt, loginUser, arg.Email, arg.Crypt)
+	row := q.db.QueryRowContext(ctx, loginUser, arg.Email, arg.Crypt)
 	var i LoginUserRow
 	err := row.Scan(
 		&i.ID,
@@ -171,7 +171,7 @@ type SignProviderParams struct {
 }
 
 func (q *Queries) SignProvider(ctx context.Context, arg SignProviderParams) (User, error) {
-	row := q.queryRow(ctx, q.signProviderStmt, signProvider,
+	row := q.db.QueryRowContext(ctx, signProvider,
 		arg.Firstname,
 		arg.Lastname,
 		arg.Email,
@@ -219,7 +219,7 @@ type SignupParams struct {
 }
 
 func (q *Queries) Signup(ctx context.Context, arg SignupParams) (User, error) {
-	row := q.queryRow(ctx, q.signupStmt, signup,
+	row := q.db.QueryRowContext(ctx, signup,
 		arg.Firstname,
 		arg.Lastname,
 		arg.Email,
@@ -264,7 +264,7 @@ type UpdatePasswordUserWithconfirmCodeParams struct {
 }
 
 func (q *Queries) UpdatePasswordUserWithconfirmCode(ctx context.Context, arg UpdatePasswordUserWithconfirmCodeParams) error {
-	_, err := q.exec(ctx, q.updatePasswordUserWithconfirmCodeStmt, updatePasswordUserWithconfirmCode, arg.Email, arg.PasswordConfirmCode, arg.Crypt)
+	_, err := q.db.ExecContext(ctx, updatePasswordUserWithconfirmCode, arg.Email, arg.PasswordConfirmCode, arg.Crypt)
 	return err
 }
 
@@ -282,7 +282,7 @@ type UpdateUserConfirmCodeParams struct {
 }
 
 func (q *Queries) UpdateUserConfirmCode(ctx context.Context, arg UpdateUserConfirmCodeParams) error {
-	_, err := q.exec(ctx, q.updateUserConfirmCodeStmt, updateUserConfirmCode, arg.Email, arg.PasswordConfirmCode)
+	_, err := q.db.ExecContext(ctx, updateUserConfirmCode, arg.Email, arg.PasswordConfirmCode)
 	return err
 }
 
@@ -298,7 +298,7 @@ type UpdateUserPasswordParams struct {
 }
 
 func (q *Queries) UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error {
-	_, err := q.exec(ctx, q.updateUserPasswordStmt, updateUserPassword, arg.ID, arg.Crypt)
+	_, err := q.db.ExecContext(ctx, updateUserPassword, arg.ID, arg.Crypt)
 	return err
 }
 
@@ -317,7 +317,7 @@ type UpdateUserProviderParams struct {
 }
 
 func (q *Queries) UpdateUserProvider(ctx context.Context, arg UpdateUserProviderParams) error {
-	_, err := q.exec(ctx, q.updateUserProviderStmt, updateUserProvider,
+	_, err := q.db.ExecContext(ctx, updateUserProvider,
 		arg.ID,
 		arg.FirebaseIDToken,
 		arg.FirebaseUid,

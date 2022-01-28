@@ -22,7 +22,7 @@ type CreateProductParams struct {
 }
 
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error) {
-	row := q.queryRow(ctx, q.createProductStmt, createProduct,
+	row := q.db.QueryRowContext(ctx, createProduct,
 		arg.Name,
 		arg.Price,
 		arg.Cover,
@@ -49,7 +49,7 @@ WHERE id = $1
 `
 
 func (q *Queries) DeleteProduct(ctx context.Context, id uuid.UUID) error {
-	_, err := q.exec(ctx, q.deleteProductStmt, deleteProduct, id)
+	_, err := q.db.ExecContext(ctx, deleteProduct, id)
 	return err
 }
 
@@ -59,7 +59,7 @@ WHERE deleted_at IS NULL
 `
 
 func (q *Queries) GetAllProducts(ctx context.Context) ([]Product, error) {
-	rows, err := q.query(ctx, q.getAllProductsStmt, getAllProducts)
+	rows, err := q.db.QueryContext(ctx, getAllProducts)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ type GetBoAllProductsParams struct {
 }
 
 func (q *Queries) GetBoAllProducts(ctx context.Context, arg GetBoAllProductsParams) ([]Product, error) {
-	rows, err := q.query(ctx, q.getBoAllProductsStmt, getBoAllProducts,
+	rows, err := q.db.QueryContext(ctx, getBoAllProducts,
 		arg.NameAsc,
 		arg.NameDesc,
 		arg.CategoryAsc,
@@ -161,7 +161,7 @@ WHERE deleted_at IS NULL
 `
 
 func (q *Queries) GetCountsProducts(ctx context.Context) (int64, error) {
-	row := q.queryRow(ctx, q.getCountsProductsStmt, getCountsProducts)
+	row := q.db.QueryRowContext(ctx, getCountsProducts)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -174,7 +174,7 @@ AND id = $1
 `
 
 func (q *Queries) GetProduct(ctx context.Context, id uuid.UUID) (Product, error) {
-	row := q.queryRow(ctx, q.getProductStmt, getProduct, id)
+	row := q.db.QueryRowContext(ctx, getProduct, id)
 	var i Product
 	err := row.Scan(
 		&i.ID,
@@ -196,7 +196,7 @@ AND category = $1
 `
 
 func (q *Queries) GetProductsByCategory(ctx context.Context, category Categories) ([]Product, error) {
-	rows, err := q.query(ctx, q.getProductsByCategoryStmt, getProductsByCategory, category)
+	rows, err := q.db.QueryContext(ctx, getProductsByCategory, category)
 	if err != nil {
 		return nil, err
 	}
@@ -242,7 +242,7 @@ type UpdateProductParams struct {
 }
 
 func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) error {
-	_, err := q.exec(ctx, q.updateProductStmt, updateProduct,
+	_, err := q.db.ExecContext(ctx, updateProduct,
 		arg.Name,
 		arg.Price,
 		arg.Cover,

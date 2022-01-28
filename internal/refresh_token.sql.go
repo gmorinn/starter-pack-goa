@@ -23,7 +23,7 @@ type CreateRefreshTokenParams struct {
 }
 
 func (q *Queries) CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) error {
-	_, err := q.exec(ctx, q.createRefreshTokenStmt, createRefreshToken, arg.Token, arg.ExpirOn, arg.UserID)
+	_, err := q.db.ExecContext(ctx, createRefreshToken, arg.Token, arg.ExpirOn, arg.UserID)
 	return err
 }
 
@@ -34,7 +34,7 @@ WHERE expir_on < NOW()
 `
 
 func (q *Queries) DeleteOldRefreshToken(ctx context.Context) error {
-	_, err := q.exec(ctx, q.deleteOldRefreshTokenStmt, deleteOldRefreshToken)
+	_, err := q.db.ExecContext(ctx, deleteOldRefreshToken)
 	return err
 }
 
@@ -45,7 +45,7 @@ WHERE id = $1
 `
 
 func (q *Queries) DeleteRefreshToken(ctx context.Context, id uuid.UUID) error {
-	_, err := q.exec(ctx, q.deleteRefreshTokenStmt, deleteRefreshToken, id)
+	_, err := q.db.ExecContext(ctx, deleteRefreshToken, id)
 	return err
 }
 
@@ -60,6 +60,7 @@ FROM refresh_token
 LEFT JOIN users u ON (u.id = refresh_token.user_id)
 WHERE refresh_token.token = $1
 AND refresh_token.deleted_at IS NULL
+AND u.deleted_at IS NULL
 `
 
 type GetRefreshTokenRow struct {
@@ -77,7 +78,7 @@ type GetRefreshTokenRow struct {
 }
 
 func (q *Queries) GetRefreshToken(ctx context.Context, token string) (GetRefreshTokenRow, error) {
-	row := q.queryRow(ctx, q.getRefreshTokenStmt, getRefreshToken, token)
+	row := q.db.QueryRowContext(ctx, getRefreshToken, token)
 	var i GetRefreshTokenRow
 	err := row.Scan(
 		&i.ID,
@@ -100,17 +101,18 @@ SELECT id, created_at, updated_at, deleted_at, token, expir_on, user_id FROM ref
 WHERE user_id = $1
 AND deleted_at IS NULL
 ORDER BY created_at
-LIMIT $1
-OFFSET $2
+LIMIT $2
+OFFSET $3
 `
 
 type ListRefreshTokenByUserIDParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	UserID uuid.UUID `json:"user_id"`
+	Limit  int32     `json:"limit"`
+	Offset int32     `json:"offset"`
 }
 
 func (q *Queries) ListRefreshTokenByUserID(ctx context.Context, arg ListRefreshTokenByUserIDParams) ([]RefreshToken, error) {
-	rows, err := q.query(ctx, q.listRefreshTokenByUserIDStmt, listRefreshTokenByUserID, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listRefreshTokenByUserID, arg.UserID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}

@@ -32,7 +32,7 @@ type CreateFileRow struct {
 }
 
 func (q *Queries) CreateFile(ctx context.Context, arg CreateFileParams) (CreateFileRow, error) {
-	row := q.queryRow(ctx, q.createFileStmt, createFile,
+	row := q.db.QueryRowContext(ctx, createFile,
 		arg.Name,
 		arg.Url,
 		arg.Mime,
@@ -54,7 +54,7 @@ DELETE FROM files WHERE url = $1
 `
 
 func (q *Queries) DeleteFile(ctx context.Context, url sql.NullString) error {
-	_, err := q.exec(ctx, q.deleteFileStmt, deleteFile, url)
+	_, err := q.db.ExecContext(ctx, deleteFile, url)
 	return err
 }
 
@@ -65,7 +65,7 @@ AND url = $1
 `
 
 func (q *Queries) GetFileByURL(ctx context.Context, url sql.NullString) (File, error) {
-	row := q.queryRow(ctx, q.getFileByURLStmt, getFileByURL, url)
+	row := q.db.QueryRowContext(ctx, getFileByURL, url)
 	var i File
 	err := row.Scan(
 		&i.ID,
