@@ -124,3 +124,48 @@ func TestCountProducts(t *testing.T) {
 	require.NoError(t, err)
 	require.GreaterOrEqual(t, count, min)
 }
+
+func TestGetProductsByCategory(t *testing.T) {
+	arg := CreateProductParams{
+		Name:     utils.RandStringRunes(12),
+		Price:    float64(utils.RandomInt(1, 299)),
+		Cover:    utils.RandStringRunes(50),
+		Category: CategoriesHat,
+	}
+	product, err := testQueries.CreateProduct(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, product)
+
+	arg = CreateProductParams{
+		Name:     utils.RandStringRunes(12),
+		Price:    float64(utils.RandomInt(1, 299)),
+		Cover:    utils.RandStringRunes(50),
+		Category: CategoriesHat,
+	}
+	product, err = testQueries.CreateProduct(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, product)
+
+	products, err := testQueries.GetProductsByCategory(context.Background(), CategoriesHat)
+	require.NoError(t, err)
+	require.GreaterOrEqual(t, len(products), 2)
+
+	for _, v := range products {
+		require.NotEmpty(t, v)
+		require.Equal(t, v.Category, CategoriesHat)
+	}
+}
+
+func TestGetAllProducts(t *testing.T) {
+	for i := 0; i < 10; i++ {
+		createRandomProduct(t)
+	}
+
+	products, err := testQueries.GetAllProducts(context.Background())
+	require.NoError(t, err)
+	require.GreaterOrEqual(t, len(products), 9)
+
+	for _, v := range products {
+		require.NotEmpty(t, v)
+	}
+}

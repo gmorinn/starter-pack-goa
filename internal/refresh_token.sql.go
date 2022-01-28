@@ -60,6 +60,7 @@ FROM refresh_token
 LEFT JOIN users u ON (u.id = refresh_token.user_id)
 WHERE refresh_token.token = $1
 AND refresh_token.deleted_at IS NULL
+AND u.deleted_at IS NULL
 `
 
 type GetRefreshTokenRow struct {
@@ -100,17 +101,18 @@ SELECT id, created_at, updated_at, deleted_at, token, expir_on, user_id FROM ref
 WHERE user_id = $1
 AND deleted_at IS NULL
 ORDER BY created_at
-LIMIT $1
-OFFSET $2
+LIMIT $2
+OFFSET $3
 `
 
 type ListRefreshTokenByUserIDParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	UserID uuid.UUID `json:"user_id"`
+	Limit  int32     `json:"limit"`
+	Offset int32     `json:"offset"`
 }
 
 func (q *Queries) ListRefreshTokenByUserID(ctx context.Context, arg ListRefreshTokenByUserIDParams) ([]RefreshToken, error) {
-	rows, err := q.db.QueryContext(ctx, listRefreshTokenByUserID, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listRefreshTokenByUserID, arg.UserID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
