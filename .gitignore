@@ -8,3 +8,4 @@ public/uploads
 data.db
 api.log
 backup.sql
+google.json
