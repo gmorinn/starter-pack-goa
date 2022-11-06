@@ -163,12 +163,15 @@ func FilesImportFileDecoderFunc(mr *multipart.Reader, p **files.ImportFilePayloa
 			mimefile := string(part.Header.Get("Content-Type")[0])
 			filename := params["filename"]
 			url := "/" + fn
+			size := len(bytefile)
+			var size_res int64 = int64(size)
 			imageUpload := files.ImportFilePayload{
 				Format:   disposition,
 				Content:  bytefile,
 				Filename: filename,
 				Mime:     &mimefile,
 				URL:      &url,
+				Size:     &size_res,
 			}
 			r = imageUpload
 		}

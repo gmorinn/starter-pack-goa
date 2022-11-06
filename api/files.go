@@ -53,6 +53,7 @@ func (s *filessrvc) ImportFile(ctx context.Context, p *files.ImportFilePayload) 
 			Name: utils.NullS(p.Filename),
 			Url:  utils.NullS(*p.URL),
 			Mime: utils.NullS(*p.Mime),
+			Size: utils.NullI64(int64(*p.Size)),
 		}
 		newFile, err := q.CreateFile(ctx, arg)
 		if err != nil {
