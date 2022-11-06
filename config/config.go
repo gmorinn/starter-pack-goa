@@ -1,29 +1,26 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/joho/godotenv"
 )
 
 // API represent api
 type API struct {
-	Mode     string
-	Domain   string
-	TZ       string
-	SSL      bool
-	Host     string
-	Port     int
-	Project  string
-	Cert     string
-	Cors     string
-	Key      string
-	FronHost string
-	Security Security
-	Database Database
+	Name        string
+	Mode        string
+	Domain      string
+	SSL         bool
+	Host        string
+	Port        int
+	Cors        string
+	Security    Security
+	DatabaseURL string
+	Database    Database
 }
 
 // Database represent database
@@ -50,23 +47,19 @@ func New() *API {
 
 	godotenv.Load("../.env")
 
-	config.Mode = os.Getenv("API_MODE")
+	config.Mode = os.Getenv("ENV")
+	config.Name = os.Getenv("PROJECT")
 	config.Domain = os.Getenv("API_DOMAIN")
-	config.Project = os.Getenv("PROJECT")
 
-	config.TZ = os.Getenv("TZ")
-	config.Port, _ = getenvInt("API_PORT")
-	config.SSL, _ = getenvBool("API_SSL")
-	config.Cert = os.Getenv("API_CERT")
-	config.Key = os.Getenv("API_KEY")
-	config.Host = os.Getenv("API_HOST")
+	if os.Getenv("PORT") == "" {
+		config.Port, _ = getenvInt("API_PORT")
+	} else {
+		config.Port, _ = getenvInt("PORT")
+	}
 
 	config.Cors = os.Getenv("API_CORS")
-
-	config.Cert = os.Getenv("API_CERT")
-	config.Key = os.Getenv("API_KEY")
-
-	config.FronHost = os.Getenv("FRONT_HOST")
+	config.SSL, _ = getenvBool("API_SSL")
+	config.Host = fmt.Sprintf("%s:%d", config.Domain, config.Port)
 
 	config.Database.Host = os.Getenv("POSTGRES_HOST")
 	config.Database.Database = os.Getenv("POSTGRES_DB")
@@ -80,6 +73,12 @@ func New() *API {
 	config.Security.Secret = os.Getenv("API_SECRET")
 	config.Security.AccessTokenDuration, _ = getenvInt("API_ACCESS_TOKEN")
 	config.Security.RefreshTokenDuration, _ = getenvInt("API_REFRESH_TOKEN")
+
+	if os.Getenv("ENV") == "PROD" {
+		config.DatabaseURL = os.Getenv("DATABASE_URL")
+	} else {
+		config.DatabaseURL = fmt.Sprintf("postgresql://%s:%s@%s:%v/%s?sslmode=disable", config.Database.User, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)
+	}
 
 	return &config
 }
@@ -102,10 +101,4 @@ func getenvBool(key string) (bool, error) {
 		return false, err
 	}
 	return v, nil
-}
-
-func getenvSliceString(key string) []string {
-	s := os.Getenv(key)
-	v := strings.Split(s, ",")
-	return v
 }

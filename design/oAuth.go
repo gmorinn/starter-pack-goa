@@ -14,10 +14,12 @@ var _ = Service("oAuth", func() {
 	Error("unknown_error", unknownError, "Error not identified (500)")
 	Error("invalid_scopes", String, "Token scopes are invalid")
 	Error("unauthorized", String, "Identifiers are invalid")
+	Error("oauth_error", String, "Error when a request is send before asking for oAuth")
 
 	HTTP(func() {
 		Response("unknown_error", StatusInternalServerError)
 		Response("invalid_scopes", StatusForbidden)
+		Response("oauth_error", StatusForbidden)
 		Response("unauthorized", StatusUnauthorized)
 	})
 

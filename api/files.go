@@ -1,13 +1,13 @@
 package api
 
 import (
-	files "api_crud/gen/files"
-	db "api_crud/internal"
-	"api_crud/utils"
 	"context"
 	"fmt"
 	"log"
 	"os"
+	files "starter-pack-goa/gen/files"
+	db "starter-pack-goa/internal"
+	"starter-pack-goa/utils"
 
 	"goa.design/goa/v3/security"
 )
@@ -86,8 +86,15 @@ func (s *filessrvc) DeleteFile(ctx context.Context, p *files.DeleteFilePayload) 
 		if err := q.DeleteFile(ctx, utils.NullS(file.Url.String)); err != nil {
 			return fmt.Errorf("ERROR_DELETE_FILE_BY_ID %v", err)
 		}
-		if err = os.Remove("bin/" + p.URL); err != nil {
-			return fmt.Errorf("ERROR_REMOVE_FILE_IN_FOLDER %v", err)
+
+		if s.server.Config.Mode == "dev" {
+			if err = os.Remove("bin" + p.URL); err != nil {
+				return fmt.Errorf("ERROR_REMOVE_FILE_IN_FOLDER %v", err)
+			}
+		} else {
+			if err = os.Remove("/go/bin" + p.URL); err != nil {
+				return fmt.Errorf("ERROR_REMOVE_FILE_IN_FOLDER %v", err)
+			}
 		}
 		return nil
 	})

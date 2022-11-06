@@ -1,8 +1,8 @@
 package api
 
 import (
-	openapi "api_crud/gen/openapi"
 	"log"
+	openapi "starter-pack-goa/gen/openapi"
 )
 
 // openapi service example implementation.

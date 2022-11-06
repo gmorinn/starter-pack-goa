@@ -17,7 +17,7 @@ var _ = Service("files", func() {
 	Error("unknown_error", unknownError, "Error not identified (500)")
 
 	HTTP(func() {
-		Path("/v1/bo/files")
+		Path("/v1/file")
 		Header("oauth:Authorization", String, "OAuth token", func() {
 			Pattern("^Bearer [^ ]+$")
 		})
@@ -32,6 +32,7 @@ var _ = Service("files", func() {
 		Payload(func() {
 			Attribute("filename", String, "uploaded file name", func() {
 				Example("foo.jpg")
+				MinLength(2)
 			})
 			Attribute("url", String, "url file")
 			Attribute("w", Int64, "width of image if you crop")
@@ -41,6 +42,7 @@ var _ = Service("files", func() {
 			Attribute("size", Int64, "size of image")
 			Attribute("format", String, "uploaded file format", func() {
 				Example("image/jpeg")
+				Enum("image/jpeg", "image/png", "image/jpg")
 			})
 			TokenField(1, "jwtToken", String, func() {
 				Description("JWT used for authentication after Signin/Signup")
@@ -71,6 +73,7 @@ var _ = Service("files", func() {
 		Payload(func() {
 			Attribute("url", String, func() {
 				Example("/public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png")
+				MinLength(23)
 			})
 			TokenField(1, "jwtToken", String, func() {
 				Description("JWT used for authentication after Signin/Signup")

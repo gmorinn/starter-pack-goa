@@ -1,9 +1,9 @@
 package api
 
 import (
-	"api_crud/config"
-	db "api_crud/internal"
-	sqlc "api_crud/internal"
+	"starter-pack-goa/config"
+	db "starter-pack-goa/internal"
+	sqlc "starter-pack-goa/internal"
 
 	"context"
 	"database/sql"
@@ -17,32 +17,29 @@ import (
 	"log"
 )
 
-type Store interface {
-	db.Querier
-	ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) error
-}
-
-type SQLStore struct {
+type Store struct {
 	*sqlc.Queries
 	db *sql.DB
 }
 
 type Server struct {
-	Store    Store
+	Store    *Store
 	Config   *config.API
 	cronTask *cron.Cron
 }
 
 // NewStore create new Store
-func NewStore(db *sql.DB) Store {
-	return &SQLStore{
+func NewStore(db *sql.DB) *Store {
+	// db.SetMaxOpenConns(140)
+	// db.SetMaxIdleConns(140)
+	return &Store{
 		db:      db,
 		Queries: sqlc.New(db),
 	}
 }
 
 // execTx executes a function within a database transaction
-func (store *SQLStore) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) error {
+func (store *Store) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -59,21 +56,41 @@ func (store *SQLStore) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error)
 
 func NewServer() *Server {
 	cnf := config.New()
-	source := fmt.Sprintf("postgresql://%s:%s@%s:%v/%s?sslmode=disable", cnf.Database.User, cnf.Database.Password, cnf.Database.Host, cnf.Database.Port, cnf.Database.Database)
-	pg, err := sql.Open("postgres", source)
+	pg, err := sql.Open("postgres", cnf.DatabaseURL)
 	if err != nil {
-		log.Fatal("Err DB ==> ", err)
+		log.Fatalln("Err DB ==> ", err)
+	} else {
+		fmt.Println("Connect DB successful")
 	}
 
 	if err = pg.Ping(); err != nil {
-		fmt.Printf("Postgres ping error : (%v)", err)
+		fmt.Printf("Postgres ping error : (%v)\n", err)
+	} else {
+		fmt.Println("Ping DB successful")
 	}
-
 	store := NewStore(pg)
 	server := &Server{Store: store}
 	server.Config = cnf
 	server.runCron(&server.cronTask, server.Config)
 	initCron(server)
+	return server
+}
+
+func NewServerTest() *Server {
+	cnf := config.New()
+	source := fmt.Sprintf("postgresql://%s:%s@127.0.0.1:%v/%s?sslmode=disable", cnf.Database.User, cnf.Database.Password, cnf.Database.Port, cnf.Database.Database)
+	pg, err := sql.Open("postgres", source)
+	if err != nil {
+		log.Fatalln("Err DB ==> ", err)
+	}
+
+	if err = pg.Ping(); err != nil {
+		fmt.Printf("Postgres ping error : (%v)\n", err)
+	}
+
+	store := NewStore(pg)
+	server := &Server{Store: store}
+	server.Config = cnf
 	return server
 }
 

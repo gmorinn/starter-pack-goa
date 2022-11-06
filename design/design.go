@@ -1,9 +1,8 @@
 package design
 
 import (
-	"api_crud/config"
 	"fmt"
-	"os"
+	"starter-pack-goa/config"
 
 	. "goa.design/goa/v3/dsl"
 	cors "goa.design/plugins/v3/cors/dsl"
@@ -11,19 +10,19 @@ import (
 )
 
 // API describes the global properties of the API server.
-var _ = API(os.Getenv("PROJECT"), func() {
+var _ = API("starter-pack-goa", func() {
 
 	// Get .env
 	cnf := config.New()
 	var host string
 
 	if cnf.SSL {
-		host = fmt.Sprintf("https://%s:%v", cnf.Domain, cnf.Port)
+		host = fmt.Sprintf("https://%s", cnf.Host)
 	} else {
-		host = fmt.Sprintf("http://%s:%v", cnf.Domain, cnf.Port)
+		host = fmt.Sprintf("http://%s", cnf.Host)
 	}
 
-	Title(cnf.Project)
+	Title(cnf.Name)
 	Description("Best API REST building with GoaDesign")
 	Version("1.0")
 
@@ -35,7 +34,7 @@ var _ = API(os.Getenv("PROJECT"), func() {
 		cors.Credentials()
 	})
 
-	Server(cnf.Project, func() {
+	Server(cnf.Name, func() {
 		Host(cnf.Domain, func() {
 			URI(host)
 		})

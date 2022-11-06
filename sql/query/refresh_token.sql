@@ -32,3 +32,8 @@ WHERE id = sqlc.arg('id');
 UPDATE refresh_token
 SET deleted_at = NOW()
 WHERE expir_on < NOW();
+
+-- name: GetOldRefreshToken :one
+SELECT * FROM refresh_token
+WHERE expir_on < NOW()
+LIMIT 1;

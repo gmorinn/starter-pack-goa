@@ -1,10 +1,9 @@
 package api
 
 import (
-	jwttoken "api_crud/gen/jwt_token"
-	oauth "api_crud/gen/o_auth"
 	"context"
 	"log"
+	oauth "starter-pack-goa/gen/o_auth"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -23,11 +22,6 @@ func NewOAuth(logger *log.Logger, server *Server) oauth.Service {
 	return &oAuthsrvc{logger, server}
 }
 
-var (
-	ErrUnsupportedGrantType error = oauth.Unauthorized("Unsupported grant")
-	ErrInvalidRequest       error = oauth.Unauthorized("Invalid request")
-)
-
 func (s *oAuthsrvc) errorResponse(msg string, err error) *oauth.UnknownError {
 	return &oauth.UnknownError{
 		Err:       err.Error(),
@@ -37,12 +31,11 @@ func (s *oAuthsrvc) errorResponse(msg string, err error) *oauth.UnknownError {
 
 // oAuth
 func (s *oAuthsrvc) OAuth(ctx context.Context, p *oauth.OauthPayload) (res *oauth.OAuthResponse, err error) {
+	if p == nil {
+		return nil, ErrNullPayload
+	}
 	if p.GrantType != "client_credentials" {
 		return nil, ErrUnsupportedGrantType
-	}
-
-	if p.ClientID == "" || p.ClientSecret == "" {
-		return nil, ErrInvalidRequest
 	}
 
 	if p.ClientID != s.server.Config.Security.OAuthID || p.ClientSecret != s.server.Config.Security.OAuthSecret {
@@ -70,7 +63,10 @@ func (s *oAuthsrvc) OAuth(ctx context.Context, p *oauth.OauthPayload) (res *oaut
 }
 
 func (server *Server) CheckAuth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
-
+	ctx = contextWithAuthInfo(ctx, authInfo{})
+	if scheme == nil {
+		return ctx, ErrNullPayload
+	}
 	claims := make(jwt.MapClaims)
 
 	// authorize request
@@ -80,7 +76,7 @@ func (server *Server) CheckAuth(ctx context.Context, token string, scheme *secur
 		return b, nil
 	})
 	if err != nil {
-		return ctx, ErrInvalidToken
+		return ctx, oauth.OauthError("Invalid token")
 	}
 	if !t.Valid {
 		return ctx, ErrInvalidToken
@@ -105,7 +101,7 @@ func (server *Server) CheckAuth(ctx context.Context, token string, scheme *secur
 		scopesInToken = append(scopesInToken, scp.(string))
 	}
 	if err := scheme.Validate(scopesInToken); err != nil {
-		return ctx, jwttoken.InvalidScopes(err.Error())
+		return ctx, ErrInvalidTokenScopes
 	}
 
 	// 3. add authInfo to context

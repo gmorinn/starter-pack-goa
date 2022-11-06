@@ -1,29 +1,21 @@
 package api
 
 import (
-	jwttoken "api_crud/gen/jwt_token"
-	db "api_crud/internal"
-	"api_crud/utils"
 	"context"
-	"errors"
 	"fmt"
 	"log"
+	jwttoken "starter-pack-goa/gen/jwt_token"
+	db "starter-pack-goa/internal"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 	"goa.design/goa/v3/security"
-	"gopkg.in/oauth2.v3/utils/uuid"
 )
 
 type jwtTokensrvc struct {
 	logger *log.Logger
 	server *Server
-}
-
-func errorEmail() *jwttoken.EmailAlreadyExist {
-	return &jwttoken.EmailAlreadyExist{
-		Err: "EMAIL_ALREADY_EXIST",
-	}
 }
 
 func NewJWTToken(logger *log.Logger, server *Server) jwttoken.Service {
@@ -37,53 +29,39 @@ func (s *jwtTokensrvc) errorResponse(msg string, err error) *jwttoken.UnknownErr
 	}
 }
 
-var (
-	ErrInvalidToken       error = jwttoken.Unauthorized("invalid token")
-	ErrInvalidPassword    error = jwttoken.Unauthorized("invalid password")
-	ErrInvalidTokenScopes error = jwttoken.InvalidScopes("invalid scopes in token")
-	ErrExpiredToken       error = jwttoken.Unauthorized("token has expired")
-)
-
 func (s *jwtTokensrvc) OAuth2Auth(ctx context.Context, token string, scheme *security.OAuth2Scheme) (context.Context, error) {
 	return s.server.CheckAuth(ctx, token, scheme)
 }
 
 func (s *jwtTokensrvc) Signup(ctx context.Context, p *jwttoken.SignupPayload) (res *jwttoken.Sign, err error) {
-
+	if p == nil {
+		return nil, ErrNullPayload
+	}
 	if p.Password != p.ConfirmPassword {
 		return nil, ErrInvalidPassword
 	}
-
 	isExist, err := s.server.Store.CheckEmailExist(ctx, p.Email)
 	if err != nil {
 		return nil, s.errorResponse("ERROR_GET_MAIL", err)
 	}
 	if isExist {
-		return nil, errorEmail()
+		return nil, s.errorResponse("EMAIL_ALREADY_EXIST", ErrEmailExist)
 	}
-
 	arg := db.SignupParams{
-		Firstname: p.Firstname,
-		Lastname:  p.Lastname,
-		Email:     p.Email,
-		Crypt:     p.Password,
-		Phone:     utils.NullS(p.Phone),
-		Birthday:  utils.NullS(p.Birthday),
+		Email: p.Email,
+		Crypt: p.Password,
 	}
 	user, err := s.server.Store.Signup(ctx, arg)
 	if err != nil {
 		return nil, s.errorResponse("ERROR_CREATE_USER", err)
 	}
-
-	t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID), string(user.Role))
+	t, r, expt, err := s.generateJwtToken(user.ID, string(user.Role))
 	if err != nil {
 		return nil, s.errorResponse("ERROR_TOKEN", err)
 	}
-
 	if err := s.server.StoreRefresh(ctx, r, expt, user.ID); err != nil {
 		return nil, s.errorResponse("ERROR_REFRESH_TOKEN", err)
 	}
-
 	response := jwttoken.Sign{
 		AccessToken:  t,
 		RefreshToken: r,
@@ -94,6 +72,9 @@ func (s *jwtTokensrvc) Signup(ctx context.Context, p *jwttoken.SignupPayload) (r
 
 func (s *jwtTokensrvc) Signin(ctx context.Context, p *jwttoken.SigninPayload) (res *jwttoken.Sign, err error) {
 	// Request Login
+	if p == nil {
+		return nil, ErrNullPayload
+	}
 	arg := db.LoginUserParams{
 		Email: p.Email,
 		Crypt: p.Password,
@@ -102,16 +83,13 @@ func (s *jwtTokensrvc) Signin(ctx context.Context, p *jwttoken.SigninPayload) (r
 	if err != nil {
 		return nil, s.errorResponse("ERROR_LOGIN_USER", err)
 	}
-
-	t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID), string(user.Role))
+	t, r, expt, err := s.generateJwtToken(user.ID, string(user.Role))
 	if err != nil {
 		return nil, s.errorResponse("ERROR_TOKEN", err)
 	}
-
 	if err := s.server.StoreRefresh(ctx, r, expt, user.ID); err != nil {
 		return nil, s.errorResponse("ERROR_REFRESH_TOKEN", err)
 	}
-
 	response := jwttoken.Sign{
 		AccessToken:  t,
 		RefreshToken: r,
@@ -121,33 +99,30 @@ func (s *jwtTokensrvc) Signin(ctx context.Context, p *jwttoken.SigninPayload) (r
 }
 
 func (s *jwtTokensrvc) Refresh(ctx context.Context, p *jwttoken.RefreshPayload) (res *jwttoken.Sign, err error) {
+	if p == nil {
+		return nil, ErrNullPayload
+	}
 	token, err := jwt.Parse(p.RefreshToken, func(token *jwt.Token) (interface{}, error) {
 		b := ([]byte(s.server.Config.Security.Secret))
 		return b, nil
 	})
-
 	if err != nil {
 		return nil, s.errorResponse("TOKEN_ERROR", err)
 	}
-
 	if !token.Valid {
-		return nil, s.errorResponse("TOKEN_IS_NOT_VALID", err)
+		return nil, s.errorResponse("TOKEN_IS_NOT_VALID", ErrInvalidToken)
 	}
-
 	refresh, err := s.server.Store.GetRefreshToken(ctx, p.RefreshToken)
 	if err != nil {
 		return nil, s.errorResponse("FIND_REFRESH_TOKEN", err)
 	}
-
-	t, r, expt, err := s.generateJwtToken(uuid.UUID(refresh.UserID), string(refresh.UserRole))
+	t, r, expt, err := s.generateJwtToken(refresh.UserID, string(refresh.UserRole.Role))
 	if err != nil {
 		return nil, s.errorResponse("ERROR_TOKEN", err)
 	}
-
 	if err := s.server.StoreRefresh(ctx, r, expt, refresh.UserID); err != nil {
 		return nil, s.errorResponse("ERROR_REFRESH_TOKEN", err)
 	}
-
 	response := jwttoken.Sign{
 		AccessToken:  t,
 		RefreshToken: r,
@@ -168,7 +143,6 @@ func (s *jwtTokensrvc) generateJwtToken(ID uuid.UUID, role string) (string, stri
 	if err != nil {
 		return "", "", time.Now(), fmt.Errorf("ERROR_GENERATE_ACCESS_JWT %v", err)
 	}
-
 	expt := time.Now().Add(time.Duration((time.Hour * 24) * time.Duration(s.server.Config.Security.RefreshTokenDuration)))
 	exp := expt.Unix()
 
@@ -183,104 +157,15 @@ func (s *jwtTokensrvc) generateJwtToken(ID uuid.UUID, role string) (string, stri
 	if err != nil {
 		return "", "", time.Now(), fmt.Errorf("ERROR_GENERATE_REFRESH_JWT %v", err)
 	}
-
 	return t, r, expt, nil
-}
-
-func (s *jwtTokensrvc) AuthProviders(ctx context.Context, p *jwttoken.AuthProvidersPayload) (res *jwttoken.Sign, err error) {
-	var t, r string
-	var user db.User
-	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		app, err := firebaseClient(ctx)
-		if err != nil {
-			return fmt.Errorf("FIREBASE_CLIENT %v", err.Error())
-		}
-
-		client, err := app.Auth(ctx)
-		if err != nil {
-			return fmt.Errorf("FIREBASE_AUTH %v", err.Error())
-		}
-
-		_, err = client.VerifyIDTokenAndCheckRevoked(ctx, p.FirebaseIDToken)
-		if err != nil {
-			return fmt.Errorf("VERIFYING_ID_TOKEN: %v", err.Error())
-		}
-		// CHECK IF USER BY FIREBASE EXIST
-		existFBUid, err := q.ExistGetUserByFireBaseUid(ctx, utils.NullS(p.FirebaseUID))
-		if err != nil {
-			return fmt.Errorf("EXIST_GET_USER_BY_FIRE_BASE_UID %v", err.Error())
-		}
-		// IF USER WAS EVER CONNECTED WITH FIREBASE
-		if existFBUid {
-			user, err = q.GetUserByFireBaseUid(ctx, utils.NullS(p.FirebaseUID))
-			if err != nil {
-				return fmt.Errorf("GET_USER_BY_FIRE_BASE_UID %v", err.Error())
-			}
-		} else {
-			// CHECK IF USER ALREADY EXIST IN DATABASE
-			existEmail, err := q.CheckEmailExist(ctx, p.Email)
-			if err != nil {
-				return fmt.Errorf("EXIST_EMAIL: %v", err.Error())
-			}
-			// IF ALREADY EXIST
-			if existEmail {
-				user, err = q.FindUserByEmail(ctx, p.Email)
-				if err != nil {
-					return fmt.Errorf("FIND_USER_BY_EMAIL: %v", err.Error())
-				}
-				// UPDATE FIREBASE FIELDS IN DB
-				if err := q.UpdateUserProvider(ctx, db.UpdateUserProviderParams{
-					ID:               user.ID,
-					FirebaseIDToken:  utils.NullS(p.FirebaseIDToken),
-					FirebaseUid:      utils.NullS(p.FirebaseUID),
-					FirebaseProvider: utils.NullS(p.FirebaseProvider)}); err != nil {
-					return fmt.Errorf("UPDATE_USER_PROVIDER: %v", err.Error())
-				}
-			} else {
-				arg := db.SignProviderParams{
-					Firstname:        p.Firstname,
-					Lastname:         p.Lastname,
-					Email:            p.Email,
-					Crypt:            utils.RandStringRunes(60),
-					FirebaseIDToken:  utils.NullS(p.FirebaseIDToken),
-					FirebaseUid:      utils.NullS(p.FirebaseUID),
-					FirebaseProvider: utils.NullS(p.FirebaseProvider),
-				}
-				//Sign with Provider
-				user, err = q.SignProvider(ctx, arg)
-				if err != nil {
-					return fmt.Errorf("SIGNUP_PROVIDER %v", err.Error())
-				}
-			}
-		}
-		return nil
-	})
-
-	if err != nil {
-		return nil, s.errorResponse("TX_AUTH_PROVIDER", err)
-	}
-
-	t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID), string(user.Role))
-	if err != nil {
-		return nil, s.errorResponse("ERROR_TOKEN", err)
-	}
-
-	if err := s.server.StoreRefresh(ctx, r, expt, user.ID); err != nil {
-		return nil, s.errorResponse("ERROR_REFRESH_TOKEN", err)
-	}
-
-	res = &jwttoken.Sign{
-		AccessToken:  t,
-		RefreshToken: r,
-		Success:      true,
-	}
-	return res, nil
 }
 
 func (server *Server) CheckJWT(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error) {
 
+	if schema == nil {
+		return ctx, ErrNullPayload
+	}
 	claims := make(jwt.MapClaims)
-
 	// authorize request
 	// 1. parse JWT token, token key is hardcoded to "secret" in this example
 	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
@@ -310,7 +195,7 @@ func (server *Server) CheckJWT(ctx context.Context, token string, schema *securi
 		scopesInToken = append(scopesInToken, scp.(string))
 	}
 	if err := schema.Validate(scopesInToken); err != nil {
-		return ctx, jwttoken.InvalidScopes(err.Error())
+		return ctx, ErrInvalidTokenScopes
 	}
 
 	// 3. add authInfo to context
@@ -318,45 +203,4 @@ func (server *Server) CheckJWT(ctx context.Context, token string, schema *securi
 		jwtToken: claims,
 	})
 	return ctx, nil
-}
-
-func (s *jwtTokensrvc) SigninBo(ctx context.Context, p *jwttoken.SigninBoPayload) (res *jwttoken.Sign, err error) {
-
-	var response jwttoken.Sign
-	err = s.server.Store.ExecTx(ctx, func(q *db.Queries) error {
-		// Request Login
-		arg := db.LoginUserParams{
-			Email: p.Email,
-			Crypt: p.Password,
-		}
-		user, err := q.LoginUser(ctx, arg)
-		if err != nil {
-			return fmt.Errorf("ERROR_LOGIN_USER %v", err)
-		}
-
-		getUser, err := q.GetUserByID(ctx, user.ID)
-		if err != nil {
-			return fmt.Errorf("ERROR_GET_USER %v", err)
-		}
-		if getUser.Role != "admin" {
-			return fmt.Errorf("ERROR_BAD_ROLE %v", errors.New("Bad role"))
-		}
-		t, r, expt, err := s.generateJwtToken(uuid.UUID(user.ID), string(user.Role))
-		if err != nil {
-			return fmt.Errorf("ERROR_TOKEN %v", err)
-		}
-		if err := s.server.StoreRefresh(ctx, r, expt, user.ID); err != nil {
-			return fmt.Errorf("ERROR_REFRESH_TOKEN %v", err)
-		}
-		response = jwttoken.Sign{
-			AccessToken:  t,
-			RefreshToken: r,
-			Success:      true,
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, s.errorResponse("TX_SIGNIN_BO", err)
-	}
-	return &response, nil
 }

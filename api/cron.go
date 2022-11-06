@@ -1,8 +1,8 @@
 package api
 
 import (
-	"api_crud/config"
 	"log"
+	"starter-pack-goa/config"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -18,14 +18,6 @@ type Days struct {
 func (server *Server) runCron(c **cron.Cron, config *config.API) {
 	// ctx := context.Background()
 	(*c) = cron.New()
-
-	// (*c).AddFunc("@every 5s", func() {
-	// 	test, err := server.Store.GetBooks(ctx)
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	// 	fmt.Println(test)
-	// })
 
 	(*c).Start()
 	log.Printf("%+v\n", (*c).Entries())

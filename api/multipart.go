@@ -1,13 +1,10 @@
 package api
 
 import (
-	files "api_crud/gen/files"
-	"api_crud/utils"
 	"bytes"
 	"errors"
 	"fmt"
 	"image"
-	"image/gif"
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
@@ -15,6 +12,8 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	files "starter-pack-goa/gen/files"
+	"starter-pack-goa/utils"
 	"strconv"
 	"strings"
 
@@ -37,11 +36,6 @@ func convertByteToImg(format string, file **os.File, img *image.Image) error {
 		break
 	case strings.Contains(format, "jpg"):
 		if err := jpeg.Encode(*file, *img, &jpeg.Options{Quality: 40}); err != nil {
-			return err
-		}
-		break
-	case strings.Contains(format, "gif"):
-		if err := gif.Encode(*file, *img, &gif.Options{NumColors: 256}); err != nil {
 			return err
 		}
 		break

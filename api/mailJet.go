@@ -1,15 +1,15 @@
 package api
 
 import (
-	db "api_crud/internal"
-	"api_crud/utils"
 	"context"
 	"fmt"
 	"log"
 	"os"
+	db "starter-pack-goa/internal"
+	"starter-pack-goa/utils"
 	"strconv"
 
-	mailjet "github.com/mailjet/mailjet-apiv3-go"
+	"github.com/mailjet/mailjet-apiv3-go"
 )
 
 func (server *Server) sendEmail(ctx context.Context, id, email string) error {
@@ -23,17 +23,15 @@ func (server *Server) sendEmail(ctx context.Context, id, email string) error {
 			Email:               email,
 			PasswordConfirmCode: utils.NullS(code),
 		}
-
 		if err := q.UpdateUserConfirmCode(ctx, arg); err != nil {
 			return fmt.Errorf("UPDATE_USER_CONFIRM_CODE %s", err.Error())
 		}
-
 		m := mailjet.NewMailjetClient(os.Getenv("API_MAILJET_KEY"), os.Getenv("API_MAILJET_SECRET"))
 		messagesInfo := []mailjet.InfoMessagesV31{
 			mailjet.InfoMessagesV31{
 				From: &mailjet.RecipientV31{
 					Email: os.Getenv("API_MAIL_FROM"),
-					Name:  os.Getenv("API_MAIL_NAME"),
+					Name:  "GM API",
 				},
 				To: &mailjet.RecipientsV31{
 					mailjet.RecipientV31{
@@ -41,7 +39,7 @@ func (server *Server) sendEmail(ctx context.Context, id, email string) error {
 						Name:  " ",
 					},
 				},
-				TemplateID:       templateAPI,
+				TemplateID:       int(templateAPI),
 				TemplateLanguage: true,
 				Subject:          "Votre code de confirmation",
 				Variables:        map[string]interface{}{"code": code},

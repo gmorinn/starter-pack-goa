@@ -5,8 +5,8 @@ AND password = crypt($2, password)
 AND deleted_at IS NULL;
 
 -- name: Signup :one
-INSERT INTO users (firstname, lastname, email, password, phone, birthday) 
-VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5, $6)
+INSERT INTO users (email, password) 
+VALUES ($1, crypt($2, gen_salt('bf')))
 RETURNING *;
 
 -- name: UpdateUserPassword :exec
@@ -26,29 +26,12 @@ SELECT EXISTS(
     AND deleted_at IS NULL
 );
 
--- name: SignProvider :one
-INSERT INTO users (firstname, lastname, email, password, phone, birthday, firebase_id_token, firebase_uid, firebase_provider) 
-VALUES ($1, $2, $3, crypt($4, gen_salt('bf')), $5, $6, $7, $8, $9)
-RETURNING *;
-
--- name: ExistGetUserByFireBaseUid :one
+-- name: CheckIDExist :one
 SELECT EXISTS(
-	SELECT * FROM users
-	WHERE deleted_at IS NULL
-	AND firebase_uid = sqlc.arg('firebase_uid')
+    SELECT * FROM users
+    WHERE id = $1
+    AND deleted_at IS NULL
 );
-
--- name: GetUserByFireBaseUid :one
-SELECT * FROM users
-WHERE deleted_at IS NULL
-AND firebase_uid = $1;
-
-
--- name: UpdateUserProvider :exec
-UPDATE users
-SET firebase_id_token = $2, firebase_uid = $3, firebase_provider = $4, updated_at = NOW()
-WHERE id = $1
-RETURNING *;
 
 -- name: UpdateUserConfirmCode :exec
 UPDATE users
@@ -72,3 +55,8 @@ SELECT EXISTS(
     AND email = $1
     AND password_confirm_code = $2
 );
+
+-- name: GetCodeByEmail :one
+SELECT password_confirm_code FROM users
+WHERE deleted_at IS NULL
+AND email = $1;

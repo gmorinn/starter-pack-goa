@@ -1,8 +1,8 @@
 package api
 
 import (
-	fileapi "api_crud/gen/fileapi"
 	"log"
+	fileapi "starter-pack-goa/gen/fileapi"
 )
 
 // fileapi service example implementation.

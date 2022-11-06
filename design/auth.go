@@ -78,18 +78,22 @@ var _ = Service("auth", func() {
 				Format(FormatEmail)
 			})
 			Attribute("code", String, func() {
-				Example("ZGI5EV")
+				Example("ZGI5E")
+				MinLength(5)
+				MaxLength(5)
+				Pattern("^[A-Za-z0-9]+$")
+
 			})
 			Attribute("password", String, func() {
-				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Description("Minimum 9 charactères / Chiffre Obligatoire")
 				Pattern("\\d")
-				MinLength(8)
+				MinLength(9)
 				Example("JeSuisUnTest974")
 			})
 			Attribute("confirm_password", String, func() {
-				Description("Minimum 8 charactères / Chiffre Obligatoire")
+				Description("Minimum 9 charactères / Chiffre Obligatoire")
 				Pattern("\\d")
-				MinLength(8)
+				MinLength(9)
 				Example("JeSuisUnTest974")
 			})
 			AccessTokenField(1, "oauth", String, func() {
