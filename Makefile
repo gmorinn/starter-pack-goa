@@ -11,12 +11,13 @@ export DIR
 
 api-goa:
 	@echo -e "\n\t🔥GOA GM\n\n\tLoading...⌛\n"
+	@rm -rf ./gen
 	@goa gen $(DIR)/design
 	@cp -f gen/http/openapi3.json ./
 	@echo -e "\nWait...⌛\n\nGOA GM will generate functions for you❤️\n"
 	@goa example $(DIR)/design
-	@clean
-	@echo -e "\nEnjoy🐿️\n=> Documentation make api-doc"
+	@./bin/clean
+	@echo -e "\nEnjoy🐿️\n"
 
 doc:
 	@echo "\n\tCopy paste "openapi3.json" (file in the root of the project) in this website\n"
@@ -29,8 +30,12 @@ api-init:
 
 sql:
 	@echo "\n\t🧠\n"
-	@./sql/bin/sqlc generate
-	@echo "\nQueries generated\n"
+	@sqlc generate
+	@echo "\nIf there is an error, do"
+	@echo "👉 go install github.com/kyleconroy/sqlc/cmd/sqlc@latest\n"
+
+migrateup:
+	migrate -path sql/migration -database "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" -verbose up
 
 api-dev:
 	@echo -e "\n\t💣\n"
@@ -38,5 +43,5 @@ api-dev:
 	@go run $(GOROOT)/src/crypto/tls/generate_cert.go --host $(API_DOMAIN)
 	docker-compose -p ${PROJECT} up --build --force-recreate --remove-orphans
 
-.PHONY: api-init sql doc api-goa show-schema api-dev
+.PHONY: api-init sql doc api-goa show-schema api-dev migrateup
 

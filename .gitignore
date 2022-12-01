@@ -1,6 +1,7 @@
 tmp
 .DS_Store
-bin/*
+bin/public/*
+bin/api
 api.log
 backup.sql
 cmd/clean

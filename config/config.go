@@ -76,7 +76,7 @@ func New() *API {
 	config.Security.AccessTokenDuration, _ = getenvInt("API_ACCESS_TOKEN")
 	config.Security.RefreshTokenDuration, _ = getenvInt("API_REFRESH_TOKEN")
 
-	config.DatabaseURL = fmt.Sprintf("postgresql://%s:%s@%s:%v/%s?sslmode=disable", config.Database.User, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)
+	config.DatabaseURL = fmt.Sprintf("postgresql://%s:%s@%s:%v/%s", config.Database.User, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)
 
 	return &config
 }

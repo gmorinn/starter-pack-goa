@@ -56,13 +56,12 @@ func (store *Store) ExecTx(ctx context.Context, fn func(*sqlc.Queries) error) er
 
 func NewServer() *Server {
 	cnf := config.New()
-	pg, err := sql.Open("postgres", cnf.DatabaseURL)
+	pg, err := sql.Open("postgres", cnf.DatabaseURL+"?sslmode=disable")
 	if err != nil {
 		log.Fatalln("Err DB ==> ", err)
 	} else {
 		fmt.Println("Connect DB successful")
 	}
-
 	if err = pg.Ping(); err != nil {
 		fmt.Printf("Postgres ping error : (%v)\n", err)
 	} else {
