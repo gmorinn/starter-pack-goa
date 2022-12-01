@@ -26,8 +26,6 @@ type Service interface {
 type Auther interface {
 	// OAuth2Auth implements the authorization logic for the OAuth2 security scheme.
 	OAuth2Auth(ctx context.Context, token string, schema *security.OAuth2Scheme) (context.Context, error)
-	// JWTAuth implements the authorization logic for the JWT security scheme.
-	JWTAuth(ctx context.Context, token string, schema *security.JWTScheme) (context.Context, error)
 }
 
 // ServiceName is the name of the service as defined in the design. This is the
@@ -43,8 +41,6 @@ var MethodNames = [2]string{"importFile", "deleteFile"}
 // DeleteFilePayload is the payload type of the files service deleteFile method.
 type DeleteFilePayload struct {
 	URL string
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
 	// Use to generate Oauth with /authorization
 	Oauth *string
 }
@@ -56,32 +52,33 @@ type DeleteFileResult struct {
 
 // ImportFilePayload is the payload type of the files service importFile method.
 type ImportFilePayload struct {
-	// uploaded file name
-	Filename string
-	// url file
-	URL *string
-	// width of image if you crop
-	W *int64
-	// height of image if you crop
-	H *int64
-	// url file
-	Mime *string
-	// content of image
-	Content []byte
-	// size of image
-	Size *int64
-	// uploaded file format
-	Format string
-	// JWT used for authentication after Signin/Signup
-	JWTToken *string
+	// Files to import
+	Files []*PayloadFile
 	// Use to generate Oauth with /authorization
 	Oauth *string
 }
 
 // ImportFileResult is the result type of the files service importFile method.
 type ImportFileResult struct {
-	File    *ResFile
+	File    []*ResFile
 	Success bool
+}
+
+type PayloadFile struct {
+	// uploaded file name
+	Filename string
+	// url file
+	URL string
+	// width of image if you crop
+	W *int64
+	// height of image if you crop
+	H *int64
+	// content of image
+	Content []byte
+	// size of image
+	Size int64
+	// uploaded file format
+	Format string
 }
 
 type ResFile struct {

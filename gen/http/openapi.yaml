@@ -73,7 +73,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
     /openapi.json:
         get:
             tags:
@@ -90,7 +90,7 @@ paths:
                     schema:
                         type: file
             schemes:
-                - http
+                - https
     /public/{path}:
         get:
             tags:
@@ -114,7 +114,7 @@ paths:
                     schema:
                         $ref: '#/definitions/Error'
             schemes:
-                - http
+                - https
     /refresh:
         post:
             tags:
@@ -154,7 +154,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
     /signin:
@@ -197,7 +197,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
     /signup:
@@ -241,7 +241,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
     /v1/email-exist:
@@ -282,7 +282,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
     /v1/file/add:
@@ -301,21 +301,13 @@ paths:
                   required: false
                   type: string
                   pattern: ^Bearer [^ ]+$
-                - name: jwtToken
-                  in: header
-                  description: Jwt token
-                  required: false
-                  type: string
-                  pattern: ^Bearer [^ ]+$
                 - name: ImportFileRequestBody
                   in: formData
                   required: true
                   schema:
                     $ref: '#/definitions/FilesImportFileRequestBody'
                     required:
-                        - filename
-                        - content
-                        - format
+                        - files
             responses:
                 "201":
                     description: Created response.
@@ -333,10 +325,9 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
-                  jwt_header_jwtToken: []
     /v1/file/remove:
         patch:
             tags:
@@ -348,12 +339,6 @@ paths:
                 - name: Authorization
                   in: header
                   description: OAuth token
-                  required: false
-                  type: string
-                  pattern: ^Bearer [^ ]+$
-                - name: jwtToken
-                  in: header
-                  description: Jwt token
                   required: false
                   type: string
                   pattern: ^Bearer [^ ]+$
@@ -380,10 +365,9 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
-                  jwt_header_jwtToken: []
     /v1/lost:
         post:
             tags:
@@ -422,7 +406,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
     /v1/reset-password:
@@ -465,7 +449,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
     /v1/web/user/{id}:
@@ -511,7 +495,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
                   jwt_header_jwtToken: []
@@ -559,7 +543,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
                   jwt_header_jwtToken: []
@@ -607,7 +591,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
                   jwt_header_jwtToken: []
@@ -652,7 +636,7 @@ paths:
                             - success
                             - error_code
             schemes:
-                - http
+                - https
             security:
                 - OAuth2_header_Authorization: []
                   jwt_header_jwtToken: []
@@ -678,10 +662,10 @@ definitions:
                 example: true
             success:
                 type: boolean
-                example: true
+                example: false
         example:
             exist: true
-            success: true
+            success: false
         required:
             - exist
             - success
@@ -698,7 +682,7 @@ definitions:
             success:
                 type: boolean
                 default: false
-                example: false
+                example: true
         description: Error not identified (500)
         example:
             err: sql no rows affected
@@ -750,9 +734,9 @@ definitions:
         properties:
             success:
                 type: boolean
-                example: false
+                example: true
         example:
-            success: true
+            success: false
         required:
             - success
     AuthResetPasswordUnknownErrorResponseBody:
@@ -773,7 +757,7 @@ definitions:
         example:
             err: sql no rows affected
             error_code: TX_UPDATE_ITEM
-            success: false
+            success: true
         required:
             - err
             - success
@@ -799,7 +783,7 @@ definitions:
                 example: false
             success:
                 type: boolean
-                example: true
+                example: false
         example:
             exist: false
             success: false
@@ -824,7 +808,7 @@ definitions:
         example:
             err: sql no rows affected
             error_code: TX_UPDATE_ITEM
-            success: true
+            success: false
         required:
             - err
             - success
@@ -864,7 +848,7 @@ definitions:
             message: parameter 'p' must be an integer
             name: bad_request
             temporary: true
-            timeout: true
+            timeout: false
         required:
             - name
             - id
@@ -890,7 +874,7 @@ definitions:
         properties:
             success:
                 type: boolean
-                example: false
+                example: true
         example:
             success: false
         required:
@@ -922,110 +906,262 @@ definitions:
         title: FilesImportFileRequestBody
         type: object
         properties:
-            content:
-                type: string
-                description: content of image
+            files:
+                type: array
+                items:
+                    $ref: '#/definitions/payloadFileRequestBody'
+                description: Files to import
                 example:
-                    - 85
+                    - content:
+                        - 68
+                        - 101
+                        - 108
+                        - 101
+                        - 110
+                        - 105
+                        - 116
+                        - 105
+                        - 32
+                        - 114
+                        - 101
+                        - 112
+                        - 101
+                        - 108
+                        - 108
+                        - 101
+                        - 110
+                        - 100
+                        - 117
+                        - 115
+                        - 46
+                      filename: foo.jpg
+                      format: image/jpeg
+                      h: 453901555597122463
+                      size: 4908872163727939995
+                      url: Similique tenetur ratione est.
+                      w: 6121017000915498524
+                    - content:
+                        - 68
+                        - 101
+                        - 108
+                        - 101
+                        - 110
+                        - 105
+                        - 116
+                        - 105
+                        - 32
+                        - 114
+                        - 101
+                        - 112
+                        - 101
+                        - 108
+                        - 108
+                        - 101
+                        - 110
+                        - 100
+                        - 117
+                        - 115
+                        - 46
+                      filename: foo.jpg
+                      format: image/jpeg
+                      h: 453901555597122463
+                      size: 4908872163727939995
+                      url: Similique tenetur ratione est.
+                      w: 6121017000915498524
+                    - content:
+                        - 68
+                        - 101
+                        - 108
+                        - 101
+                        - 110
+                        - 105
+                        - 116
+                        - 105
+                        - 32
+                        - 114
+                        - 101
+                        - 112
+                        - 101
+                        - 108
+                        - 108
+                        - 101
+                        - 110
+                        - 100
+                        - 117
+                        - 115
+                        - 46
+                      filename: foo.jpg
+                      format: image/jpeg
+                      h: 453901555597122463
+                      size: 4908872163727939995
+                      url: Similique tenetur ratione est.
+                      w: 6121017000915498524
+                    - content:
+                        - 68
+                        - 101
+                        - 108
+                        - 101
+                        - 110
+                        - 105
+                        - 116
+                        - 105
+                        - 32
+                        - 114
+                        - 101
+                        - 112
+                        - 101
+                        - 108
+                        - 108
+                        - 101
+                        - 110
+                        - 100
+                        - 117
+                        - 115
+                        - 46
+                      filename: foo.jpg
+                      format: image/jpeg
+                      h: 453901555597122463
+                      size: 4908872163727939995
+                      url: Similique tenetur ratione est.
+                      w: 6121017000915498524
+        example:
+            files:
+                - content:
+                    - 68
+                    - 101
+                    - 108
+                    - 101
+                    - 110
+                    - 105
+                    - 116
+                    - 105
+                    - 32
+                    - 114
+                    - 101
+                    - 112
+                    - 101
+                    - 108
+                    - 108
+                    - 101
                     - 110
                     - 100
-                    - 101
-                    - 32
-                    - 110
-                    - 101
+                    - 117
                     - 115
-                    - 99
-                    - 105
-                    - 117
-                    - 110
-                    - 116
-                    - 32
-                    - 99
-                    - 117
-                    - 109
-                    - 113
-                    - 117
-                    - 101
                     - 46
-                format: byte
-            filename:
-                type: string
-                description: uploaded file name
-                example: foo.jpg
-                minLength: 2
-            format:
-                type: string
-                description: uploaded file format
-                example: image/jpeg
-                enum:
-                    - image/jpeg
-                    - image/png
-                    - image/jpg
-            h:
-                type: integer
-                description: height of image if you crop
-                example: 8529679476592417868
-                format: int64
-            mime:
-                type: string
-                description: url file
-                example: Illo repudiandae in eum ratione sed.
-            size:
-                type: integer
-                description: size of image
-                example: 5795732347313123467
-                format: int64
-            url:
-                type: string
-                description: url file
-                example: Molestias ad quasi sed laborum.
-            w:
-                type: integer
-                description: width of image if you crop
-                example: 2908476327083422861
-                format: int64
-        example:
-            content:
-                - 81
-                - 117
-                - 105
-                - 32
-                - 100
-                - 117
-                - 99
-                - 105
-                - 109
-                - 117
-                - 115
-                - 46
-            filename: foo.jpg
-            format: image/jpeg
-            h: 5194974390363827584
-            mime: Quia quam et incidunt vero.
-            size: 1352988947556285481
-            url: Vero deleniti sint temporibus deserunt.
-            w: 5381470590522431180
+                  filename: foo.jpg
+                  format: image/jpeg
+                  h: 453901555597122463
+                  size: 4908872163727939995
+                  url: Similique tenetur ratione est.
+                  w: 6121017000915498524
+                - content:
+                    - 68
+                    - 101
+                    - 108
+                    - 101
+                    - 110
+                    - 105
+                    - 116
+                    - 105
+                    - 32
+                    - 114
+                    - 101
+                    - 112
+                    - 101
+                    - 108
+                    - 108
+                    - 101
+                    - 110
+                    - 100
+                    - 117
+                    - 115
+                    - 46
+                  filename: foo.jpg
+                  format: image/jpeg
+                  h: 453901555597122463
+                  size: 4908872163727939995
+                  url: Similique tenetur ratione est.
+                  w: 6121017000915498524
+                - content:
+                    - 68
+                    - 101
+                    - 108
+                    - 101
+                    - 110
+                    - 105
+                    - 116
+                    - 105
+                    - 32
+                    - 114
+                    - 101
+                    - 112
+                    - 101
+                    - 108
+                    - 108
+                    - 101
+                    - 110
+                    - 100
+                    - 117
+                    - 115
+                    - 46
+                  filename: foo.jpg
+                  format: image/jpeg
+                  h: 453901555597122463
+                  size: 4908872163727939995
+                  url: Similique tenetur ratione est.
+                  w: 6121017000915498524
         required:
-            - filename
-            - content
-            - format
+            - files
     FilesImportFileResponseBody:
         title: FilesImportFileResponseBody
         type: object
         properties:
             file:
-                $ref: '#/definitions/resFileResponseBody'
+                type: array
+                items:
+                    $ref: '#/definitions/resFileResponseBody'
+                example:
+                    - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                      mime: Ut vero sit.
+                      name: foo.png
+                      size: 4120569230563613071
+                      url: Ad nam ab reiciendis tempore et.
+                    - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                      mime: Ut vero sit.
+                      name: foo.png
+                      size: 4120569230563613071
+                      url: Ad nam ab reiciendis tempore et.
+                    - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                      mime: Ut vero sit.
+                      name: foo.png
+                      size: 4120569230563613071
+                      url: Ad nam ab reiciendis tempore et.
+                    - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                      mime: Ut vero sit.
+                      name: foo.png
+                      size: 4120569230563613071
+                      url: Ad nam ab reiciendis tempore et.
             success:
                 type: boolean
                 example: true
         example:
             file:
-                id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                mime: Animi quia eos est ipsam magnam.
-                name: foo.png
-                size: 6063255645832637196
-                url: Eum non delectus qui explicabo.
-            success: true
+                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  mime: Ut vero sit.
+                  name: foo.png
+                  size: 4120569230563613071
+                  url: Ad nam ab reiciendis tempore et.
+                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  mime: Ut vero sit.
+                  name: foo.png
+                  size: 4120569230563613071
+                  url: Ad nam ab reiciendis tempore et.
+                - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                  mime: Ut vero sit.
+                  name: foo.png
+                  size: 4120569230563613071
+                  url: Ad nam ab reiciendis tempore et.
+            success: false
         required:
             - success
             - file
@@ -1042,7 +1178,7 @@ definitions:
             success:
                 type: boolean
                 default: false
-                example: true
+                example: false
         description: Error not identified (500)
         example:
             err: sql no rows affected
@@ -1076,7 +1212,7 @@ definitions:
                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
             success:
                 type: boolean
-                example: true
+                example: false
         example:
             access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
             refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
@@ -1098,12 +1234,12 @@ definitions:
             success:
                 type: boolean
                 default: false
-                example: false
+                example: true
         description: Error not identified (500)
         example:
             err: sql no rows affected
             error_code: TX_UPDATE_ITEM
-            success: true
+            success: false
         required:
             - err
             - success
@@ -1144,7 +1280,7 @@ definitions:
         example:
             access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
             refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-            success: false
+            success: true
         required:
             - access_token
             - refresh_token
@@ -1162,7 +1298,7 @@ definitions:
             success:
                 type: boolean
                 default: false
-                example: false
+                example: true
         description: Error not identified (500)
         example:
             err: sql no rows affected
@@ -1212,11 +1348,11 @@ definitions:
                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
             success:
                 type: boolean
-                example: true
+                example: false
         example:
             access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
             refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-            success: true
+            success: false
         required:
             - access_token
             - refresh_token
@@ -1250,34 +1386,7 @@ definitions:
         properties:
             access_token:
                 type: string
-                example: Nam et voluptatem illum tenetur minima aut.
-            expires_in:
-                type: integer
-                example: 8161455401701233110
-                format: int64
-            success:
-                type: boolean
-                example: false
-            token_type:
-                type: string
-                example: Vel voluptatem ut nihil.
-        example:
-            access_token: Quod mollitia velit.
-            expires_in: 1779374780890354756
-            success: true
-            token_type: In saepe voluptates.
-        required:
-            - access_token
-            - token_type
-            - expires_in
-            - success
-    OAuthOAuthCreatedResponseBody:
-        title: OAuthOAuthCreatedResponseBody
-        type: object
-        properties:
-            access_token:
-                type: string
-                example: Accusantium est ut esse.
+                example: Animi accusantium est ut esse.
             expires_in:
                 type: integer
                 example: 4545527829279733676
@@ -1298,23 +1407,50 @@ definitions:
             - token_type
             - expires_in
             - success
+    OAuthOAuthCreatedResponseBody:
+        title: OAuthOAuthCreatedResponseBody
+        type: object
+        properties:
+            access_token:
+                type: string
+                example: Temporibus deserunt aspernatur iusto atque.
+            expires_in:
+                type: integer
+                example: 72790680147885009
+                format: int64
+            success:
+                type: boolean
+                example: true
+            token_type:
+                type: string
+                example: Quam et incidunt.
+        example:
+            access_token: Ducimus libero omnis unde aut voluptas eligendi.
+            expires_in: 6619145419624376195
+            success: false
+            token_type: Doloremque voluptate veniam blanditiis voluptatibus sed fuga.
+        required:
+            - access_token
+            - token_type
+            - expires_in
+            - success
     OAuthOAuthRequestBody:
         title: OAuthOAuthRequestBody
         type: object
         properties:
             client_id:
                 type: string
-                example: Consequatur ut dicta dolorum.
+                example: Voluptatem illum tenetur minima aut.
             client_secret:
                 type: string
-                example: Ipsum assumenda aut et quos atque nam.
+                example: Vel voluptatem ut nihil.
             grant_type:
                 type: string
-                example: Esse dolore dolore.
+                example: Quis voluptates quod mollitia.
         example:
-            client_id: Aut at veniam quia numquam.
-            client_secret: Consequatur est et.
-            grant_type: Nam aut asperiores voluptatem esse.
+            client_id: Voluptatum in saepe voluptates non.
+            client_secret: Expedita possimus fuga consequatur.
+            grant_type: Dicta dolorum est ipsum assumenda aut.
         required:
             - client_id
             - client_secret
@@ -1337,7 +1473,7 @@ definitions:
         example:
             err: sql no rows affected
             error_code: TX_UPDATE_ITEM
-            success: false
+            success: true
         required:
             - err
             - success
@@ -1366,12 +1502,12 @@ definitions:
             success:
                 type: boolean
                 default: false
-                example: true
+                example: false
         description: Error not identified (500)
         example:
             err: sql no rows affected
             error_code: TX_UPDATE_ITEM
-            success: false
+            success: true
         required:
             - err
             - success
@@ -1393,7 +1529,7 @@ definitions:
                 firstname: Guillaume
                 id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                 lastname: Morin
-                role: Sed sunt.
+                role: Est distinctio veritatis quibusdam.
         required:
             - user
             - success
@@ -1410,7 +1546,7 @@ definitions:
             success:
                 type: boolean
                 default: false
-                example: false
+                example: true
         description: Error not identified (500)
         example:
             err: sql no rows affected
@@ -1427,13 +1563,13 @@ definitions:
             avatar:
                 type: string
                 description: Url of the avatar and stock in db
-                example: Rem sunt distinctio sint aut.
+                example: Dolorem corrupti accusamus iusto fugit.
             id:
                 type: string
                 example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                 format: uuid
         example:
-            avatar: Exercitationem temporibus quas.
+            avatar: Quas rerum amet.
             id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
         required:
             - id
@@ -1444,7 +1580,7 @@ definitions:
         properties:
             success:
                 type: boolean
-                example: true
+                example: false
             user:
                 $ref: '#/definitions/resUserResponseBody'
         example:
@@ -1455,7 +1591,7 @@ definitions:
                 firstname: Guillaume
                 id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                 lastname: Morin
-                role: Sed sunt.
+                role: Est distinctio veritatis quibusdam.
         required:
             - success
     UsersUpdateAvatarUnknownErrorResponseBody:
@@ -1471,7 +1607,7 @@ definitions:
             success:
                 type: boolean
                 default: false
-                example: true
+                example: false
         description: Error not identified (500)
         example:
             err: sql no rows affected
@@ -1517,18 +1653,18 @@ definitions:
         properties:
             success:
                 type: boolean
-                example: true
+                example: false
             user:
                 $ref: '#/definitions/resUserResponseBody'
         example:
-            success: true
+            success: false
             user:
                 avatar: /public/uploads/2022/02/eedf427a-559a-4faf-9e75-357fbb5d65fb.png
                 email: guillaume@gmail.com
                 firstname: Guillaume
                 id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                 lastname: Morin
-                role: Sed sunt.
+                role: Est distinctio veritatis quibusdam.
         required:
             - success
     UsersUpdateDescriptionUnknownErrorResponseBody:
@@ -1549,11 +1685,118 @@ definitions:
         example:
             err: sql no rows affected
             error_code: TX_UPDATE_ITEM
-            success: true
+            success: false
         required:
             - err
             - success
             - error_code
+    payloadFileRequestBody:
+        title: payloadFileRequestBody
+        type: object
+        properties:
+            content:
+                type: string
+                description: content of image
+                example:
+                    - 65
+                    - 117
+                    - 116
+                    - 32
+                    - 113
+                    - 117
+                    - 105
+                    - 97
+                    - 32
+                    - 108
+                    - 105
+                    - 98
+                    - 101
+                    - 114
+                    - 111
+                    - 32
+                    - 101
+                    - 116
+                    - 46
+                format: byte
+            filename:
+                type: string
+                description: uploaded file name
+                example: foo.jpg
+                minLength: 2
+            format:
+                type: string
+                description: uploaded file format
+                example: image/jpeg
+                enum:
+                    - image/jpeg
+                    - image/png
+                    - image/jpg
+            h:
+                type: integer
+                description: height of image if you crop
+                example: 1005649613830708203
+                format: int64
+            size:
+                type: integer
+                description: size of image
+                example: 5710438328882919695
+                format: int64
+            url:
+                type: string
+                description: url file
+                example: Laboriosam laborum repellat consectetur.
+            w:
+                type: integer
+                description: width of image if you crop
+                example: 4812326111393089347
+                format: int64
+        example:
+            content:
+                - 81
+                - 117
+                - 105
+                - 32
+                - 113
+                - 117
+                - 105
+                - 32
+                - 97
+                - 108
+                - 105
+                - 97
+                - 115
+                - 32
+                - 109
+                - 111
+                - 108
+                - 101
+                - 115
+                - 116
+                - 105
+                - 97
+                - 115
+                - 32
+                - 97
+                - 100
+                - 32
+                - 113
+                - 117
+                - 97
+                - 115
+                - 105
+                - 46
+            filename: foo.jpg
+            format: image/jpeg
+            h: 6211682876195979408
+            size: 392387664016998855
+            url: Blanditiis est aut odit aliquid.
+            w: 1532588874162345822
+        required:
+            - filename
+            - content
+            - format
+            - size
+            - url
     resFileResponseBody:
         title: resFileResponseBody
         type: object
@@ -1564,23 +1807,23 @@ definitions:
                 format: uuid
             mime:
                 type: string
-                example: Tempore aut.
+                example: Temporibus nobis tempore.
             name:
                 type: string
                 example: foo.png
             size:
                 type: integer
-                example: 5628325901883333098
+                example: 7956991256582004969
                 format: int64
             url:
                 type: string
-                example: Quo voluptas laboriosam laborum repellat consectetur magnam.
+                example: Beatae est nobis.
         example:
             id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-            mime: Est aut odit aliquid.
+            mime: Sequi aut ipsam.
             name: foo.png
-            size: 1532588874162345822
-            url: Et animi et.
+            size: 5814378729141051674
+            url: Velit odio ut eius numquam fugit.
         required:
             - id
             - name
@@ -1607,14 +1850,14 @@ definitions:
             role:
                 type: string
                 description: User is admin or not
-                example: Accusamus iusto fugit.
+                example: Esse dolore dolore.
         example:
             avatar: /public/uploads/2022/02/eedf427a-559a-4faf-9e75-357fbb5d65fb.png
             email: guillaume@gmail.com
             firstname: Guillaume
             id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
             lastname: Morin
-            role: Quas rerum amet.
+            role: Aut at veniam quia numquam.
         required:
             - id
             - email

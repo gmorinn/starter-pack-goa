@@ -12,7 +12,7 @@ var _ = Service("files", func() {
 		Timeout()
 	})
 
-	Security(OAuth2, JWTAuth)
+	Security(OAuth2)
 
 	Error("unknown_error", unknownError, "Error not identified (500)")
 
@@ -21,39 +21,18 @@ var _ = Service("files", func() {
 		Header("oauth:Authorization", String, "OAuth token", func() {
 			Pattern("^Bearer [^ ]+$")
 		})
-		Header("jwtToken:jwtToken", String, "Jwt token", func() {
-			Pattern("^Bearer [^ ]+$")
-		})
 		Response("unknown_error", StatusInternalServerError)
 	})
 
 	Method("importFile", func() {
 		Description("Import file")
 		Payload(func() {
-			Attribute("filename", String, "uploaded file name", func() {
-				Example("foo.jpg")
-				MinLength(2)
-			})
-			Attribute("url", String, "url file")
-			Attribute("w", Int64, "width of image if you crop")
-			Attribute("h", Int64, "height of image if you crop")
-			Attribute("mime", String, "url file")
-			Attribute("content", Bytes, "content of image")
-			Attribute("size", Int64, "size of image")
-			Attribute("format", String, "uploaded file format", func() {
-				Example("image/jpeg")
-				Enum("image/jpeg", "image/png", "image/jpg")
-			})
-			TokenField(1, "jwtToken", String, func() {
-				Description("JWT used for authentication after Signin/Signup")
-			})
-			AccessTokenField(2, "oauth", String, func() {
+			Attribute("files", ArrayOf(payloadFile), "Files to import")
+			AccessTokenField(1, "oauth", String, func() {
 				Description("Use to generate Oauth with /authorization")
 			})
 			Required(
-				"filename",
-				"content",
-				"format",
+				"files",
 			)
 		})
 		HTTP(func() {
@@ -62,7 +41,7 @@ var _ = Service("files", func() {
 			Response(StatusCreated)
 		})
 		Result(func() {
-			Attribute("file", resFile)
+			Attribute("file", ArrayOf(resFile))
 			Attribute("success", Boolean)
 			Required("success", "file")
 		})
@@ -75,10 +54,7 @@ var _ = Service("files", func() {
 				Example("/public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png")
 				MinLength(23)
 			})
-			TokenField(1, "jwtToken", String, func() {
-				Description("JWT used for authentication after Signin/Signup")
-			})
-			AccessTokenField(2, "oauth", String, func() {
+			AccessTokenField(1, "oauth", String, func() {
 				Description("Use to generate Oauth with /authorization")
 			})
 			Required("url")
@@ -106,4 +82,27 @@ var resFile = Type("resFile", func() {
 	Attribute("mime", String)
 	Attribute("size", Int64)
 	Required("id", "name", "url")
+})
+
+var payloadFile = Type("payloadFile", func() {
+	Attribute("filename", String, "uploaded file name", func() {
+		Example("foo.jpg")
+		MinLength(2)
+	})
+	Attribute("url", String, "url file")
+	Attribute("w", Int64, "width of image if you crop")
+	Attribute("h", Int64, "height of image if you crop")
+	Attribute("content", Bytes, "content of image")
+	Attribute("size", Int64, "size of image")
+	Attribute("format", String, "uploaded file format", func() {
+		Example("image/jpeg")
+		Enum("image/jpeg", "image/png", "image/jpg")
+	})
+	Required(
+		"filename",
+		"content",
+		"format",
+		"size",
+		"url",
+	)
 })

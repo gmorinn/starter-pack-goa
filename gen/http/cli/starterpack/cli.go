@@ -38,28 +38,49 @@ users (delete-user|get-user-by-id|update-description|update-avatar)
 func UsageExamples() string {
 	return os.Args[0] + ` auth email-exist --body '{
       "email": "guillaume@gmail.com"
-   }' --oauth "Illo sed voluptatem exercitationem."` + "\n" +
+   }' --oauth "Quis repudiandae veniam."` + "\n" +
 		os.Args[0] + ` files import-file --body '{
-      "content": "TmFtIGFiIHJlaWNpZW5kaXMgdGVtcG9yZSBldCBwYXJpYXR1ciB1dC4=",
-      "filename": "foo.jpg",
-      "format": "image/jpeg",
-      "h": 4017343155180222301,
-      "mime": "Repellendus debitis ut natus repellat ipsa eveniet.",
-      "size": 8756228599422910954,
-      "url": "Est blanditiis.",
-      "w": 453901555597122463
-   }' --oauth "Aut esse unde." --jwt-token "Iste et voluptatem."` + "\n" +
+      "files": [
+         {
+            "content": "RGVsZW5pdGkgcmVwZWxsZW5kdXMu",
+            "filename": "foo.jpg",
+            "format": "image/jpeg",
+            "h": 453901555597122463,
+            "size": 4908872163727939995,
+            "url": "Similique tenetur ratione est.",
+            "w": 6121017000915498524
+         },
+         {
+            "content": "RGVsZW5pdGkgcmVwZWxsZW5kdXMu",
+            "filename": "foo.jpg",
+            "format": "image/jpeg",
+            "h": 453901555597122463,
+            "size": 4908872163727939995,
+            "url": "Similique tenetur ratione est.",
+            "w": 6121017000915498524
+         },
+         {
+            "content": "RGVsZW5pdGkgcmVwZWxsZW5kdXMu",
+            "filename": "foo.jpg",
+            "format": "image/jpeg",
+            "h": 453901555597122463,
+            "size": 4908872163727939995,
+            "url": "Similique tenetur ratione est.",
+            "w": 6121017000915498524
+         }
+      ]
+   }' --oauth "Natus repellat ipsa."` + "\n" +
 		os.Args[0] + ` jwt-token signup --body '{
       "confirm_password": "JeSuisUnTest974",
       "email": "guillaume@epitech.eu",
       "password": "JeSuisUnTest974"
-   }' --oauth "Voluptas sunt."` + "\n" +
+   }' --oauth "Delectus qui explicabo nemo."` + "\n" +
 		os.Args[0] + ` o-auth o-auth --body '{
-      "client_id": "Incidunt sit et ex rem.",
-      "client_secret": "Voluptates hic optio.",
-      "grant_type": "Velit consequatur numquam sint."
+      "client_id": "Accusamus dolore sint.",
+      "client_secret": "Voluptas sunt.",
+      "grant_type": "Labore quisquam quo."
    }'` + "\n" +
-		os.Args[0] + ` users delete-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Veritatis quibusdam modi velit." --jwt-token "Facilis sint ut molestiae culpa est."` + "\n" +
+		os.Args[0] + ` users delete-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Aut ex vel sint voluptatem." --jwt-token "Sed aut ut est sunt explicabo doloremque."` + "\n" +
 		""
 }
 
@@ -90,15 +111,13 @@ func ParseEndpoint(
 
 		filesFlags = flag.NewFlagSet("files", flag.ContinueOnError)
 
-		filesImportFileFlags        = flag.NewFlagSet("import-file", flag.ExitOnError)
-		filesImportFileBodyFlag     = filesImportFileFlags.String("body", "REQUIRED", "")
-		filesImportFileOauthFlag    = filesImportFileFlags.String("oauth", "", "")
-		filesImportFileJWTTokenFlag = filesImportFileFlags.String("jwt-token", "", "")
+		filesImportFileFlags     = flag.NewFlagSet("import-file", flag.ExitOnError)
+		filesImportFileBodyFlag  = filesImportFileFlags.String("body", "REQUIRED", "")
+		filesImportFileOauthFlag = filesImportFileFlags.String("oauth", "", "")
 
-		filesDeleteFileFlags        = flag.NewFlagSet("delete-file", flag.ExitOnError)
-		filesDeleteFileBodyFlag     = filesDeleteFileFlags.String("body", "REQUIRED", "")
-		filesDeleteFileOauthFlag    = filesDeleteFileFlags.String("oauth", "", "")
-		filesDeleteFileJWTTokenFlag = filesDeleteFileFlags.String("jwt-token", "", "")
+		filesDeleteFileFlags     = flag.NewFlagSet("delete-file", flag.ExitOnError)
+		filesDeleteFileBodyFlag  = filesDeleteFileFlags.String("body", "REQUIRED", "")
+		filesDeleteFileOauthFlag = filesDeleteFileFlags.String("oauth", "", "")
 
 		jwtTokenFlags = flag.NewFlagSet("jwt-token", flag.ContinueOnError)
 
@@ -301,10 +320,10 @@ func ParseEndpoint(
 			switch epn {
 			case "import-file":
 				endpoint = c.ImportFile(filesImportFileEncoderFn)
-				data, err = filesc.BuildImportFilePayload(*filesImportFileBodyFlag, *filesImportFileOauthFlag, *filesImportFileJWTTokenFlag)
+				data, err = filesc.BuildImportFilePayload(*filesImportFileBodyFlag, *filesImportFileOauthFlag)
 			case "delete-file":
 				endpoint = c.DeleteFile()
-				data, err = filesc.BuildDeleteFilePayload(*filesDeleteFileBodyFlag, *filesDeleteFileOauthFlag, *filesDeleteFileJWTTokenFlag)
+				data, err = filesc.BuildDeleteFilePayload(*filesDeleteFileBodyFlag, *filesDeleteFileOauthFlag)
 			}
 		case "jwt-token":
 			c := jwttokenc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -376,7 +395,7 @@ Check if email exist in database
 Example:
     %[1]s auth email-exist --body '{
       "email": "guillaume@gmail.com"
-   }' --oauth "Illo sed voluptatem exercitationem."
+   }' --oauth "Quis repudiandae veniam."
 `, os.Args[0])
 }
 
@@ -390,7 +409,7 @@ Check if email exist in database and send code by email to reset password
 Example:
     %[1]s auth send-confirmation --body '{
       "email": "guillaume@gmail.com"
-   }' --oauth "Praesentium sapiente."
+   }' --oauth "Eum quidem est."
 `, os.Args[0])
 }
 
@@ -407,7 +426,7 @@ Example:
       "confirm_password": "JeSuisUnTest974",
       "email": "guillaume@gmail.com",
       "password": "JeSuisUnTest974"
-   }' --oauth "Id autem est ut."
+   }' --oauth "Explicabo corporis voluptatem hic."
 `, os.Args[0])
 }
 
@@ -426,39 +445,58 @@ Additional help:
 `, os.Args[0])
 }
 func filesImportFileUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] files import-file -body JSON -oauth STRING -jwt-token STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] files import-file -body JSON -oauth STRING
 
 Import file
     -body JSON: 
     -oauth STRING: 
-    -jwt-token STRING: 
 
 Example:
     %[1]s files import-file --body '{
-      "content": "TmFtIGFiIHJlaWNpZW5kaXMgdGVtcG9yZSBldCBwYXJpYXR1ciB1dC4=",
-      "filename": "foo.jpg",
-      "format": "image/jpeg",
-      "h": 4017343155180222301,
-      "mime": "Repellendus debitis ut natus repellat ipsa eveniet.",
-      "size": 8756228599422910954,
-      "url": "Est blanditiis.",
-      "w": 453901555597122463
-   }' --oauth "Aut esse unde." --jwt-token "Iste et voluptatem."
+      "files": [
+         {
+            "content": "RGVsZW5pdGkgcmVwZWxsZW5kdXMu",
+            "filename": "foo.jpg",
+            "format": "image/jpeg",
+            "h": 453901555597122463,
+            "size": 4908872163727939995,
+            "url": "Similique tenetur ratione est.",
+            "w": 6121017000915498524
+         },
+         {
+            "content": "RGVsZW5pdGkgcmVwZWxsZW5kdXMu",
+            "filename": "foo.jpg",
+            "format": "image/jpeg",
+            "h": 453901555597122463,
+            "size": 4908872163727939995,
+            "url": "Similique tenetur ratione est.",
+            "w": 6121017000915498524
+         },
+         {
+            "content": "RGVsZW5pdGkgcmVwZWxsZW5kdXMu",
+            "filename": "foo.jpg",
+            "format": "image/jpeg",
+            "h": 453901555597122463,
+            "size": 4908872163727939995,
+            "url": "Similique tenetur ratione est.",
+            "w": 6121017000915498524
+         }
+      ]
+   }' --oauth "Natus repellat ipsa."
 `, os.Args[0])
 }
 
 func filesDeleteFileUsage() {
-	fmt.Fprintf(os.Stderr, `%[1]s [flags] files delete-file -body JSON -oauth STRING -jwt-token STRING
+	fmt.Fprintf(os.Stderr, `%[1]s [flags] files delete-file -body JSON -oauth STRING
 
 Delete one file by ID
     -body JSON: 
     -oauth STRING: 
-    -jwt-token STRING: 
 
 Example:
     %[1]s files delete-file --body '{
       "url": "/public/uploads/2021/12/2ca51d10-b660-4b2c-b27f-f7a119642885.png"
-   }' --oauth "Aut voluptatibus nobis." --jwt-token "Quo optio quam eveniet accusamus."
+   }' --oauth "Et voluptatem."
 `, os.Args[0])
 }
 
@@ -490,7 +528,7 @@ Example:
       "confirm_password": "JeSuisUnTest974",
       "email": "guillaume@epitech.eu",
       "password": "JeSuisUnTest974"
-   }' --oauth "Voluptas sunt."
+   }' --oauth "Delectus qui explicabo nemo."
 `, os.Args[0])
 }
 
@@ -505,7 +543,7 @@ Example:
     %[1]s jwt-token signin --body '{
       "email": "guillaume@epitech.eu",
       "password": "JeSuisUnTest974"
-   }' --oauth "Quo odit id ab soluta tempora suscipit."
+   }' --oauth "Est ipsam magnam."
 `, os.Args[0])
 }
 
@@ -519,7 +557,7 @@ Refresh Token
 Example:
     %[1]s jwt-token refresh --body '{
       "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
-   }' --oauth "Qui ut sint inventore fugiat qui nostrum."
+   }' --oauth "Temporibus aut voluptatibus nobis reiciendis quo."
 `, os.Args[0])
 }
 
@@ -544,9 +582,9 @@ oAuth
 
 Example:
     %[1]s o-auth o-auth --body '{
-      "client_id": "Incidunt sit et ex rem.",
-      "client_secret": "Voluptates hic optio.",
-      "grant_type": "Velit consequatur numquam sint."
+      "client_id": "Accusamus dolore sint.",
+      "client_secret": "Voluptas sunt.",
+      "grant_type": "Labore quisquam quo."
    }'
 `, os.Args[0])
 }
@@ -576,7 +614,7 @@ Delete one User by ID
     -jwt-token STRING: 
 
 Example:
-    %[1]s users delete-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Veritatis quibusdam modi velit." --jwt-token "Facilis sint ut molestiae culpa est."
+    %[1]s users delete-user --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Aut ex vel sint voluptatem." --jwt-token "Sed aut ut est sunt explicabo doloremque."
 `, os.Args[0])
 }
 
@@ -589,7 +627,7 @@ Get one User
     -jwt-token STRING: 
 
 Example:
-    %[1]s users get-user-by-id --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Aliquid explicabo iusto." --jwt-token "Expedita blanditiis."
+    %[1]s users get-user-by-id --id "5dfb0bf7-597a-4250-b7ad-63a43ff59c25" --oauth "Quos laboriosam quam vel." --jwt-token "Alias sunt distinctio velit asperiores."
 `, os.Args[0])
 }
 
@@ -607,7 +645,7 @@ Example:
       "firstname": "Guillaume",
       "id": "5dfb0bf7-597a-4250-b7ad-63a43ff59c25",
       "lastname": "Morin"
-   }' --oauth "Et sed aliquam." --jwt-token "Est quo voluptate quae expedita."
+   }' --oauth "Facilis sint ut molestiae culpa est." --jwt-token "Molestias voluptatem aliquid explicabo iusto non."
 `, os.Args[0])
 }
 
@@ -621,8 +659,8 @@ Update avatar
 
 Example:
     %[1]s users update-avatar --body '{
-      "avatar": "Eos sit voluptatum doloribus fugit aut fuga.",
+      "avatar": "Sed sunt.",
       "id": "5dfb0bf7-597a-4250-b7ad-63a43ff59c25"
-   }' --oauth "Repellat et similique dolor tempore illo unde." --jwt-token "Architecto veniam."
+   }' --oauth "Rerum illo et sed." --jwt-token "Aliquid est."
 `, os.Args[0])
 }

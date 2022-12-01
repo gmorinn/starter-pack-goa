@@ -46,13 +46,6 @@ func DecodeImportFileRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 				payload.Oauth = &cred
 			}
 		}
-		if payload.JWTToken != nil {
-			if strings.Contains(*payload.JWTToken, " ") {
-				// Remove authorization scheme prefix (e.g. "Bearer")
-				cred := strings.SplitN(*payload.JWTToken, " ", 2)[1]
-				payload.JWTToken = &cred
-			}
-		}
 
 		return payload, nil
 	}
@@ -73,19 +66,13 @@ func NewFilesImportFileDecoder(mux goahttp.Muxer, filesImportFileDecoderFn Files
 			}
 
 			var (
-				oauth    *string
-				jwtToken *string
+				oauth *string
 			)
 			oauthRaw := r.Header.Get("Authorization")
 			if oauthRaw != "" {
 				oauth = &oauthRaw
 			}
-			jwtTokenRaw := r.Header.Get("jwtToken")
-			if jwtTokenRaw != "" {
-				jwtToken = &jwtTokenRaw
-			}
 			(*p).Oauth = oauth
-			(*p).JWTToken = jwtToken
 			return nil
 		})
 	}
@@ -153,30 +140,18 @@ func DecodeDeleteFileRequest(mux goahttp.Muxer, decoder func(*http.Request) goah
 		}
 
 		var (
-			oauth    *string
-			jwtToken *string
+			oauth *string
 		)
 		oauthRaw := r.Header.Get("Authorization")
 		if oauthRaw != "" {
 			oauth = &oauthRaw
 		}
-		jwtTokenRaw := r.Header.Get("jwtToken")
-		if jwtTokenRaw != "" {
-			jwtToken = &jwtTokenRaw
-		}
-		payload := NewDeleteFilePayload(&body, oauth, jwtToken)
+		payload := NewDeleteFilePayload(&body, oauth)
 		if payload.Oauth != nil {
 			if strings.Contains(*payload.Oauth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")
 				cred := strings.SplitN(*payload.Oauth, " ", 2)[1]
 				payload.Oauth = &cred
-			}
-		}
-		if payload.JWTToken != nil {
-			if strings.Contains(*payload.JWTToken, " ") {
-				// Remove authorization scheme prefix (e.g. "Bearer")
-				cred := strings.SplitN(*payload.JWTToken, " ", 2)[1]
-				payload.JWTToken = &cred
 			}
 		}
 
@@ -211,6 +186,22 @@ func EncodeDeleteFileError(encoder func(context.Context, http.ResponseWriter) go
 			return encodeError(ctx, w, v)
 		}
 	}
+}
+
+// unmarshalPayloadFileRequestBodyToFilesPayloadFile builds a value of type
+// *files.PayloadFile from a value of type *PayloadFileRequestBody.
+func unmarshalPayloadFileRequestBodyToFilesPayloadFile(v *PayloadFileRequestBody) *files.PayloadFile {
+	res := &files.PayloadFile{
+		Filename: *v.Filename,
+		URL:      *v.URL,
+		W:        v.W,
+		H:        v.H,
+		Content:  v.Content,
+		Size:     *v.Size,
+		Format:   *v.Format,
+	}
+
+	return res
 }
 
 // marshalFilesResFileToResFileResponseBody builds a value of type

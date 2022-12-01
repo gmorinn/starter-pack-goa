@@ -18,22 +18,23 @@ import (
 
 // BuildImportFilePayload builds the payload for the files importFile endpoint
 // from CLI flags.
-func BuildImportFilePayload(filesImportFileBody string, filesImportFileOauth string, filesImportFileJWTToken string) (*files.ImportFilePayload, error) {
+func BuildImportFilePayload(filesImportFileBody string, filesImportFileOauth string) (*files.ImportFilePayload, error) {
 	var err error
 	var body ImportFileRequestBody
 	{
 		err = json.Unmarshal([]byte(filesImportFileBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"content\": \"TmFtIGFiIHJlaWNpZW5kaXMgdGVtcG9yZSBldCBwYXJpYXR1ciB1dC4=\",\n      \"filename\": \"foo.jpg\",\n      \"format\": \"image/jpeg\",\n      \"h\": 4017343155180222301,\n      \"mime\": \"Repellendus debitis ut natus repellat ipsa eveniet.\",\n      \"size\": 8756228599422910954,\n      \"url\": \"Est blanditiis.\",\n      \"w\": 453901555597122463\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"files\": [\n         {\n            \"content\": \"RGVsZW5pdGkgcmVwZWxsZW5kdXMu\",\n            \"filename\": \"foo.jpg\",\n            \"format\": \"image/jpeg\",\n            \"h\": 453901555597122463,\n            \"size\": 4908872163727939995,\n            \"url\": \"Similique tenetur ratione est.\",\n            \"w\": 6121017000915498524\n         },\n         {\n            \"content\": \"RGVsZW5pdGkgcmVwZWxsZW5kdXMu\",\n            \"filename\": \"foo.jpg\",\n            \"format\": \"image/jpeg\",\n            \"h\": 453901555597122463,\n            \"size\": 4908872163727939995,\n            \"url\": \"Similique tenetur ratione est.\",\n            \"w\": 6121017000915498524\n         },\n         {\n            \"content\": \"RGVsZW5pdGkgcmVwZWxsZW5kdXMu\",\n            \"filename\": \"foo.jpg\",\n            \"format\": \"image/jpeg\",\n            \"h\": 453901555597122463,\n            \"size\": 4908872163727939995,\n            \"url\": \"Similique tenetur ratione est.\",\n            \"w\": 6121017000915498524\n         }\n      ]\n   }'")
 		}
-		if body.Content == nil {
-			err = goa.MergeErrors(err, goa.MissingFieldError("content", "body"))
+		if body.Files == nil {
+			err = goa.MergeErrors(err, goa.MissingFieldError("files", "body"))
 		}
-		if utf8.RuneCountInString(body.Filename) < 2 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError("body.filename", body.Filename, utf8.RuneCountInString(body.Filename), 2, true))
-		}
-		if !(body.Format == "image/jpeg" || body.Format == "image/png" || body.Format == "image/jpg") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.format", body.Format, []interface{}{"image/jpeg", "image/png", "image/jpg"}))
+		for _, e := range body.Files {
+			if e != nil {
+				if err2 := ValidatePayloadFileRequestBody(e); err2 != nil {
+					err = goa.MergeErrors(err, err2)
+				}
+			}
 		}
 		if err != nil {
 			return nil, err
@@ -45,31 +46,21 @@ func BuildImportFilePayload(filesImportFileBody string, filesImportFileOauth str
 			oauth = &filesImportFileOauth
 		}
 	}
-	var jwtToken *string
-	{
-		if filesImportFileJWTToken != "" {
-			jwtToken = &filesImportFileJWTToken
+	v := &files.ImportFilePayload{}
+	if body.Files != nil {
+		v.Files = make([]*files.PayloadFile, len(body.Files))
+		for i, val := range body.Files {
+			v.Files[i] = marshalPayloadFileRequestBodyToFilesPayloadFile(val)
 		}
 	}
-	v := &files.ImportFilePayload{
-		Filename: body.Filename,
-		URL:      body.URL,
-		W:        body.W,
-		H:        body.H,
-		Mime:     body.Mime,
-		Content:  body.Content,
-		Size:     body.Size,
-		Format:   body.Format,
-	}
 	v.Oauth = oauth
-	v.JWTToken = jwtToken
 
 	return v, nil
 }
 
 // BuildDeleteFilePayload builds the payload for the files deleteFile endpoint
 // from CLI flags.
-func BuildDeleteFilePayload(filesDeleteFileBody string, filesDeleteFileOauth string, filesDeleteFileJWTToken string) (*files.DeleteFilePayload, error) {
+func BuildDeleteFilePayload(filesDeleteFileBody string, filesDeleteFileOauth string) (*files.DeleteFilePayload, error) {
 	var err error
 	var body DeleteFileRequestBody
 	{
@@ -90,17 +81,10 @@ func BuildDeleteFilePayload(filesDeleteFileBody string, filesDeleteFileOauth str
 			oauth = &filesDeleteFileOauth
 		}
 	}
-	var jwtToken *string
-	{
-		if filesDeleteFileJWTToken != "" {
-			jwtToken = &filesDeleteFileJWTToken
-		}
-	}
 	v := &files.DeleteFilePayload{
 		URL: body.URL,
 	}
 	v.Oauth = oauth
-	v.JWTToken = jwtToken
 
 	return v, nil
 }

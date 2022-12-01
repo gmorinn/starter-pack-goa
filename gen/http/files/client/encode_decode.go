@@ -51,10 +51,6 @@ func EncodeImportFileRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 				req.Header.Set("Authorization", head)
 			}
 		}
-		if p.JWTToken != nil {
-			head := *p.JWTToken
-			req.Header.Set("jwtToken", head)
-		}
 		if err := encoder(req).Encode(p); err != nil {
 			return goahttp.ErrEncodingError("files", "importFile", err)
 		}
@@ -168,10 +164,6 @@ func EncodeDeleteFileRequest(encoder func(*http.Request) goahttp.Encoder) func(*
 				req.Header.Set("Authorization", head)
 			}
 		}
-		if p.JWTToken != nil {
-			head := *p.JWTToken
-			req.Header.Set("jwtToken", head)
-		}
 		body := NewDeleteFileRequestBody(p)
 		if err := encoder(req).Encode(&body); err != nil {
 			return goahttp.ErrEncodingError("files", "deleteFile", err)
@@ -235,6 +227,38 @@ func DecodeDeleteFileResponse(decoder func(*http.Response) goahttp.Decoder, rest
 			return nil, goahttp.ErrInvalidResponse("files", "deleteFile", resp.StatusCode, string(body))
 		}
 	}
+}
+
+// marshalFilesPayloadFileToPayloadFileRequestBody builds a value of type
+// *PayloadFileRequestBody from a value of type *files.PayloadFile.
+func marshalFilesPayloadFileToPayloadFileRequestBody(v *files.PayloadFile) *PayloadFileRequestBody {
+	res := &PayloadFileRequestBody{
+		Filename: v.Filename,
+		URL:      v.URL,
+		W:        v.W,
+		H:        v.H,
+		Content:  v.Content,
+		Size:     v.Size,
+		Format:   v.Format,
+	}
+
+	return res
+}
+
+// marshalPayloadFileRequestBodyToFilesPayloadFile builds a value of type
+// *files.PayloadFile from a value of type *PayloadFileRequestBody.
+func marshalPayloadFileRequestBodyToFilesPayloadFile(v *PayloadFileRequestBody) *files.PayloadFile {
+	res := &files.PayloadFile{
+		Filename: v.Filename,
+		URL:      v.URL,
+		W:        v.W,
+		H:        v.H,
+		Content:  v.Content,
+		Size:     v.Size,
+		Format:   v.Format,
+	}
+
+	return res
 }
 
 // unmarshalResFileResponseBodyToFilesResFile builds a value of type

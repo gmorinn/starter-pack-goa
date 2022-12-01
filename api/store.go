@@ -76,24 +76,6 @@ func NewServer() *Server {
 	return server
 }
 
-func NewServerTest() *Server {
-	cnf := config.New()
-	source := fmt.Sprintf("postgresql://%s:%s@127.0.0.1:%v/%s?sslmode=disable", cnf.Database.User, cnf.Database.Password, cnf.Database.Port, cnf.Database.Database)
-	pg, err := sql.Open("postgres", source)
-	if err != nil {
-		log.Fatalln("Err DB ==> ", err)
-	}
-
-	if err = pg.Ping(); err != nil {
-		fmt.Printf("Postgres ping error : (%v)\n", err)
-	}
-
-	store := NewStore(pg)
-	server := &Server{Store: store}
-	server.Config = cnf
-	return server
-}
-
 func initCron(server *Server) {
 	c := cron.New()
 	c.AddFunc("@hourly", func() { server.Store.DeleteOldRefreshToken(context.Background()) })

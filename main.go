@@ -89,7 +89,7 @@ func main() {
 	var wg sync.WaitGroup
 	ctx, cancel := context.WithCancel(context.Background())
 
-	var addr string = fmt.Sprintf("http://%s", server.Config.Host)
+	var addr string = fmt.Sprintf("https://%s", server.Config.Host)
 
 	fmt.Printf("API on %s\n", addr)
 

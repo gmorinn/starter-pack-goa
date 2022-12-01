@@ -128,7 +128,11 @@ func handleHTTPServer(ctx context.Context, u *url.URL, api *ApiEndpoints, wg *sy
 
 		// Start HTTP server in a separate goroutine.
 		go func() {
-			errc <- srv.ListenAndServe()
+			if cnf.SSL {
+				errc <- srv.ListenAndServeTLS(cnf.Security.Cert, cnf.Security.Key)
+			} else {
+				errc <- srv.ListenAndServe()
+			}
 			logger.Printf("HTTP server listening on %q", u.Host)
 		}()
 

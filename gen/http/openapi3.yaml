@@ -11,7 +11,7 @@ info:
         url: https://guillaume-morin.fr/
     version: "1.0"
 servers:
-    - url: http://localhost:8088
+    - url: https://localhost:8088
 paths:
     /authorization:
         post:
@@ -27,9 +27,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/OAuthRequestBody'
                         example:
-                            client_id: Incidunt sit et ex rem.
-                            client_secret: Voluptates hic optio.
-                            grant_type: Velit consequatur numquam sint.
+                            client_id: Accusamus dolore sint.
+                            client_secret: Voluptas sunt.
+                            grant_type: Labore quisquam quo.
             responses:
                 "201":
                     description: Created response.
@@ -38,10 +38,10 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/OAuthResponse'
                             example:
-                                access_token: Aut fugiat magnam dicta.
-                                expires_in: 7072457515267178163
-                                success: false
-                                token_type: Quia quo omnis et.
+                                access_token: Id ab soluta tempora.
+                                expires_in: 4484882972777029123
+                                success: true
+                                token_type: Nihil voluptates dolor qui.
                 "400":
                     description: Bad Request response.
                     content:
@@ -49,24 +49,24 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/OAuthResponse'
                             example:
-                                access_token: Quos laboriosam quam vel.
-                                expires_in: 8202018749446831889
+                                access_token: Commodi tenetur reiciendis aut eligendi.
+                                expires_in: 158009050374148575
                                 success: true
-                                token_type: Alias sunt distinctio velit asperiores.
+                                token_type: Velit distinctio.
                 "401":
                     description: 'unauthorized: Unauthorized response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Rerum ullam et error dolorum et.
+                                example: Eos explicabo nihil esse ut.
                 "403":
                     description: 'oauth_error: Forbidden response.'
                     content:
                         application/json:
                             schema:
                                 type: string
-                                example: Quam facere.
+                                example: Libero unde cumque molestiae eveniet suscipit molestiae.
                 "500":
                     description: 'unknown_error: Error not identified (500)'
                     content:
@@ -201,7 +201,7 @@ paths:
                             example:
                                 access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
                                 refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-                                success: true
+                                success: false
                 "500":
                     description: 'unknown_error: Error not identified (500)'
                     content:
@@ -234,7 +234,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/EmailExistResponseBody'
                             example:
-                                exist: true
+                                exist: false
                                 success: false
                 "500":
                     description: 'unknown_error: Error not identified (500)'
@@ -252,17 +252,6 @@ paths:
             summary: importFile files
             description: Import file
             operationId: files#importFile
-            parameters:
-                - name: jwtToken
-                  in: header
-                  description: Jwt token
-                  allowEmptyValue: true
-                  schema:
-                    type: string
-                    description: Jwt token
-                    example: "Bearer \U000DF0C7\U00050969\U0005BB0F\U00040D2F"
-                    pattern: ^Bearer [^ ]+$
-                  example: "Bearer \U00094B2E\U000AC949\U0004CDE6\U00028764\U000B7D56"
             requestBody:
                 required: true
                 content:
@@ -270,55 +259,91 @@ paths:
                         schema:
                             $ref: '#/components/schemas/ImportFileRequestBody'
                         example:
-                            content:
-                                - 78
-                                - 97
-                                - 109
-                                - 32
-                                - 97
-                                - 98
-                                - 32
-                                - 114
-                                - 101
-                                - 105
-                                - 99
-                                - 105
-                                - 101
-                                - 110
-                                - 100
-                                - 105
-                                - 115
-                                - 32
-                                - 116
-                                - 101
-                                - 109
-                                - 112
-                                - 111
-                                - 114
-                                - 101
-                                - 32
-                                - 101
-                                - 116
-                                - 32
-                                - 112
-                                - 97
-                                - 114
-                                - 105
-                                - 97
-                                - 116
-                                - 117
-                                - 114
-                                - 32
-                                - 117
-                                - 116
-                                - 46
-                            filename: foo.jpg
-                            format: image/jpeg
-                            h: 4017343155180222301
-                            mime: Repellendus debitis ut natus repellat ipsa eveniet.
-                            size: 8756228599422910954
-                            url: Est blanditiis.
-                            w: 453901555597122463
+                            files:
+                                - content:
+                                    - 68
+                                    - 101
+                                    - 108
+                                    - 101
+                                    - 110
+                                    - 105
+                                    - 116
+                                    - 105
+                                    - 32
+                                    - 114
+                                    - 101
+                                    - 112
+                                    - 101
+                                    - 108
+                                    - 108
+                                    - 101
+                                    - 110
+                                    - 100
+                                    - 117
+                                    - 115
+                                    - 46
+                                  filename: foo.jpg
+                                  format: image/jpeg
+                                  h: 453901555597122463
+                                  size: 4908872163727939995
+                                  url: Similique tenetur ratione est.
+                                  w: 6121017000915498524
+                                - content:
+                                    - 68
+                                    - 101
+                                    - 108
+                                    - 101
+                                    - 110
+                                    - 105
+                                    - 116
+                                    - 105
+                                    - 32
+                                    - 114
+                                    - 101
+                                    - 112
+                                    - 101
+                                    - 108
+                                    - 108
+                                    - 101
+                                    - 110
+                                    - 100
+                                    - 117
+                                    - 115
+                                    - 46
+                                  filename: foo.jpg
+                                  format: image/jpeg
+                                  h: 453901555597122463
+                                  size: 4908872163727939995
+                                  url: Similique tenetur ratione est.
+                                  w: 6121017000915498524
+                                - content:
+                                    - 68
+                                    - 101
+                                    - 108
+                                    - 101
+                                    - 110
+                                    - 105
+                                    - 116
+                                    - 105
+                                    - 32
+                                    - 114
+                                    - 101
+                                    - 112
+                                    - 101
+                                    - 108
+                                    - 108
+                                    - 101
+                                    - 110
+                                    - 100
+                                    - 117
+                                    - 115
+                                    - 46
+                                  filename: foo.jpg
+                                  format: image/jpeg
+                                  h: 453901555597122463
+                                  size: 4908872163727939995
+                                  url: Similique tenetur ratione est.
+                                  w: 6121017000915498524
             responses:
                 "201":
                     description: Created response.
@@ -328,11 +353,16 @@ paths:
                                 $ref: '#/components/schemas/ImportFileResponseBody'
                             example:
                                 file:
-                                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                                    mime: Animi quia eos est ipsam magnam.
-                                    name: foo.png
-                                    size: 6063255645832637196
-                                    url: Eum non delectus qui explicabo.
+                                    - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                                      mime: Ut vero sit.
+                                      name: foo.png
+                                      size: 4120569230563613071
+                                      url: Ad nam ab reiciendis tempore et.
+                                    - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                                      mime: Ut vero sit.
+                                      name: foo.png
+                                      size: 4120569230563613071
+                                      url: Ad nam ab reiciendis tempore et.
                                 success: false
                 "500":
                     description: 'unknown_error: Error not identified (500)'
@@ -343,9 +373,6 @@ paths:
             security:
                 - OAuth2_header_Authorization:
                     - api:read
-                  jwt_header_jwtToken:
-                    - api:read
-                    - api:write
     /v1/file/remove:
         patch:
             tags:
@@ -353,17 +380,6 @@ paths:
             summary: deleteFile files
             description: Delete one file by ID
             operationId: files#deleteFile
-            parameters:
-                - name: jwtToken
-                  in: header
-                  description: Jwt token
-                  allowEmptyValue: true
-                  schema:
-                    type: string
-                    description: Jwt token
-                    example: "Bearer \U000EA3C4\U000CC528\U0002A1AB\U00073DFA\U000F48C0\U000911AF"
-                    pattern: ^Bearer [^ ]+$
-                  example: "Bearer \U0003705F\U0001D315\U0010C64D\U000D64C8\U00080588\U0006424B"
             requestBody:
                 required: true
                 content:
@@ -380,7 +396,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ResetPasswordResponseBody'
                             example:
-                                success: true
+                                success: false
                 "500":
                     description: 'unknown_error: Error not identified (500)'
                     content:
@@ -390,9 +406,6 @@ paths:
             security:
                 - OAuth2_header_Authorization:
                     - api:read
-                  jwt_header_jwtToken:
-                    - api:read
-                    - api:write
     /v1/lost:
         post:
             tags:
@@ -416,8 +429,8 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/EmailExistResponseBody'
                             example:
-                                exist: true
-                                success: true
+                                exist: false
+                                success: false
                 "500":
                     description: 'unknown_error: Error not identified (500)'
                     content:
@@ -488,9 +501,9 @@ paths:
                   schema:
                     type: string
                     description: Jwt token
-                    example: "Bearer \U0002CFAC\U000E8A7A\U000D114D\U00100513\U0002BF78"
+                    example: "Bearer \U000EA3C4\U000CC528\U0002A1AB\U00073DFA\U000F48C0\U000911AF"
                     pattern: ^Bearer [^ ]+$
-                  example: "Bearer \U0001EFE7\U00064D0B\U0006EC04\U0009B0FE\U000E3B6C"
+                  example: "Bearer \U0003705F\U0001D315\U0010C64D\U000D64C8\U00080588\U0006424B"
             responses:
                 "200":
                     description: OK response.
@@ -506,7 +519,7 @@ paths:
                                     firstname: Guillaume
                                     id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                                     lastname: Morin
-                                    role: Sed sunt.
+                                    role: Est distinctio veritatis quibusdam.
                 "500":
                     description: 'unknown_error: Error not identified (500)'
                     content:
@@ -534,9 +547,9 @@ paths:
                   schema:
                     type: string
                     description: Jwt token
-                    example: "Bearer \U000A4AAA\U00094DB1\U0009DE6D\U0006E1D8"
+                    example: "Bearer \U0002CFAC\U000E8A7A\U000D114D\U00100513\U0002BF78"
                     pattern: ^Bearer [^ ]+$
-                  example: "Bearer \U00073A8F\U0004093F\U0005301D뭘"
+                  example: "Bearer \U0001EFE7\U00064D0B\U0006EC04\U0009B0FE\U000E3B6C"
             requestBody:
                 required: true
                 content:
@@ -544,7 +557,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/UpdateAvatarRequestBody'
                         example:
-                            avatar: Eos sit voluptatum doloribus fugit aut fuga.
+                            avatar: Sed sunt.
                             id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
             responses:
                 "200":
@@ -561,7 +574,7 @@ paths:
                                     firstname: Guillaume
                                     id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                                     lastname: Morin
-                                    role: Sed sunt.
+                                    role: Est distinctio veritatis quibusdam.
                 "500":
                     description: 'unknown_error: Error not identified (500)'
                     content:
@@ -589,9 +602,9 @@ paths:
                   schema:
                     type: string
                     description: Jwt token
-                    example: "Bearer \U0010D749\U000DDB74웠\U0010545D"
+                    example: "Bearer \U000708E7\U000BB83D\U00029014"
                     pattern: ^Bearer [^ ]+$
-                  example: "Bearer \U000F46B1\U00098CAB\U0002A625\U00040A1F"
+                  example: "Bearer \U000C518F\U00107C83\U0008CE64"
             requestBody:
                 required: true
                 content:
@@ -618,7 +631,7 @@ paths:
                                     firstname: Guillaume
                                     id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                                     lastname: Morin
-                                    role: Sed sunt.
+                                    role: Est distinctio veritatis quibusdam.
                 "500":
                     description: 'unknown_error: Error not identified (500)'
                     content:
@@ -654,9 +667,9 @@ paths:
                   schema:
                     type: string
                     description: Jwt token
-                    example: "Bearer \U000708E7\U000BB83D\U00029014"
+                    example: "Bearer \U000DF0C7\U00050969\U0005BB0F\U00040D2F"
                     pattern: ^Bearer [^ ]+$
-                  example: "Bearer \U000C518F\U00107C83\U0008CE64"
+                  example: "Bearer \U00094B2E\U000AC949\U0004CDE6\U00028764\U000B7D56"
             responses:
                 "200":
                     description: OK response.
@@ -712,7 +725,7 @@ components:
                     type: boolean
                     example: true
             example:
-                exist: false
+                exist: true
                 success: false
             required:
                 - exist
@@ -726,74 +739,351 @@ components:
                 user:
                     $ref: '#/components/schemas/ResUser'
             example:
-                success: false
+                success: true
                 user:
                     avatar: /public/uploads/2022/02/eedf427a-559a-4faf-9e75-357fbb5d65fb.png
                     email: guillaume@gmail.com
                     firstname: Guillaume
                     id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                     lastname: Morin
-                    role: Sed sunt.
+                    role: Est distinctio veritatis quibusdam.
             required:
                 - user
                 - success
         ImportFileRequestBody:
             type: object
             properties:
+                files:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/PayloadFile'
+                    description: Files to import
+                    example:
+                        - content:
+                            - 68
+                            - 101
+                            - 108
+                            - 101
+                            - 110
+                            - 105
+                            - 116
+                            - 105
+                            - 32
+                            - 114
+                            - 101
+                            - 112
+                            - 101
+                            - 108
+                            - 108
+                            - 101
+                            - 110
+                            - 100
+                            - 117
+                            - 115
+                            - 46
+                          filename: foo.jpg
+                          format: image/jpeg
+                          h: 453901555597122463
+                          size: 4908872163727939995
+                          url: Similique tenetur ratione est.
+                          w: 6121017000915498524
+                        - content:
+                            - 68
+                            - 101
+                            - 108
+                            - 101
+                            - 110
+                            - 105
+                            - 116
+                            - 105
+                            - 32
+                            - 114
+                            - 101
+                            - 112
+                            - 101
+                            - 108
+                            - 108
+                            - 101
+                            - 110
+                            - 100
+                            - 117
+                            - 115
+                            - 46
+                          filename: foo.jpg
+                          format: image/jpeg
+                          h: 453901555597122463
+                          size: 4908872163727939995
+                          url: Similique tenetur ratione est.
+                          w: 6121017000915498524
+                        - content:
+                            - 68
+                            - 101
+                            - 108
+                            - 101
+                            - 110
+                            - 105
+                            - 116
+                            - 105
+                            - 32
+                            - 114
+                            - 101
+                            - 112
+                            - 101
+                            - 108
+                            - 108
+                            - 101
+                            - 110
+                            - 100
+                            - 117
+                            - 115
+                            - 46
+                          filename: foo.jpg
+                          format: image/jpeg
+                          h: 453901555597122463
+                          size: 4908872163727939995
+                          url: Similique tenetur ratione est.
+                          w: 6121017000915498524
+                        - content:
+                            - 68
+                            - 101
+                            - 108
+                            - 101
+                            - 110
+                            - 105
+                            - 116
+                            - 105
+                            - 32
+                            - 114
+                            - 101
+                            - 112
+                            - 101
+                            - 108
+                            - 108
+                            - 101
+                            - 110
+                            - 100
+                            - 117
+                            - 115
+                            - 46
+                          filename: foo.jpg
+                          format: image/jpeg
+                          h: 453901555597122463
+                          size: 4908872163727939995
+                          url: Similique tenetur ratione est.
+                          w: 6121017000915498524
+            example:
+                files:
+                    - content:
+                        - 68
+                        - 101
+                        - 108
+                        - 101
+                        - 110
+                        - 105
+                        - 116
+                        - 105
+                        - 32
+                        - 114
+                        - 101
+                        - 112
+                        - 101
+                        - 108
+                        - 108
+                        - 101
+                        - 110
+                        - 100
+                        - 117
+                        - 115
+                        - 46
+                      filename: foo.jpg
+                      format: image/jpeg
+                      h: 453901555597122463
+                      size: 4908872163727939995
+                      url: Similique tenetur ratione est.
+                      w: 6121017000915498524
+                    - content:
+                        - 68
+                        - 101
+                        - 108
+                        - 101
+                        - 110
+                        - 105
+                        - 116
+                        - 105
+                        - 32
+                        - 114
+                        - 101
+                        - 112
+                        - 101
+                        - 108
+                        - 108
+                        - 101
+                        - 110
+                        - 100
+                        - 117
+                        - 115
+                        - 46
+                      filename: foo.jpg
+                      format: image/jpeg
+                      h: 453901555597122463
+                      size: 4908872163727939995
+                      url: Similique tenetur ratione est.
+                      w: 6121017000915498524
+                    - content:
+                        - 68
+                        - 101
+                        - 108
+                        - 101
+                        - 110
+                        - 105
+                        - 116
+                        - 105
+                        - 32
+                        - 114
+                        - 101
+                        - 112
+                        - 101
+                        - 108
+                        - 108
+                        - 101
+                        - 110
+                        - 100
+                        - 117
+                        - 115
+                        - 46
+                      filename: foo.jpg
+                      format: image/jpeg
+                      h: 453901555597122463
+                      size: 4908872163727939995
+                      url: Similique tenetur ratione est.
+                      w: 6121017000915498524
+            required:
+                - files
+        ImportFileResponseBody:
+            type: object
+            properties:
+                file:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ResFile'
+                    example:
+                        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                          mime: Ut vero sit.
+                          name: foo.png
+                          size: 4120569230563613071
+                          url: Ad nam ab reiciendis tempore et.
+                        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                          mime: Ut vero sit.
+                          name: foo.png
+                          size: 4120569230563613071
+                          url: Ad nam ab reiciendis tempore et.
+                        - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                          mime: Ut vero sit.
+                          name: foo.png
+                          size: 4120569230563613071
+                          url: Ad nam ab reiciendis tempore et.
+                success:
+                    type: boolean
+                    example: true
+            example:
+                file:
+                    - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                      mime: Ut vero sit.
+                      name: foo.png
+                      size: 4120569230563613071
+                      url: Ad nam ab reiciendis tempore et.
+                    - id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
+                      mime: Ut vero sit.
+                      name: foo.png
+                      size: 4120569230563613071
+                      url: Ad nam ab reiciendis tempore et.
+                success: true
+            required:
+                - success
+                - file
+        OAuthRequestBody:
+            type: object
+            properties:
+                client_id:
+                    type: string
+                    example: Perferendis labore numquam accusamus odio laborum.
+                client_secret:
+                    type: string
+                    example: Aut asperiores.
+                grant_type:
+                    type: string
+                    example: Sit praesentium dolores distinctio atque et.
+            example:
+                client_id: Rerum sed ab.
+                client_secret: Qui sit nam.
+                grant_type: Molestias voluptatum et occaecati.
+            required:
+                - client_id
+                - client_secret
+                - grant_type
+        OAuthResponse:
+            type: object
+            properties:
+                access_token:
+                    type: string
+                    example: Sed repellendus laboriosam velit rerum earum.
+                expires_in:
+                    type: integer
+                    example: 905489999438370610
+                    format: int64
+                success:
+                    type: boolean
+                    example: true
+                token_type:
+                    type: string
+                    example: Id vitae.
+            example:
+                access_token: Voluptate atque in iusto non et.
+                expires_in: 1827198877104942018
+                success: false
+                token_type: Sed qui et.
+            required:
+                - access_token
+                - token_type
+                - expires_in
+                - success
+        PayloadFile:
+            type: object
+            properties:
                 content:
                     type: string
                     description: content of image
                     example:
-                        - 65
-                        - 32
-                        - 118
-                        - 111
-                        - 108
+                        - 83
                         - 117
-                        - 112
-                        - 116
-                        - 97
-                        - 116
-                        - 101
-                        - 109
-                        - 32
                         - 110
-                        - 97
-                        - 109
+                        - 116
                         - 32
-                        - 99
-                        - 111
-                        - 114
-                        - 114
-                        - 117
-                        - 112
+                        - 100
+                        - 105
+                        - 115
                         - 116
                         - 105
-                        - 32
-                        - 113
-                        - 117
-                        - 111
-                        - 32
-                        - 118
-                        - 111
-                        - 108
-                        - 117
-                        - 112
-                        - 116
-                        - 97
-                        - 115
-                        - 32
-                        - 99
-                        - 111
                         - 110
-                        - 115
-                        - 101
-                        - 113
-                        - 117
-                        - 97
+                        - 99
                         - 116
+                        - 105
+                        - 111
+                        - 32
+                        - 115
+                        - 105
+                        - 110
+                        - 116
+                        - 32
+                        - 97
                         - 117
-                        - 114
+                        - 116
+                        - 32
+                        - 110
+                        - 105
+                        - 104
+                        - 105
+                        - 108
                         - 46
                     format: binary
                 filename:
@@ -812,136 +1102,52 @@ components:
                 h:
                     type: integer
                     description: height of image if you crop
-                    example: 6939292498267796376
+                    example: 531640318569623122
                     format: int64
-                mime:
-                    type: string
-                    description: url file
-                    example: Id voluptate nihil ut molestiae pariatur.
                 size:
                     type: integer
                     description: size of image
-                    example: 8895680033612075379
+                    example: 6681480776762861306
                     format: int64
                 url:
                     type: string
                     description: url file
-                    example: Dicta dolorem sint sint quo modi.
+                    example: Omnis aut.
                 w:
                     type: integer
                     description: width of image if you crop
-                    example: 4036898854750822438
+                    example: 8441994472517798801
                     format: int64
             example:
                 content:
-                    - 78
-                    - 97
-                    - 109
-                    - 32
-                    - 97
-                    - 117
-                    - 116
-                    - 32
-                    - 97
-                    - 115
-                    - 112
-                    - 101
-                    - 114
+                    - 77
                     - 105
-                    - 111
-                    - 114
-                    - 101
-                    - 115
+                    - 110
+                    - 105
+                    - 109
+                    - 97
                     - 32
                     - 99
                     - 111
-                    - 110
-                    - 115
-                    - 101
-                    - 113
-                    - 117
-                    - 117
-                    - 110
-                    - 116
-                    - 117
                     - 114
+                    - 114
+                    - 117
+                    - 112
+                    - 116
+                    - 105
                     - 46
                 filename: foo.jpg
                 format: image/jpeg
-                h: 3854707436302817694
-                mime: Voluptatem perferendis labore numquam accusamus odio.
-                size: 2018832282908155749
-                url: Et doloremque quam est cupiditate ut.
-                w: 4702383485044555044
+                h: 6695150015291329825
+                size: 1468524805186468882
+                url: Quas perferendis fuga.
+                w: 3079156405173066483
             required:
                 - filename
                 - content
                 - format
-        ImportFileResponseBody:
-            type: object
-            properties:
-                file:
-                    $ref: '#/components/schemas/ResFile'
-                success:
-                    type: boolean
-                    example: true
-            example:
-                file:
-                    id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                    mime: Animi quia eos est ipsam magnam.
-                    name: foo.png
-                    size: 6063255645832637196
-                    url: Eum non delectus qui explicabo.
-                success: false
-            required:
-                - success
-                - file
-        OAuthRequestBody:
-            type: object
-            properties:
-                client_id:
-                    type: string
-                    example: Voluptate atque in iusto non et.
-                client_secret:
-                    type: string
-                    example: Sed qui et.
-                grant_type:
-                    type: string
-                    example: Aut magnam libero unde.
-            example:
-                client_id: Molestiae eveniet suscipit molestiae ab.
-                client_secret: Explicabo nihil esse ut et eveniet.
-                grant_type: Voluptas quas aliquid minus numquam et.
-            required:
-                - client_id
-                - client_secret
-                - grant_type
-        OAuthResponse:
-            type: object
-            properties:
-                access_token:
-                    type: string
-                    example: Officiis esse minima.
-                expires_in:
-                    type: integer
-                    example: 9122104050723980919
-                    format: int64
-                success:
-                    type: boolean
-                    example: true
-                token_type:
-                    type: string
-                    example: Consequatur molestiae est sint.
-            example:
-                access_token: Quia et dolorem asperiores quisquam.
-                expires_in: 8625202472410996683
-                success: true
-                token_type: Nostrum recusandae aperiam.
-            required:
-                - access_token
-                - token_type
-                - expires_in
-                - success
+                - size
+                - url
         RefreshRequestBody:
             type: object
             properties:
@@ -962,23 +1168,23 @@ components:
                     format: uuid
                 mime:
                     type: string
-                    example: Et porro rerum sed ab.
+                    example: Voluptate nihil.
                 name:
                     type: string
                     example: foo.png
                 size:
                     type: integer
-                    example: 2200005855769417251
+                    example: 5553575870671356874
                     format: int64
                 url:
                     type: string
-                    example: Dolores distinctio.
+                    example: Sint sint quo modi ab qui dolore.
             example:
                 id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
-                mime: Sed repellendus laboriosam velit rerum earum.
+                mime: Voluptas consequatur impedit quia et doloremque.
                 name: foo.png
-                size: 1873761967196738555
-                url: Sit nam itaque molestias voluptatum et occaecati.
+                size: 6586627390712349755
+                url: Pariatur deleniti a voluptatem nam corrupti.
             required:
                 - id
                 - name
@@ -1004,14 +1210,14 @@ components:
                 role:
                     type: string
                     description: User is admin or not
-                    example: Reiciendis nesciunt vel.
+                    example: Minus numquam.
             example:
                 avatar: /public/uploads/2022/02/eedf427a-559a-4faf-9e75-357fbb5d65fb.png
                 email: guillaume@gmail.com
                 firstname: Guillaume
                 id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                 lastname: Morin
-                role: Totam rem.
+                role: Quod officiis esse minima quis.
             required:
                 - id
                 - email
@@ -1058,7 +1264,7 @@ components:
             properties:
                 success:
                     type: boolean
-                    example: false
+                    example: true
             example:
                 success: true
             required:
@@ -1146,7 +1352,7 @@ components:
             example:
                 err: sql no rows affected
                 error_code: TX_UPDATE_ITEM
-                success: false
+                success: true
             required:
                 - err
                 - success
@@ -1157,13 +1363,13 @@ components:
                 avatar:
                     type: string
                     description: Url of the avatar and stock in db
-                    example: Et quam quisquam voluptate.
+                    example: Dolor accusantium quia.
                 id:
                     type: string
                     example: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                     format: uuid
             example:
-                avatar: Natus architecto consequuntur aspernatur id dolorem qui.
+                avatar: Dolorem asperiores.
                 id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
             required:
                 - id
@@ -1202,18 +1408,18 @@ components:
             properties:
                 success:
                     type: boolean
-                    example: true
+                    example: false
                 user:
                     $ref: '#/components/schemas/ResUser'
             example:
-                success: true
+                success: false
                 user:
                     avatar: /public/uploads/2022/02/eedf427a-559a-4faf-9e75-357fbb5d65fb.png
                     email: guillaume@gmail.com
                     firstname: Guillaume
                     id: 5dfb0bf7-597a-4250-b7ad-63a43ff59c25
                     lastname: Morin
-                    role: Sed sunt.
+                    role: Est distinctio veritatis quibusdam.
             required:
                 - success
     securitySchemes:

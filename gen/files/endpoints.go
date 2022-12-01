@@ -25,8 +25,8 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		ImportFile: NewImportFileEndpoint(s, a.OAuth2Auth, a.JWTAuth),
-		DeleteFile: NewDeleteFileEndpoint(s, a.OAuth2Auth, a.JWTAuth),
+		ImportFile: NewImportFileEndpoint(s, a.OAuth2Auth),
+		DeleteFile: NewDeleteFileEndpoint(s, a.OAuth2Auth),
 	}
 }
 
@@ -38,7 +38,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 
 // NewImportFileEndpoint returns an endpoint function that calls the method
 // "importFile" of service "files".
-func NewImportFileEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+func NewImportFileEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*ImportFilePayload)
 		var err error
@@ -59,18 +59,6 @@ func NewImportFileEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, auth
 			token = *p.Oauth
 		}
 		ctx, err = authOAuth2Fn(ctx, token, &sc)
-		if err == nil {
-			sc := security.JWTScheme{
-				Name:           "jwt",
-				Scopes:         []string{"api:read", "api:write"},
-				RequiredScopes: []string{},
-			}
-			var token string
-			if p.JWTToken != nil {
-				token = *p.JWTToken
-			}
-			ctx, err = authJWTFn(ctx, token, &sc)
-		}
 		if err != nil {
 			return nil, err
 		}
@@ -80,7 +68,7 @@ func NewImportFileEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, auth
 
 // NewDeleteFileEndpoint returns an endpoint function that calls the method
 // "deleteFile" of service "files".
-func NewDeleteFileEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+func NewDeleteFileEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
 		p := req.(*DeleteFilePayload)
 		var err error
@@ -101,18 +89,6 @@ func NewDeleteFileEndpoint(s Service, authOAuth2Fn security.AuthOAuth2Func, auth
 			token = *p.Oauth
 		}
 		ctx, err = authOAuth2Fn(ctx, token, &sc)
-		if err == nil {
-			sc := security.JWTScheme{
-				Name:           "jwt",
-				Scopes:         []string{"api:read", "api:write"},
-				RequiredScopes: []string{},
-			}
-			var token string
-			if p.JWTToken != nil {
-				token = *p.JWTToken
-			}
-			ctx, err = authJWTFn(ctx, token, &sc)
-		}
 		if err != nil {
 			return nil, err
 		}

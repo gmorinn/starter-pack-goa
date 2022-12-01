@@ -17,7 +17,6 @@ type API struct {
 	SSL         bool
 	Host        string
 	Port        int
-	Cors        string
 	Security    Security
 	DatabaseURL string
 	Database    Database
@@ -39,6 +38,8 @@ type Security struct {
 	RefreshTokenDuration int
 	OAuthID              string
 	OAuthSecret          string
+	Cert 			   string
+	Key 			   string
 }
 
 // New config api return config
@@ -57,7 +58,6 @@ func New() *API {
 		config.Port, _ = getenvInt("PORT")
 	}
 
-	config.Cors = os.Getenv("API_CORS")
 	config.SSL, _ = getenvBool("API_SSL")
 	config.Host = fmt.Sprintf("%s:%d", config.Domain, config.Port)
 
@@ -69,16 +69,14 @@ func New() *API {
 
 	config.Security.OAuthID = os.Getenv("API_OAUTH_ID")
 	config.Security.OAuthSecret = os.Getenv("API_OAUTH_SECRET")
+	config.Security.Key = os.Getenv("API_SSL_KEY")
+	config.Security.Cert = os.Getenv("API_SSL_CERT")
 
 	config.Security.Secret = os.Getenv("API_SECRET")
 	config.Security.AccessTokenDuration, _ = getenvInt("API_ACCESS_TOKEN")
 	config.Security.RefreshTokenDuration, _ = getenvInt("API_REFRESH_TOKEN")
 
-	if os.Getenv("ENV") == "PROD" {
-		config.DatabaseURL = os.Getenv("DATABASE_URL")
-	} else {
-		config.DatabaseURL = fmt.Sprintf("postgresql://%s:%s@%s:%v/%s?sslmode=disable", config.Database.User, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)
-	}
+	config.DatabaseURL = fmt.Sprintf("postgresql://%s:%s@%s:%v/%s?sslmode=disable", config.Database.User, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)
 
 	return &config
 }

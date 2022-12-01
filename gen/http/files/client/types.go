@@ -9,6 +9,7 @@ package client
 
 import (
 	files "starter-pack-goa/gen/files"
+	"unicode/utf8"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -16,22 +17,8 @@ import (
 // ImportFileRequestBody is the type of the "files" service "importFile"
 // endpoint HTTP request body.
 type ImportFileRequestBody struct {
-	// uploaded file name
-	Filename string `form:"filename" json:"filename" xml:"filename"`
-	// url file
-	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
-	// width of image if you crop
-	W *int64 `form:"w,omitempty" json:"w,omitempty" xml:"w,omitempty"`
-	// height of image if you crop
-	H *int64 `form:"h,omitempty" json:"h,omitempty" xml:"h,omitempty"`
-	// url file
-	Mime *string `form:"mime,omitempty" json:"mime,omitempty" xml:"mime,omitempty"`
-	// content of image
-	Content []byte `form:"content" json:"content" xml:"content"`
-	// size of image
-	Size *int64 `form:"size,omitempty" json:"size,omitempty" xml:"size,omitempty"`
-	// uploaded file format
-	Format string `form:"format" json:"format" xml:"format"`
+	// Files to import
+	Files []*PayloadFileRequestBody `form:"files" json:"files" xml:"files"`
 }
 
 // DeleteFileRequestBody is the type of the "files" service "deleteFile"
@@ -43,8 +30,8 @@ type DeleteFileRequestBody struct {
 // ImportFileResponseBody is the type of the "files" service "importFile"
 // endpoint HTTP response body.
 type ImportFileResponseBody struct {
-	File    *ResFileResponseBody `form:"file,omitempty" json:"file,omitempty" xml:"file,omitempty"`
-	Success *bool                `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
+	File    []*ResFileResponseBody `form:"file,omitempty" json:"file,omitempty" xml:"file,omitempty"`
+	Success *bool                  `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
 // DeleteFileResponseBody is the type of the "files" service "deleteFile"
@@ -69,6 +56,24 @@ type DeleteFileUnknownErrorResponseBody struct {
 	Success   *bool   `form:"success,omitempty" json:"success,omitempty" xml:"success,omitempty"`
 }
 
+// PayloadFileRequestBody is used to define fields on request body types.
+type PayloadFileRequestBody struct {
+	// uploaded file name
+	Filename string `form:"filename" json:"filename" xml:"filename"`
+	// url file
+	URL string `form:"url" json:"url" xml:"url"`
+	// width of image if you crop
+	W *int64 `form:"w,omitempty" json:"w,omitempty" xml:"w,omitempty"`
+	// height of image if you crop
+	H *int64 `form:"h,omitempty" json:"h,omitempty" xml:"h,omitempty"`
+	// content of image
+	Content []byte `form:"content" json:"content" xml:"content"`
+	// size of image
+	Size int64 `form:"size" json:"size" xml:"size"`
+	// uploaded file format
+	Format string `form:"format" json:"format" xml:"format"`
+}
+
 // ResFileResponseBody is used to define fields on response body types.
 type ResFileResponseBody struct {
 	ID   *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
@@ -81,15 +86,12 @@ type ResFileResponseBody struct {
 // NewImportFileRequestBody builds the HTTP request body from the payload of
 // the "importFile" endpoint of the "files" service.
 func NewImportFileRequestBody(p *files.ImportFilePayload) *ImportFileRequestBody {
-	body := &ImportFileRequestBody{
-		Filename: p.Filename,
-		URL:      p.URL,
-		W:        p.W,
-		H:        p.H,
-		Mime:     p.Mime,
-		Content:  p.Content,
-		Size:     p.Size,
-		Format:   p.Format,
+	body := &ImportFileRequestBody{}
+	if p.Files != nil {
+		body.Files = make([]*PayloadFileRequestBody, len(p.Files))
+		for i, val := range p.Files {
+			body.Files[i] = marshalFilesPayloadFileToPayloadFileRequestBody(val)
+		}
 	}
 	return body
 }
@@ -109,7 +111,10 @@ func NewImportFileResultCreated(body *ImportFileResponseBody) *files.ImportFileR
 	v := &files.ImportFileResult{
 		Success: *body.Success,
 	}
-	v.File = unmarshalResFileResponseBodyToFilesResFile(body.File)
+	v.File = make([]*files.ResFile, len(body.File))
+	for i, val := range body.File {
+		v.File[i] = unmarshalResFileResponseBodyToFilesResFile(val)
+	}
 
 	return v
 }
@@ -157,9 +162,11 @@ func ValidateImportFileResponseBody(body *ImportFileResponseBody) (err error) {
 	if body.File == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("file", "body"))
 	}
-	if body.File != nil {
-		if err2 := ValidateResFileResponseBody(body.File); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	for _, e := range body.File {
+		if e != nil {
+			if err2 := ValidateResFileResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
 	}
 	return
@@ -200,6 +207,21 @@ func ValidateDeleteFileUnknownErrorResponseBody(body *DeleteFileUnknownErrorResp
 	}
 	if body.ErrorCode == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("error_code", "body"))
+	}
+	return
+}
+
+// ValidatePayloadFileRequestBody runs the validations defined on
+// payloadFileRequestBody
+func ValidatePayloadFileRequestBody(body *PayloadFileRequestBody) (err error) {
+	if body.Content == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("content", "body"))
+	}
+	if utf8.RuneCountInString(body.Filename) < 2 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError("body.filename", body.Filename, utf8.RuneCountInString(body.Filename), 2, true))
+	}
+	if !(body.Format == "image/jpeg" || body.Format == "image/png" || body.Format == "image/jpg") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError("body.format", body.Format, []interface{}{"image/jpeg", "image/png", "image/jpg"}))
 	}
 	return
 }
